@@ -15,11 +15,12 @@
         /// <summary>
         ///     Initializes a new instance of the <see cref="MenuList" /> class.
         /// </summary>
-        /// <param name="internalName">Name of the internal.</param>
+        /// <param name="internalName">The Internal Name.</param>
+        /// <param name="displayName">The Displayed Name</param>
         /// <param name="items">The items.</param>
         /// <param name="selectedValue">The selected value.</param>
         /// <exception cref="System.ArgumentException">selectedValue</exception>
-        public MenuList(string internalName, string[] items, int selectedValue)
+        public MenuList(string internalName, string displayName, string[] items, int selectedValue)
         {
             if (items.Length < selectedValue - 1)
             {
@@ -27,6 +28,7 @@
             }
 
             this.InternalName = internalName;
+            this.DisplayName = displayName;
             this.Value = selectedValue;
             this.Items = items;
         }

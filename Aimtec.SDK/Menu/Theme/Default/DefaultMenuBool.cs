@@ -55,12 +55,7 @@
             // Draw arrow box
             position += new Vector2(this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth, 0);
 
-            var boolColor = Color.FromArgb(39, 96, 17);
-
-            if (!this.Component.Value)
-            {
-                boolColor = Color.FromArgb(85, 25, 15);
-            }
+            var boolColor = this.Component.Value ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 
             RenderManager.RenderRectangle(
                 position,

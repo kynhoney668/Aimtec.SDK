@@ -113,6 +113,11 @@ namespace Aimtec.SDK.Orbwalking
             return false;
         }
 
+        public void Dispose()
+        {
+            throw new NotImplementedException();
+        }
+
         public event EventHandler<BeforeAttackEventArgs> BeforeAttack;
         public event EventHandler<AttackEventArgs> Attack;
         public event EventHandler<AfterAttackEventArgs> AfterAttack;

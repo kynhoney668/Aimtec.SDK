@@ -15,12 +15,14 @@
         /// <summary>
         ///     Initializes a new instance of the <see cref="MenuSlider" /> class.
         /// </summary>
+        /// <param name="displayName">The internal name.</param>
         /// <param name="displayName">The display name.</param>
         /// <param name="value">The value.</param>
         /// <param name="minValue">The minimum value.</param>
         /// <param name="maxValue">The maximum value.</param>
-        public MenuSlider(string displayName, int value, int minValue = 0, int maxValue = 100)
+        public MenuSlider(string internalName, string displayName, int value, int minValue = 0, int maxValue = 100)
         {
+            this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Value = value;
             this.MinValue = minValue;
@@ -142,8 +144,7 @@
         /// <param name="x">The x.</param>
         private void SetSliderValue(int x)
         {
-            this.Value = (int) ((x - this.Position.X) / this.GetBounds(this.Position).Width * this.MaxValue)
-                + this.MinValue;
+            this.Value = System.Math.Max(this.MinValue, (int) ((x - this.Position.X) / this.GetBounds(this.Position).Width * this.MaxValue));
         }
 
         #endregion

@@ -141,11 +141,9 @@
         /// <param name="id">The identifier.</param>
         /// <param name="menu">The menu.</param>
         /// <returns>IMenu.</returns>
-        public IMenu Add(string id, IMenuComponent menu)
+        public IMenu Add(IMenuComponent menu)
         {
-            this.Children.Add(id, menu);
-            menu.InternalName = id;
-
+            this.Children.Add(menu.InternalName, menu);
             return this;
         }
 
@@ -156,7 +154,7 @@
         /// <returns>IMenu.</returns>
         public IMenu Add(IMenu menu)
         {
-            return this.Add(menu.InternalName, menu);
+            return this.Add((IMenuComponent)menu);
         }
 
         /// <summary>
@@ -165,7 +163,7 @@
         /// <returns>IMenu.</returns>
         public IMenu Attach()
         {
-            MenuManager.Instance.Add(this.InternalName, this);
+            MenuManager.Instance.Add(this);
 
             return this;
         }

@@ -78,15 +78,15 @@
 
         #region Public Methods and Operators
 
-        public IMenu Add(string id, IMenuComponent menu)
+        public IMenu Add(IMenuComponent menu)
         {
-            this.Children.Add(id, menu);
+            this.Children.Add(menu.InternalName, menu);
             return this;
         }
 
         public IMenu Add(IMenu menu)
         {
-            return this.Add(menu.InternalName, menu);
+            return this.Add((IMenuComponent)menu);
         }
 
         public Rectangle GetBounds(Vector2 pos)

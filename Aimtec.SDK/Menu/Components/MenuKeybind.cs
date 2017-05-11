@@ -15,11 +15,13 @@
         /// <summary>
         ///     Initializes a new instance of the <see cref="MenuKeybind" /> class.
         /// </summary>
+        /// <param name="internalName">The internal name.</param>
         /// <param name="displayName">The display name.</param>
         /// <param name="key">The key.</param>
         /// <param name="keybindType">Type of the keybind.</param>
-        public MenuKeybind(string displayName, Keys key, KeybindType keybindType)
+        public MenuKeybind(string internalName, string displayName, Keys key, KeybindType keybindType)
         {
+            this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Key = key;
             this.KeybindType = keybindType;

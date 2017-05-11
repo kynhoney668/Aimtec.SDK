@@ -48,7 +48,8 @@
                 return;
             }
 
-            if (!this.Attacks.TryGetValue(sender.NetworkId, out HashSet<Attack> value))
+            HashSet<Attack> value;
+            if (!this.Attacks.TryGetValue(sender.NetworkId, out value))
             {
                 return;
             }
@@ -66,7 +67,8 @@
                 return;
             }
 
-            if (!this.Attacks.TryGetValue(target.NetworkId, out HashSet<Attack> value))
+            HashSet<Attack> value;
+            if (!this.Attacks.TryGetValue(target.NetworkId, out value))
             {
                 value = new HashSet<Attack>();
                 this.Attacks[target.NetworkId] = value;

@@ -6,8 +6,9 @@
     {
         #region Constructors and Destructors
 
-        public MenuSeperator(string displayName, string text = "")
+        public MenuSeperator(string internalName, string displayName, string text = "")
         {
+            this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Value = text;
         }

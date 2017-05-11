@@ -15,19 +15,12 @@
         /// <summary>
         ///     Initializes a new instance of the <see cref="MenuBool" /> class.
         /// </summary>
-        /// <param name="displayName">The display name.</param>
-        public MenuBool(string displayName)
-            : this(displayName, false)
-        {
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="MenuBool" /> class.
-        /// </summary>
+        /// <param name="internalName">The display name.</param>
         /// <param name="displayName">The display name.</param>
         /// <param name="enabled">if set to <c>true</c> [enabled].</param>
-        public MenuBool(string displayName, bool enabled)
+        public MenuBool(string internalName, string displayName, bool enabled = true)
         {
+            this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Value = enabled;
         }

@@ -23,10 +23,9 @@
         /// <summary>
         ///     Adds the specified identifier.
         /// </summary>
-        /// <param name="id">The identifier.</param>
         /// <param name="menu">The menu.</param>
         /// <returns>IMenu.</returns>
-        IMenu Add(string id, IMenuComponent menu);
+        IMenu Add(IMenuComponent menu);
 
         /// <summary>
         ///     Adds the specified menu.

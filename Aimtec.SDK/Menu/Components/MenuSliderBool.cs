@@ -10,8 +10,9 @@
     {
         #region Constructors and Destructors
 
-        public MenuSliderBool(string displayName, bool enabled, int value, int minValue, int maxValue)
+        public MenuSliderBool(string internalName, string displayName, bool enabled, int value, int minValue, int maxValue)
         {
+            this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Enabled = enabled;
             this.Value = value;
