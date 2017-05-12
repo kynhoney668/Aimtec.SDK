@@ -33,9 +33,9 @@
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBorder(pos);
+            this.Theme.DrawMenuItemBox(position);
 
-            var displayString = this.Component.DisplayName + " [" + (this.Component.KeyIsBeingSet ? "PRESS NEW KEY" : this.Component.Key.ToString()) + "]";
+            var displayString = this.Component.DisplayName;
             
             // Todo measure text
             RenderManager.RenderText(
@@ -45,18 +45,29 @@
                     (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
                 // not bro science
                 Color.FromArgb(207, 195, 149),
-                displayString);
+                this.Component.DisplayName);
+
 
             // Render arrow outline
             RenderManager.RenderLine(
-                pos.X + this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
+                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
-                pos.X + this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
+                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
+            //Draw Key inidcator
+            RenderManager.RenderText(
+               pos
+               + new Vector2(
+                   this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth - (this.Component.KeyIsBeingSet ? 85 : 30), //todo: measure text rather than explicit values
+                   (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
+               // not bro science
+               Color.FromArgb(207, 195, 149),
+               this.Component.KeyIsBeingSet ? "PRESS KEY" : "[" + (uint)this.Component.Key + "]");
+
             // Draw arrow box
-            position += new Vector2(this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth, 0);
+            position += new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth, 0);
 
             var boolColor = this.Component.Value ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 

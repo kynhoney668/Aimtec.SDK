@@ -91,7 +91,7 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                if (this.GetBounds(this.Position).Contains(x, y))
+                if (MenuManager.Instance.Theme.GetControlObjectBounds(this.Position, MenuTheme.MenuItemType.MenuBool).Contains(x, y))
                 {
                     this.Value = !this.Value;
                 }

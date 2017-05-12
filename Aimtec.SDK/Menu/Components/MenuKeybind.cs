@@ -1,5 +1,7 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
+    using System;
+    using System.Drawing;
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
 
@@ -98,18 +100,26 @@
         {
             if (this.Visible)
             {
-                if (!this.KeyIsBeingSet && message == (ulong)WindowsMessages.WM_LBUTTONUP)
-                {
-                    var x = lparam & 0xffff;
-                    var y = lparam >> 16;
+                var x = lparam & 0xffff;
+                var y = lparam >> 16;
 
-                    if (this.GetBounds(this.Position).Contains(x, y))
+                if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
+                {
+                    if (!this.KeyIsBeingSet && this.GetBounds(this.Position).Contains(x, y))
                     {
-                        this.KeyIsBeingSet = true;
+                        if (!MenuManager.Instance.Theme.GetControlObjectBounds(this.Position, MenuTheme.MenuItemType.MenuBool).Contains(x, y))
+                        {
+                            this.KeyIsBeingSet = true;
+                        }
+
+                        else
+                        {
+                            this.Value = !this.Value;
+                        }
                     }
                 }
 
-                else if (this.KeyIsBeingSet && message == (ulong)WindowsMessages.WM_KEYUP)
+                if (this.KeyIsBeingSet && message == (ulong)WindowsMessages.WM_KEYUP)
                 {
                     this.Key = (Keys)wparam;
                     this.KeyIsBeingSet = false;
@@ -138,6 +148,7 @@
                 this.Value = !this.Value;
             }
         }
+
         #endregion
     }
 

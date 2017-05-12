@@ -1,5 +1,6 @@
 ﻿namespace Aimtec.SDK.Menu.Theme.Default
 {
+    using System;
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Components;
@@ -10,17 +11,21 @@
 
         public static int ArrowWidth { get; } = 35;
 
+        public static int BoolIndicatorWidth { get; } = 35;
+
         public static int LineWidth { get; } = 1;
 
         public static int TextSpacing { get; } = 15;
 
         public Color LineColor { get; } = Color.FromArgb(82, 83, 57);
 
-        public Color MenuBoxBackgroundColor { get; } = Color.FromArgb(205, 16, 26, 29);
+        public Color MenuBoxBackgroundColor { get; } = Color.FromArgb(206, 16, 26, 29);
 
         public override int MenuHeight { get; } = 32;
 
         public override int MenuWidth { get; } = 160;
+
+        public override int ComponentWidth { get; } = 250;
 
         public Color TextColor { get; } = Color.FromArgb(207, 195, 149);
 
@@ -92,10 +97,36 @@
                 this.MenuBoxBackgroundColor);
         }
 
-        internal void DrawMenuItemBorder(Vector2 pos)
+        internal void DrawMenuItemBox(Vector2 position)
+        {
+            RenderManager.RenderRectangle(
+                position,
+                this.ComponentWidth - ArrowWidth - LineWidth,
+                this.MenuHeight - LineWidth,
+                this.MenuBoxBackgroundColor);
+        }
+
+        internal void DrawMenuBorder(Vector2 pos)
         {
             DrawRectangleOutline(pos.X, pos.Y, this.MenuWidth, this.MenuHeight, LineWidth, this.LineColor);
         }
+
+        internal void DrawMenuItemBorder(Vector2 pos)
+        {
+            DrawRectangleOutline(pos.X, pos.Y, this.ComponentWidth, this.MenuHeight, LineWidth, this.LineColor);
+        }
+
+        public override Rectangle GetControlObjectBounds(Vector2 pos, MenuItemType type)
+        {
+            var newPos = pos + new Vector2(this.ComponentWidth - ArrowWidth - LineWidth, 0);
+            return new Rectangle(
+              (int)newPos.X,
+              (int)newPos.Y,
+              BoolIndicatorWidth,
+              MenuHeight);
+        }
+
+
 
         #endregion
     }

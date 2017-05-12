@@ -32,7 +32,7 @@
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBorder(pos);
+            this.Theme.DrawMenuItemBox(position);
 
             // Todo measure text
             RenderManager.RenderText(
@@ -46,14 +46,14 @@
 
             // Render arrow outline
             RenderManager.RenderLine(
-                pos.X + this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
+                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
-                pos.X + this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
+                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
             // Draw arrow box
-            position += new Vector2(this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth, 0);
+            position += new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth, 0);
 
             var boolColor = this.Component.Value ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 

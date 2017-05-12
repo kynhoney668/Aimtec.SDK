@@ -29,19 +29,21 @@
         public void Render(Vector2 pos)
         {
             var beforeSliderWidth = (float) (this.Component.Value - this.Component.MinValue)
-                / (this.Component.MaxValue - this.Component.MinValue) * this.Theme.MenuWidth;
+                / (this.Component.MaxValue - this.Component.MinValue) * this.Theme.ComponentWidth;
 
-            var afterSliderWidth = this.Theme.MenuWidth - beforeSliderWidth;
+            var afterSliderWidth = this.Theme.ComponentWidth - beforeSliderWidth;
 
             this.Theme.DrawMenuItemBorder(pos);
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
+            this.Theme.DrawMenuItemBox(position);
+
             // Draw light bar before the slider line
             RenderManager.RenderRectangle(
                 position,
                 beforeSliderWidth,
-                this.Theme.MenuHeight,
+                this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(14, 59, 73));
 
             // Todo measure text
@@ -68,14 +70,14 @@
             RenderManager.RenderRectangle(
                 position,
                 afterSliderWidth - DefaultMenuTheme.LineWidth * 2,
-                this.Theme.MenuHeight,
+                this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(16, 26, 29));
 
             // draw text
             RenderManager.RenderText(
                 pos + DefaultMenuTheme.LineWidth
                 + new Vector2(
-                    this.Theme.MenuWidth - 25,
+                    this.Theme.ComponentWidth - 25,
                     (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
                 Color.FromArgb(207, 195, 149),
                 this.Component.Value.ToString());

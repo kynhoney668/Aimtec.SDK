@@ -1,6 +1,7 @@
 ﻿namespace Aimtec.SDK.Menu.Theme
 {
     using Aimtec.SDK.Menu.Components;
+    using System.Drawing;
 
     /// <summary>
     ///     Class MenuTheme.
@@ -20,6 +21,13 @@
         /// </summary>
         /// <value>The width of the menu.</value>
         public abstract int MenuWidth { get; }
+
+        /// <summary>
+        ///     Gets the width of the menu components.
+        /// </summary>
+        /// <value>The width of the menu.</value>
+        public abstract int ComponentWidth { get; }
+
 
         #endregion
 
@@ -66,6 +74,19 @@
         /// <param name="slider">The slider.</param>
         /// <returns>IRenderManager&lt;MenuSlider&gt;.</returns>
         public abstract IRenderManager<MenuSlider> BuildMenuSliderRenderer(MenuSlider slider);
+
+        public abstract Rectangle GetControlObjectBounds(Vector2 position, MenuItemType type);
+
+        public enum MenuItemType
+        {
+            MenuBool,
+            MenuKeyBind,
+            MenuList,
+            MenuSeperator,
+            MenuSlider,
+            MenuSliderBool
+        }
+
 
         #endregion
     }

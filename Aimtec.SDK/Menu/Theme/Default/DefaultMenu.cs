@@ -26,7 +26,7 @@
 
         public void Render(Vector2 pos)
         {
-            this.Theme.DrawMenuItemBorder(pos);
+            this.Theme.DrawMenuBorder(pos);
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
@@ -65,6 +65,8 @@
                 DefaultMenuTheme.ArrowWidth,
                 this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
                 arrowBoxColor);
+
+            RenderManager.RenderText(position + new Vector2((DefaultMenuTheme.ArrowWidth / 2), this.Theme.MenuHeight / 2), Color.LightGray, ">");
 
             // todo draw arrow thingy ">"
         }

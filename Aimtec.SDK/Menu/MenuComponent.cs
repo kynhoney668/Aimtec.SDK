@@ -75,9 +75,10 @@
             return new Rectangle(
                 (int) pos.X,
                 (int) pos.Y,
-                MenuManager.Instance.Theme.MenuWidth,
+                MenuManager.Instance.Theme.ComponentWidth,
                 MenuManager.Instance.Theme.MenuHeight);
         }
+
 
         /// <summary>
         ///     Gets the render manager.
