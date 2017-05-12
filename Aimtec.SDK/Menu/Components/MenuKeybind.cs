@@ -73,6 +73,8 @@
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         public override bool Visible { get; set; }
 
+        public bool KeyIsBeingSet { get; set; }
+
         #endregion
 
         #region Public Methods and Operators
@@ -94,21 +96,48 @@
         /// <param name="lparam">Additional message information.</param>
         public override void WndProc(uint message, uint wparam, int lparam)
         {
-            if (wparam != (ulong) this.Key)
+            if (this.Visible)
+            {
+                if (!this.KeyIsBeingSet && message == (ulong)WindowsMessages.WM_LBUTTONUP)
+                {
+                    var x = lparam & 0xffff;
+                    var y = lparam >> 16;
+
+                    if (this.GetBounds(this.Position).Contains(x, y))
+                    {
+                        this.KeyIsBeingSet = true;
+                    }
+                }
+
+                else if (this.KeyIsBeingSet && message == (ulong)WindowsMessages.WM_KEYUP)
+                {
+                    this.Key = (Keys)wparam;
+                    this.KeyIsBeingSet = false;
+                }
+            }
+
+            if (wparam != (ulong)this.Key || KeyIsBeingSet)
             {
                 return;
             }
 
             if (this.KeybindType == KeybindType.Press)
             {
-                this.Value = message == (ulong) WindowsMessages.WM_KEYDOWN;
+                if (message == (ulong)WindowsMessages.WM_KEYDOWN)
+                {
+                    this.Value = true;
+                }
+                else if (message == (ulong)WindowsMessages.WM_KEYUP)
+                {
+                    this.Value = false;
+                }
             }
-            else if (this.KeybindType == KeybindType.Toggle && message == (ulong) WindowsMessages.WM_KEYUP)
+
+            else if (message == (ulong)WindowsMessages.WM_KEYUP)
             {
                 this.Value = !this.Value;
             }
         }
-
         #endregion
     }
 
