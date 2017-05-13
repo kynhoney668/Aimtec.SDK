@@ -4,6 +4,7 @@
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Components;
+    using Util;
 
     internal class DefaultMenuKeybind : IRenderManager<MenuKeybind, DefaultMenuTheme>
     {
@@ -36,7 +37,7 @@
             this.Theme.DrawMenuItemBox(position);
 
             var displayString = this.Component.DisplayName;
-            
+
             // Todo measure text
             RenderManager.RenderText(
                 pos
@@ -50,9 +51,9 @@
 
             // Render arrow outline
             RenderManager.RenderLine(
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
+                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
+                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
@@ -60,20 +61,20 @@
             RenderManager.RenderText(
                pos
                + new Vector2(
-                   this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth - (this.Component.KeyIsBeingSet ? 85 : 30), //todo: measure text rather than explicit values
+                   this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth - (this.Component.KeyIsBeingSet ? 85 : 35), //todo: measure text rather than explicit values
                    (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
                // not bro science
                Color.FromArgb(207, 195, 149),
-               this.Component.KeyIsBeingSet ? "PRESS KEY" : "[" + (uint)this.Component.Key + "]");
+               this.Component.KeyIsBeingSet ? "PRESS KEY" : "[" + SimplifyKey(this.Component.Key) + "]");
 
             // Draw arrow box
-            position += new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth, 0);
+            position += new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth, 0);
 
             var boolColor = this.Component.Value ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 
             RenderManager.RenderRectangle(
                 position,
-                DefaultMenuTheme.ArrowWidth,
+                DefaultMenuTheme.IndicatorWidth ,
                 this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
                 boolColor);
 
@@ -85,5 +86,17 @@
         }
 
         #endregion
+
+        string SimplifyKey(Keys key)
+        {
+            var str = key.ToString();
+            var length = str.Length;
+            if (length <= 3)
+            {
+                return str;
+            }
+
+            return ((uint)key).ToString();
+        }
     }
 }

@@ -69,6 +69,10 @@
         /// <value>The value.</value>
         public bool Value { get; set; }
 
+        public override Menu Parent { get; set; }
+
+        public override bool Root { get; set; }
+
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
         /// </summary>
@@ -107,7 +111,7 @@
                 {
                     if (!this.KeyIsBeingSet && this.GetBounds(this.Position).Contains(x, y))
                     {
-                        if (!MenuManager.Instance.Theme.GetControlObjectBounds(this.Position, MenuTheme.MenuItemType.MenuBool).Contains(x, y))
+                        if (!MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position).Contains(x, y))
                         {
                             this.KeyIsBeingSet = true;
                         }

@@ -4,6 +4,7 @@
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Theme;
+    using Util;
 
     // todo
     public sealed class MenuSliderBool : MenuComponent, IReturns<int>
@@ -40,42 +41,86 @@
 
         public override bool Visible { get; set; }
 
+        public override Menu Parent { get; set; }
+
+        public override bool Root { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether [mouse down].
+        /// </summary>
+        /// <value><c>true</c> if [mouse down]; otherwise, <c>false</c>.</value>
+        private bool MouseDown { get; set; }
+
         #endregion
 
         #region Public Methods and Operators
 
         public override Rectangle GetBounds(Vector2 pos)
         {
-            return Rectangle.Union(this.GetSliderBounds(pos), this.GetBoolBounds(pos));
+            var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(pos);
+            return Rectangle.Union(bounds[0], bounds[1]);
         }
 
         public override IRenderManager GetRenderManager()
         {
-            throw new NotImplementedException();
+            return MenuManager.Instance.Theme.BuildMenuSliderBoolRenderer(this);
         }
 
-        public override void Render(Vector2 pos)
-        {
-            throw new NotImplementedException();
-        }
 
+        /// <summary>
+        ///     An application-defined function that processes messages sent to a window.
+        /// </summary>
+        /// <param name="message">The message.</param>
+        /// <param name="wparam">Additional message information.</param>
+        /// <param name="lparam">Additional message information.</param>
         public override void WndProc(uint message, uint wparam, int lparam)
         {
-            throw new NotImplementedException();
+            if ((message == (ulong)WindowsMessages.WM_LBUTTONDOWN
+                || message == (ulong)WindowsMessages.WM_MOUSEMOVE && this.MouseDown) && this.Visible)
+            {
+                var x = lparam & 0xffff;
+                var y = lparam >> 16;
+
+                var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(Position);
+                var sliderBounds = bounds[0];
+
+                if (sliderBounds.Contains(x, y))
+                {
+                    this.SetSliderValue(x);
+                    this.MouseDown = true;
+                }
+            }
+
+            else if (message == (ulong)WindowsMessages.WM_LBUTTONUP)
+            {
+                if (Visible)
+                {
+                    var x = lparam & 0xffff;
+                    var y = lparam >> 16;
+                    var boolBounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(Position)[1];
+                    if (boolBounds.Contains(x, y))
+                    {
+                        this.Enabled = !Enabled;
+                    }
+                }
+
+                this.MouseDown = false;
+            }
         }
+
 
         #endregion
 
         #region Methods
 
-        private Rectangle GetBoolBounds(Vector2 pos)
+        /// <summary>
+        ///     Sets the slider value.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        private void SetSliderValue(int x)
         {
-            return default(Rectangle);
-        }
-
-        private Rectangle GetSliderBounds(Vector2 pos)
-        {
-            return default(Rectangle);
+            var sliderbounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position)[0];
+            this.Value = Math.Max(this.MinValue, (int)((x - this.Position.X) / sliderbounds.Width * this.MaxValue));
         }
 
         #endregion

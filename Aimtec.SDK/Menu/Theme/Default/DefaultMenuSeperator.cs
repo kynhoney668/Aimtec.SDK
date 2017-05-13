@@ -32,12 +32,12 @@
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuBox(position);
+            this.Theme.DrawMenuItemBoxFull(position);
 
             RenderManager.RenderText(
-                position + new Vector2(this.Theme.MenuWidth / 2f - 50, this.Theme.MenuHeight / 2f - 5),
+                position + new Vector2(this.Theme.ComponentWidth / 2f - 50, this.Theme.MenuHeight / 2f - 5),
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName);
+                this.Component.Value);
         }
 
         #endregion

@@ -1,5 +1,6 @@
 ﻿namespace Aimtec.SDK.Menu
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Drawing;
@@ -86,7 +87,11 @@
 
                 foreach (var child in this.Children.Values)
                 {
-                    child.Visible = value;
+                    //Avoid pre opening sub menus when root menu is clicked
+                    if (!child.IsMenu)
+                    {
+                        child.Visible = value;
+                    }
 
                     if (!this.toggled)
                     {
@@ -120,6 +125,12 @@
             }
         }
 
+        public bool Root { get; set; }
+
+        public Menu Parent { get; set; }
+
+        public bool IsMenu { get { return true; } }
+
         #endregion
 
         #region Public Indexers
@@ -141,9 +152,10 @@
         /// <param name="id">The identifier.</param>
         /// <param name="menu">The menu.</param>
         /// <returns>IMenu.</returns>
-        public IMenu Add(IMenuComponent menu)
+        public IMenu Add(IMenuComponent menuComponent)
         {
-            this.Children.Add(menu.InternalName, menu);
+            this.Children.Add(menuComponent.InternalName, menuComponent);
+            menuComponent.Parent = this;
             return this;
         }
 
@@ -164,7 +176,7 @@
         public IMenu Attach()
         {
             MenuManager.Instance.Add(this);
-
+            this.Root = true;
             return this;
         }
 
@@ -178,7 +190,7 @@
             return new Rectangle(
                 (int) pos.X,
                 (int) pos.Y,
-                MenuManager.Instance.Theme.MenuWidth,
+                this.Root ? MenuManager.Instance.Theme.RootMenuWidth : MenuManager.Instance.Theme.ComponentWidth,
                 MenuManager.Instance.Theme.MenuHeight);
         }
 
@@ -230,7 +242,7 @@
             {
                 var child = this.Children.Values.ToList()[i];
                 child.Position = position
-                    + new Vector2(MenuManager.Instance.Theme.MenuWidth, i * MenuManager.Instance.Theme.MenuHeight);
+                    + new Vector2(this.Root ? MenuManager.Instance.Theme.RootMenuWidth : MenuManager.Instance.Theme.ComponentWidth, i * MenuManager.Instance.Theme.MenuHeight);
                 child.Render(child.Position);
             }
         }
@@ -252,10 +264,30 @@
                 {
                     this.Toggled = !this.Toggled;
 
-                    // If we're toggled then children are visible
-                    foreach (var child in this.Children.Values)
+                    if (!this.Root && this.Parent != null)
                     {
-                        child.Visible = this.Toggled;
+                        foreach (var m in Parent.Children)
+                        {
+                            var menu = m.Value;
+                            if (menu != this)
+                            {
+                                if (menu.Toggled)
+                                {
+                                    menu.Toggled = false;
+                                }
+                            }
+                        }
+                    }
+
+                    if (this.Root)
+                    {
+                        foreach (var m in MenuManager.Instance.Menus)
+                        {
+                            if (m.Toggled && m != this)
+                            {
+                                m.Toggled = false;
+                            } 
+                        }
                     }
                 }
             }

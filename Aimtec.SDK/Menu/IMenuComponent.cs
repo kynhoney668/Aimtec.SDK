@@ -29,6 +29,12 @@
         /// <value>The position.</value>
         Vector2 Position { get; set; }
 
+        bool Root { get; set; }
+
+        Menu Parent { get; set; }
+
+        bool IsMenu { get; }
+
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
         /// </summary>

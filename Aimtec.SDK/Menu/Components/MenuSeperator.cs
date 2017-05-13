@@ -6,10 +6,10 @@
     {
         #region Constructors and Destructors
 
-        public MenuSeperator(string internalName, string displayName, string text = "")
+        public MenuSeperator(string internalName, string text = "")
         {
             this.InternalName = internalName;
-            this.DisplayName = displayName;
+            this.DisplayName = text;
             this.Value = text;
         }
 
@@ -26,6 +26,10 @@
         public string Value { get; set; }
 
         public override bool Visible { get; set; }
+
+        public override Menu Parent { get; set; }
+
+        public override bool Root { get; set; }
 
         #endregion
 

@@ -19,14 +19,14 @@
         /// <summary>
         ///     Gets the width of the menu.
         /// </summary>
-        /// <value>The width of the menu.</value>
-        public abstract int MenuWidth { get; }
+        /// <value>The width of the root menu items.</value>
+        public abstract int RootMenuWidth { get; set; }
 
         /// <summary>
         ///     Gets the width of the menu components.
         /// </summary>
         /// <value>The width of the menu.</value>
-        public abstract int ComponentWidth { get; }
+        public abstract int ComponentWidth { get; set; }
 
 
         #endregion
@@ -55,6 +55,13 @@
         public abstract IRenderManager<MenuList> BuildMenuList(MenuList menuList);
 
         /// <summary>
+        ///     Builds the menu slider bool renderer.
+        /// </summary>
+        /// <param name="menuList">The menu list.</param>
+        /// <returns>IRenderManager&lt;MenuList&gt;.</returns>
+        public abstract IRenderManager<MenuSliderBool> BuildMenuSliderBoolRenderer(MenuSliderBool menuSliderBool);
+
+        /// <summary>
         ///     Builds the menu renderer.
         /// </summary>
         /// <param name="menu">The menu.</param>
@@ -75,17 +82,11 @@
         /// <returns>IRenderManager&lt;MenuSlider&gt;.</returns>
         public abstract IRenderManager<MenuSlider> BuildMenuSliderRenderer(MenuSlider slider);
 
-        public abstract Rectangle GetControlObjectBounds(Vector2 position, MenuItemType type);
+        public abstract Rectangle GetMenuBoolControlBounds(Vector2 pos);
 
-        public enum MenuItemType
-        {
-            MenuBool,
-            MenuKeyBind,
-            MenuList,
-            MenuSeperator,
-            MenuSlider,
-            MenuSliderBool
-        }
+        public abstract Rectangle[] GetMenuListControlBounds(Vector2 pos);
+
+        public abstract Rectangle[] GetMenuSliderBoolControlBounds(Vector2 pos);
 
 
         #endregion

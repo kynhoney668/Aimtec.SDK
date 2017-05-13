@@ -1,5 +1,6 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
+    using System;
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
 
@@ -41,6 +42,11 @@
         /// <value>The name of the internal.</value>
         public override string InternalName { get; set; }
 
+        public override Menu Parent { get; set; }
+
+        public override bool Root { get; set; }
+
+
         /// <summary>
         ///     Gets or sets the position.
         /// </summary>
@@ -52,7 +58,6 @@
         /// </summary>
         /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
         public override bool Toggled { get; set; }
-
         /// <summary>
         ///     Gets or sets the value.
         /// </summary>
@@ -91,7 +96,7 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                if (MenuManager.Instance.Theme.GetControlObjectBounds(this.Position, MenuTheme.MenuItemType.MenuBool).Contains(x, y))
+                if (MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position).Contains(x, y))
                 {
                     this.Value = !this.Value;
                 }

@@ -81,6 +81,10 @@
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         public override bool Visible { get; set; }
 
+        public override Menu Parent { get; set; }
+
+        public override bool Root { get; set; }
+
         #endregion
 
         #region Properties

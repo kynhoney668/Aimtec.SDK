@@ -74,6 +74,7 @@
     <Compile Include="Menu\Theme\Default\DefaultMenuList.cs" />
     <Compile Include="Menu\Theme\Default\DefaultMenuSeperator.cs" />
     <Compile Include="Menu\Theme\Default\DefaultMenuSlider.cs" />
+    <Compile Include="Menu\Theme\Default\DefaultMenuSliderBool.cs" />
     <Compile Include="Menu\Theme\Default\DefaultMenuTheme.cs" />
     <Compile Include="Menu\IMenu.cs" />
     <Compile Include="Menu\IMenuComponent.cs" />

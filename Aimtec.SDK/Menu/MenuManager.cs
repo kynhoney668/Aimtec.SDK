@@ -45,7 +45,19 @@
 
         public string InternalName { get; set; } = "AimtecSDK-RootMenu";
 
+        public bool IsMenu
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        public Menu Parent { get; set; }
+
         public Vector2 Position { get; set; } = new Vector2(10, 10);
+
+        public bool Root { get; set; }
 
         public MenuTheme Theme { get; set; }
 
@@ -74,6 +86,8 @@
 
         internal IReadOnlyList<IMenuComponent> Menus => this.Children.Values.Where(x => x is IMenu).ToList();
 
+        Menu IMenuComponent.Parent { get; set; }
+
         #endregion
 
         #region Public Methods and Operators
@@ -94,7 +108,7 @@
             return new Rectangle(
                 (int) pos.X,
                 (int) pos.Y,
-                this.Theme.MenuWidth,
+                this.Root ? this.Theme.RootMenuWidth : this.Theme.ComponentWidth,
                 this.Theme.MenuHeight * this.Menus.Count);
         }
 
@@ -138,6 +152,7 @@
             {
                 menu.WndProc(message, wparam, lparam);
             }
+
         }
 
         #endregion

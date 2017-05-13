@@ -1,5 +1,6 @@
 ﻿namespace Aimtec.SDK.Menu
 {
+    using System;
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Theme;
@@ -51,6 +52,19 @@
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         public abstract bool Visible { get; set; }
 
+        public abstract Menu Parent { get; set; }
+
+        public abstract bool Root { get; set; }
+
+        public bool IsMenu
+        {
+           get
+            {
+                return false;
+            }
+        }
+
+
         #endregion
 
         #region Public Methods and Operators
@@ -75,9 +89,10 @@
             return new Rectangle(
                 (int) pos.X,
                 (int) pos.Y,
-                MenuManager.Instance.Theme.ComponentWidth,
+                this.Root ? MenuManager.Instance.Theme.RootMenuWidth : MenuManager.Instance.Theme.ComponentWidth,
                 MenuManager.Instance.Theme.MenuHeight);
         }
+
 
 
         /// <summary>

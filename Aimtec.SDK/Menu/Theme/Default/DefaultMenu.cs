@@ -26,11 +26,11 @@
 
         public void Render(Vector2 pos)
         {
-            this.Theme.DrawMenuBorder(pos);
-
+            this.Theme.DrawMenuItemBorder(pos, this.Component.Root);
+   
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuBox(position);
+            this.Theme.DrawMenuItemBox(position, this.Component.Root);
 
             // Todo measure text
             RenderManager.RenderText(
@@ -42,16 +42,18 @@
                 this.Theme.TextColor,
                 this.Component.DisplayName);
 
+            var width = this.Component.Root ? this.Theme.RootMenuWidth : this.Theme.ComponentWidth;
+
             // Render arrow outline
             RenderManager.RenderLine(
-                pos.X + this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
-                pos.X + this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 this.Theme.LineColor);
 
             // Draw arrow box
-            position += new Vector2(this.Theme.MenuWidth - DefaultMenuTheme.ArrowWidth - DefaultMenuTheme.LineWidth, 0);
+            position += new Vector2(width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth, 0);
 
             var arrowBoxColor = Color.FromArgb(14, 59, 73);
 
@@ -62,11 +64,11 @@
 
             RenderManager.RenderRectangle(
                 position,
-                DefaultMenuTheme.ArrowWidth,
+                DefaultMenuTheme.IndicatorWidth ,
                 this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
                 arrowBoxColor);
 
-            RenderManager.RenderText(position + new Vector2((DefaultMenuTheme.ArrowWidth / 2), this.Theme.MenuHeight / 2), Color.LightGray, ">");
+            RenderManager.RenderText(position + new Vector2((DefaultMenuTheme.IndicatorWidth  / 2), (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1), Color.LightGray, ">");
 
             // todo draw arrow thingy ">"
         }
