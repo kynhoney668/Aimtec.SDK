@@ -6,11 +6,11 @@
     using Aimtec.SDK.Menu.Components;
     using Util;
 
-    internal class DefaultMenuKeybind : IRenderManager<MenuKeybind, DefaultMenuTheme>
+    internal class DefaultMenuKeyBind : IRenderManager<MenuKeyBind, DefaultMenuTheme>
     {
         #region Constructors and Destructors
 
-        public DefaultMenuKeybind(MenuKeybind component, DefaultMenuTheme theme)
+        public DefaultMenuKeyBind(MenuKeyBind component, DefaultMenuTheme theme)
         {
             this.Component = component;
             this.Theme = theme;
@@ -20,7 +20,7 @@
 
         #region Public Properties
 
-        public MenuKeybind Component { get; }
+        public MenuKeyBind Component { get; }
 
         public DefaultMenuTheme Theme { get; }
 
@@ -36,20 +36,14 @@
 
             this.Theme.DrawMenuItemBox(position);
 
-            var displayString = this.Component.DisplayName;
+            var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
-            // Todo measure text
             RenderManager.RenderText(
-                pos
-                + new Vector2(
-                    DefaultMenuTheme.TextSpacing,
-                    (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
-                // not bro science
+                displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName);
+                this.Component.DisplayName, RenderTextFlags.VerticalCenter);
 
-
-            // Render arrow outline
+            // Render indicator box outline
             RenderManager.RenderLine(
                 pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
@@ -57,46 +51,35 @@
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
-            //Draw Key inidcator
-            RenderManager.RenderText(
-               pos
-               + new Vector2(
-                   this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth - (this.Component.KeyIsBeingSet ? 85 : 35), //todo: measure text rather than explicit values
-                   (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
-               // not bro science
-               Color.FromArgb(207, 195, 149),
-               this.Component.KeyIsBeingSet ? "PRESS KEY" : "[" + SimplifyKey(this.Component.Key) + "]");
-
-            // Draw arrow box
-            position += new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth, 0);
+            // Draw indicator box
+            var indBoxPosition = position + new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth, 0);
 
             var boolColor = this.Component.Value ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 
             RenderManager.RenderRectangle(
-                position,
+                indBoxPosition,
                 DefaultMenuTheme.IndicatorWidth ,
                 this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
                 boolColor);
 
-            // todo center text in box
+            var centerArrowBox = indBoxPosition + new Vector2(DefaultMenuTheme.IndicatorWidth / 2, this.Theme.MenuHeight / 2);
+
             RenderManager.RenderText(
-                position + new Vector2(5, 10),
+                centerArrowBox,
                 Color.AliceBlue,
-                this.Component.Value ? "ON" : "OFF");
+                this.Component.Value ? "ON" : "OFF", RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+
+            //Draw Key indicator
+            var keyIndicatorPos = pos + new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth - DefaultMenuTheme.TextSpacing, this.Theme.MenuHeight / 2);
+
+            RenderManager.RenderText(
+              keyIndicatorPos,
+               Color.FromArgb(207, 195, 149),
+               this.Component.KeyIsBeingSet ? "PRESS KEY" : "[" + this.Component.Key + "]", RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
+
+
         }
 
         #endregion
-
-        string SimplifyKey(Keys key)
-        {
-            var str = key.ToString();
-            var length = str.Length;
-            if (length <= 3)
-            {
-                return str;
-            }
-
-            return ((uint)key).ToString();
-        }
     }
 }

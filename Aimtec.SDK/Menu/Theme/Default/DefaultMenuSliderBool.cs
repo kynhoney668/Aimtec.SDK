@@ -31,13 +31,15 @@
             var beforeSliderWidth = (float)(this.Component.Value - this.Component.MinValue)
                 / (this.Component.MaxValue - this.Component.MinValue) * this.Theme.ComponentWidth;
 
-            var afterSliderWidth = this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - beforeSliderWidth;
+            var afterSliderWidth = this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - beforeSliderWidth;
 
             this.Theme.DrawMenuItemBorder(pos);
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
             this.Theme.DrawMenuItemBox(position);
+
+            var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
             // Draw light bar before the slider line
             RenderManager.RenderRectangle(
@@ -46,29 +48,24 @@
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(14, 59, 73));
 
-            // Todo measure text
             RenderManager.RenderText(
-                pos
-                + new Vector2(
-                    DefaultMenuTheme.TextSpacing,
-                    (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
-                // not bro science
+                displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName);
+                this.Component.DisplayName, RenderTextFlags.VerticalCenter);
 
-            var position2 = position + new Vector2(beforeSliderWidth, 0);
+            var beforeSliderPos = position + new Vector2(beforeSliderWidth, 0);
 
             RenderManager.RenderLine(
-                position2,
-                position2 + new Vector2(0, this.Theme.MenuHeight),
+                beforeSliderPos,
+                beforeSliderPos + new Vector2(0, this.Theme.MenuHeight),
                 DefaultMenuTheme.LineWidth,
                 false,
                 Color.FromArgb(82, 83, 57));
 
-            var position3 = position2 + new Vector2(DefaultMenuTheme.LineWidth, 0);
+            var afterSliderPos = beforeSliderPos + new Vector2(DefaultMenuTheme.LineWidth, 0);
 
             RenderManager.RenderRectangle(
-                position3,
+                afterSliderPos,
                 afterSliderWidth - DefaultMenuTheme.LineWidth * 2,
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(16, 26, 29));
@@ -77,13 +74,13 @@
             RenderManager.RenderText(
                 pos + DefaultMenuTheme.LineWidth
                 + new Vector2(
-                    this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - 25,
-                    (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
+                    this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.TextSpacing,
+                    this.Theme.MenuHeight / 2),
                 Color.FromArgb(207, 195, 149),
-                this.Component.Value.ToString());
+                this.Component.Value.ToString(), RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
 
 
-            // Render arrow outline
+            // Render indicator box outline
             RenderManager.RenderLine(
                 pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth,
                 pos.Y,
@@ -91,22 +88,23 @@
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
-            // Draw arrow box
-            var positionArrowBox = position + new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth, 0);
-
+            // Draw indicator box
             var boolColor = this.Component.Enabled ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 
+            var indBoxPosition = position + new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth, 0);
+
             RenderManager.RenderRectangle(
-                positionArrowBox,
+                indBoxPosition,
                 DefaultMenuTheme.IndicatorWidth,
                 this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
                 boolColor);
 
-            // todo center text in box
+            var centerArrowBox = indBoxPosition + new Vector2(DefaultMenuTheme.IndicatorWidth / 2, this.Theme.MenuHeight / 2);
+
             RenderManager.RenderText(
-                positionArrowBox + new Vector2(5, 10),
+                centerArrowBox,
                 Color.AliceBlue,
-                this.Component.Enabled ? "ON" : "OFF");
+                this.Component.Enabled ? "ON" : "OFF", RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
         }
 
         #endregion

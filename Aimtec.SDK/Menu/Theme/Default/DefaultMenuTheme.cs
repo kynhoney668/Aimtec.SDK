@@ -58,10 +58,11 @@
             return new DefaultMenuBool(component, this);
         }
 
-        public override IRenderManager<MenuKeybind> BuildMenuKeybindRenderer(MenuKeybind keybind)
+        public override IRenderManager<MenuKeyBind> BuildMenuKeyBindRenderer(MenuKeyBind keybind)
         {
-            return new DefaultMenuKeybind(keybind, this);
+            return new DefaultMenuKeyBind(keybind, this);
         }
+
 
         public override IRenderManager<MenuList> BuildMenuList(MenuList menuList)
         {
@@ -124,7 +125,7 @@
 
         public override Rectangle[] GetMenuListControlBounds(Vector2 pos)
         {
-            var leftBox = pos + new Vector2(this.ComponentWidth - IndicatorWidth * 3.5f - LineWidth, 0);
+            var leftBox = pos + new Vector2(this.ComponentWidth - IndicatorWidth * 2.1f - LineWidth, 0);
             var rightBox = pos + new Vector2(this.ComponentWidth - IndicatorWidth - LineWidth, 0);
             var rect1 = new Rectangle((int) leftBox.X,(int) leftBox.Y, IndicatorWidth, MenuHeight);
             var rect2 = new Rectangle((int) rightBox.X, (int) rightBox.Y, IndicatorWidth, MenuHeight);
@@ -143,10 +144,6 @@
 
             return new Rectangle[] { sliderBounds, boolBounds };
         }
-
-
-
-
 
 
 

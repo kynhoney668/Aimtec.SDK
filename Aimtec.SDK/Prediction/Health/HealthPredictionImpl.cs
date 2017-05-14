@@ -57,7 +57,7 @@
             value.RemoveWhere(x => x.Active);
         }
 
-        private void OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseProcessAutoAttackEventArgs e)
+        private void OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
             var target = sender as Obj_AI_Minion;
 

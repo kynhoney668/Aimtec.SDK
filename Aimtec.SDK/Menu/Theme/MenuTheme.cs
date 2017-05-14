@@ -45,7 +45,7 @@
         /// </summary>
         /// <param name="keybind">The keybind.</param>
         /// <returns>IRenderManager&lt;MenuKeybind&gt;.</returns>
-        public abstract IRenderManager<MenuKeybind> BuildMenuKeybindRenderer(MenuKeybind keybind);
+        public abstract IRenderManager<MenuKeyBind> BuildMenuKeyBindRenderer(MenuKeyBind keybind);
 
         /// <summary>
         ///     Builds the menu list.

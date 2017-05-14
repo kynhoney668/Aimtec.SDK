@@ -10,7 +10,7 @@
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
     /// <seealso cref="bool" />
-    public sealed class MenuKeybind : MenuComponent, IReturns<bool>
+    public sealed class MenuKeyBind : MenuComponent, IReturns<bool>
     {
         #region Constructors and Destructors
 
@@ -21,7 +21,7 @@
         /// <param name="displayName">The display name.</param>
         /// <param name="key">The key.</param>
         /// <param name="keybindType">Type of the keybind.</param>
-        public MenuKeybind(string internalName, string displayName, Keys key, KeybindType keybindType)
+        public MenuKeyBind(string internalName, string displayName, Keys key, KeybindType keybindType)
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
@@ -91,7 +91,7 @@
         /// <returns>Aimtec.SDK.Menu.Theme.IRenderManager.</returns>
         public override IRenderManager GetRenderManager()
         {
-            return MenuManager.Instance.Theme.BuildMenuKeybindRenderer(this);
+            return MenuManager.Instance.Theme.BuildMenuKeyBindRenderer(this);
         }
 
         /// <summary>

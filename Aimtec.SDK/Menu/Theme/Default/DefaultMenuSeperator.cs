@@ -35,9 +35,9 @@
             this.Theme.DrawMenuItemBoxFull(position);
 
             RenderManager.RenderText(
-                position + new Vector2(this.Theme.ComponentWidth / 2f - 50, this.Theme.MenuHeight / 2f - 5),
+                position + new Vector2(this.Theme.ComponentWidth / 2f, this.Theme.MenuHeight / 2f),
                 Color.FromArgb(207, 195, 149),
-                this.Component.Value);
+                this.Component.Value, RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
         }
 
         #endregion

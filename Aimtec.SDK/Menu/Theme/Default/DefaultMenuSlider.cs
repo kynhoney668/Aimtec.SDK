@@ -39,6 +39,8 @@
 
             this.Theme.DrawMenuItemBox(position);
 
+            var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
+
             // Draw light bar before the slider line
             RenderManager.RenderRectangle(
                 position,
@@ -46,29 +48,24 @@
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(14, 59, 73));
 
-            // Todo measure text
             RenderManager.RenderText(
-                pos
-                + new Vector2(
-                    DefaultMenuTheme.TextSpacing,
-                    (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
-                // not bro science
+                displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName);
+                this.Component.DisplayName, RenderTextFlags.VerticalCenter);
 
-            position += new Vector2(beforeSliderWidth, 0);
+            var bfSlider = position + new Vector2(beforeSliderWidth, 0);
 
             RenderManager.RenderLine(
-                position,
-                position + new Vector2(0, this.Theme.MenuHeight),
+                bfSlider,
+                bfSlider + new Vector2(0, this.Theme.MenuHeight),
                 DefaultMenuTheme.LineWidth,
                 false,
                 Color.FromArgb(82, 83, 57));
 
-            position += new Vector2(DefaultMenuTheme.LineWidth, 0);
+            var afSlider = bfSlider + new Vector2(DefaultMenuTheme.LineWidth, 0);
 
             RenderManager.RenderRectangle(
-                position,
+                afSlider,
                 afterSliderWidth - DefaultMenuTheme.LineWidth * 2,
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(16, 26, 29));
@@ -77,10 +74,10 @@
             RenderManager.RenderText(
                 pos + DefaultMenuTheme.LineWidth
                 + new Vector2(
-                    this.Theme.ComponentWidth - 25,
-                    (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
+                    this.Theme.ComponentWidth - DefaultMenuTheme.TextSpacing,
+                    (this.Theme.MenuHeight) / 2),
                 Color.FromArgb(207, 195, 149),
-                this.Component.Value.ToString());
+                this.Component.Value.ToString(), RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);
         }
 
         #endregion

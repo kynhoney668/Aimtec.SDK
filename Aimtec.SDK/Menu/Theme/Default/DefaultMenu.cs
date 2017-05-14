@@ -32,15 +32,12 @@
 
             this.Theme.DrawMenuItemBox(position, this.Component.Root);
 
-            // Todo measure text
+            var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
+
             RenderManager.RenderText(
-                pos
-                + new Vector2(
-                    DefaultMenuTheme.TextSpacing,
-                    (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1),
-                // not bro science
+                displayNamePosition,
                 this.Theme.TextColor,
-                this.Component.DisplayName);
+                this.Component.DisplayName, RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalLeft);
 
             var width = this.Component.Root ? this.Theme.RootMenuWidth : this.Theme.ComponentWidth;
 
@@ -68,9 +65,9 @@
                 this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
                 arrowBoxColor);
 
-            RenderManager.RenderText(position + new Vector2((DefaultMenuTheme.IndicatorWidth  / 2), (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 4f + 9 / 2f - 1), Color.LightGray, ">");
 
-            // todo draw arrow thingy ">"
+            RenderManager.RenderText(position + new Vector2((DefaultMenuTheme.IndicatorWidth  / 2), (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 2), Color.FromArgb(207, 195, 149), ">", RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalCenter);
+
         }
 
         #endregion
