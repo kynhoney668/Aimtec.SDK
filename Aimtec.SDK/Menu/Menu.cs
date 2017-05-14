@@ -78,10 +78,7 @@
         /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
         public bool Toggled
         {
-            get
-            {
-                return this.toggled;
-            }
+            get => this.toggled;
             set
             {
                 this.toggled = value;
@@ -108,10 +105,7 @@
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         public bool Visible
         {
-            get
-            {
-                return this.visible;
-            }
+            get => this.visible;
             set
             {
                 this.visible = value;
@@ -126,11 +120,23 @@
             }
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="Menu"/> is root.
+        /// </summary>
+        /// <value><c>true</c> if root; otherwise, <c>false</c>.</value>
         public bool Root { get; set; }
 
+        /// <summary>
+        /// Gets or sets the parent.
+        /// </summary>
+        /// <value>The parent.</value>
         public Menu Parent { get; set; }
 
-        public bool IsMenu { get { return true; } }
+        /// <summary>
+        /// Gets a value indicating whether this instance is a menu.
+        /// </summary>
+        /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
+        public bool IsMenu => true;
 
         #endregion
 
@@ -150,8 +156,7 @@
         /// <summary>
         ///     Adds the specified identifier.
         /// </summary>
-        /// <param name="id">The identifier.</param>
-        /// <param name="menu">The menu.</param>
+        /// <param name="menuComponent">The menu.</param>
         /// <returns>IMenu.</returns>
         public IMenu Add(IMenuComponent menuComponent)
         {
@@ -211,7 +216,7 @@
         /// <returns>MenuComponent.</returns>
         public MenuComponent GetItem(string name)
         {
-            if (Children.Keys.Contains(name))
+            if (this.Children.Keys.Contains(name))
             {
                 return (MenuComponent)this.Children[name];
             }
@@ -222,7 +227,7 @@
                 return menu.GetItem(name);
             }
 
-            throw new Exception(String.Format("[Menu] Item: {0} was not found in the menu: {1} or its submenus.", name, this.InternalName));
+            throw new Exception($"[Menu] Item: {name} was not found in the menu: {this.InternalName} or its submenus.");
         }
 
 
@@ -378,7 +383,7 @@
 
                     if (!this.Root && this.Parent != null)
                     {
-                        foreach (var m in Parent.Children)
+                        foreach (var m in this.Parent.Children)
                         {
                             var menu = m.Value;
                             if (menu != this)

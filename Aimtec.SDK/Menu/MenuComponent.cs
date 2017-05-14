@@ -52,18 +52,23 @@
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         public abstract bool Visible { get; set; }
 
+        /// <summary>
+        /// Gets or sets the parent.
+        /// </summary>
+        /// <value>The parent.</value>
         public abstract Menu Parent { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="MenuComponent"/> is the root menu.
+        /// </summary>
+        /// <value><c>true</c> if this menu is the root menu; otherwise, <c>false</c>.</value>
         public abstract bool Root { get; set; }
 
-        public bool IsMenu
-        {
-           get
-            {
-                return false;
-            }
-        }
-
+        /// <summary>
+        /// Gets a value indicating whether this instance is a menu.
+        /// </summary>
+        /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
+        public virtual bool IsMenu => false;
 
         #endregion
 
@@ -122,6 +127,13 @@
         public virtual void WndProc(uint message, uint wparam, int lparam)
         {
         }
+
+        /// <summary>
+        /// Gets the <see cref="MenuComponent"/> with the specified name.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>MenuComponent.</returns>
+        public MenuComponent this[string name] => ((Menu)(IMenu)(IMenuComponent) this)[name];
 
         #endregion
     }

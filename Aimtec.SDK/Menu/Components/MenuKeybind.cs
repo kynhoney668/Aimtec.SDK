@@ -1,7 +1,5 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
-    using System;
-    using System.Drawing;
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
 
@@ -15,7 +13,7 @@
         #region Constructors and Destructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MenuKeybind" /> class.
+        ///     Initializes a new instance of the <see cref="MenuKeyBind" /> class.
         /// </summary>
         /// <param name="internalName">The internal name.</param>
         /// <param name="displayName">The display name.</param>
@@ -69,8 +67,16 @@
         /// <value>The value.</value>
         public bool Value { get; set; }
 
+        /// <summary>
+        /// Gets or sets the parent.
+        /// </summary>
+        /// <value>The parent.</value>
         public override Menu Parent { get; set; }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="MenuComponent" /> is the root menu.
+        /// </summary>
+        /// <value><c>true</c> if this menu is the root menu; otherwise, <c>false</c>.</value>
         public override bool Root { get; set; }
 
         /// <summary>
@@ -79,7 +85,11 @@
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         public override bool Visible { get; set; }
 
-        public bool KeyIsBeingSet { get; set; }
+        /// <summary>
+        /// Gets or sets a value indicating whether the key is being set.
+        /// </summary>
+        /// <value><c>true</c> if the key is being set; otherwise, <c>false</c>.</value>
+        private bool KeyIsBeingSet { get; set; }
 
         #endregion
 
@@ -130,7 +140,7 @@
                 }
             }
 
-            if (wparam != (ulong)this.Key || KeyIsBeingSet)
+            if (wparam != (ulong)this.Key || this.KeyIsBeingSet)
             {
                 return;
             }

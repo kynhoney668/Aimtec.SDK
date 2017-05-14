@@ -51,5 +51,21 @@ namespace Aimtec.SDK.Extensions
         {
             return Vector3.DistanceSquared(gameObj.Position, gameObj1.Position);
         }
+
+        public static bool IsMelee(this Obj_AI_Base gameObject)
+        {
+            // TODO Replace with proper API once available.
+            return gameObject.AttackRange > 300;
+        }
+
+        public static int GetBuffCount(this Obj_AI_Base from, string buffname)
+        {     
+            return from.BuffManager.GetBuffCount(buffname);
+        }
+
+        public static bool HasBuff(this Obj_AI_Base from, string buffname)
+        {
+            return from.BuffManager.HasBuff(buffname);
+        }
     }
 }
