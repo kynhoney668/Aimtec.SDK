@@ -36,7 +36,7 @@
         ///    This property will only succeed for MenuBool, MenuKeybind and MenuSliderBool.
         /// </remarks>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        public bool Enabled => ((IEnabledReturn) this).Enabled;
+        public bool Enabled => ((IReturns<bool>) this).Value;
 
         /// <summary>
         ///     Gets a numeric value associated with MenuComponent <see cref="MenuComponent" />.
@@ -44,7 +44,8 @@
         /// <remarks>
         ///     This property will only succeed for MenuSlider, MenuSliderBool and MenuList.
         /// </remarks>
-        public int Value => ((IIntReturn)this).Value;
+        public int Value => ((IReturns<int>)this).Value;
+
 
         /// <summary>
         ///     Gets or sets the name of the internal.

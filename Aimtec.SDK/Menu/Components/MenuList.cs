@@ -9,7 +9,7 @@
     ///     Class MenuList.
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
-    public sealed class MenuList : MenuComponent, IIntReturn
+    public sealed class MenuList : MenuComponent, IReturns<int>
     {
         #region Constructors and Destructors
 

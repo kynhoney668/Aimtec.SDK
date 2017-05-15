@@ -3,7 +3,7 @@
     using System;
     using Aimtec.SDK.Menu.Theme;
 
-    public sealed class MenuSeperator : MenuComponent, IStringReturn
+    public sealed class MenuSeperator : MenuComponent, IReturns<string>
     {
         #region Constructors and Destructors
 

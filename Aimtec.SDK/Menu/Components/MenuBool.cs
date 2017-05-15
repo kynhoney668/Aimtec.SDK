@@ -9,7 +9,7 @@
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
     /// <seealso cref="bool" />
-    public sealed class MenuBool : MenuComponent, IEnabledReturn
+    public sealed class MenuBool : MenuComponent, IReturns<bool>
     {
         #region Constructors and Destructors
 
@@ -63,14 +63,7 @@
         ///     Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
-        internal new bool Value { get; set; }
-
-        /// <summary>
-        ///     Gets whether this menu componenet is enabled if applicable
-        /// </summary>
-        /// <value>The value.</value>
-        public new bool Enabled => Value;
-
+        public new bool Value { get; set; }
 
 
         /// <summary>
@@ -79,8 +72,10 @@
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         public override bool Visible { get; set; }
 
+    
 
-        #endregion
+
+    #endregion
 
         #region Public Methods and Operators
 

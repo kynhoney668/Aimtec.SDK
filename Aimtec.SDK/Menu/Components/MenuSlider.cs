@@ -12,7 +12,7 @@
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
     /// <seealso cref="int" />
-    public sealed class MenuSlider : MenuComponent, IIntReturn
+    public sealed class MenuSlider : MenuComponent, IReturns<int>
     {
         #region Constructors and Destructors
 

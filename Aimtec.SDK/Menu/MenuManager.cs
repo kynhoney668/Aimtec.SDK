@@ -41,6 +41,12 @@
 
         public Dictionary<string, IMenuComponent> Children { get; } = new Dictionary<string, IMenuComponent>();
 
+        public T As<T>()
+            where T : MenuComponent
+        {
+            throw new NotImplementedException();
+        }
+
         public IMenuComponent this[string name]
         {
             get

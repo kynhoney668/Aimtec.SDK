@@ -147,6 +147,12 @@
 
         #region Public Indexers
 
+        public T As<T>()
+            where T : MenuComponent
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         ///     Gets the <see cref="MenuComponent" /> with the specified internal name.
         /// </summary>

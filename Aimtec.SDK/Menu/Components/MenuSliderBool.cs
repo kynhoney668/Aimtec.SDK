@@ -9,7 +9,7 @@
     using Util;
 
     // todo
-    public sealed class MenuSliderBool : MenuComponent, IEnabledReturn, IIntReturn
+    public sealed class MenuSliderBool : MenuComponent, IReturns<int>, IReturns<bool>
     {
         #region Constructors and Destructors
 
@@ -39,8 +39,6 @@
 
         public override bool Toggled { get; set; }
 
-        public new int Value { get; set; }
-
         public override bool Visible { get; set; }
 
         public override Menu Parent { get; set; }
@@ -52,6 +50,18 @@
         /// </summary>
         /// <value><c>true</c> if [mouse down]; otherwise, <c>false</c>.</value>
         private bool MouseDown { get; set; }
+
+        public new int Value { get; set; }
+
+        bool IReturns<bool>.Value
+        {
+            get => Enabled;
+            set
+            {
+                Enabled = value;
+            }
+        }
+
 
         #endregion
 

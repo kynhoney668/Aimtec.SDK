@@ -18,6 +18,13 @@
         /// <value>The children.</value>
         Dictionary<string, IMenuComponent> Children { get; }
 
+        /// <summary>
+        ///     Converts the <see cref="IMenuComponent" /> to the specified <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>T.</returns>
+        T As<T>() where T : MenuComponent;
+
         IMenuComponent this[string name] { get; }
 
         /// <summary>
@@ -38,11 +45,13 @@
         /// <value>The position.</value>
         Vector2 Position { get; set; }
 
+
         /// <summary>
         ///     Gets a value indicating whether this <see cref="MenuComponent" /> is enabled.
         /// </summary>
         /// <remarks>
         ///     This property will only succeed if the MenuComponent implements <see cref="IReturns{bool}" />.
+        ///     This property will only succeed for MenuBool, MenuKeyBind and MenuSliderBool" />.
         /// </remarks>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         bool Enabled { get; }
@@ -53,10 +62,22 @@
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         int Value { get; }
 
+        /// <summary>
+        ///     Gets or sets whether this <see cref="MenuComponent" /> is a a root menu.
+        /// </summary>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         bool Root { get; set; }
 
+        /// <summary>
+        ///     Gets the parent of this <see cref="MenuComponent" /> if it has one.
+        /// </summary>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         Menu Parent { get; set; }
 
+        /// <summary>
+        ///     Gets or sets whether this <see cref="MenuComponent" /> is a Menu.
+        /// </summary>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         bool IsMenu { get; }
 
         /// <summary>

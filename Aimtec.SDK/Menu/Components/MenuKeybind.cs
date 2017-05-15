@@ -8,7 +8,7 @@
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
     /// <seealso cref="bool" />
-    public sealed class MenuKeyBind : MenuComponent, IEnabledReturn
+    public sealed class MenuKeyBind : MenuComponent, IReturns<bool>
     {
         #region Constructors and Destructors
 
