@@ -4,6 +4,7 @@
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Theme;
+    using Aimtec.SDK.Menu.Theme.Default;
     using Aimtec.SDK.Util;
 
     /// <summary>
@@ -157,7 +158,7 @@
         /// <param name="x">The x.</param>
         private void SetSliderValue(int x)
         {
-            this.Value = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width - 10) * this.MaxValue)));
+            this.Value = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue)));
         }
 
         #endregion

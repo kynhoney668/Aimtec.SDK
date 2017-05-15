@@ -25,7 +25,7 @@
 
         private MenuManager()
         {
-            RenderManager.OnRender += () => this.Render(this.Position);
+            RenderManager.OnPresent += () => this.Render(this.Position);
             Game.OnWndProc += args => this.WndProc(args.Message, args.WParam, args.LParam);
 
             // TODO: Make this load from settings

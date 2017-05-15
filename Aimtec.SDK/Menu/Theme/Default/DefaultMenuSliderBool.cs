@@ -29,9 +29,9 @@
         public void Render(Vector2 pos)
         {
             var beforeSliderWidth = (float)(this.Component.Value - this.Component.MinValue)
-                / (this.Component.MaxValue - this.Component.MinValue) * (this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth);
+                / (this.Component.MaxValue - this.Component.MinValue) * (this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth * 2);
 
-            var afterSliderWidth = this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - beforeSliderWidth;
+            var afterSliderWidth = this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - beforeSliderWidth - DefaultMenuTheme.LineWidth;
 
             this.Theme.DrawMenuItemBorder(pos);
 

@@ -4,6 +4,8 @@
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Theme;
+    using Aimtec.SDK.Menu.Theme.Default;
+
     using Util;
 
     // todo
@@ -81,7 +83,7 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(Position);
+                var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position);
                 var sliderBounds = bounds[0];
 
                 if (sliderBounds.Contains(x, y))
@@ -91,9 +93,9 @@
                 }
             }
 
-            else if (message == (ulong)WindowsMessages.WM_LBUTTONUP && !this.MouseDown)
+            else if (message == (ulong)WindowsMessages.WM_LBUTTONUP)
             {
-                if (Visible)
+                if (Visible && !this.MouseDown)
                 {
                     var x = lparam & 0xffff;
                     var y = lparam >> 16;
@@ -120,7 +122,7 @@
         private void SetSliderValue(int x)
         {
             var sliderbounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position)[0];
-            this.Value = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int)((x - this.Position.X) / (sliderbounds.Width - 10) * this.MaxValue)));
+            this.Value = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int)((x - this.Position.X) / (sliderbounds.Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue)));
         }
 
         #endregion

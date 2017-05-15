@@ -29,9 +29,9 @@
         public void Render(Vector2 pos)
         {
             var beforeSliderWidth = (float) (this.Component.Value - this.Component.MinValue)
-                / (this.Component.MaxValue - this.Component.MinValue) * (this.Theme.ComponentWidth);
+                / (this.Component.MaxValue - this.Component.MinValue) * (this.Theme.ComponentWidth - DefaultMenuTheme.LineWidth * 2);
 
-            var afterSliderWidth = this.Theme.ComponentWidth - beforeSliderWidth;
+            var afterSliderWidth = this.Theme.ComponentWidth - beforeSliderWidth - DefaultMenuTheme.LineWidth;
 
             this.Theme.DrawMenuItemBorder(pos);
 
@@ -62,11 +62,11 @@
                 false,
                 Color.FromArgb(82, 83, 57));
 
-            var afSlider = bfSlider + new Vector2(DefaultMenuTheme.LineWidth, 0);
+            var afSlider = bfSlider;
 
             RenderManager.RenderRectangle(
                 afSlider,
-                afterSliderWidth - DefaultMenuTheme.LineWidth * 2,
+                afterSliderWidth - DefaultMenuTheme.LineWidth,
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(16, 26, 29));
 
