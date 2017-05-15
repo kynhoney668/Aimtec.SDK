@@ -120,6 +120,7 @@
             }
         }
 
+
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="Menu"/> is root.
         /// </summary>
@@ -138,6 +139,10 @@
         /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
         public bool IsMenu => true;
 
+        public bool Enabled => throw new NotImplementedException();
+
+        public int Value => throw new NotImplementedException();
+
         #endregion
 
         #region Public Indexers
@@ -147,7 +152,7 @@
         /// </summary>
         /// <param name="name">The name.</param>
         /// <returns>MenuComponent.</returns>
-        public MenuComponent this[string name] => this.GetItem(name);
+        public IMenuComponent this[string name] => this.GetItem(name);
 
         #endregion
 
@@ -214,120 +219,15 @@
         /// </summary>
         /// <param name="name">The name.</param>
         /// <returns>MenuComponent.</returns>
-        public MenuComponent GetItem(string name)
+        public IMenuComponent GetItem(string name)
         {
             if (this.Children.Keys.Contains(name))
             {
-                return (MenuComponent)this.Children[name];
+                return this.Children[name];
             }
 
-            foreach (var item in this.Children.Where(x => x.Value.IsMenu))
-            {
-                var menu = (Menu)item.Value;
-                return menu.GetItem(name);
-            }
-
-            throw new Exception($"[Menu] Item: {name} was not found in the menu: {this.InternalName} or its submenus.");
+            throw new Exception($"[Menu] Item: {name} was not found in the menu: {this.InternalName}");
         }
-
-
-        /// <summary>
-        ///     Gets the Menu.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>Menu.</returns>
-        public Menu GetMenu(string name)
-        {
-            var item = (Menu) (IMenuComponent) GetItem(name);
-            if (item != null)
-            {
-                return item;
-            }
-
-            return null;
-        }
-
-
-        /// <summary>
-        ///     Gets the MenuBool Item.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuBool.</returns>
-        public MenuBool GetBool(string name)
-        {
-            var item = (MenuBool) GetItem(name);
-            if (item != null)
-            {
-                return item;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        ///     Gets the MenuKeybind item.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuKeybind.</returns>
-        public MenuKeyBind GetKeyBind(string name)
-        {
-            var item = (MenuKeyBind)GetItem(name);
-            if (item != null)
-            {
-                return item;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        ///     Gets the MenuList item.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuComponent.</returns>
-        public MenuList GetMenuList(string name)
-        {
-            var item = (MenuList)GetItem(name);
-            if (item != null)
-            {
-                return item;
-            }
-
-            return null;
-
-        }
-
-        /// <summary>
-        ///     Gets the MenuSlider item.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuSlider.</returns>
-        public MenuSlider GetSlider(string name)
-        {
-            var item = (MenuSlider)GetItem(name);
-            if (item != null)
-            {
-                return item;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        ///     Gets the MenuSliderBool item.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuSliderBool.</returns>
-        public MenuSliderBool GetSliderBool(string name)
-        {
-            var item = (MenuSliderBool)GetItem(name);
-            if (item != null)
-            {
-                return item;
-            }
-            return null;
-        }
-
 
 
         /// <summary>

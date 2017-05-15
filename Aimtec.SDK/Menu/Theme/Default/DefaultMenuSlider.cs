@@ -29,7 +29,7 @@
         public void Render(Vector2 pos)
         {
             var beforeSliderWidth = (float) (this.Component.Value - this.Component.MinValue)
-                / (this.Component.MaxValue - this.Component.MinValue) * this.Theme.ComponentWidth;
+                / (this.Component.MaxValue - this.Component.MinValue) * (this.Theme.ComponentWidth);
 
             var afterSliderWidth = this.Theme.ComponentWidth - beforeSliderWidth;
 
@@ -39,7 +39,7 @@
 
             this.Theme.DrawMenuItemBox(position);
 
-            var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
+            var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2f);
 
             // Draw light bar before the slider line
             RenderManager.RenderRectangle(
@@ -75,7 +75,7 @@
                 pos + DefaultMenuTheme.LineWidth
                 + new Vector2(
                     this.Theme.ComponentWidth - DefaultMenuTheme.TextSpacing,
-                    (this.Theme.MenuHeight) / 2),
+                    (this.Theme.MenuHeight) / 2f),
                 Color.FromArgb(207, 195, 149),
                 this.Component.Value.ToString(), RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);
         }

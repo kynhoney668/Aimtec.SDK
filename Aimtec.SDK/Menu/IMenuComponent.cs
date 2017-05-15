@@ -1,5 +1,6 @@
 ﻿namespace Aimtec.SDK.Menu
 {
+    using System.Collections.Generic;
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Theme;
@@ -10,6 +11,14 @@
     public interface IMenuComponent
     {
         #region Public Properties
+
+        /// <summary>
+        ///     Gets the children.
+        /// </summary>
+        /// <value>The children.</value>
+        Dictionary<string, IMenuComponent> Children { get; }
+
+        IMenuComponent this[string name] { get; }
 
         /// <summary>
         ///     Gets or sets the display name.
@@ -28,6 +37,21 @@
         /// </summary>
         /// <value>The position.</value>
         Vector2 Position { get; set; }
+
+        /// <summary>
+        ///     Gets a value indicating whether this <see cref="MenuComponent" /> is enabled.
+        /// </summary>
+        /// <remarks>
+        ///     This property will only succeed if the MenuComponent implements <see cref="IReturns{bool}" />.
+        /// </remarks>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
+        bool Enabled { get; }
+
+        /// <summary>
+        ///     Gets a value associated with this <see cref="MenuComponent" />
+        /// </summary>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
+        int Value { get; }
 
         bool Root { get; set; }
 

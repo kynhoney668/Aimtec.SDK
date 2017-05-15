@@ -41,6 +41,14 @@
 
         public Dictionary<string, IMenuComponent> Children { get; } = new Dictionary<string, IMenuComponent>();
 
+        public IMenuComponent this[string name]
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         public string DisplayName { get; set; } = string.Empty;
 
         public string InternalName { get; set; } = "AimtecSDK-RootMenu";
@@ -56,6 +64,10 @@
         public Menu Parent { get; set; }
 
         public Vector2 Position { get; set; } = new Vector2(10, 10);
+
+        public bool Enabled { get; }
+
+        public int Value { get; }
 
         public bool Root { get; set; }
 

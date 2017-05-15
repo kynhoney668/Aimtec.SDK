@@ -1,8 +1,9 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
+    using System;
     using Aimtec.SDK.Menu.Theme;
 
-    public sealed class MenuSeperator : MenuComponent, IReturns<string>
+    public sealed class MenuSeperator : MenuComponent, IStringReturn
     {
         #region Constructors and Destructors
 
@@ -30,6 +31,8 @@
         public override Menu Parent { get; set; }
 
         public override bool Root { get; set; }
+
+        public string StringValue => Value;
 
         #endregion
 

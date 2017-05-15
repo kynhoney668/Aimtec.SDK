@@ -1,9 +1,10 @@
 ﻿namespace Aimtec.SDK.Menu
 {
-    using System;
-    using System.Drawing;
-
     using Aimtec.SDK.Menu.Theme;
+    using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.Linq;
 
     /// <summary>
     ///     Class MenuComponent.
@@ -12,6 +13,15 @@
     public abstract class MenuComponent : IMenuComponent
     {
         #region Public Properties
+
+        /// <summary>
+        ///     Gets the children.
+        /// </summary>
+        /// <value>The children.</value>
+        public Dictionary<string, IMenuComponent> Children { get; }
+
+        public IMenuComponent this[string name] => null;
+
 
         /// <summary>
         ///     Gets or sets the display name.
@@ -23,10 +33,18 @@
         ///     Gets a value indicating whether this <see cref="MenuComponent" /> is enabled.
         /// </summary>
         /// <remarks>
-        ///     This property will only succeed if the MenuComponent implements <see cref="IReturns{bool}" />.
+        ///    This property will only succeed for MenuBool, MenuKeybind and MenuSliderBool.
         /// </remarks>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        public bool Enabled => ((IReturns<bool>) this).Value;
+        public bool Enabled => ((IEnabledReturn) this).Enabled;
+
+        /// <summary>
+        ///     Gets a numeric value associated with MenuComponent <see cref="MenuComponent" />.
+        /// </summary>
+        /// <remarks>
+        ///     This property will only succeed for MenuSlider, MenuSliderBool and MenuList.
+        /// </remarks>
+        public int Value => ((IIntReturn)this).Value;
 
         /// <summary>
         ///     Gets or sets the name of the internal.
@@ -73,6 +91,21 @@
         #endregion
 
         #region Public Methods and Operators
+
+        /// <summary>
+        ///     Gets the item.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <returns>MenuComponent.</returns>
+        public IMenuComponent GetItem(string name)
+        {
+            if (this.Children.Keys.Contains(name))
+            {
+                return this.Children[name];
+            }
+
+            throw new Exception($"[Menu] Item: {name} was not found in the menu: {this.InternalName}");
+        }
 
         /// <summary>
         ///     Converts the <see cref="MenuComponent" /> to the specified <typeparamref name="T" />.
@@ -128,12 +161,6 @@
         {
         }
 
-        /// <summary>
-        /// Gets the <see cref="MenuComponent"/> with the specified name.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuComponent.</returns>
-        public MenuComponent this[string name] => ((Menu)(IMenu)(IMenuComponent) this)[name];
 
         #endregion
     }

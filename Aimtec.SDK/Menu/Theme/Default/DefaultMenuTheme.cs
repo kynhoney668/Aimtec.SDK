@@ -119,8 +119,15 @@
 
         public override Rectangle GetMenuBoolControlBounds(Vector2 pos)
         {
-            var newPos = pos + new Vector2(this.ComponentWidth - IndicatorWidth  - LineWidth, 0);
+            var newPos = pos + new Vector2(this.ComponentWidth - IndicatorWidth - LineWidth, 0);
             return new Rectangle((int) newPos.X, (int) newPos.Y, IndicatorWidth, MenuHeight);
+        }
+
+        public override Rectangle GetMenuSliderControlBounds(Vector2 pos)
+        {
+            var sliderPosition = pos;
+            var sliderBounds = new Rectangle((int)sliderPosition.X, (int)sliderPosition.Y, this.ComponentWidth, this.MenuHeight);
+            return sliderBounds;
         }
 
         public override Rectangle[] GetMenuListControlBounds(Vector2 pos)
@@ -136,11 +143,11 @@
         {
             var boolPosition = pos + new Vector2(this.ComponentWidth - IndicatorWidth - LineWidth, 0);
 
-            var sliderPosition = pos + new Vector2(LineWidth, 0);
+            var sliderPosition = pos;
 
             var boolBounds = new Rectangle((int)boolPosition.X, (int)boolPosition.Y, IndicatorWidth, MenuHeight); ;
 
-            var sliderBounds = new Rectangle((int)sliderPosition.X, (int)sliderPosition.Y, ComponentWidth - IndicatorWidth - LineWidth, MenuHeight);
+            var sliderBounds = new Rectangle((int)sliderPosition.X, (int)sliderPosition.Y, ComponentWidth - IndicatorWidth, MenuHeight);
 
             return new Rectangle[] { sliderBounds, boolBounds };
         }

@@ -7,7 +7,7 @@
     using Util;
 
     // todo
-    public sealed class MenuSliderBool : MenuComponent, IReturns<int>
+    public sealed class MenuSliderBool : MenuComponent, IEnabledReturn, IIntReturn
     {
         #region Constructors and Destructors
 
@@ -37,7 +37,7 @@
 
         public override bool Toggled { get; set; }
 
-        public int Value { get; set; }
+        public new int Value { get; set; }
 
         public override bool Visible { get; set; }
 
@@ -91,16 +91,16 @@
                 }
             }
 
-            else if (message == (ulong)WindowsMessages.WM_LBUTTONUP)
+            else if (message == (ulong)WindowsMessages.WM_LBUTTONUP && !this.MouseDown)
             {
                 if (Visible)
                 {
                     var x = lparam & 0xffff;
                     var y = lparam >> 16;
-                    var boolBounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(Position)[1];
+                    var boolBounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position)[1];
                     if (boolBounds.Contains(x, y))
                     {
-                        this.Enabled = !Enabled;
+                        this.Enabled = !this.Enabled;
                     }
                 }
 
@@ -120,7 +120,7 @@
         private void SetSliderValue(int x)
         {
             var sliderbounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position)[0];
-            this.Value = Math.Max(this.MinValue, (int)((x - this.Position.X) / sliderbounds.Width * this.MaxValue));
+            this.Value = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int)((x - this.Position.X) / (sliderbounds.Width - 10) * this.MaxValue)));
         }
 
         #endregion

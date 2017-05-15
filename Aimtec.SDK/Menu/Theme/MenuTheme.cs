@@ -84,6 +84,8 @@
 
         public abstract Rectangle GetMenuBoolControlBounds(Vector2 pos);
 
+        public abstract Rectangle GetMenuSliderControlBounds(Vector2 pos);
+
         public abstract Rectangle[] GetMenuListControlBounds(Vector2 pos);
 
         public abstract Rectangle[] GetMenuSliderBoolControlBounds(Vector2 pos);

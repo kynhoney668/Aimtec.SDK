@@ -4,7 +4,7 @@
     ///     Exposes a property of type <typeparamref name="T" />.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IReturns<T>
+    public interface IEnabledReturn
     {
         #region Public Properties
 
@@ -14,8 +14,50 @@
         /// <value>
         ///     The value.
         /// </value>
-        T Value { get; set; }
+        bool Enabled { get; }
 
         #endregion
     }
+
+    /// <summary>
+    ///     Exposes a property of type <typeparamref name="T" />.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IIntReturn
+    {
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets or sets the value.
+        /// </summary>
+        /// <value>
+        ///     The value.
+        /// </value>
+        int Value { get; }
+
+        #endregion
+    }
+
+
+
+    /// <summary>
+    ///     Exposes a property of type <typeparamref name="T" />.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    public interface IStringReturn
+    {
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets or sets the value.
+        /// </summary>
+        /// <value>
+        ///     The value.
+        /// </value>
+        string StringValue { get; }
+
+        #endregion
+    }
+
+
 }

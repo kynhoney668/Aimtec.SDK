@@ -8,7 +8,7 @@
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
     /// <seealso cref="bool" />
-    public sealed class MenuKeyBind : MenuComponent, IReturns<bool>
+    public sealed class MenuKeyBind : MenuComponent, IEnabledReturn
     {
         #region Constructors and Destructors
 
@@ -68,6 +68,12 @@
         public bool Value { get; set; }
 
         /// <summary>
+        ///     Gets whether this menu componenet is enabled if applicable
+        /// </summary>
+        /// <value>The value.</value>
+        public new bool Enabled => Value;
+
+        /// <summary>
         /// Gets or sets the parent.
         /// </summary>
         /// <value>The parent.</value>
@@ -89,7 +95,7 @@
         /// Gets or sets a value indicating whether the key is being set.
         /// </summary>
         /// <value><c>true</c> if the key is being set; otherwise, <c>false</c>.</value>
-        private bool KeyIsBeingSet { get; set; }
+        internal bool KeyIsBeingSet { get; set; }
 
         #endregion
 

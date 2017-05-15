@@ -1,5 +1,8 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
+    using System;
+    using System.Drawing;
+
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
 
@@ -8,7 +11,7 @@
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
     /// <seealso cref="int" />
-    public sealed class MenuSlider : MenuComponent, IReturns<int>
+    public sealed class MenuSlider : MenuComponent, IIntReturn
     {
         #region Constructors and Destructors
 
@@ -73,7 +76,7 @@
         ///     Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
-        public int Value { get; set; }
+        public new int Value { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
@@ -107,6 +110,12 @@
         {
             return MenuManager.Instance.Theme.BuildMenuSliderRenderer(this);
         }
+
+        public override Rectangle GetBounds(Vector2 pos)
+        {
+            return MenuManager.Instance.Theme.GetMenuSliderControlBounds(pos);
+        }
+
 
         /// <summary>
         ///     An application-defined function that processes messages sent to a window.
@@ -148,7 +157,7 @@
         /// <param name="x">The x.</param>
         private void SetSliderValue(int x)
         {
-            this.Value = System.Math.Max(this.MinValue, (int) ((x - this.Position.X) / this.GetBounds(this.Position).Width * this.MaxValue));
+            this.Value = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width - 10) * this.MaxValue)));
         }
 
         #endregion

@@ -9,7 +9,7 @@
     ///     Class MenuList.
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
-    public sealed class MenuList : MenuComponent, IReturns<int>
+    public sealed class MenuList : MenuComponent, IIntReturn
     {
         #region Constructors and Destructors
 
@@ -76,13 +76,14 @@
         ///     Gets or sets the value, which is the index of the string list.
         /// </summary>
         /// <value>The value.</value>
-        public int Value { get; set; }
+        public new int Value { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
         public override bool Visible { get; set; }
+
 
         #endregion
 
