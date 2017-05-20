@@ -13,19 +13,12 @@
         #region Public Properties
 
         /// <summary>
-        ///     Gets the children.
-        /// </summary>
-        /// <value>The children.</value>
-        Dictionary<string, IMenuComponent> Children { get; }
-
-        /// <summary>
         ///     Converts the <see cref="IMenuComponent" /> to the specified <typeparamref name="T" />.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns>T.</returns>
         T As<T>() where T : MenuComponent;
 
-        IMenuComponent this[string name] { get; }
 
         /// <summary>
         ///     Gets or sets the display name.

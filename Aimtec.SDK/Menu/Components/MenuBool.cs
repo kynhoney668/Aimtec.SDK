@@ -1,14 +1,20 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
     using System;
+    using System.IO;
+    using System.Reflection;
+
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
+
+    using Newtonsoft.Json;
 
     /// <summary>
     ///     Class MenuBool. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
     /// <seealso cref="bool" />
+    [JsonObject(MemberSerialization.OptIn)]
     public sealed class MenuBool : MenuComponent, IReturns<bool>
     {
         #region Constructors and Destructors
@@ -19,63 +25,40 @@
         /// <param name="internalName">The display name.</param>
         /// <param name="displayName">The display name.</param>
         /// <param name="enabled">if set to <c>true</c> [enabled].</param>
-        public MenuBool(string internalName, string displayName, bool enabled = true)
+        /// <param name="shared">if set to <c>true</c> [shared].</param>
+        public MenuBool(string internalName, string displayName, bool enabled = true, bool shared = false)
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Value = enabled;
+            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
+
+            this.Shared = shared;
+
+            this.LoadValue();
+        }
+
+        [JsonConstructor]
+        private MenuBool()
+        {
+            
         }
 
         #endregion
 
         #region Public Properties
 
-        /// <summary>
-        ///     Gets or sets the display name.
-        /// </summary>
-        /// <value>The display name.</value>
-        public override string DisplayName { get; set; }
+        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
 
-        /// <summary>
-        ///     Gets or sets the name of the internal.
-        /// </summary>
-        /// <value>The name of the internal.</value>
-        public override string InternalName { get; set; }
-
-        public override Menu Parent { get; set; }
-
-        public override bool Root { get; set; }
-
-
-        /// <summary>
-        ///     Gets or sets the position.
-        /// </summary>
-        /// <value>The position.</value>
-        public override Vector2 Position { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
-        /// </summary>
-        /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
-        public override bool Toggled { get; set; }
-
+ 
         /// <summary>
         ///     Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
+        [JsonProperty(Order = 3, PropertyName = "Value")]
         public new bool Value { get; set; }
-
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
-        /// </summary>
-        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        public override bool Visible { get; set; }
-
-    
-
-
-    #endregion
+        
+        #endregion
 
         #region Public Methods and Operators
 
@@ -103,7 +86,45 @@
 
                 if (MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position).Contains(x, y))
                 {
-                    this.Value = !this.Value;
+                    this.UpdateValue(!this.Value);
+                }
+            }
+        }
+
+
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        ///     Updates the value of the bool, saves the new value and fires the value changed event
+        /// </summary>
+        private void UpdateValue(bool newVal)
+        {
+            var oldClone = new MenuBool { InternalName = this.InternalName, DisplayName = this.DisplayName, Value = this.Value };
+
+            this.Value = newVal;
+
+            this.SaveValue();
+
+            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
+        }
+
+        /// <summary>
+        ///    Loads the value from the file for this component
+        /// </summary>
+        internal override void LoadValue()
+        {
+            if (File.Exists(this.ConfigPath))
+            {
+                var read = File.ReadAllText(this.ConfigPath);
+
+                var sValue = JsonConvert.DeserializeObject<MenuBool>(read);
+
+                if (sValue?.InternalName != null)
+                {
+                    this.Value = sValue.Value;
                 }
             }
         }

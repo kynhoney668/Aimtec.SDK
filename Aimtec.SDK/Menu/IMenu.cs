@@ -6,7 +6,7 @@
     ///     Interface IMenu
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.IMenuComponent" />
-    public interface IMenu : IMenuComponent
+    public interface IMenu
     {
         #region Public Properties
 
@@ -14,7 +14,7 @@
         ///     Gets the children.
         /// </summary>
         /// <value>The children.</value>
-        Dictionary<string, IMenuComponent> Children { get; }
+        Dictionary<string, MenuComponent> Children { get; }
 
         #endregion
 
@@ -25,20 +25,13 @@
         /// </summary>
         /// <param name="menu">The menu.</param>
         /// <returns>IMenu.</returns>
-        IMenu Add(IMenuComponent menu);
-
-        /// <summary>
-        ///     Adds the specified menu.
-        /// </summary>
-        /// <param name="menu">The menu.</param>
-        /// <returns>IMenu.</returns>
-        IMenu Add(IMenu menu);
+        Menu Add(MenuComponent menu);
 
         /// <summary>
         ///     Attaches this instance.
         /// </summary>
         /// <returns>IMenu.</returns>
-        IMenu Attach();
+        Menu Attach();
 
         #endregion
     }

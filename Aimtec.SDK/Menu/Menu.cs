@@ -4,18 +4,19 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
 
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
-    using Components;
 
     /// <summary>
     ///     Class Menu.
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.IMenu" />
     /// <seealso cref="System.Collections.IEnumerable" />
-    public class Menu : IMenu, IEnumerable
+    public class Menu : MenuComponent, IMenu, IEnumerable
     {
         #region Fields
 
@@ -38,10 +39,14 @@
         /// </summary>
         /// <param name="internalName">Name of the internal.</param>
         /// <param name="displayName">The display name.</param>
-        public Menu(string internalName, string displayName)
+        public Menu(string internalName, string displayName, bool isRoot = false)
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
+
+            this.Root = isRoot;
+
+            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
         }
 
         #endregion
@@ -52,31 +57,16 @@
         ///     Gets the children.
         /// </summary>
         /// <value>The children.</value>
-        public Dictionary<string, IMenuComponent> Children { get; } = new Dictionary<string, IMenuComponent>();
+        public override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
 
-        /// <summary>
-        ///     Gets or sets the display name.
-        /// </summary>
-        /// <value>The display name.</value>
-        public string DisplayName { get; set; }
+        internal override string Serialized { get; }
 
-        /// <summary>
-        ///     Gets or sets the name of the internal.
-        /// </summary>
-        /// <value>The name of the internal.</value>
-        public string InternalName { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the position.
-        /// </summary>
-        /// <value>The position.</value>
-        public Vector2 Position { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
         /// </summary>
         /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
-        public bool Toggled
+        public override bool Toggled
         {
             get => this.toggled;
             set
@@ -103,7 +93,7 @@
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        public bool Visible
+        public override bool Visible
         {
             get => this.visible;
             set
@@ -122,26 +112,15 @@
 
 
         /// <summary>
-        /// Gets or sets a value indicating whether this <see cref="Menu"/> is root.
-        /// </summary>
-        /// <value><c>true</c> if root; otherwise, <c>false</c>.</value>
-        public bool Root { get; set; }
-
-        /// <summary>
-        /// Gets or sets the parent.
-        /// </summary>
-        /// <value>The parent.</value>
-        public Menu Parent { get; set; }
-
-        /// <summary>
         /// Gets a value indicating whether this instance is a menu.
         /// </summary>
         /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
-        public bool IsMenu => true;
+        public override bool IsMenu => true;
 
         public bool Enabled => throw new NotImplementedException();
 
         public int Value => throw new NotImplementedException();
+
 
         #endregion
 
@@ -153,12 +132,8 @@
             throw new NotImplementedException();
         }
 
-        /// <summary>
-        ///     Gets the <see cref="MenuComponent" /> with the specified internal name.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuComponent.</returns>
-        public IMenuComponent this[string name] => this.GetItem(name);
+        public override MenuComponent this[string name] => this.GetItem(name);
+
 
         #endregion
 
@@ -169,31 +144,46 @@
         /// </summary>
         /// <param name="menuComponent">The menu.</param>
         /// <returns>IMenu.</returns>
-        public IMenu Add(IMenuComponent menuComponent)
+        public Menu Add(MenuComponent menuComponent)
         {
-            menuComponent.Parent = this;
-            this.Children.Add(menuComponent.InternalName, menuComponent);
-            return this;
-        }
+            if (menuComponent != null)
+            {
+                menuComponent.Parent = this;
 
-        /// <summary>
-        ///     Adds the specified menu.
-        /// </summary>
-        /// <param name="menu">The menu.</param>
-        /// <returns>IMenu.</returns>
-        public IMenu Add(IMenu menu)
-        {
-            return this.Add((IMenuComponent)menu);
+                this.Children.Add(menuComponent.InternalName, menuComponent);
+            }
+
+            return this;
         }
 
         /// <summary>
         ///     Attaches this instance.
         /// </summary>
         /// <returns>IMenu.</returns>
-        public IMenu Attach()
+        public Menu Attach()
         {
+            if (!this.Root)
+            {
+                throw new Exception($"You can only attach a Root Menu. If this is supposed to be your root menu, set isRoot to true in the constructor.");
+            }
+
             MenuManager.Instance.Add(this);
-            this.Root = true;
+
+            return this;
+        }
+
+        /// <summary>
+        /// Sets this menu instance to true will make it shared resulting in all its children becoming shared.
+        /// </summary>
+        public Menu SetShared(bool value)
+        {
+            this.Shared = value;
+
+            foreach (var item in this.Children.Values)
+            {
+                item.Shared = true;
+            }
+
             return this;
         }
 
@@ -202,7 +192,7 @@
         /// </summary>
         /// <param name="pos">The position.</param>
         /// <returns>Rectangle.</returns>
-        public Rectangle GetBounds(Vector2 pos)
+        public override Rectangle GetBounds(Vector2 pos)
         {
             return new Rectangle(
                 (int) pos.X,
@@ -220,27 +210,13 @@
             return this.Children.GetEnumerator();
         }
 
-        /// <summary>
-        ///     Gets the item.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuComponent.</returns>
-        public IMenuComponent GetItem(string name)
-        {
-            if (this.Children.Keys.Contains(name))
-            {
-                return this.Children[name];
-            }
-
-            throw new Exception($"[Menu] Item: {name} was not found in the menu: {this.InternalName}");
-        }
-
+  
 
         /// <summary>
         ///     Gets the render manager.
         /// </summary>
         /// <returns>IRenderManager.</returns>
-        public IRenderManager GetRenderManager()
+        public override IRenderManager GetRenderManager()
         {
             return MenuManager.Instance.Theme.BuildMenuRenderer(this);
         }
@@ -249,7 +225,7 @@
         ///     Renders the specified position.
         /// </summary>
         /// <param name="position">The position.</param>
-        public void Render(Vector2 position)
+        public override void Render(Vector2 position)
         {
             if (this.Visible)
             {
@@ -276,7 +252,7 @@
         /// <param name="message">The message.</param>
         /// <param name="wparam">Additional message information.</param>
         /// <param name="lparam">Additional message information.</param>
-        public void WndProc(uint message, uint wparam, int lparam)
+        public override void WndProc(uint message, uint wparam, int lparam)
         {
             if (message == (ulong) WindowsMessages.WM_LBUTTONUP && this.Visible)
             {
@@ -322,6 +298,25 @@
             }
         }
 
+        internal override void LoadValue()
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
+
+        internal override void SaveValue()
+        {
+            if (!Directory.Exists(this.ConfigBaseFolder))
+            {
+                Directory.CreateDirectory(this.ConfigBaseFolder);
+            }
+
+            foreach (var item in this.Children.Values)
+            {
+                var mc = (MenuComponent)item;
+                mc.SaveValue();
+            }
+        }
     }
 }

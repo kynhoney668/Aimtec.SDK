@@ -2,11 +2,11 @@
 {
     using System.Drawing;
 
-    internal class DefaultMenu : IRenderManager<IMenu, DefaultMenuTheme>
+    internal class DefaultMenu : IRenderManager<Menu, DefaultMenuTheme>
     {
         #region Constructors and Destructors
 
-        public DefaultMenu(IMenu component, DefaultMenuTheme theme)
+        public DefaultMenu(Menu component, DefaultMenuTheme theme)
         {
             this.Component = component;
             this.Theme = theme;
@@ -16,7 +16,7 @@
 
         #region Public Properties
 
-        public IMenu Component { get; }
+        public Menu Component { get; }
 
         public DefaultMenuTheme Theme { get; }
 

@@ -3,13 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.IO;
     using System.Linq;
 
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Menu.Theme.Default;
     using Aimtec.SDK.Util;
 
-    internal class MenuManager : IMenu
+    internal class MenuManager
     {
         #region Fields
 
@@ -25,13 +26,36 @@
 
         private MenuManager()
         {
+            if (!Directory.Exists(AppDataConfigPath))
+            {
+                Directory.CreateDirectory(AppDataConfigPath);
+            }
+
+            if (!Directory.Exists(MenuSettingsPath))
+            {
+                Directory.CreateDirectory(MenuSettingsPath);
+            }
+
             RenderManager.OnPresent += () => this.Render(this.Position);
             Game.OnWndProc += args => this.WndProc(args.Message, args.WParam, args.LParam);
 
+            Game.OnEnd += delegate { this.Save(); };
+            AppDomain.CurrentDomain.DomainUnload += delegate { this.Save(); };
+            AppDomain.CurrentDomain.ProcessExit += delegate { this.Save(); };
+
             // TODO: Make this load from settings
             this.Theme = new DefaultMenuTheme();
-            Console.WriteLine("init");
         }
+
+        #endregion
+
+        #region Internal Properties
+
+        internal string AppDataConfigPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimTec.SDK");
+
+        internal string MenuSettingsPath => Path.Combine(AppDataConfigPath, "MenuSettings");
+
+        internal string SharedSettingsPath => Path.Combine(MenuSettingsPath, "SharedConfig");
 
         #endregion
 
@@ -39,7 +63,7 @@
 
         public static MenuManager Instance { get; } = new MenuManager();
 
-        public Dictionary<string, IMenuComponent> Children { get; } = new Dictionary<string, IMenuComponent>();
+        public Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
 
         public T As<T>()
             where T : MenuComponent
@@ -102,23 +126,16 @@
 
         #region Properties
 
-        internal IReadOnlyList<IMenuComponent> Menus => this.Children.Values.Where(x => x is IMenu).ToList();
+        internal IReadOnlyList<MenuComponent> Menus => this.Children.Values.Where(x => x.IsMenu).ToList();
 
-        Menu IMenuComponent.Parent { get; set; }
 
         #endregion
 
         #region Public Methods and Operators
 
-        public IMenu Add(IMenuComponent menu)
+        public void Add(MenuComponent menu)
         {
             this.Children.Add(menu.InternalName, menu);
-            return this;
-        }
-
-        public IMenu Add(IMenu menu)
-        {
-            return this.Add((IMenuComponent)menu);
         }
 
         public Rectangle GetBounds(Vector2 pos)
@@ -133,6 +150,15 @@
         public IRenderManager GetRenderManager()
         {
             return null;
+        }
+
+        public void Save()
+        {
+            foreach (var mc in Menus)
+            {
+                var m = (Menu)mc;
+                m.SaveValue();
+            }
         }
 
         public void Render(Vector2 pos)
@@ -166,6 +192,12 @@
                 this.Visible = false;
             }
 
+            //Save Menu if F5 is pressed (upon reloading)
+            if (message == (int)WindowsMessages.WM_KEYUP && wparam == (ulong)Keys.F5)
+            {
+                this.Save();
+            }
+
             foreach (var menu in this.Menus)
             {
                 menu.WndProc(message, wparam, lparam);
@@ -176,11 +208,6 @@
         #endregion
 
         #region Explicit Interface Methods
-
-        IMenu IMenu.Attach()
-        {
-            return this;
-        }
 
         #endregion
     }

@@ -69,7 +69,7 @@
             return new DefaultMenuList(menuList, this);
         }
 
-        public override IRenderManager<IMenu> BuildMenuRenderer(IMenu menu)
+        public override IRenderManager<Menu> BuildMenuRenderer(Menu menu)
         {
             return new DefaultMenu(menu, this);
         }

@@ -31,9 +31,8 @@
     <DocumentationFile>bin\Release\Aimtec.SDK.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aimtec, Version=1.0.6319.29380, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Desktop\Aimtec\System\Aimtec.dll</HintPath>
+    <Reference Include="Aimtec">
+      <HintPath>..\..\..\aimkek-dev-build-0.0.3\System\Aimtec.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -85,6 +84,7 @@
     <Compile Include="Menu\Theme\MenuTheme.cs" />
     <Compile Include="Menu\Menu.cs" />
     <Compile Include="Menu\MenuManager.cs" />
+    <Compile Include="Menu\ValueChangedArgs.cs" />
     <Compile Include="Orbwalking\IOrbwalker.cs" />
     <Compile Include="Orbwalking\Orbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkingImpl.cs" />

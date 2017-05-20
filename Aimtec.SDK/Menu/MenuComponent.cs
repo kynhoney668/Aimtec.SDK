@@ -4,7 +4,10 @@
     using System;
     using System.Collections.Generic;
     using System.Drawing;
+    using System.IO;
     using System.Linq;
+
+    using Newtonsoft.Json;
 
     /// <summary>
     ///     Class MenuComponent.
@@ -18,16 +21,68 @@
         ///     Gets the children.
         /// </summary>
         /// <value>The children.</value>
-        public Dictionary<string, IMenuComponent> Children { get; }
+        public virtual Dictionary<string, MenuComponent> Children { get; }
 
-        public IMenuComponent this[string name] => null;
+        public virtual MenuComponent this[string name] => null;
 
+        internal virtual string ConfigName => CleanFileName(
+            $"{this.DisplayName}-{this.InternalName}-{this.GetType().Name}");
+
+        internal virtual string ConfigBaseFolder
+        {
+            get
+            {
+                if (this.Shared || (this.Parent != null && this.Parent.Shared))
+                {
+                    return MenuManager.Instance.SharedSettingsPath;
+                }
+
+                return Path.Combine(MenuManager.Instance.MenuSettingsPath, this.CallingAssemblyName);
+            }
+        }
+
+
+        internal virtual string ConfigPath => Path.Combine(this.ConfigBaseFolder, this.ConfigName + ".json");
+
+        internal bool Shared { get; set; }
+
+        internal string CallingAssemblyName { get; set; }
+
+        internal abstract string Serialized { get; }
+
+        public delegate void ValueChangedHandler(MenuComponent sender, ValueChangedArgs args);
+
+        public virtual event ValueChangedHandler ValueChanged;
+
+        protected virtual void FireOnValueChanged(MenuComponent sender, ValueChangedArgs args)
+        {
+            if (this.ValueChanged != null)
+            {
+                //Fire the value changed of this menucomponent instance
+                ValueChanged(sender, args);
+            }
+
+
+            //Fire the value changed on the parent menu 
+            if (this.Parent != null)
+            {
+                this.Parent.FireOnValueChanged(sender, args);
+            }
+        }
 
         /// <summary>
         ///     Gets or sets the display name.
         /// </summary>
         /// <value>The display name.</value>
-        public abstract string DisplayName { get; set; }
+        [JsonProperty(Order = 1)]
+        public string DisplayName { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the name of the internal.
+        /// </summary>
+        /// <value>The name of the internal.</value>
+        [JsonProperty(Order = 2)]
+        public string InternalName { get; set; }
 
         /// <summary>
         ///     Gets a value indicating whether this <see cref="MenuComponent" /> is enabled.
@@ -48,40 +103,34 @@
 
 
         /// <summary>
-        ///     Gets or sets the name of the internal.
-        /// </summary>
-        /// <value>The name of the internal.</value>
-        public virtual string InternalName { get; set; }
-
-        /// <summary>
         ///     Gets or sets the position.
         /// </summary>
         /// <value>The position.</value>
-        public abstract Vector2 Position { get; set; }
+        public Vector2 Position { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
         /// </summary>
         /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
-        public abstract bool Toggled { get; set; }
+        public virtual bool Toggled { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        public abstract bool Visible { get; set; }
+        public virtual bool Visible { get; set; }
 
         /// <summary>
         /// Gets or sets the parent.
         /// </summary>
         /// <value>The parent.</value>
-        public abstract Menu Parent { get; set; }
+        public Menu Parent { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether this <see cref="MenuComponent"/> is the root menu.
         /// </summary>
         /// <value><c>true</c> if this menu is the root menu; otherwise, <c>false</c>.</value>
-        public abstract bool Root { get; set; }
+        public bool Root { get; set; }
 
         /// <summary>
         /// Gets a value indicating whether this instance is a menu.
@@ -98,7 +147,7 @@
         /// </summary>
         /// <param name="name">The name.</param>
         /// <returns>MenuComponent.</returns>
-        public IMenuComponent GetItem(string name)
+        public MenuComponent GetItem(string name)
         {
             if (this.Children.Keys.Contains(name))
             {
@@ -162,6 +211,24 @@
         {
         }
 
+        internal virtual void SaveValue()
+        {
+            if (!Directory.Exists(this.ConfigBaseFolder))
+            {
+                Directory.CreateDirectory(this.ConfigBaseFolder);
+            }
+
+            File.WriteAllText(this.ConfigPath, this.Serialized);
+        }
+
+        internal abstract void LoadValue();
+
+
+        private string CleanFileName(string fileName)
+        {
+            var clean = Path.GetInvalidFileNameChars().Aggregate(fileName, (current, c) => current.Replace(c.ToString(), string.Empty));
+            return clean;
+        }
 
         #endregion
     }

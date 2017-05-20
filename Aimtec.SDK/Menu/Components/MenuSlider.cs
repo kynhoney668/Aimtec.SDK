@@ -2,16 +2,21 @@
 {
     using System;
     using System.Drawing;
+    using System.IO;
+    using System.Reflection;
 
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Menu.Theme.Default;
     using Aimtec.SDK.Util;
+
+    using Newtonsoft.Json;
 
     /// <summary>
     ///     Class MenuSlider. This class cannot be inherited.
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.MenuComponent" />
     /// <seealso cref="int" />
+    [JsonObject(MemberSerialization.OptIn)]
     public sealed class MenuSlider : MenuComponent, IReturns<int>
     {
         #region Constructors and Destructors
@@ -19,75 +24,62 @@
         /// <summary>
         ///     Initializes a new instance of the <see cref="MenuSlider" /> class.
         /// </summary>
-        /// <param name="displayName">The internal name.</param>
+        /// <param name="internalName">The internal name.</param>
         /// <param name="displayName">The display name.</param>
         /// <param name="value">The value.</param>
         /// <param name="minValue">The minimum value.</param>
         /// <param name="maxValue">The maximum value.</param>
-        public MenuSlider(string internalName, string displayName, int value, int minValue = 0, int maxValue = 100)
+        /// <param name="shared">Whether this item is shared across instances</param>
+        public MenuSlider(string internalName, string displayName, int value, int minValue = 0, int maxValue = 100, bool shared = false)
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Value = value;
             this.MinValue = minValue;
             this.MaxValue = maxValue;
+            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
+
+            this.Shared = shared;
+
+            this.LoadValue();
+        }
+
+        [JsonConstructor]
+        private MenuSlider()
+        {
+            
         }
 
         #endregion
 
         #region Public Properties
 
-        /// <summary>
-        ///     Gets or sets the display name.
-        /// </summary>
-        /// <value>The display name.</value>
-        public override string DisplayName { get; set; }
+        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
+
+
 
         /// <summary>
-        ///     Gets or sets the name of the internal.
+        ///     Gets or sets the value.
         /// </summary>
-        /// <value>The name of the internal.</value>
-        public override string InternalName { get; set; }
-
+        /// <value>The value.</value>
+        [JsonProperty(Order = 3)]
+        public new int Value { get; set; }
+    
         /// <summary>
         ///     Gets or sets the maximum value.
         /// </summary>
         /// <value>The maximum value.</value>
+        [JsonProperty(Order = 4)]
         public int MaxValue { get; set; }
 
         /// <summary>
         ///     Gets or sets the minimum value.
         /// </summary>
         /// <value>The minimum value.</value>
+        [JsonProperty(Order = 5)]
         public int MinValue { get; set; }
 
-        /// <summary>
-        ///     Gets or sets the position.
-        /// </summary>
-        /// <value>The position.</value>
-        public override Vector2 Position { get; set; }
 
-        /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
-        /// </summary>
-        /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
-        public override bool Toggled { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the value.
-        /// </summary>
-        /// <value>The value.</value>
-        public new int Value { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
-        /// </summary>
-        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        public override bool Visible { get; set; }
-
-        public override Menu Parent { get; set; }
-
-        public override bool Root { get; set; }
 
         #endregion
 
@@ -148,6 +140,7 @@
             }
         }
 
+
         #endregion
 
         #region Methods
@@ -158,7 +151,41 @@
         /// <param name="x">The x.</param>
         private void SetSliderValue(int x)
         {
-            this.Value = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue)));
+            this.UpdateValue(Math.Max(this.MinValue, Math.Min(this.MaxValue, (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue))));
+        }
+
+ 
+        private void UpdateValue(int newVal)
+        {
+            var oldClone = new MenuSlider { InternalName = this.InternalName, DisplayName = this.DisplayName, Value = this.Value, MinValue = this.MinValue, MaxValue = this.MaxValue };
+
+            this.Value = newVal;
+
+            this.SaveValue();
+
+            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
+        }
+
+
+
+        /// <summary>
+        ///    Loads the value from the file for this component
+        /// </summary>
+        internal override void LoadValue()
+        {
+            if (File.Exists(this.ConfigPath))
+            {
+                var read = File.ReadAllText(this.ConfigPath);
+
+                var sValue = JsonConvert.DeserializeObject<MenuSlider>(read);
+
+                if (sValue?.InternalName != null)
+                {
+                    this.Value = sValue.Value;
+                    this.MaxValue = sValue.MaxValue;
+                    this.MinValue = sValue.MinValue;
+                }
+            }
         }
 
         #endregion

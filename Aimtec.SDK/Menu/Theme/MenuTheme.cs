@@ -66,7 +66,7 @@
         /// </summary>
         /// <param name="menu">The menu.</param>
         /// <returns>IRenderManager&lt;IMenu&gt;.</returns>
-        public abstract IRenderManager<IMenu> BuildMenuRenderer(IMenu menu);
+        public abstract IRenderManager<Menu> BuildMenuRenderer(Menu menu);
 
         /// <summary>
         ///     Builds the menu seperator renderer.
