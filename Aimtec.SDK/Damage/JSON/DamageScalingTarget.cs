@@ -1,17 +1,17 @@
 ﻿namespace Aimtec.SDK.Damage.JSON
 {
     /// <summary>
-    /// Enum DamageScalingTarget
+    ///     Enum DamageScalingTarget
     /// </summary>
     public enum DamageScalingTarget
     {
         /// <summary>
-        /// The source
+        ///     The source
         /// </summary>
         Source,
 
         /// <summary>
-        /// The target
+        ///     The target
         /// </summary>
         Target
     }

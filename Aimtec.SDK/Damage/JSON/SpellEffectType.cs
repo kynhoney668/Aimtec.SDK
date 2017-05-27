@@ -1,32 +1,32 @@
 ﻿namespace Aimtec.SDK.Damage.JSON
 {
     /// <summary>
-    /// Enum SpellEffectType
+    ///     Enum SpellEffectType
     /// </summary>
     public enum SpellEffectType
     {
         /// <summary>
-        /// The none
+        ///     The none
         /// </summary>
         None,
 
         /// <summary>
-        /// The ao e
+        ///     The ao e
         /// </summary>
         AoE,
 
         /// <summary>
-        /// The single
+        ///     The single
         /// </summary>
         Single,
 
         /// <summary>
-        /// The over time
+        ///     The over time
         /// </summary>
         OverTime,
 
         /// <summary>
-        /// The attack
+        ///     The attack
         /// </summary>
         Attack
     }

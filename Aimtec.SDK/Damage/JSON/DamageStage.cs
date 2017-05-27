@@ -1,47 +1,47 @@
 ﻿namespace Aimtec.SDK.Damage.JSON
 {
     /// <summary>
-    /// Enum DamageStage
+    ///     Enum DamageStage
     /// </summary>
     public enum DamageStage
     {
         /// <summary>
-        /// The default
+        ///     The default
         /// </summary>
         Default,
 
         /// <summary>
-        /// The way back
+        ///     The way back
         /// </summary>
         WayBack,
 
         /// <summary>
-        /// The detonation
+        ///     The detonation
         /// </summary>
         Detonation,
 
         /// <summary>
-        /// The damage per second
+        ///     The damage per second
         /// </summary>
         DamagePerSecond,
 
         /// <summary>
-        /// The second form
+        ///     The second form
         /// </summary>
         SecondForm,
 
         /// <summary>
-        /// The second cast
+        ///     The second cast
         /// </summary>
         SecondCast,
 
         /// <summary>
-        /// The buff
+        ///     The buff
         /// </summary>
         Buff,
 
         /// <summary>
-        /// The empowered
+        ///     The empowered
         /// </summary>
         Empowered
     }

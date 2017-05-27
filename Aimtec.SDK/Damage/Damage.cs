@@ -106,8 +106,7 @@
                     case "Quinn":
                         if (target.HasBuff("quinnw"))
                         {
-                            dmgPhysical += 10 + 5 * hero.Level
-                                + (0.14 + 0.02 * hero.Level) * hero.TotalAttackDamage;
+                            dmgPhysical += 10 + 5 * hero.Level + (0.14 + 0.02 * hero.Level) * hero.TotalAttackDamage;
                         }
                         break;
                 }

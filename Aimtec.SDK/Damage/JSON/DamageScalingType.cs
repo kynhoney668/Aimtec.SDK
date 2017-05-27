@@ -1,52 +1,52 @@
 ﻿namespace Aimtec.SDK.Damage.JSON
 {
     /// <summary>
-    /// Enum DamageScalingType
+    ///     Enum DamageScalingType
     /// </summary>
     public enum DamageScalingType
     {
         /// <summary>
-        /// The bonus attack points
+        ///     The bonus attack points
         /// </summary>
         BonusAttackPoints,
 
         /// <summary>
-        /// The ability points
+        ///     The ability points
         /// </summary>
         AbilityPoints,
 
         /// <summary>
-        /// The attack points
+        ///     The attack points
         /// </summary>
         AttackPoints,
 
         /// <summary>
-        /// The maximum health
+        ///     The maximum health
         /// </summary>
         MaxHealth,
 
         /// <summary>
-        /// The current health
+        ///     The current health
         /// </summary>
         CurrentHealth,
 
         /// <summary>
-        /// The missing health
+        ///     The missing health
         /// </summary>
         MissingHealth,
 
         /// <summary>
-        /// The bonus health
+        ///     The bonus health
         /// </summary>
         BonusHealth,
 
         /// <summary>
-        /// The armor
+        ///     The armor
         /// </summary>
         Armor,
 
         /// <summary>
-        /// The maximum mana
+        ///     The maximum mana
         /// </summary>
         MaxMana
     }
