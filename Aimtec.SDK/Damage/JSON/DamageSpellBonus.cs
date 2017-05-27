@@ -1,99 +1,92 @@
-﻿using System.Collections.Generic;
-
-namespace Aimtec.SDK.Damage.JSON
+﻿namespace Aimtec.SDK.Damage.JSON
 {
-    public class DamageSpellBonus
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Class ChampionDamageSpellBonus.
+    /// </summary>
+    internal class DamageSpellBonus
     {
+        #region Public Properties
+
         /// <summary>
         /// Gets or sets the bonus damage on minion.
         /// </summary>
-        /// <value>
-        /// The bonus damage on minion.
-        /// </value>
+        /// <value>The bonus damage on minion.</value>
         public List<double> BonusDamageOnMinion { get; set; }
+
         /// <summary>
         /// Gets or sets the damage percentages.
         /// </summary>
-        /// <value>
-        /// The damage percentages.
-        /// </value>
+        /// <value>The damage percentages.</value>
         public List<double> DamagePercentages { get; set; }
+
         /// <summary>
         /// Gets or sets the type of the damage.
         /// </summary>
-        /// <value>
-        /// The type of the damage.
-        /// </value>
+        /// <value>The type of the damage.</value>
         public DamageType DamageType { get; set; }
+
         /// <summary>
         /// Gets or sets the maximum damage on minion.
         /// </summary>
-        /// <value>
-        /// The maximum damage on minion.
-        /// </value>
+        /// <value>The maximum damage on minion.</value>
         public List<int> MaxDamageOnMinion { get; set; }
+
         /// <summary>
         /// Gets or sets the minimum damage.
         /// </summary>
-        /// <value>
-        /// The minimum damage.
-        /// </value>
+        /// <value>The minimum damage.</value>
         public List<int> MinDamage { get; set; }
+
         /// <summary>
-        /// Gets or sets the per hundred ad scale.
+        /// Gets or sets the scale per100 ad.
         /// </summary>
-        /// <value>
-        /// The per hundred ad scale.
-        /// </value>
-        public double PerHundredAdScale { get; set; }
+        /// <value>The scale per100 ad.</value>
+        public double ScalePer100Ad { get; set; }
+
         /// <summary>
-        /// Gets or sets the per hundred bonus ad scale.
+        /// Gets or sets the scale per100 ap.
         /// </summary>
-        /// <value>
-        /// The per hundred bonus ad scale.
-        /// </value>
-        public double PerHundredBonusAdScale { get; set; }
+        /// <value>The scale per100 ap.</value>
+        public double ScalePer100Ap { get; set; }
+
         /// <summary>
-        /// Gets or sets the per hundred ap scale.
+        /// Gets or sets the scale per100 bonus ad.
         /// </summary>
-        /// <value>
-        /// The per hundred ap scale.
-        /// </value>
-        public double PerHundredApScale { get; set; }
+        /// <value>The scale per100 bonus ad.</value>
+        public double ScalePer100BonusAd { get; set; }
+
         /// <summary>
         /// Gets or sets the scaling buff.
         /// </summary>
-        /// <value>
-        /// The scaling buff.
-        /// </value>
+        /// <value>The scaling buff.</value>
         public string ScalingBuff { get; set; }
+
         /// <summary>
         /// Gets or sets the scaling buff offset.
         /// </summary>
-        /// <value>
-        /// The scaling buff offset.
-        /// </value>
+        /// <value>The scaling buff offset.</value>
         public int ScalingBuffOffset { get; set; }
+
         /// <summary>
         /// Gets or sets the scaling buff target.
         /// </summary>
-        /// <value>
-        /// The scaling buff target.
-        /// </value>
-        public ScalingTarget ScalingBuffTarget { get; set; }
+        /// <value>The scaling buff target.</value>
+        public DamageScalingTarget ScalingBuffTarget { get; set; }
+
         /// <summary>
         /// Gets or sets the scaling target.
         /// </summary>
-        /// <value>
-        /// The scaling target.
-        /// </value>
-        public ScalingTarget ScalingTarget { get; set; }
+        /// <value>The scaling target.</value>
+        public DamageScalingTarget ScalingTarget { get; set; }
+
         /// <summary>
         /// Gets or sets the type of the scaling.
         /// </summary>
-        /// <value>
-        /// The type of the scaling.
-        /// </value>
-        public ScalingType ScalingType { get; set; }
+        /// <value>The type of the scaling.</value>
+        public DamageScalingType ScalingType { get; set; }
+
+        #endregion
     }
 }

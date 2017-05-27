@@ -67,5 +67,10 @@ namespace Aimtec.SDK.Extensions
         {
             return from.BuffManager.HasBuff(buffname);
         }
+
+        public static bool HasItem(this Obj_AI_Hero from, uint itemId)
+        {
+            return from.Inventory.HasItem(itemId);
+        }
     }
 }

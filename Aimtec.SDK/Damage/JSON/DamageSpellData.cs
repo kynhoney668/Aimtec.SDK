@@ -1,106 +1,91 @@
-﻿using System.Collections.Generic;
-
-namespace Aimtec.SDK.Damage.JSON
+﻿namespace Aimtec.SDK.Damage.JSON
 {
-    public class DamageSpellData
+    using System.Collections.Generic;
+
+    /// <summary>
+    ///     The Champion Damage Spell Data class container.
+    /// </summary>
+    internal class DamageSpellData
     {
+        #region Public Properties
+
         /// <summary>
         /// Gets or sets the bonus damage on minion.
         /// </summary>
-        /// <value>
-        /// The bonus damage on minion.
-        /// </value>
+        /// <value>The bonus damage on minion.</value>
         public List<double> BonusDamageOnMinion { get; set; }
+
         /// <summary>
-        /// Gets or sets the bonus damages.
+        ///     Gets the Bonus Damages.
         /// </summary>
-        /// <value>
-        /// The bonus damages.
-        /// </value>
         public List<DamageSpellBonus> BonusDamages { get; set; }
+
         /// <summary>
-        /// Gets or sets the damages.
+        ///     Gets the Main Damages.
         /// </summary>
-        /// <value>
-        /// The damages.
-        /// </value>
-        public List<double> Damages { get; set;}
+        public List<double> Damages { get; set; }
+
         /// <summary>
-        /// Gets or sets the damage per level.
+        /// Gets or sets the damages per level.
         /// </summary>
-        /// <value>
-        /// The damage per level.
-        /// </value>
-        public List<double> DamagePerLevel { get; set; }
+        /// <value>The damages per level.</value>
+        public List<double> DamagesPerLvl { get; set; }
+
         /// <summary>
-        /// Gets or sets the type of the damage.
+        ///     Gets the Damage Type.
         /// </summary>
-        /// <value>
-        /// The type of the damage.
-        /// </value>
         public DamageType DamageType { get; set; }
+
         /// <summary>
-        /// Gets or sets a value indicating whether [apply on hit].
+        /// Gets or sets a value indicating whether this instance is apply on hit.
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if [apply on hit]; otherwise, <c>false</c>.
-        /// </value>
-        public bool ApplyOnHit { get; set; }
+        /// <value><c>true</c> if this instance is apply on hit; otherwise, <c>false</c>.</value>
+        public bool IsApplyOnHit { get; set; }
+
         /// <summary>
-        /// Gets or sets a value indicating whether this spell modifies other damages.
+        /// Gets or sets a value indicating whether this instance is modified damage.
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if modified damage; otherwise, <c>false</c>.
-        /// </value>
-        public bool ModifiedDamage { get; set; }
+        /// <value><c>true</c> if this instance is modified damage; otherwise, <c>false</c>.</value>
+        public bool IsModifiedDamage { get; set; }
+
         /// <summary>
         /// Gets or sets the maximum damage on minion.
         /// </summary>
-        /// <value>
-        /// The maximum damage on minion.
-        /// </value>
+        /// <value>The maximum damage on minion.</value>
         public List<int> MaxDamageOnMinion { get; set; }
+
         /// <summary>
         /// Gets or sets the scale per target missing health.
         /// </summary>
-        /// <value>
-        /// The scale per target missing health.
-        /// </value>
-        public double ScalePerTargetMissingHealth { get; set; }
+        /// <value>The scale per target missing health.</value>
+        public double ScalePerTargetMissHealth { get; set; }
+
         /// <summary>
-        /// Gets or sets the scale slot.
+        ///     Gets the Scaling Slot.
         /// </summary>
-        /// <value>
-        /// The scale slot.
-        /// </value>
-        public SpellSlot ScaleSlot { get; set; }
+        public SpellSlot ScaleSlot { get; set; } = SpellSlot.Unknown;
+
         /// <summary>
-        /// Gets or sets the scaling buff.
+        ///     Gets the Scaling Buff.
         /// </summary>
-        /// <value>
-        /// The scaling buff.
-        /// </value>
         public string ScalingBuff { get; set; }
+
         /// <summary>
-        /// Gets or sets the scaling buff offset.
+        ///     Gets the Scaling Buff Offset.
         /// </summary>
-        /// <value>
-        /// The scaling buff offset.
-        /// </value>
         public int ScalingBuffOffset { get; set; }
+
         /// <summary>
-        /// Gets or sets the scaling buff target.
+        ///     Gets the Scaling Buff Target.
         /// </summary>
-        /// <value>
-        /// The scaling buff target.
-        /// </value>
-        public ScalingTarget ScalingBuffTarget { get; set; }
+        public DamageScalingTarget ScalingBuffTarget { get; set; }
+
         /// <summary>
-        /// Gets or sets the type of the effect.
+        /// Gets or sets the type of the spell effect.
         /// </summary>
-        /// <value>
-        /// The type of the effect.
-        /// </value>
-        public SpellEffect EffectType { get; set; }
+        /// <value>The type of the spell effect.</value>
+        public SpellEffectType SpellEffectType { get; set; }
+
+        #endregion
     }
 }
