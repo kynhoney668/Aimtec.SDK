@@ -94,6 +94,7 @@
     <Compile Include="Orbwalking\OrbwalkingMode.cs" />
     <Compile Include="Prediction\Health\HealthPrediction.cs" />
     <Compile Include="Prediction\Health\HealthPredictionImpl.cs" />
+    <Compile Include="Prediction\Health\HealthPredictionImplB.cs" />
     <Compile Include="Prediction\Health\IHealthPrediction.cs" />
     <Compile Include="Prediction\HitChance.cs" />
     <Compile Include="Prediction\Prediction.cs" />

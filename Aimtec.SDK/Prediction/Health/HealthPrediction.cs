@@ -14,7 +14,7 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="HealthPrediction"/> class.
         /// </summary>
-        public HealthPrediction() : this(new HealthPredictionImpl())
+        public HealthPrediction() : this(new HealthPredictionImplB())
         {
             
         }
