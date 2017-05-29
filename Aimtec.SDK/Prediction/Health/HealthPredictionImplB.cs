@@ -17,13 +17,13 @@
 
         internal HealthPredictionImplB()
         {
-            Game.OnUpdate += this.GameOnOnUpdate;
+            Game.OnUpdate += this.GameOnUpdate;
             Obj_AI_Base.OnProcessAutoAttack += this.ObjAiBaseOnOnProcessAutoAttack;
             SpellBook.OnStopCast += this.SpellBookOnOnStopCast;
         }
 
 
-        private void GameOnOnUpdate()
+        private void GameOnUpdate()
         {
             // remove attacks where either the target or sender has become invalid or when they are no longer active
             foreach (var value in this.incomingAttacks.Values)
