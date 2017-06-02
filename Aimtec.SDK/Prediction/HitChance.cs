@@ -33,6 +33,16 @@
         /// <summary>
         ///     The target is immobile.
         /// </summary>
-        Immobile = 5
+        Immobile = 5,
+
+        /// <summary>
+        ///     The target is out of range.
+        /// </summary>
+        OutOfRange = 6,
+
+        /// <summary>
+        ///      Collision between the target and the skillshot.
+        /// </summary>
+        Collision = 7
     }
 }

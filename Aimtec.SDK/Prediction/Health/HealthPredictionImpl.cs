@@ -16,8 +16,6 @@
             public float MissileSpeed { get; set; }
 
             public bool Active { get; set; } = true;
-
-
         }
 
         #region Constructors and Destructors
