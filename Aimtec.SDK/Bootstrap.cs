@@ -39,7 +39,7 @@
         /// <summary>
         ///     Initalizes the library.
         /// </summary>
-        public void Load()
+        public static void Load()
         {
             if (alreadyLoaded)
             {
@@ -47,6 +47,7 @@
             }
 
             SetupLogging();
+            LogUnhandledExceptions();
 
             Logger.Info($"Aimtec.SDK version {Assembly.GetExecutingAssembly().GetName().Version} loaded.");
 
@@ -58,7 +59,33 @@
         #region Methods
 
         /// <summary>
-        ///     Setups the logging.
+        ///     Adds an event handler for unhandles exceptions and logs them accordingly.
+        /// </summary>
+        private static void LogUnhandledExceptions()
+        {
+            // FIXME this requires that the SDK be fully trusted by the AppDomain
+            // this event is not raised for exceptions that corrupt the state of the process, such as stack overflows or access violations
+            AppDomain.CurrentDomain.UnhandledException += (sender, args) =>
+            {
+                var exception = args.ExceptionObject as Exception;
+                var logLevel = args.IsTerminating ? LogLevel.Fatal : LogLevel.Error;
+
+                if (exception == null)
+                {
+                    Logger.Log(logLevel, "An unknown unhandled exception occured.");
+                    return;
+                }
+
+                // Is there a better way to do this? -Pixl
+                if (exception.TargetSite.Module.Assembly.Equals(Assembly.GetExecutingAssembly()))
+                {
+                    Logger.Log(logLevel, exception, "An unhandled exception occured in Aimtec.SDK");
+                }
+            };
+        }
+
+        /// <summary>
+        ///     Configures NLog to properly display and record log messages.
         /// </summary>
         private static void SetupLogging()
         {

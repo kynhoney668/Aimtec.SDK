@@ -3,12 +3,15 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
 
     using Aimtec.SDK.Damage.JSON;
     using Aimtec.SDK.Extensions;
 
     using Newtonsoft.Json;
+
+    using NLog;
 
     /// <summary>
     ///     Class DamageLibrary.
@@ -18,25 +21,43 @@
         #region Constructors and Destructors
 
         /// <summary>
+        /// Gets the logger.
+        /// </summary>
+        /// <value>The logger.</value>
+        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+
+        /// <summary>
         ///     Initializes static members of the <see cref="DamageLibrary" /> class.
         /// </summary>
         static DamageLibrary()
         {
-            using (var stream = Assembly.GetExecutingAssembly()
-                                        .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.11.json"))
+            try
             {
-                if (stream == null)
+                // Todo makes this load based on game version
+                using (var stream = Assembly.GetExecutingAssembly()
+                                            .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.11.json"))
                 {
-                    Console.WriteLine("Could not load damages!");
-                    return;
-                }
+                    if (stream == null)
+                    {
+                        Logger.Error($"Could not load the damage library. {nameof(stream)} was null.");
+                        return;
+                    }
 
-                using (var streamReader = new StreamReader(stream))
-                {
-                    Damages =
-                        JsonConvert.DeserializeObject<Dictionary<string, ChampionDamage>>(streamReader.ReadToEnd());
+                    using (var streamReader = new StreamReader(stream))
+                    {
+                        Damages =
+                            JsonConvert.DeserializeObject<Dictionary<string, ChampionDamage>>(streamReader.ReadToEnd());
+                    }
                 }
             }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Could not load damages. Subsequent Damage API calls will return 0.");
+
+                // Create empty damages to supress errors
+                Damages = new Dictionary<string, ChampionDamage>();
+            }
+            
         }
 
         #endregion
@@ -47,7 +68,7 @@
         ///     Gets the damages.
         /// </summary>
         /// <value>The damages.</value>
-        public static IReadOnlyDictionary<string, ChampionDamage> Damages { get; private set; }
+        public static IReadOnlyDictionary<string, ChampionDamage> Damages { get; }
 
         #endregion
 
@@ -72,7 +93,7 @@
             var percent = spellBonus.DamagePercentages?.Count > 0
                 ? spellBonus.DamagePercentages[Math.Min(index, spellBonus.DamagePercentages.Count - 1)]
                 : 0d;
-            var origin = 0f;
+            float origin;
 
             switch (spellBonus.ScalingType)
             {
@@ -95,7 +116,7 @@
                     origin = sourceScale.MaxHealth - sourceScale.Health;
                     break;
                 case DamageScalingType.BonusHealth: // TODO Replace with correct health
-                    origin = ((Obj_AI_Hero) sourceScale).Health;
+                    origin = ((Obj_AI_Hero) sourceScale).MaxHealth;
                     break;
                 case DamageScalingType.Armor:
                     origin = sourceScale.Armor;

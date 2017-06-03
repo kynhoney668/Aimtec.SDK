@@ -51,7 +51,7 @@
 
         #region Internal Properties
 
-        internal string AppDataConfigPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "AimTec.SDK");
+        internal string AppDataConfigPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Aimtec.SDK");
 
         internal string MenuSettingsPath => Path.Combine(AppDataConfigPath, "MenuSettings");
 
