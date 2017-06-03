@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="CollisionType.cs" />
     <Compile Include="Damage\Damage.cs" />
+    <Compile Include="Damage\DamageLibrary.cs" />
     <Compile Include="Damage\ItemId.cs" />
     <Compile Include="Damage\JSON\ChampionDamage.cs" />
     <Compile Include="Damage\JSON\DamageSpell.cs" />
@@ -113,6 +114,7 @@
     <Compile Include="Util\WindowsMessages.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Damage\Data\7.11.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

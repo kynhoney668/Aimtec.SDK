@@ -72,5 +72,10 @@ namespace Aimtec.SDK.Extensions
         {
             return from.Inventory.HasItem(itemId);
         }
+
+        public static bool HasItem(this Obj_AI_Base from, uint itemId)
+        {
+            return from.Inventory.HasItem(itemId);
+        }
     }
 }
