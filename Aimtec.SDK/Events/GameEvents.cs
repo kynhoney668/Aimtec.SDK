@@ -9,7 +9,7 @@ namespace Aimtec.SDK.Events
     /// <summary>
     /// Class GameEvents.
     /// </summary>
-    public class GameEvents
+    public static class GameEvents
     {
         /// <summary>
         /// Initializes static members of the <see cref="GameEvents"/> class.
@@ -23,7 +23,7 @@ namespace Aimtec.SDK.Events
         /// <summary>
         /// Occurs when the game is started.
         /// </summary>
-        public static event EventHandler GameStart;
+        public static event EventHandler<EventArgs> GameStart;
 
         /// <summary>
         /// Handles the <see cref="GameStart"/> event.
@@ -49,7 +49,7 @@ namespace Aimtec.SDK.Events
             {
                 try
                 {
-                    del.DynamicInvoke(EventArgs.Empty);
+                    del.DynamicInvoke(null, EventArgs.Empty);
                 }
                 catch (Exception e)
                 {
