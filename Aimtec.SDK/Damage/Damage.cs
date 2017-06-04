@@ -1,4 +1,4 @@
-﻿namespace Aimtec.SDK.Damage
+namespace Aimtec.SDK.Damage
 {
     using System;
     using System.Linq;
@@ -117,7 +117,7 @@
                         break;
                     // TODO getting the actual buffname
                     case "Sejuani":
-                        if (target.HasBuff("SEJUANIICEBREAKERPASSIVE"))
+                        if (target.HasBuff("SejuaniEMarker")) //SejuaniEMarkerMax
                         {
                             switch (target.Type)
                             {
