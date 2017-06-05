@@ -117,7 +117,7 @@ namespace Aimtec.SDK.Damage
                         break;
                     // TODO getting the actual buffname
                     case "Sejuani":
-                        if (target.HasBuff("SejuaniEMarker")) //SejuaniEMarkerMax
+                        if (target.HasBuff("sejuanistun"))
                         {
                             switch (target.Type)
                             {
