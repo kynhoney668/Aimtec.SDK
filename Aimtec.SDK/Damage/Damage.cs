@@ -261,12 +261,6 @@ namespace Aimtec.SDK.Damage
                             dmgPhysical += 10 + (35 * hero.Spellbook.GetSpell(SpellSlot.E).Level) + (0.5 * hero.BonusAttackDamage); //not accurate (it a min value (depend on time traveled))
                         }
                         break;
-                    case "":
-                        if (hero.HasBuff(""))
-                        {
-                            dmgPhysical += 0;
-                        }
-                        break;
                     case "Kalista":
                         dmgPhysical *= 0.9;
                         break;
