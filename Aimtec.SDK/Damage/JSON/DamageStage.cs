@@ -6,42 +6,57 @@
     public enum DamageStage
     {
         /// <summary>
-        ///     The default
+        ///     The default damage stage.
         /// </summary>
         Default,
 
         /// <summary>
-        ///     The way back
+        ///     The way back damage stage.
         /// </summary>
         WayBack,
 
         /// <summary>
-        ///     The detonation
+        ///     The detonation damage stage.
         /// </summary>
         Detonation,
 
         /// <summary>
-        ///     The damage per second
+        ///     The damage per second stage.
         /// </summary>
         DamagePerSecond,
 
         /// <summary>
-        ///     The second form
+        ///     The second form damage stage.
         /// </summary>
         SecondForm,
+        
+        /// <summary>
+        ///     The third form damage stage.
+        /// </summary>
+        ThirdForm,
 
         /// <summary>
-        ///     The second cast
+        ///     The second cast damage stage.
         /// </summary>
         SecondCast,
+        
+        /// <summary>
+        ///     The third cast damage stage.
+        /// </summary>
+        ThirdCast,
+        
+        /// <summary>
+        ///     The against minion damage stage.
+        /// </summary>
+        AgainstMinion,
 
         /// <summary>
-        ///     The buff
+        ///     The buff damage stage.
         /// </summary>
         Buff,
 
         /// <summary>
-        ///     The empowered
+        ///     The empowered damage stage.
         /// </summary>
         Empowered
     }

@@ -121,7 +121,7 @@ namespace Aimtec.SDK.Damage
                         {
                             switch (target.Type)
                             {
-                                case obj_AI_Hero:
+                                case GameObjectType.AIHeroClient:
                                     if (hero.Level < 7)
                                     {
                                         dmgMagical += 0.1 * targetHero.MaxHealth;
@@ -135,7 +135,7 @@ namespace Aimtec.SDK.Damage
                                         dmgMagical += 0.2 * targetHero.MaxHealth;
                                     }
                                     break;
-                                case obj_AI_Minion:
+                                case GameObjectType.obj_AI_Minion:
                                     dmgMagical += 400;
                                     break;
                             }
