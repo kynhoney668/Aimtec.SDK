@@ -111,8 +111,7 @@
                     FileName = new SimpleLayout(
                         Path.Combine(
                             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                            "aimtec.loader",
-                            "GameLogs",
+                            "Aimtec.SDK",
                             "Aimtec.SDK.log")),
                     OpenFileCacheTimeout = 30,
                     KeepFileOpen = true

@@ -3,7 +3,7 @@
     /// <summary>
     ///     The chance that the prediction will hit the target.
     /// </summary>
-    public enum HitChance
+    public enum HitChance // todo update this
     {
         /// <summary>
         ///     The chance to hit the target is impossible.

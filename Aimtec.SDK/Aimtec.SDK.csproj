@@ -54,7 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
-    <Compile Include="CollisionType.cs" />
+    <Compile Include="GameObjectEqualityComparer.cs" />
+    <Compile Include="GameObjects.cs" />
+    <Compile Include="Prediction\CollisionType.cs" />
     <Compile Include="Damage\Damage.cs" />
     <Compile Include="Damage\DamageLibrary.cs" />
     <Compile Include="Damage\ItemId.cs" />
@@ -105,15 +107,19 @@
     <Compile Include="Prediction\Prediction.cs" />
     <Compile Include="Prediction\PredictionInput.cs" />
     <Compile Include="Prediction\PredictionOutput.cs" />
-    <Compile Include="SkillType.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionImpl.cs" />
+    <Compile Include="Prediction\SkillType.cs" />
     <Compile Include="TargetSelector\ITargetSelector.cs" />
     <Compile Include="TargetSelector\TargetSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TargetSelector\TargetSelectorImpl.cs" />
     <Compile Include="TargetSelector\TargetSelectorMode.cs" />
+    <Compile Include="Util\Collision.cs" />
     <Compile Include="Util\DelayAction.cs" />
     <Compile Include="Util\KeyboardEvents.cs" />
     <Compile Include="Util\Keys.cs" />
+    <Compile Include="Util\Geometry.cs" />
+    <Compile Include="Util\Requires.cs" />
     <Compile Include="Util\ThirdParty\Clipper.cs" />
     <Compile Include="Util\WindowsMessages.cs" />
   </ItemGroup>
