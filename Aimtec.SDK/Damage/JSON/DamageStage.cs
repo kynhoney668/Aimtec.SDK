@@ -29,6 +29,11 @@
         ///     The second form
         /// </summary>
         SecondForm,
+        
+        /// <summary>
+        ///     The third form
+        /// </summary>
+        ThirdForm,
 
         /// <summary>
         ///     The second cast
