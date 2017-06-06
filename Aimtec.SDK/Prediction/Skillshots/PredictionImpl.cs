@@ -8,7 +8,7 @@
     using System.Linq;
 
     // todo move dash to seperate class?
-    internal class PredictionImpl
+    public class PredictionImpl
     {
         private struct Path
         { 
