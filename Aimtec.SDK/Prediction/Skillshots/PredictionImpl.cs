@@ -479,7 +479,7 @@
             return result;
         }
 
-        private PredictionOutput GetLineCastPosition(
+        public PredictionOutput GetLineCastPosition(
             Obj_AI_Base unit,
             float delay,
             float radius,
