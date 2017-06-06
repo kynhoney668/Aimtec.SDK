@@ -1574,20 +1574,34 @@
 			}
 		}],
 		"E": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "Attack",
-				"DamageType": "Magical",
-				"Damages": [65.0, 85.0, 105.0, 125.0, 145.0],
-				"BonusDamages": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Attack",
 					"DamageType": "Magical",
-					"BonusDamageOnMinion": [32.5, 42.5, 52.5, 62.5, 72.5],
-					"DamagePercentages": [0.45, 0.45, 0.45, 0.45, 0.45],
-					"ScalingTarget": "Source",
-					"ScalingType": "AbilityPoints"
-				}]
+					"Damages": [65.0, 85.0, 105.0, 125.0, 145.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [0.45, 0.45, 0.45, 0.45, 0.45],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "AgainstMinion",
+				"SpellData": {
+					"SpellEffectType": "Attack",
+					"DamageType": "Magical",
+					"Damages": [97.5, 127.5, 157.5, 187.5, 217.5],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [0.675, 0.675, 0.675, 0.675, 0.675],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}]
+				}
 			}
-		}],
+		],
 		"R": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -1675,6 +1689,8 @@
 					"SpellEffectType": "None",
 					"DamageType": "Magical",
 					"Damages": [60.0, 90.0, 120.0, 150.0, 180.0],
+
+
 					"BonusDamages": [{
 						"DamageType": "Magical",
 						"DamagePercentages": [1.2, 1.2, 1.2, 1.2, 1.2],
@@ -1746,6 +1762,7 @@
 					"SpellEffectType": "Attack",
 					"DamageType": "Magical",
 					"Damages": [300.0, 400.0, 500.0],
+
 					"BonusDamages": [{
 						"DamageType": "Magical",
 						"DamagePercentages": [0.6, 0.6, 0.6],
@@ -1793,6 +1810,7 @@
 					]
 				}
 			}
+
 		],
 		"E": [{
 			"Stage": "Default",
@@ -2140,9 +2158,9 @@
 	},
 	"Graves": {
 		"Q": [{
-				"SpellEffectType": "AoE",
 				"Stage": "Default",
 				"SpellData": {
+					"SpellEffectType": "AoE",
 					"DamageType": "Physical",
 					"Damages": [40, 55, 70, 85, 100],
 
@@ -2189,6 +2207,7 @@
 					"SpellEffectType": "Single",
 					"DamageType": "Physical",
 					"Damages": [200, 320, 440],
+
 					"BonusDamages": [{
 						"DamageType": "Physical",
 						"DamagePercentages": [1.2, 1.2, 1.2],
@@ -2198,11 +2217,12 @@
 				}
 			},
 			{
-				"Stage": "SecondForm",
+				"Stage": "AreaOfEffect",
 				"SpellData": {
 					"SpellEffectType": "AoE",
 					"DamageType": "Physical",
 					"Damages": [250, 400, 550],
+
 					"BonusDamages": [{
 						"DamageType": "Physical",
 						"DamagePercentages": [1.5, 1.5, 1.5],
@@ -2248,6 +2268,7 @@
 				"SpellEffectType": "Single",
 				"DamageType": "Physical",
 				"Damages": [40.0, 75.0, 110.0, 145.0, 180.0],
+
 				"BonusDamages": [{
 					"DamageType": "Physical",
 					"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
@@ -2345,6 +2366,23 @@
 						"ScalingType": "AbilityPoints"
 					}]
 				}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 			},
 			{
 				"Stage": "SecondForm",
@@ -2364,19 +2402,29 @@
 		]
 	},
 	"Illaoi": {
-		"E": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "Single",
-				"DamageType": "Physical",
-				"BonusDamages": [{
+		"E": [
+
+			{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Single",
 					"DamageType": "Physical",
-					"DamagePercentages": [0.25, 0.30, 0.35, 0.40, 0.45],
-					"ScalePer100Ad": 0.08,
-					"ScalingTarget": "Source"
-				}]
+
+
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.25, 0.30, 0.35, 0.40, 0.45],
+						"ScalePer100Ad": 0.08,
+						"ScalingTarget": "Source"
+
+
+					}]
+				}
 			}
-		}],
+		],
+
+
+
 		"R": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -2500,6 +2548,7 @@
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "None",
 				"DamageType": "Magical",
 				"Damages": [60.0, 85.0, 110.0, 135.0, 160.0],
 				"BonusDamages": [{
@@ -2513,6 +2562,7 @@
 		"W": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "Attack",
 				"DamageType": "Magical",
 				"Damages": [60.0, 115.0, 170.0, 225.0, 280.0],
 				"BonusDamages": [{
@@ -2524,11 +2574,11 @@
 			}
 		}]
 	},
-	"Jarvan IV": {
-
+	"JarvanIV": {
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "Attack",
 				"DamageType": "Physical",
 				"Damages": [70.0, 115.0, 160.0, 205.0, 250.0],
 				"BonusDamages": [{
@@ -2542,6 +2592,7 @@
 		"E": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "AoE",
 				"DamageType": "Magical",
 				"Damages": [60.0, 105.0, 150.0, 195.0, 240.0],
 				"BonusDamages": [{
@@ -2555,6 +2606,7 @@
 		"R": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "AoE",
 				"DamageType": "Physical",
 				"Damages": [200.0, 325.0, 450.0],
 				"BonusDamages": [{
@@ -2570,26 +2622,28 @@
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "Single",
 				"DamageType": "Physical",
 				"Damages": [70.0, 110.0, 150.0, 190.0, 230.0],
 				"BonusDamages": [{
-					"DamageType": "Physical",
-					"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
-					"ScalingTarget": "Source",
-					"ScalingType": "BonusAttackPoints"
-				}, {
-
-
-					"DamageType": "Physical",
-					"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
-					"ScalingTarget": "Source",
-					"ScalingType": "AbilityPoints"
-				}]
+						"DamageType": "Physical",
+						"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
+						"ScalingTarget": "Source",
+						"ScalingType": "BonusAttackPoints"
+					},
+					{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}
+				]
 			}
 		}],
 		"W": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "None",
 				"DamageType": "Magical",
 				"Damages": [40.0, 75.0, 110.0, 145.0, 180.0],
 				"BonusDamages": [{
@@ -2603,6 +2657,7 @@
 		"E": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "AoE",
 				"DamageType": "Physical",
 				"Damages": [50.0, 75.0, 100.0, 125.0, 150.0],
 				"BonusDamages": [{
@@ -2616,29 +2671,81 @@
 	},
 	"Jayce": {
 		"Q": [{
-			"Stage": "Default",
-			"SpellData": {
-				"DamageType": "Physical",
-				"Damages": [35.0, 70.0, 105.0, 140.0, 175.0, 210.0],
-				"BonusDamages": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "AoE",
 					"DamageType": "Physical",
-					"DamagePercentages": [1.2, 1.2, 1.2, 1.2, 1.2, 1.2],
-					"ScalingTarget": "Source",
-					"ScalingType": "BonusAttackPoints"
-				}]
+					"Damages": [35.0, 70.0, 105.0, 140.0, 175.0, 210.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [1.2, 1.2, 1.2, 1.2, 1.2, 1.2],
+						"ScalingTarget": "Source",
+						"ScalingType": "BonusAttackPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "SecondForm",
+				"SpellData": {
+					"SpellEffectType": "AoE",
+					"DamageType": "Physical",
+					"Damages": [70.0, 120.0, 170.0, 220.0, 270.0, 320.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [1.2, 1.2, 1.2, 1.2, 1.2, 1.2],
+						"ScalingTarget": "Source",
+						"ScalingType": "BonusAttackPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "Empowered",
+				"SpellData": {
+					"SpellEffectType": "AoE",
+					"DamageType": "Physical",
+					"Damages": [98.0, 168.0, 238.0, 308.0, 378.0, 448.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [1.68, 1.68, 1.68, 1.68, 1.68, 1.68],
+						"ScalingTarget": "Source",
+						"ScalingType": "BonusAttackPoints"
+					}]
+				}
 			}
-		}],
+		],
 		"W": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "OverTime",
 				"DamageType": "Magical",
-				"Damages": [100.0, 160.0, 220.0, 280.0, 340.0, 400.0],
+				"Damages": [25.0, 40.0, 55.0, 70.0, 85.0, 100.0],
 				"BonusDamages": [{
 					"DamageType": "Magical",
-					"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+					"DamagePercentages": [0.25, 0.25, 0.25, 0.25, 0.25, 0.25],
 					"ScalingTarget": "Source",
 					"ScalingType": "AbilityPoints"
 				}]
+			}
+		}],
+		"E": [{
+			"Stage": "Default",
+			"SpellData": {
+				"SpellEffectType": "Single",
+				"DamageType": "Magical",
+				"BonusDamages": [{
+						"DamageType": "Magical",
+						"MaxDamageOnMinion": [200, 300, 400, 500, 600, 700],
+						"DamagePercentages": [0.08, 0.104, 0.128, 0.152, 0.176, 0.2],
+						"ScalingTarget": "Target",
+						"ScalingType": "MaxHealth"
+					},
+					{
+						"DamageType": "Magical",
+						"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0, 1.0],
+						"ScalingTarget": "Source",
+						"ScalingType": "BonusAttackPoints"
+					}
+				]
 			}
 		}]
 	},
@@ -2646,67 +2753,111 @@
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "Single",
 				"DamageType": "Physical",
 				"Damages": [50.0, 75.0, 100.0, 125.0, 150.0],
 				"BonusDamages": [{
-					"DamageType": "Physical",
-					"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
-					"ScalingTarget": "Source",
-					"ScalingType": "AbilityPoints"
-				}]
+						"DamageType": "Physical",
+						"DamagePercentages": [0.3, 0.35, 0.4, 0.45, 0.5],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					},
+					{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}
+				]
 			}
 		}],
 		"W": [{
-			"Stage": "Default",
-			"SpellData": {
-				"DamageType": "Physical",
-				"Damages": [50.0, 85.0, 120.0, 155.0, 190.0],
-				"BonusDamages": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Single",
 					"DamageType": "Physical",
-					"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
-					"ScalingTarget": "Source",
-					"ScalingType": "AttackPoints"
-				}]
+					"Damages": [50.0, 85.0, 120.0, 155.0, 190.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "AgainstMinion",
+				"SpellData": {
+					"SpellEffectType": "AoE",
+					"DamageType": "Physical",
+					"Damages": [37.5, 63.75, 90.0, 116.25, 142.5],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.375, 0.375, 0.375, 0.375, 0.375],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					}]
+				}
 			}
-		}],
+		],
 		"E": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "AoE",
 				"DamageType": "Magical",
 				"Damages": [20.0, 80.0, 140.0, 200.0, 260.0],
 				"BonusDamages": [{
-					"DamageType": "Magical",
-					"DamagePercentages": [1.2, 1.2, 1.2, 1.2, 1.2],
-					"ScalingTarget": "Source",
-					"ScalingType": "AttackPoints"
-				}, {
-
-
-					"DamageType": "Magical",
-					"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
-					"ScalingTarget": "Source",
-					"ScalingType": "AbilityPoints"
-				}]
+						"DamageType": "Magical",
+						"DamagePercentages": [1.2, 1.2, 1.2, 1.2, 1.2],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					},
+					{
+						"DamageType": "Magical",
+						"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}
+				]
 			}
 		}],
 		"R": [{
-			"Stage": "Default",
-			"SpellData": {
-				"DamageType": "Physical",
-				"Damages": [40.0, 100.0, 160.0],
-				"BonusDamages": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Single",
 					"DamageType": "Physical",
-					"DamagePercentages": [0.2, 0.2, 0.2],
-					"ScalingTarget": "Source",
-					"ScalingType": "AttackPoints"
-				}]
+					"Damages": [40.0, 100.0, 160.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.2, 0.2, 0.2],
+						"ScalePerTargetMissHealth": 2.5,
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "SecondForm",
+				"SpellData": {
+					"SpellEffectType": "Single",
+					"DamageType": "Physical",
+					"Damages": [80.0, 200.0, 320.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.4, 0.4, 0.4],
+						"ScalePerTargetMissHealth": 2.5,
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					}]
+				}
 			}
-		}]
+		]
 	},
 	"Jinx": {
 		"W": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "Single",
 				"DamageType": "Physical",
 				"Damages": [10.0, 60.0, 110.0, 160.0, 210.0],
 				"BonusDamages": [{
@@ -2720,6 +2871,7 @@
 		"E": [{
 			"Stage": "Default",
 			"SpellData": {
+				"SpellEffectType": "AoE",
 				"DamageType": "Magical",
 				"Damages": [70.0, 120.0, 170.0, 220.0, 270.0],
 				"BonusDamages": [{
@@ -2731,31 +2883,54 @@
 			}
 		}],
 		"R": [{
-			"Stage": "Default",
-			"SpellData": {
-				"DamageType": "Physical",
-				"Damages": [250.0, 350.0, 450.0],
-				"BonusDamages": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Single",
 					"DamageType": "Physical",
-					"DamagePercentages": [1.5, 1.5, 1.5],
-
-					"ScalingTarget": "Source",
-					"ScalingType": "BonusAttackPoints"
-
-
-
-
-
-
-				}]
+					"Damages": [25.0, 35.0, 45.0],
+					"BonusDamages": [{
+							"DamageType": "Physical",
+							"DamagePercentages": [0.15, 0.15, 0.15],
+							"ScalingTarget": "Source",
+							"ScalingType": "BonusAttackPoints"
+						},
+						{
+							"DamageType": "Physical",
+							"DamagePercentages": [0.25, 0.3, 0.35],
+							"ScalingTarget": "Target",
+							"ScalingType": "MissingHealth"
+						}
+					]
+				}
+			},
+			{
+				"Stage": "AreaOfEffect",
+				"SpellData": {
+					"SpellEffectType": "AoE",
+					"DamageType": "Physical",
+					"Damages": [20.0, 28.0, 36.0],
+					"BonusDamages": [{
+							"DamageType": "Physical",
+							"DamagePercentages": [0.12, 0.12, 0.12],
+							"ScalingTarget": "Source",
+							"ScalingType": "BonusAttackPoints"
+						},
+						{
+							"DamageType": "Physical",
+							"DamagePercentages": [0.20, 0.24, 0.28],
+							"ScalingTarget": "Target",
+							"ScalingType": "MissingHealth"
+						}
+					]
+				}
 			}
-		}]
+		]
 	},
 	"Kalista": {
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
-
+				"SpellEffectType": "Attack",
 				"DamageType": "Physical",
 				"Damages": [10.0, 70.0, 130.0, 190.0, 250.0],
 				"BonusDamages": [{
@@ -2766,74 +2941,130 @@
 				}]
 			}
 		}],
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		"E": [{
+		"W": [{
 			"Stage": "Default",
 			"SpellData": {
-
-				"DamageType": "Physical",
-				"Damages": [20.0, 30.0, 40.0, 50.0, 60.0],
+				"SpellEffectType": "None",
 				"BonusDamages": [{
-					"DamageType": "Physical",
-					"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
-					"ScalingTarget": "Source",
-					"ScalingType": "AttackPoints"
+					"DamageType": "Magical",
+					"DamagePercentages": [0.05, 0.075, 0.1, 0.125, 0.15],
+					"MaxDamageOnMinion": [75, 125, 150, 175, 200],
+					"ScalingTarget": "Target",
+					"ScalingType": "MaxHealth"
 				}]
 			}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		}]
+		}],
+		"E": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "None",
+					"DamageType": "Physical",
+					"Damages": [20, 30, 40, 50, 60],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "Buff",
+				"SpellData": {
+					"SpellEffectType": "None",
+					"DamageType": "Physical",
+					"Damages": [10, 14, 19, 25, 32],
+					"ScalingBuff": "kalistaexpungemarker",
+					"ScalingBuffTarget": "Target",
+					"ScalingBuffOffset": -1,
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.2, 0.225, 0.25, 0.275, 0.3],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints",
+						"ScalingBuff": "kalistaexpungemarker",
+						"ScalingBuffTarget": "Target",
+						"ScalingBuffOffset": -1
+					}]
+				}
+			}
+		]
 	},
 	"Karma": {
 		"Q": [{
-			"Stage": "Default",
-			"SpellData": {
-				"DamageType": "Magical",
-				"Damages": [80.0, 125.0, 170.0, 215.0, 260.0],
-				"BonusDamages": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "AoE",
 					"DamageType": "Magical",
-					"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
-					"ScalingTarget": "Source",
-					"ScalingType": "AbilityPoints"
-				}]
+					"Damages": [80.0, 125.0, 170.0, 215.0, 260.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "SecondForm",
+				"SpellData": {
+					"SpellEffectType": "AoE",
+					"DamageType": "Magical",
+					"Damages": [25.0, 75.0, 125.0, 175.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [0.3, 0.3, 0.3, 0.3],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints",
+						"ScaleSlot": "R"
+					}]
+				}
+			},
+			{
+				"Stage": "Detonation",
+				"SpellData": {
+					"SpellEffectType": "AoE",
+					"DamageType": "Magical",
+					"Damages": [50.0, 150.0, 250.0, 350.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [0.6, 0.6, 0.6, 0.6],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints",
+						"ScaleSlot": "R"
+					}]
+				}
 			}
-		}]
+		],
+		"W": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Single",
+					"DamageType": "Magical",
+					"Damages": [30.0, 55.0, 80.0, 105.0, 130.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [0.45, 0.45, 0.45, 0.45, 0.45],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "Detonation",
+				"SpellData": {
+					"SpellEffectType": "Single",
+					"DamageType": "Magical",
+					"Damages": [30.0, 55.0, 80.0, 105.0, 130.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [0.45, 0.45, 0.45, 0.45, 0.45],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}]
+				}
+			}
+		]
 	},
 	"Karthus": {
 		"Q": [{
@@ -2948,6 +3179,7 @@
 				"Stage": "Default",
 				"SpellData": {
 
+
 					"DamageType": "Magical",
 					"Damages": [80.0, 100.0, 120.0],
 					"BonusDamages": [{
@@ -2962,6 +3194,12 @@
 
 
 
+
+
+
+
+
+
 					}]
 				}
 			},
@@ -2969,9 +3207,30 @@
 				"Stage": "Default",
 				"SpellData": {
 
+
 					"DamageType": "Magical",
 					"Damages": [40.0, 50.0, 60.0],
 					"BonusDamages": []
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3023,6 +3282,8 @@
 				}, {
 
 
+
+
 					"DamageType": "Magical",
 					"DamagePercentages": [0.25, 0.25, 0.25, 0.25, 0.25],
 					"ScalingTarget": "Source",
@@ -3041,6 +3302,8 @@
 					"ScalingTarget": "Source",
 					"ScalingType": "BonusAttackPoints"
 				}, {
+
+
 
 
 					"DamageType": "Magical",
@@ -3063,6 +3326,8 @@
 					"ScalingTarget": "Source",
 					"ScalingType": "BonusAttackPoints"
 				}, {
+
+
 
 
 					"DamageType": "Magical",
@@ -3109,6 +3374,8 @@
 						"ScalingTarget": "Source",
 						"ScalingType": "AttackPoints"
 					}, {
+
+
 
 
 						"DamageType": "Magical",
@@ -3175,6 +3442,7 @@
 		}]
 	},
 	"Kha'Zix": {
+
 
 		"Q": [{
 			"Stage": "Default",
@@ -3265,8 +3533,31 @@
 
 
 
+
+
+
+
+
+
 				}]
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		}],
 		"E": [{
 			"Stage": "Default",
@@ -3274,6 +3565,8 @@
 				"SpellEffectType": "None",
 				"DamageType": "Physical",
 				"Damages": [40, 75, 110, 145, 180],
+
+
 
 				"MaxDamageOnMinion": [300, 300, 300, 300, 300],
 				"BonusDamages": [{
@@ -3305,6 +3598,23 @@
 
 				}]
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		}]
 	},
 	"Kled": {
@@ -3336,6 +3646,7 @@
 		}]
 	},
 	"Kog'Maw": {
+
 
 		"Q": [{
 			"Stage": "Default",
@@ -3380,6 +3691,7 @@
 		}],
 		"W": [
 
+
 			{
 				"Stage": "Default",
 				"SpellData": {
@@ -3392,6 +3704,22 @@
 						"ScalingType": "AbilityPoints"
 					}]
 				}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3429,12 +3757,14 @@
 					"DamageType": "Magical",
 					"Damages": [40.0, 60.0, 80.0, 100.0, 120.0],
 
+
 					"BonusDamages": [{
 						"DamageType": "Magical",
 						"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
 
 						"ScalingTarget": "Source",
 						"ScalingType": "AbilityPoints"
+
 
 					}]
 				}
@@ -3467,6 +3797,14 @@
 
 
 
+
+
+
+
+
+
+
+
 				}
 			},
 			{
@@ -3480,12 +3818,14 @@
 						"ScalingTarget": "Source",
 						"ScalingType": "AbilityPoints"
 
+
 					}]
 				}
 			}
 		]
 	},
 	"Lee Sin": {
+
 
 		"Q": [{
 				"Stage": "Default",
@@ -3510,6 +3850,12 @@
 						"DamagePercentages": [0.9, 0.9, 0.9, 0.9, 0.9],
 						"ScalingTarget": "Source",
 						"ScalingType": "BonusAttackPoints"
+
+
+
+
+
+
 
 
 
@@ -3696,6 +4042,8 @@
 				}, {
 
 
+
+
 					"DamageType": "Physical",
 					"DamagePercentages": [0.2, 0.2, 0.2],
 					"ScalingTarget": "Source",
@@ -3814,6 +4162,8 @@
 				}, {
 
 
+
+
 					"DamageType": "Magical",
 					"DamagePercentages": [0.2, 0.2, 0.2, 0.2, 0.2],
 					"ScalingTarget": "Source",
@@ -3872,6 +4222,30 @@
 					"DamagePercentages": [0.7, 0.7, 0.7, 0.7, 0.7],
 					"ScalingTarget": "Source",
 					"ScalingType": "AbilityPoints"
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -3963,6 +4337,42 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		"R": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -3978,6 +4388,7 @@
 		}]
 	},
 	"Master Yi": {
+
 
 		"Q": [{
 			"Stage": "Default",
@@ -4008,6 +4419,7 @@
 	},
 	"Miss Fortune": {
 
+
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -4019,6 +4431,8 @@
 					"ScalingTarget": "Source",
 					"ScalingType": "AttackPoints"
 				}, {
+
+
 
 
 					"DamageType": "Physical",
@@ -4043,6 +4457,7 @@
 		}]
 	},
 	"Wukong": {
+
 
 		"Q": [{
 			"Stage": "Default",
@@ -4111,6 +4526,8 @@
 				}, {
 
 
+
+
 					"DamageType": "Magical",
 					"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
 					"ScalingTarget": "Source",
@@ -4129,6 +4546,8 @@
 					"ScalingTarget": "Source",
 					"ScalingType": "AttackPoints"
 				}, {
+
+
 
 
 					"DamageType": "Magical",
@@ -4275,6 +4694,8 @@
 				}, {
 
 
+
+
 					"DamageType": "Physical",
 					"DamagePercentages": [3.0, 3.0, 3.0, 3.0, 3.0],
 					"ScalingTarget": "Source",
@@ -4411,6 +4832,8 @@
 					}, {
 
 
+
+
 						"DamageType": "Magical",
 						"DamagePercentages": [0.75, 0.75, 0.75, 0.75],
 						"ScalingTarget": "Source",
@@ -4427,9 +4850,11 @@
 					"DamageType": "Magical",
 					"Damages": [40, 80, 120, 160, 200],
 
+
 					"BonusDamages": [{
 						"DamageType": "Magical",
 						"DamagePercentages": [0.2, 0.2, 0.2, 0.2, 0.2],
+
 
 						"ScalingTarget": "Source",
 						"ScalingType": "AbilityPoints"
@@ -4541,7 +4966,30 @@
 
 
 
+
+
+
+
+
+
+
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		}],
 		"E": [{
 			"Stage": "Default",
@@ -4571,6 +5019,22 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		}],
 		"R": [{
 			"Stage": "Default",
@@ -4584,6 +5048,22 @@
 					"ScalingType": "AbilityPoints"
 				}]
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -4865,6 +5345,7 @@
 	},
 	"Rek'Sai": {
 
+
 		"Q": [{
 				"Stage": "Default",
 				"SpellData": {
@@ -4891,6 +5372,12 @@
 
 
 
+
+
+
+
+
+
 						"DamagePercentages": [0.7, 0.7, 0.7, 0.7, 0.7],
 						"ScalingTarget": "Source",
 						"ScalingType": "AbilityPoints"
@@ -4904,6 +5391,7 @@
 					"DamageType": "Physical",
 					"Damages": [40.0, 80.0, 120.0, 160.0, 200.0],
 
+
 					"BonusDamages": [{
 						"DamageType": "Physical",
 						"DamagePercentages": [0.4, 0.4, 0.4, 0.4, 0.4],
@@ -4912,6 +5400,61 @@
 					}]
 				}
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -5046,7 +5589,30 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 				"BonusDamages": []
+
+
+
+
+
+
+
 
 
 
@@ -5083,6 +5649,21 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		}],
 		"E": [{
 			"Stage": "Default",
@@ -5101,11 +5682,13 @@
 	"Riven": {
 		"Q": [
 
+
 			{
 				"Stage": "Default",
 				"SpellData": {
 					"DamageType": "Physical",
 					"Damages": [10.0, 30.0, 50.0, 70.0, 90.0],
+
 
 					"BonusDamages": [{
 						"DamageType": "Physical",
@@ -5115,6 +5698,11 @@
 					}]
 				}
 			},
+
+
+
+
+
 
 
 
@@ -5152,6 +5740,7 @@
 			"SpellData": {
 				"DamageType": "Physical",
 				"Damages": [300.0, 450.0, 600.0],
+
 
 				"BonusDamages": [{
 					"DamageType": "Physical",
@@ -5272,6 +5861,14 @@
 
 
 
+
+
+
+
+
+
+
+
 				}
 			},
 			{
@@ -5280,6 +5877,14 @@
 					"DamageType": "Physical",
 					"Damages": [30.0, 65.0, 100.0, 135.0, 170.0],
 					"BonusDamages": []
+
+
+
+
+
+
+
+
 
 
 
@@ -5380,6 +5985,7 @@
 				"SpellData": {
 					"SpellEffectType": "None",
 
+
 					"BonusDamages": [{
 						"DamageType": "Magical",
 						"DamagePercentages": [0.02, 0.025, 0.03, 0.035, 0.04],
@@ -5399,6 +6005,7 @@
 						"DamageType": "Magical",
 						"DamagePercentages": [0.02, 0.02, 0.02, 0.02, 0.02],
 						"ScalePer100Ap": 0.005,
+
 
 						"ScalingTarget": "Target",
 						"ScalingType": "MaxHealth"
@@ -5433,6 +6040,8 @@
 					"ScalingTarget": "Source",
 					"ScalingType": "BonusAttackPoints"
 				}, {
+
+
 
 
 					"DamageType": "Magical",
@@ -5498,6 +6107,8 @@
 				}, {
 
 
+
+
 					"DamageType": "Magical",
 					"DamagePercentages": [0.06, 0.065, 0.07, 0.075, 0.08],
 					"MaxDamageOnMinion": [300, 300, 300, 300, 300],
@@ -5560,6 +6171,8 @@
 					"ScalingTarget": "Source",
 					"ScalingType": "AttackPoints"
 				}, {
+
+
 
 
 					"DamageType": "Physical",
@@ -5779,6 +6392,7 @@
 	},
 	"Tahm Kench": {
 
+
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -5875,7 +6489,30 @@
 
 
 
+
+
+
+
+
+
+
+
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6060,36 +6697,36 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 					}]
 				}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 			}
 		],
 		"R": [{
@@ -6138,6 +6775,7 @@
 	},
 	"Twisted Fate": {
 
+
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -6164,6 +6802,8 @@
 					}, {
 
 
+
+
 						"DamageType": "Magical",
 						"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
 						"ScalingTarget": "Source",
@@ -6184,6 +6824,8 @@
 					}, {
 
 
+
+
 						"DamageType": "Magical",
 						"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
 						"ScalingTarget": "Source",
@@ -6202,6 +6844,8 @@
 						"ScalingTarget": "Source",
 						"ScalingType": "AttackPoints"
 					}, {
+
+
 
 
 						"DamageType": "Magical",
@@ -6231,10 +6875,39 @@
 			"Stage": "Default",
 			"SpellData": {
 
+
 				"DamageType": "Physical",
 				"Damages": [20.0, 35.0, 50.0, 65.0, 80.0],
 				"BonusDamages": []
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6284,6 +6957,7 @@
 				"SpellData": {
 					"DamageType": "Magical",
 					"Damages": [40.0, 80.0, 120.0, 160.0, 200.0],
+
 
 					"BonusDamages": [{
 						"DamageType": "Magical",
@@ -6354,6 +7028,7 @@
 			"Stage": "Default",
 			"SpellData": {
 
+
 				"DamageType": "Magical",
 				"Damages": [10.0, 14.0, 18.0, 22.0, 26.0],
 				"BonusDamages": [{
@@ -6363,6 +7038,24 @@
 					"ScalingType": "AbilityPoints"
 				}]
 			}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6467,6 +7160,7 @@
 	},
 	"Vel'Koz": {
 
+
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -6533,6 +7227,8 @@
 					"ScalingTarget": "Source",
 					"ScalingType": "AttackPoints"
 				}, {
+
+
 
 
 					"DamageType": "Physical",
@@ -6656,6 +7352,8 @@
 		"E": [],
 
 
+
+
 		"R": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -6674,6 +7372,7 @@
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
+
 
 				"DamageType": "Physical",
 				"Damages": [30.0, 60.0, 90.0, 120.0, 150.0],
@@ -6743,6 +7442,15 @@
 				"DamageType": "Physical",
 				"Damages": [50.0, 60.0, 70.0, 80.0, 90.0],
 				"BonusDamages": []
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6824,6 +7532,7 @@
 	},
 	"Xin Zhao": {
 
+
 		"Q": [{
 			"Stage": "Default",
 			"SpellData": {
@@ -6881,8 +7590,23 @@
 
 
 
+
+
+
+
+
+
 				}]
 			}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -6937,6 +7661,16 @@
 
 
 
+
+
+
+
+
+
+
+
+
+
 			}
 		}]
 	},
@@ -6946,6 +7680,7 @@
 				"SpellData": {
 					"DamageType": "Magical",
 					"Damages": [40.0, 60.0, 80.0, 100.0, 120.0],
+
 
 					"BonusDamages": [{
 						"DamageType": "Magical",
@@ -6975,6 +7710,15 @@
 				"DamageType": "Magical",
 				"Damages": [40.0, 55.0, 70.0, 85.0, 100.0],
 				"BonusDamages": []
+
+
+
+
+
+
+
+
+
 
 
 
