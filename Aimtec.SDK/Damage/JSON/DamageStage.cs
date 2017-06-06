@@ -56,6 +56,11 @@
         Buff,
 
         /// <summary>
+        ///     The AoE damage stage.
+        /// </summary>
+        AreaOfEffect,
+
+        /// <summary>
         ///     The empowered damage stage.
         /// </summary>
         Empowered
