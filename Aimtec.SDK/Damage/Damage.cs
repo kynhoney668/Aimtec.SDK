@@ -143,10 +143,10 @@ namespace Aimtec.SDK.Damage
                         {
                             switch (target.Type)
                             {
-                                case obj_AI_Hero:
+                                case GameObjectType.AIHeroClient:
                                     dmgPhysical += (0.5 + (0.5 * hero.CritDamageBonus * hero.Crit)) * hero.TotalAttackDamage;
                                     break;
-                                case obj_AI_Minion:
+                                case GameObjectType.obj_AI_Minion:
                                     dmgPhysical += 1.5 * hero.TotalAttackDamage;
                                     break;
                             }
@@ -179,7 +179,7 @@ namespace Aimtec.SDK.Damage
                         }
                         break;
                     case "Diana":
-                        if (hero.HasBuff("dianapassivemarker") == 2)
+                        if (hero.GetBuffCount("dianapassivemarker") == 2)
                         {
                             dmgMagical += new[] { 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 105, 120, 135, 155, 175, 200, 225, 250 }[hero.Level - 1] + 0.80 * hero.TotalAbilityDamage;
                         }
@@ -205,7 +205,7 @@ namespace Aimtec.SDK.Damage
                         }
                         break;
                     case "Draven":
-                        if (hero.HasBuff("DravenSpinning")) //todo check it is the correct buff name ("DravenSpinning" or "dianapassivemarker")
+                        if (hero.HasBuff("dravenspinningattack"))
                         {
                             dmgPhysical += (25 + (5 * hero.SpellBook.GetSpell(SpellSlot.Q).Level)) + ((0.55 + (0.10 * hero.SpellBook.GetSpell(SpellSlot.Q).Level)) * hero.BonusAttackDamage);
                         }
@@ -216,12 +216,7 @@ namespace Aimtec.SDK.Damage
                             dmgMagical += new[] { 30, 40, 50, 60, 70, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140 }[hero.Level -1] + 0.8 * hero.TotalAbilityDamage;
                         }
                         break;
-                    case "Fiora": //todo check vital point and add option/variable for true damage
-                        if (hero.HasBuff(""))
-                        {
-                            // 2% (+ 4.5% per 100 bonus AD) of target's maximum health as bonus true damage
-                        }
-                        break;
+
                     case "Fizz":
                         if (hero.HasBuff("FizzSeastonePassive"))
                         {
