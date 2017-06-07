@@ -59,6 +59,11 @@
         ///     The AoE damage stage.
         /// </summary>
         AreaOfEffect,
+        
+        /// <summary>
+        ///     The collision damage stage.
+        /// </summary>
+        Collision,
 
         /// <summary>
         ///     The empowered damage stage.
