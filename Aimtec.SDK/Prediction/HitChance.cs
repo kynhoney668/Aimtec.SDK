@@ -3,46 +3,41 @@
     /// <summary>
     ///     The chance that the prediction will hit the target.
     /// </summary>
-    public enum HitChance // todo update this
+    public enum HitChance
     {
         /// <summary>
-        ///     The chance to hit the target is impossible.
+        ///     There is a collision.
         /// </summary>
-        Impossible = 0,
+        Collision = -1,
 
         /// <summary>
-        ///     The chance to hit the target is low.
+        ///     The target is not moving, hindering prediction.
         /// </summary>
-        Low = 1,
+        Low = 0,
 
         /// <summary>
-        ///     The target may or may not get hit.
+        ///     The target has a medium chance of being hit.
         /// </summary>
-        Medium = 2,
+        Medium = 1,
 
         /// <summary>
         ///     The target has a high chance of being hit.
         /// </summary>
-        High = 3,
+        High = 2,
 
         /// <summary>
-        ///     The target is dashing.
+        ///     The target is slowed, and/or too close, allowing for an easy hit.
         /// </summary>
-        Dashing = 4,
+        Slowed = 3,
 
         /// <summary>
-        ///     The target is immobile.
+        ///     The target is immobile, guaranteeing a hit.
         /// </summary>
-        Immobile = 5,
+        Immobile = 4,
 
         /// <summary>
-        ///     The target is out of range.
+        ///     The target is dashing in a straight line, guaranteeing a hit.
         /// </summary>
-        OutOfRange = 6,
-
-        /// <summary>
-        ///      Collision between the target and the skillshot.
-        /// </summary>
-        Collision = 7
+        Dash = 5
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Aimtec.SDK.Prediction
 {
+    using Aimtec.SDK.Prediction.Collision;
+
     /// <summary>
     ///     The input parameters to calculate skillshot prediction.
     /// </summary>
@@ -16,6 +18,11 @@ namespace Aimtec.SDK.Prediction
             this.RangeCheckFrom = this.From;
         }
 
+        /// <summary>
+        /// Gets or sets the unit.
+        /// </summary>
+        /// <value>The unit.</value>
+        public Obj_AI_Base Unit { get; set; }
         /// <summary>
         ///     Gets or sets from.
         /// </summary>
@@ -38,7 +45,7 @@ namespace Aimtec.SDK.Prediction
         /// <value>
         ///     The collision types.
         /// </value>
-        public IList<CollisionType> CollisionTypes { get; set; }
+        public CollisionableObjects CollisionObjects { get; set; }
 
         /// <summary>
         ///     Gets or sets the spell delay.
@@ -54,7 +61,7 @@ namespace Aimtec.SDK.Prediction
         /// <value>
         ///     The width.
         /// </value>
-        public float Width { get; set; }
+        public float Radius { get; set; }
 
         /// <summary>
         ///     Gets or sets the spell range.

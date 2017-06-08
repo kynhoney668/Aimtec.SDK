@@ -7,8 +7,10 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Aimtec.SDK.Prediction.Collision;
+
     // todo move dash to seperate class?
-    public class PredictionImpl
+    internal class PredictionImpl : IPrediction
     {
         private struct Path
         { 
@@ -71,12 +73,6 @@
         private struct ImmobileResult
         {
             public bool Immobile { get; set; }
-            public Vector3 UnitPosition { get; set; }
-            public Vector3 CastPosition { get; set; }
-        }
-
-        private struct CalculatedTargetPosition
-        {
             public Vector3 UnitPosition { get; set; }
             public Vector3 CastPosition { get; set; }
         }
@@ -491,7 +487,7 @@
             return this.GetCastPosition(unit, delay, radius, range, speed, from.Position, collision, SkillType.Line);
         }
 
-        private CalculatedTargetPosition CalculateTargetPosition(
+        public PredictedTargetPosition CalculateTargetPosition(
             Obj_AI_Base unit,
             float delay,
             float radius,
@@ -504,7 +500,7 @@
             {
                 if (this.PathAnalysis[unit.NetworkId].Count > 4)
                 {
-                    return new CalculatedTargetPosition(){CastPosition = unit.Position, UnitPosition = unit.Position};
+                    return new PredictedTargetPosition(){CastPosition = unit.Position, UnitPosition = unit.Position};
                 }
 
                 if (this.PathAnalysis[unit.NetworkId].Count > 3)
@@ -561,7 +557,7 @@
 
                             if (!second.IsZero)
                             {
-                                return new CalculatedTargetPosition(){UnitPosition = spot, CastPosition = spot};
+                                return new PredictedTargetPosition(){UnitPosition = spot, CastPosition = spot};
                             }
                             else
                             {
@@ -585,7 +581,7 @@
 
             if (!second.IsZero)
             {
-                return new CalculatedTargetPosition(){CastPosition = spot, UnitPosition = spot };
+                return new PredictedTargetPosition(){CastPosition = spot, UnitPosition = spot };
             }
 
             return this.CalculateTargetPosition(unit, delay, radius, speed, from, type, spot);
@@ -605,9 +601,9 @@
             var isFromPlayer = Vector3.DistanceSquared(from, ObjectManager.GetLocalPlayer().Position) < 50 * 50;
             delay = delay + (0.07f + Game.Ping / 2000f);
 
-            var position = unit.Position;
-            var castPosition = unit.Position;
-            var hitchance = 0;
+            Vector3 position;
+            Vector3 castPosition;
+            int hitchance;
 
             var dashResult = this.IsDashing(unit, delay, radius, speed, from);
             var immobileResult = this.IsImmobile(unit, delay, radius, speed, from, type);
@@ -685,8 +681,17 @@
             radius -= this.GetHitBox(unit) + 4;
 
             // todo collision
+            if (collision && Collision.CheckCollision(unit, castPosition, delay, radius, range, speed, from))
+            {
+                hitchance = -1;
+            }
 
-            return null;
+            return new PredictionOutput()
+            {
+                CastPosition = castPosition,
+                HitChance = (HitChance) hitchance,
+                PredictedPosition = position
+            };
         }
 
         private PredictionOutput AnalyzeWaypoints(
@@ -818,6 +823,31 @@
         {
             // todo properhitbox
             return 65;
+        }
+
+        public PredictedTargetPosition CalculateTargetPosition(
+            Obj_AI_Base target,
+            float delay,
+            float radius,
+            float speed,
+            Vector3 @from,
+            SkillType type)
+        {
+            return this.CalculateTargetPosition(target, delay, radius, speed, from, type, default(Vector3));
+        }
+
+        // todo implement rangecheckfrom
+        public PredictionOutput GetPrediction(PredictionInput input)
+        {
+            return this.GetLineCastPosition(
+                input.Target,
+                input.Delay,
+                input.Radius,
+                input.Range,
+                input.Speed,
+                input.Unit,
+                Enum.GetValues(typeof(CollisionableObjects)).Cast<CollisionableObjects>()
+                    .Any(x => input.CollisionObjects.HasFlag(x)));
         }
     }
 }

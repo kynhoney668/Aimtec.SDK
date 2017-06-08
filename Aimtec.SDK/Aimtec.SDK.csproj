@@ -56,7 +56,6 @@
     <Compile Include="Bootstrap.cs" />
     <Compile Include="GameObjectEqualityComparer.cs" />
     <Compile Include="GameObjects.cs" />
-    <Compile Include="Prediction\CollisionType.cs" />
     <Compile Include="Damage\Damage.cs" />
     <Compile Include="Damage\DamageLibrary.cs" />
     <Compile Include="Damage\ItemId.cs" />
@@ -99,14 +98,17 @@
     <Compile Include="Orbwalking\Orbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkingImpl.cs" />
     <Compile Include="Orbwalking\OrbwalkingMode.cs" />
+    <Compile Include="Prediction\Collision\Collision.cs" />
+    <Compile Include="Prediction\Collision\CollisionableObjects.cs" />
     <Compile Include="Prediction\Health\HealthPrediction.cs" />
     <Compile Include="Prediction\Health\HealthPredictionImpl.cs" />
     <Compile Include="Prediction\Health\HealthPredictionImplB.cs" />
     <Compile Include="Prediction\Health\IHealthPrediction.cs" />
     <Compile Include="Prediction\HitChance.cs" />
-    <Compile Include="Prediction\Prediction.cs" />
-    <Compile Include="Prediction\PredictionInput.cs" />
-    <Compile Include="Prediction\PredictionOutput.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionInput.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionOutput.cs" />
+    <Compile Include="Prediction\Skillshots\IPrediction.cs" />
+    <Compile Include="Prediction\Skillshots\Prediction.cs" />
     <Compile Include="Prediction\Skillshots\PredictionImpl.cs" />
     <Compile Include="Prediction\SkillType.cs" />
     <Compile Include="TargetSelector\ITargetSelector.cs" />
@@ -114,7 +116,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TargetSelector\TargetSelectorImpl.cs" />
     <Compile Include="TargetSelector\TargetSelectorMode.cs" />
-    <Compile Include="Util\Collision.cs" />
     <Compile Include="Util\DelayAction.cs" />
     <Compile Include="Util\KeyboardEvents.cs" />
     <Compile Include="Util\Keys.cs" />
