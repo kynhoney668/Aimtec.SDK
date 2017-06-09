@@ -99,7 +99,7 @@
                     Layout = new SimpleLayout("${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${message}")
                 });
 
-            config.AddTarget(consoleTarget);
+            config.AddTarget("AsyncWrapper1", consoleTarget);
             config.AddRule(LogLevel.Trace, LogLevel.Fatal, consoleTarget);
 
             var asyncFileTarget = new AsyncTargetWrapper(
@@ -117,7 +117,7 @@
                     KeepFileOpen = true
                 });
 
-            config.AddTarget(asyncFileTarget);
+            config.AddTarget("AsyncWrapper2", asyncFileTarget);
             config.AddRule(LogLevel.Warn, LogLevel.Fatal, asyncFileTarget);
 
             LogManager.Configuration = config;

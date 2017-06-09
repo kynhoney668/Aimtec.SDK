@@ -5,13 +5,17 @@
 
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
 
     using Aimtec.SDK.Prediction.Collision;
 
+    using NLog;
+
     // todo move dash to seperate class?
     internal class PredictionImpl : IPrediction
     {
+        private static Logger Logger => LogManager.GetCurrentClassLogger();
         private struct Path
         { 
                 public float Time { get; set; }
@@ -173,7 +177,9 @@
             this.PathAnalysis = objAiHeroes.ToDictionary(x => x.NetworkId, x => new List<Path>());
             this.DontShootUntilNewWaypoints = objAiHeroes.ToDictionary(x => x.NetworkId, x => false);
             this.TargetsWaypoints = objAiHeroes.ToDictionary(x => x.NetworkId, x => new List<WaypointInfo>());
-        
+            this.DontShoot = objAiHeroes.ToDictionary(x => x.NetworkId, x => 0f);
+            this.DontShoot2 = objAiHeroes.ToDictionary(x => x.NetworkId, x => 0f);
+
             Obj_AI_Base.OnNewPath += this.OnNewPath;
             Game.OnUpdate += this.OnUpdate;
             Obj_AI_Base.OnProcessSpellCast += this.OnProcessSpellCast;
@@ -600,7 +606,7 @@
 
             var isFromPlayer = Vector3.DistanceSquared(from, ObjectManager.GetLocalPlayer().Position) < 50 * 50;
             delay = delay + (0.07f + Game.Ping / 2000f);
-
+            Console.WriteLine(isFromPlayer);
             Vector3 position;
             Vector3 castPosition;
             int hitchance;
@@ -674,7 +680,7 @@
 
                 if (Vector3.DistanceSquared(from, castPosition) > range * range)
                 {
-                    hitchance = 2;
+                    hitchance = 0;
                 }
             }
 
@@ -770,7 +776,7 @@
 
             if (position.IsZero || castPosition.IsZero)
             {
-                hitchance = 0;
+                hitchance = 1;
                 castPosition = unit.Position;
                 position = castPosition;
             }
