@@ -33,11 +33,12 @@
             float speed,
             Vector3 from)
         {
-            return GameObjects.EnemyMinions
-                              .Where(
-                                  x => Vector3.DistanceSquared(x.Position, from)
-                                      <= range + 500 * (delay + range / speed))
-                              .Any(x => WillCollideWith(unit, x, position, delay, radius, range, speed, from));
+            return ObjectManager.Get<Obj_AI_Minion>()
+                                .Where(
+                                    x => x.IsValidTarget()
+                                        && Vector3.DistanceSquared(x.Position, from)
+                                        <= range + 500 * (delay + range / speed))
+                                .Any(x => WillCollideWith(unit, x, position, delay, radius, range, speed, from));
         }
 
         /// <summary>
