@@ -1,4 +1,4 @@
-﻿namespace Aimtec.SDK
+namespace Aimtec.SDK
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
@@ -18,9 +18,9 @@
         private static readonly HashSet<GameObject> allGameObjects;
 
         /// <summary>
-        ///     The ally hereos
+        ///     The ally heroes
         /// </summary>
-        private static readonly HashSet<Obj_AI_Hero> allyHereos;
+        private static readonly HashSet<Obj_AI_Hero> allyHeroes;
 
         /// <summary>
         ///     The ally minions
@@ -28,9 +28,9 @@
         private static HashSet<Obj_AI_Minion> allyMinions;
 
         /// <summary>
-        ///     The enemy hereos
+        ///     The enemy heroes
         /// </summary>
-        private static readonly HashSet<Obj_AI_Hero> enemyHereos;
+        private static readonly HashSet<Obj_AI_Hero> enemyHeroes;
 
         /// <summary>
         ///     The enemy minions
@@ -38,9 +38,9 @@
         private static HashSet<Obj_AI_Minion> enemyMinionsI;
 
         /// <summary>
-        ///     The hereos
+        ///     The heroes
         /// </summary>
-        private static readonly HashSet<Obj_AI_Hero> HereosI;
+        private static readonly HashSet<Obj_AI_Hero> HeroesI;
 
         /// <summary>
         ///     The minions
@@ -57,10 +57,10 @@
         public static IEnumerable<GameObject> AllGameObjects => allGameObjects;
 
         /// <summary>
-        /// Gets the ally hereos.
+        /// Gets the ally heroes.
         /// </summary>
-        /// <value>The ally hereos.</value>
-        public static IEnumerable<Obj_AI_Hero> AllyHereos => allyHereos;
+        /// <value>The ally heroes.</value>
+        public static IEnumerable<Obj_AI_Hero> AllyHeroes => allyHeroes;
 
         /// <summary>
         /// Gets the ally minions.
@@ -69,10 +69,10 @@
         public static IEnumerable<Obj_AI_Minion> AllyMinions => allyMinions;
 
         /// <summary>
-        /// Gets the enemy hereos.
+        /// Gets the enemy heroes.
         /// </summary>
-        /// <value>The enemy hereos.</value>
-        public static IEnumerable<Obj_AI_Hero> EnemyHereos => enemyHereos;
+        /// <value>The enemy heroes.</value>
+        public static IEnumerable<Obj_AI_Hero> EnemyHeroes => enemyHeroes;
 
         /// <summary>
         /// Gets the enemy minions.
@@ -81,10 +81,10 @@
         public static IEnumerable<Obj_AI_Minion> EnemyMinions => enemyMinionsI;
 
         /// <summary>
-        /// Gets the hereos.
+        /// Gets the heroes.
         /// </summary>
-        /// <value>The hereos.</value>
-        public static IEnumerable<Obj_AI_Hero> Hereos => HereosI;
+        /// <value>The heroes.</value>
+        public static IEnumerable<Obj_AI_Hero> Heroes => HeroesI;
 
         /// <summary>
         /// Gets the minions.
@@ -108,9 +108,9 @@
             allyMinions = CreateHashSet(minionsI.Where(x => x.IsAlly));
             enemyMinionsI = CreateHashSet(minionsI.Where(x => x.IsEnemy));
 
-            HereosI = CreateHashSet(ObjectManager.Get<Obj_AI_Hero>());
-            allyHereos = CreateHashSet(HereosI.Where(x => x.IsAlly));
-            enemyHereos = CreateHashSet(HereosI.Where(x => x.IsEnemy));
+            HeroesI = CreateHashSet(ObjectManager.Get<Obj_AI_Hero>());
+            allyHeroes = CreateHashSet(HeroesI.Where(x => x.IsAlly));
+            enemyHeroes = CreateHashSet(HeroesI.Where(x => x.IsEnemy));
         }
 
         #endregion
