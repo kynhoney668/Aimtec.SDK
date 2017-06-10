@@ -9,6 +9,7 @@
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
+    using Aimtec.SDK.Menu.SDKMenuInstance;
 
     using Menu = Aimtec.SDK.Menu.Menu;
 
