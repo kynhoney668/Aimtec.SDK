@@ -1,9 +1,10 @@
-﻿namespace Aimtec.SDK.Damage
+namespace Aimtec.SDK.Damage
 {
     using System;
     using System.Linq;
     using System.Text.RegularExpressions;
 
+    using Aimtec.SDK.Damage.JSON;
     using Aimtec.SDK.Extensions;
 
     /// <summary>
@@ -21,6 +22,7 @@
         /// <param name="damageType">Type of the damage.</param>
         /// <param name="amount">The amount.</param>
         /// <returns>System.Double.</returns>
+        /// <exception cref="ArgumentOutOfRangeException">damageType - null</exception>
         public static double CalculateDamage(
             this Obj_AI_Base source,
             Obj_AI_Base target,
@@ -42,6 +44,7 @@
                 case DamageType.True:
                     damage = Math.Floor(source.GetPassiveDamage(target, Math.Max(amount, 0), DamageType.True));
                     break;
+                default: throw new ArgumentOutOfRangeException(nameof(damageType), damageType, null);
             }
 
             return damage;
@@ -75,13 +78,11 @@
         {
             var dmgPhysical = (double) source.TotalAttackDamage;
             var dmgMagical = 0d;
-            var dmgPassive = 0d;
+            //var dmgPassive = 0d;
             var dmgReduce = 1d;
 
             var hero = source as Obj_AI_Hero;
             var targetHero = target as Obj_AI_Hero;
-
-            var isMixDmg = false;
 
             if (hero != null)
             {
@@ -101,7 +102,6 @@
                     case "Corki":
                         dmgPhysical /= 2;
                         dmgMagical = dmgPhysical;
-                        isMixDmg = true;
                         break;
                     case "Quinn":
                         if (target.HasBuff("quinnw"))
@@ -109,32 +109,41 @@
                             dmgPhysical += 10 + 5 * hero.Level + (0.14 + 0.02 * hero.Level) * hero.TotalAttackDamage;
                         }
                         break;
+                    case "Galio":
+                        if (hero.HasBuff("galiopassivebuff"))
+                        {
+                            dmgMagical += 8 + 4 * hero.Level + hero.TotalAttackDamage + 0.6 * hero.TotalAbilityDamage + 0.6 * hero.BonusSpellBlock;
+                        }
+                        break;
+                    // TODO getting the actual buffname
+                    case "Sejuani":
+                        if (target.HasBuff("sejuanistun"))
+                        {
+                            switch (target.Type)
+                            {
+                                case GameObjectType.AIHeroClient:
+                                    if (hero.Level < 7)
+                                    {
+                                        dmgMagical += 0.1 * targetHero.MaxHealth;
+                                    }
+                                    else if (hero.Level < 14)
+                                    {
+                                        dmgMagical += 0.15 * targetHero.MaxHealth;
+                                    }
+                                    else
+                                    {
+                                        dmgMagical += 0.2 * targetHero.MaxHealth;
+                                    }
+                                    break;
+                                case GameObjectType.obj_AI_Minion:
+                                    dmgMagical += 400;
+                                    break;
+                            }
+                        }
+                        break;
                 }
 
-                // Serrated Dirk
-                if (hero.HasBuff("Serrated"))
-                {
-                    if (!isMixDmg)
-                    {
-                        dmgPhysical += 15;
-                    }
-                    else
-                    {
-                        dmgPhysical += 7.5;
-                        dmgMagical += 7.5;
-                    }
-                }
-
-                if (targetHero != null)
-                {
-                    // Dorans Shield
-                    if (targetHero.HasItem(ItemId.DoransShield))
-                    {
-                        var subDmg = dmgPhysical + dmgMagical - 8;
-                        dmgPhysical = !isMixDmg ? subDmg : (dmgMagical = subDmg / 2);
-                    }
-                }
-                else if (target is Obj_AI_Minion)
+                if (target is Obj_AI_Minion)
                 {
                     // RiftHerald P
                     if (!hero.IsMelee && target.Team == GameObjectTeam.Neutral
@@ -142,12 +151,17 @@
                     {
                         dmgReduce *= 0.65;
                     }
+
+                    // Dorans Shield
+                    if (hero.HasItem(ItemId.DoransShield))
+                    {
+                        dmgPhysical += 5;
+                    }
                 }
             }
 
             // Ninja Tabi
-            if (targetHero != null && !(source is Obj_AI_Turret)
-                && new[] { 3047, 1316, 1318, 1315, 1317 }.Any(i => targetHero.HasItem((uint) i)))
+            if (targetHero != null && !(source is Obj_AI_Turret) && targetHero.HasItem(3047))
             {
                 dmgReduce *= 0.9;
             }
@@ -161,8 +175,165 @@
                 dmgPhysical -= 4 + 2 * Math.Floor((targetHero.Level - 1) / 3d);
             }
 
+            return Math.Max(Math.Floor((dmgPhysical + dmgMagical) * dmgReduce + source.GetPassiveFlatMod(target)), 0);
+        }
+
+        /// <summary>
+        ///     Gets the spell damage.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="spellSlot">The spell slot.</param>
+        /// <param name="stage">The stage.</param>
+        /// <returns>System.Double.</returns>
+        public static double GetSpellDamage(
+            this Obj_AI_Hero source,
+            Obj_AI_Base target,
+            SpellSlot spellSlot,
+            DamageStage stage = DamageStage.Default)
+        {
+            if (source == null || !source.IsValid || target == null || !target.IsValid)
+            {
+                return 0;
+            }
+
+            if (!DamageLibrary.Damages.TryGetValue(source.ChampionName, out ChampionDamage value))
+            {
+                return 0;
+            }
+
+            var spellData = value.GetSlot(spellSlot)?.FirstOrDefault(e => e.Stage == stage)?.SpellData;
+            if (spellData == null)
+            {
+                return 0;
+            }
+
+            var spellLevel = source.SpellBook.GetSpell(
+                                       spellData.ScaleSlot != SpellSlot.Unknown ? spellData.ScaleSlot : spellSlot)
+                                   .Level;
+
+            if (spellLevel == 0)
+            {
+                return 0;
+            }
+
+            var alreadyAdd1 = false;
+            var alreadyAdd2 = false;
+
+            var targetHero = target as Obj_AI_Hero;
+            var targetMinion = target as Obj_AI_Minion;
+
+            var dmgBase = 0d;
+            var dmgBonus = 0d;
+            var dmgPassive = 0d;
+            var dmgReduce = 1d;
+
+            if (spellData.DamagesPerLvl?.Count > 0)
+            {
+                dmgBase = spellData.DamagesPerLvl[Math.Min(source.Level - 1, spellData.DamagesPerLvl.Count - 1)];
+            }
+            else if (spellData.Damages?.Count > 0)
+            {
+                dmgBase = spellData.Damages[Math.Min(spellLevel - 1, spellData.Damages.Count - 1)];
+
+                if (!string.IsNullOrEmpty(spellData.ScalingBuff))
+                {
+                    var buffCount = (spellData.ScalingBuffTarget == DamageScalingTarget.Source ? source : target)
+                        .GetBuffCount(spellData.ScalingBuff);
+
+                    dmgBase = buffCount > 0 ? dmgBase * (buffCount + spellData.ScalingBuffOffset) : 0;
+                }
+            }
+            if (dmgBase > 0)
+            {
+                if (targetMinion != null && spellData.BonusDamageOnMinion?.Count > 0)
+                {
+                    dmgBase += spellData.BonusDamageOnMinion[Math.Min(
+                        spellLevel - 1,
+                        spellData.BonusDamageOnMinion.Count - 1)];
+                }
+
+                if (spellData.IsApplyOnHit || spellData.IsModifiedDamage
+                    || spellData.SpellEffectType == SpellEffectType.Single)
+                {
+                    alreadyAdd1 = true;
+                }
+
+                dmgBase = source.CalculateDamage(target, spellData.DamageType, dmgBase);
+
+                if (spellData.IsModifiedDamage && spellData.DamageType == DamageType.Physical && targetHero != null
+                    && targetHero.ChampionName == "Fizz")
+                {
+                    dmgBase -= 4 + (2 * Math.Floor((targetHero.Level - 1) / 3d));
+                    alreadyAdd2 = true;
+                }
+            }
+            if (spellData.BonusDamages?.Count > 0)
+            {
+                foreach (var bonusDmg in spellData.BonusDamages)
+                {
+                    var dmg = source.GetBonusSpellDamage(target, bonusDmg, spellLevel - 1);
+
+                    if (dmg <= 0)
+                    {
+                        continue;
+                    }
+
+                    if (!alreadyAdd1 && (spellData.IsModifiedDamage
+                        || spellData.SpellEffectType == SpellEffectType.Single))
+                    {
+                        alreadyAdd1 = true;
+                    }
+
+                    dmgBonus += source.CalculateDamage(target, bonusDmg.DamageType, dmg);
+
+                    if (alreadyAdd2 || !spellData.IsModifiedDamage || bonusDmg.DamageType != DamageType.Physical
+                        || targetHero == null || targetHero.ChampionName != "Fizz")
+                    {
+                        continue;
+                    }
+
+                    dmgBonus -= 4 + (2 * Math.Floor((targetHero.Level - 1) / 3d));
+                    alreadyAdd2 = true;
+                }
+            }
+
+            var totalDamage = dmgBase + dmgBonus;
+
+            if (totalDamage > 0)
+            {
+                if (spellData.ScalePerTargetMissHealth > 0)
+                {
+                    totalDamage *= (target.MaxHealth - target.Health) / target.MaxHealth
+                        * spellData.ScalePerTargetMissHealth + 1;
+                }
+
+                if (target is Obj_AI_Minion && spellData.MaxDamageOnMinion?.Count > 0)
+                {
+                    totalDamage = Math.Min(
+                        totalDamage,
+                        spellData.MaxDamageOnMinion[Math.Min(spellLevel - 1, spellData.MaxDamageOnMinion.Count - 1)]);
+                }
+
+                if (spellData.IsApplyOnHit || spellData.IsModifiedDamage)
+                {
+                    dmgPassive += 0; // todo get passive shit
+
+                    if (targetHero != null)
+                    {
+                        if (spellData.IsModifiedDamage && targetHero.HasItem(3047))
+                        {
+                            dmgReduce *= 0.9;
+                        }
+                    }
+                }
+            }
+
             return Math.Max(
-                Math.Floor((dmgPhysical + dmgMagical) * dmgReduce + source.GetPassiveFlatMod(target) + dmgPassive),
+                Math.Floor(
+                    totalDamage * dmgReduce + (spellData.IsApplyOnHit || spellData.IsModifiedDamage
+                        ? source.GetPassiveFlatMod(target)
+                        : 0) + dmgPassive),
                 0);
         }
 
@@ -321,7 +492,7 @@
             if (targetHero != null)
             {
                 // Alistar R
-                if (targetHero.HasBuff("Ferocious Howl"))
+                if (targetHero.HasBuff("FerociousHowl"))
                 {
                     amount *= 0.3;
                 }
@@ -339,10 +510,11 @@
                         .SpellBook.GetSpell(SpellSlot.E).Level - 1];
                 }
 
-                // Galio R
-                if (targetHero.HasBuff("GalioIdolOfDurand"))
+                // Galio W TODO
+                if (targetHero.HasBuff("galioSOMEONEPLSHELPMEWITHBUFFNAMESTY"))
                 {
-                    amount *= 0.5;
+                    amount *= 1 - new[] { 0.2, 0.25, 0.3, 0.35, 0.4 }[targetHero
+                        .SpellBook.GetSpell(SpellSlot.W).Level - 1] + 0.08 * (int)(targetHero.BonusSpellBlock/100);
                 }
 
                 // Garen W
@@ -364,18 +536,6 @@
                     amount *= 0.85;
                 }
 
-                // Katarina E
-                if (targetHero.HasBuff("KatarinaEReduction"))
-                {
-                    amount *= 0.85;
-                }
-
-                // Maokai R
-                if (targetHero.HasBuff("MaokaiDrainDefense") && !(source is Obj_AI_Turret))
-                {
-                    amount *= 0.8;
-                }
-
                 // MasterYi W
                 if (targetHero.HasBuff("Meditate"))
                 {
@@ -387,18 +547,6 @@
                 if (targetHero.HasBuff("urgotswapdef"))
                 {
                     amount *= 1 - new[] { 0.3, 0.4, 0.5 }[targetHero.SpellBook.GetSpell(SpellSlot.R).Level - 1];
-                }
-
-                // Yorick P
-                if (targetHero.HasBuff("YorickUnholySymbiosis"))
-                {
-                    amount *= 1 - ObjectManager
-                        .Get<Obj_AI_Minion>().Count(
-                            g => g.Team == targetHero.Team && (g.Name.Equals("Clyde") || g.Name.Equals("Inky")
-                                || g.Name.Equals("Blinky")
-                                || g.HasBuff("yorickunholysymbiosis")
-                                && g.BuffManager.GetBuff("yorickunholysymbiosis").Caster.NetworkId
-                                == targetHero.NetworkId)) * 0.05;
                 }
             }
 

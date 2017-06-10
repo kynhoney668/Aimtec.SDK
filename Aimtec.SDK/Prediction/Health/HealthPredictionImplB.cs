@@ -19,7 +19,7 @@
 
         internal HealthPredictionImplB()
         {
-            Game.OnUpdate += this.GameOnOnUpdate;
+            Game.OnUpdate += this.GameOnUpdate;
             Obj_AI_Base.OnProcessAutoAttack += this.ObjAiBaseOnOnProcessAutoAttack;
             SpellBook.OnStopCast += this.SpellBookOnOnStopCast;
             GameObject.OnDestroy += this.GameObjectOnOnDestroy;
@@ -37,7 +37,7 @@
             }
         }
 
-        private void GameOnOnUpdate()
+        private void GameOnUpdate()
         {
             foreach (var value in this.incomingAttacks.Values)
             {

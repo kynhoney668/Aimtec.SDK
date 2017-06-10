@@ -35,8 +35,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\..\..\..\Desktop\Aimtec\System\Aimtec.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=9.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.9.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLog.4.4.10\lib\net45\NLog.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,8 +53,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CollisionType.cs" />
+    <Compile Include="Bootstrap.cs" />
+    <Compile Include="GameObjectEqualityComparer.cs" />
+    <Compile Include="GameObjects.cs" />
     <Compile Include="Damage\Damage.cs" />
+    <Compile Include="Damage\DamageLibrary.cs" />
     <Compile Include="Damage\ItemId.cs" />
     <Compile Include="Damage\JSON\ChampionDamage.cs" />
     <Compile Include="Damage\JSON\DamageSpell.cs" />
@@ -92,15 +98,19 @@
     <Compile Include="Orbwalking\Orbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkingImpl.cs" />
     <Compile Include="Orbwalking\OrbwalkingMode.cs" />
+    <Compile Include="Prediction\Collision\Collision.cs" />
+    <Compile Include="Prediction\Collision\CollisionableObjects.cs" />
     <Compile Include="Prediction\Health\HealthPrediction.cs" />
     <Compile Include="Prediction\Health\HealthPredictionImpl.cs" />
     <Compile Include="Prediction\Health\HealthPredictionImplB.cs" />
     <Compile Include="Prediction\Health\IHealthPrediction.cs" />
     <Compile Include="Prediction\HitChance.cs" />
-    <Compile Include="Prediction\Prediction.cs" />
-    <Compile Include="Prediction\PredictionInput.cs" />
-    <Compile Include="Prediction\PredictionOutput.cs" />
-    <Compile Include="SkillType.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionInput.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionOutput.cs" />
+    <Compile Include="Prediction\Skillshots\IPrediction.cs" />
+    <Compile Include="Prediction\Skillshots\Prediction.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionImpl.cs" />
+    <Compile Include="Prediction\SkillType.cs" />
     <Compile Include="TargetSelector\ITargetSelector.cs" />
     <Compile Include="TargetSelector\TargetSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -109,10 +119,13 @@
     <Compile Include="Util\DelayAction.cs" />
     <Compile Include="Util\KeyboardEvents.cs" />
     <Compile Include="Util\Keys.cs" />
+    <Compile Include="Util\Geometry.cs" />
+    <Compile Include="Util\Requires.cs" />
     <Compile Include="Util\ThirdParty\Clipper.cs" />
     <Compile Include="Util\WindowsMessages.cs" />
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Damage\Data\7.11.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

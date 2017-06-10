@@ -79,6 +79,7 @@ namespace Aimtec.SDK.Extensions
             return from.Inventory.HasItem(itemId);
         }
 
+<<<<<<< HEAD:Aimtec.SDK/Extensions/UnitExtensions.cs
         public static float FullAttackRange(this Obj_AI_Base source, AttackableUnit target)
         {
             var baseRange = source.AttackRange + source.BoundingRadius;
@@ -111,5 +112,11 @@ namespace Aimtec.SDK.Extensions
             return false;
         }
 
+=======
+        public static bool HasItem(this Obj_AI_Base from, uint itemId)
+        {
+            return from.Inventory.HasItem(itemId);
+        }
+>>>>>>> 8f618b10bc1489be311005d19840e9faa0e9d4ac:Aimtec.SDK/Extensions/HeroExtensions.cs
     }
 }
