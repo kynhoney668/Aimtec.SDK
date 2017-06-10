@@ -542,7 +542,7 @@ namespace Aimtec.SDK.Orbwalking
             {
                 var predHealth = this.GetPredictedHealth(minion) - 1;
 
-                var dmg = this.Player.GetAutoAttackDamage(this.Player);
+                var dmg = this.Player.GetAutoAttackDamage(minion);
 
                 var data = this.HealthPrediction.GetAggroData(minion);
 
