@@ -3,14 +3,13 @@
 namespace Aimtec.SDK.Orbwalking
 {
     using System.Collections.Generic;
-    using System.Drawing;
     using System.Linq;
 
     using Aimtec.SDK.Damage;
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
-    using Aimtec.SDK.Menu.SDKMenuInstance;
+    using Aimtec.SDK.Menu.Config;
     using Aimtec.SDK.Prediction.Health;
     using Aimtec.SDK.TargetSelector;
     using Aimtec.SDK.Util;
@@ -26,19 +25,20 @@ namespace Aimtec.SDK.Orbwalking
             this.CreateMenu();
         }
 
-        private Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
+        private static Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
 
-        private HealthPredictionImplB HealthPrediction = new HealthPredictionImplB();
+        // TODO this completely breaks the modular design, Orbwalker and health prediction shouldnt be tightly coupled!
+        private HealthPredictionImplB HealthPrediction { get; }= new HealthPredictionImplB();
 
         private Menu Config;
 
-        private readonly List<CustomMode> CustomModes = new List<CustomMode>();
+        private List<CustomMode> CustomModes { get; } = new List<CustomMode>();
 
         private AttackableUnit LastTarget { get; set; }
 
-        public float AnimationTime => this.Player.AttackCastDelay * 1000;
+        public float AnimationTime => Player.AttackCastDelay * 1000;
 
-        public float WindUpTime => this.Player.AttackDelay * 1000;
+        public float WindUpTime => Player.AttackDelay * 1000;
 
         protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick
                                       >= this.WindUpTime;
@@ -52,7 +52,7 @@ namespace Aimtec.SDK.Orbwalking
                                        >= this.LastAttackCommandSentTime + this.AnimationTime + this.ExtraWindUp;
 
         public bool CanMove => this.CanMoveServer && this.CanMoveLocal
-                               && this.Player.Distance(Game.CursorPos) > this.HoldPositionRadius;
+                               && Player.Distance(Game.CursorPos) > this.HoldPositionRadius;
 
         public bool CanAttack => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick >= this.WindUpTime;
 
@@ -76,9 +76,9 @@ namespace Aimtec.SDK.Orbwalking
 
 
         //Members
-        private float ServerAttackDetectionTick;
+        private float ServerAttackDetectionTick { get; set; }
 
-        private float LastAttackCommandSentTime;
+        private float LastAttackCommandSentTime { get; set; }
 
         public OrbwalkingMode Mode
         {
@@ -132,51 +132,33 @@ namespace Aimtec.SDK.Orbwalking
 
 
         //Situations where it does not make sense to cast an auto attack (independent of target)
-        protected bool ShouldNotAttack
-        {
-            get
-            {
-                return BlindCheck;
-            }
-        }
+        protected bool ShouldNotAttack => BlindCheck;
 
-        private bool BlindCheck
-        {
-            get
-            {
-                return this.Config["noBlindAA"].Enabled && !this.Player.ChampionName.Equals("Kalista")
-                       && !this.Player.ChampionName.Equals("Twitch")
-                       && this.Player.BuffManager.HasBuffOfType(BuffType.Blind);
-            }
-        }
-
-
+        private bool BlindCheck => this.Config["noBlindAA"].Enabled && !Player.ChampionName.Equals("Kalista")
+            && !Player.ChampionName.Equals("Twitch")
+            && Player.BuffManager.HasBuffOfType(BuffType.Blind);
 
         protected void Game_OnUpdate()
         {
             this.Orbwalker();
         }
 
-        void Orbwalker()
+        private void Orbwalker()
         {
             var activeMode = this.GetCurrentMode();
 
-            if (activeMode == OrbwalkingMode.None)
+            switch (activeMode)
             {
-                return;
+                case OrbwalkingMode.None:
+                    return;
+                case OrbwalkingMode.Custom:
+                    this.CustomModeOrbwalking();
+                    break;
+                default:
+                    var target = this.GetTarget();
+                    this.Orbwalk(target);
+                    break;
             }
-
-            if (activeMode == OrbwalkingMode.Custom)
-            {
-                this.CustomModeOrbwalking();
-            }
-
-            else
-            {
-                var target = this.GetTarget();
-                this.Orbwalk(target);
-            }
-
         }
 
 
@@ -205,7 +187,7 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-        public void Orbwalk(AttackableUnit target, bool Move = true, bool Attack = true)
+        public void Orbwalk(AttackableUnit target, bool move = true, bool attack = true)
         {
             if (this.AttackReady && target != null && !this.ShouldNotAttack)
             {
@@ -213,7 +195,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 if (!args.Cancel)
                 {
-                    this.Player.IssueOrder(OrderType.AttackUnit, target);
+                    Player.IssueOrder(OrderType.AttackUnit, target);
                     this.LastAttackCommandSentTime = Game.TickCount;
                 }
             }
@@ -224,7 +206,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 if (!args.Cancel)
                 {
-                    this.Player.IssueOrder(OrderType.MoveTo, Game.CursorPos);
+                    Player.IssueOrder(OrderType.MoveTo, Game.CursorPos);
                 }
             }
         }
@@ -258,11 +240,11 @@ namespace Aimtec.SDK.Orbwalking
 
         private PreAttackEventArgs FirePreAttack(AttackableUnit target)
         {
-            PreAttackEventArgs args = new PreAttackEventArgs { Target = target };
+            var args = new PreAttackEventArgs { Target = target };
 
             if (this.PreAttack != null)
             {
-                this.PreAttack.Invoke(this.Player, args);
+                this.PreAttack.Invoke(Player, args);
             }
 
             return args;
@@ -270,12 +252,9 @@ namespace Aimtec.SDK.Orbwalking
 
         private PostAttackEventArgs FirePostAttack(AttackableUnit target)
         {
-            PostAttackEventArgs args = new PostAttackEventArgs { Target = target };
+            var args = new PostAttackEventArgs { Target = target };
 
-            if (this.PostAttack != null)
-            {
-                this.PostAttack.Invoke(this.Player, args);
-            }
+            this.PostAttack?.Invoke(Player, args);
 
             return args;
         }
@@ -283,12 +262,9 @@ namespace Aimtec.SDK.Orbwalking
 
         private PreMoveEventArgs FirePreMove(Vector3 position)
         {
-            PreMoveEventArgs args = new PreMoveEventArgs { MovePosition = position };
+            var args = new PreMoveEventArgs { MovePosition = position };
 
-            if (this.PreMove != null)
-            {
-                this.PreMove.Invoke(this.Player, args);
-            }
+            this.PreMove?.Invoke(Player, args);
 
             return args;
         }
@@ -469,7 +445,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 var predHealth1Auto = this.HealthPrediction.GetPredictedDamage(minionTurretAggro, timeToReach);
 
-                var dmgauto = this.Player.GetAutoAttackDamage(minionTurretAggro);
+                var dmgauto = Player.GetAutoAttackDamage(minionTurretAggro);
 
                 var turretDmg = data.LastTurretAttack.Sender.GetAutoAttackDamage(minionTurretAggro);
 
@@ -503,7 +479,7 @@ namespace Aimtec.SDK.Orbwalking
                 }
 
                 var numautos = this.NumberOfAutoAttacksInTime(
-                    this.Player,
+                    Player,
                     minionTurretAggro,
                     data.TimeUntilNextTurretAttack);
 
@@ -542,11 +518,11 @@ namespace Aimtec.SDK.Orbwalking
                 return structure;
             }
 
-            foreach (var minion in minions.OrderByDescending(x => Math.Ceiling(this.GetPredictedHealth(x) / this.Player.GetAutoAttackDamage(x))).ThenBy(x => x.NetworkId == this.LastTarget?.NetworkId))
+            foreach (var minion in minions.OrderByDescending(x => Math.Ceiling(this.GetPredictedHealth(x) / Player.GetAutoAttackDamage(x))).ThenBy(x => x.NetworkId == this.LastTarget?.NetworkId))
             {
                 var predHealth = this.GetPredictedHealth(minion) - 1;
 
-                var dmg = this.Player.GetAutoAttackDamage(minion);
+                var dmg = Player.GetAutoAttackDamage(minion);
 
                 var data = this.HealthPrediction.GetAggroData(minion);
 
@@ -561,7 +537,7 @@ namespace Aimtec.SDK.Orbwalking
                     continue;
                 }
 
-                var autos = Math.Ceiling(predHealth / this.Player.GetAutoAttackDamage(minion));
+                var autos = Math.Ceiling(predHealth / Player.GetAutoAttackDamage(minion));
   
                 if (autos >= 2)
                 {
@@ -618,14 +594,14 @@ namespace Aimtec.SDK.Orbwalking
             //Nexus
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
             var nexus = attackableUnits.Where(x => x.Type == GameObjectType.obj_HQ)
-                .OrderBy(x => x.Distance(this.Player)).FirstOrDefault();
+                .OrderBy(x => x.Distance(Player)).FirstOrDefault();
             if (nexus != null && nexus.IsValidAutoRange())
             {
                 return nexus;
             }
 
             //Turret
-            var turret = attackableUnits.Where(x => x is Obj_AI_Turret).OrderBy(x => x.Distance(this.Player))
+            var turret = attackableUnits.Where(x => x is Obj_AI_Turret).OrderBy(x => x.Distance(Player))
                 .FirstOrDefault();
             if (turret != null && turret.IsValidAutoRange())
             {
@@ -634,7 +610,7 @@ namespace Aimtec.SDK.Orbwalking
 
             //Inhib
             var inhib = attackableUnits.Where(x => x.Type == GameObjectType.obj_BarracksDampener)
-                .OrderBy(x => x.Distance(this.Player)).FirstOrDefault();
+                .OrderBy(x => x.Distance(Player)).FirstOrDefault();
             if (inhib != null && inhib.IsValidAutoRange())
             {
                 return inhib;
@@ -646,16 +622,16 @@ namespace Aimtec.SDK.Orbwalking
 
         int TimeForAutoToReachTarget(AttackableUnit minion)
         {
-            var dist = this.Player.Distance(minion) - this.Player.BoundingRadius - minion.BoundingRadius;
-            var ms = this.Player.BasicAttack.MissileSpeed * 1000;
+            var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
+            var ms = Player.BasicAttack.MissileSpeed * 1000;
 
-            return (int)(this.AnimationTime + (Game.Ping / 2) + (int)Math.Max(0, dist / ms));
+            return (int)(this.AnimationTime + (Game.Ping / 2f) + (int)Math.Max(0, dist / ms));
         }
 
 
         bool CanKillMinion(Obj_AI_Base minion, int time = 0)
         {
-            int rtime = time == 0 ? (this.TimeForAutoToReachTarget(minion)) : (time);
+            var rtime = time == 0 ? (this.TimeForAutoToReachTarget(minion)) : (time);
 
             var pred = this.GetPredictedHealth(minion, rtime);
 
@@ -665,15 +641,15 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
-            return this.Player.GetAutoAttackDamage(minion) - pred >= 0;
+            return Player.GetAutoAttackDamage(minion) - pred >= 0;
         }
 
         int NumberOfAutoAttacksInTime(Obj_AI_Base sender, AttackableUnit minion, int time)
         {
             var basetimePerAuto = this.TimeForAutoToReachTarget(minion);
 
-            int numberOfAutos = 0;
-            int adjustedTime = 0;
+            var numberOfAutos = 0;
+            var adjustedTime = 0;
 
             if (this.AttackReady)
             {
@@ -701,19 +677,19 @@ namespace Aimtec.SDK.Orbwalking
 
         int GetPredictedHealth(Obj_AI_Base minion, int time = 0)
         {
-            int rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
+            var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
             return (int)this.HealthPrediction.GetPrediction(minion, rtime);
         }
 
         bool ShouldWaitMinion(Obj_AI_Base minion)
         {
             var pred = this.GetPredictedHealth(minion, this.TimeForAutoToReachTarget(minion) + (int)(this.WindUpTime));
-            return this.Player.GetAutoAttackDamage(minion) - pred >= 0;
+            return Player.GetAutoAttackDamage(minion) - pred >= 0;
         }
 
         public void Dispose()
         {
-            throw new NotImplementedException();
+            
         }
 
         //Adding a custom mode that will be in this orbwalker's menu instance because it is not using a standard key
@@ -724,10 +700,9 @@ namespace Aimtec.SDK.Orbwalking
                 throw new Exception($"Unable to add a custom mode with the name \"{modeName}\" because it already exists.");
             }
 
-            CustomMode mode = new CustomMode(modeName, modeKey, movingEnabled, attackingEnabled);
+            var mode = new CustomMode(modeName, modeKey, movingEnabled, attackingEnabled);
 
             this.CustomModes.Add(mode);
-
             this.Config.Add(mode.MenuItem);
         }
 
@@ -739,11 +714,13 @@ namespace Aimtec.SDK.Orbwalking
                 throw new Exception($"Unable to add a custom mode with the name \"{modeName}\" because it already exists.");
             }
 
-            CustomMode mode = new CustomMode(modeName, key, movingEnabled, attackingEnabled);
+            var mode = new CustomMode(modeName, key, movingEnabled, attackingEnabled);
 
             this.CustomModes.Add(mode);
         }
 
+        // TODO Let developer customize what to do in regards to attacking and moving, instead of just letting them
+        // disable/enable moving and attacking.
         public class CustomMode
         {
             //Using a GlobalKey

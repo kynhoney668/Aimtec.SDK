@@ -68,7 +68,6 @@
     <Compile Include="Damage\JSON\DamageStage.cs" />
     <Compile Include="Damage\JSON\SpellEffectType.cs" />
     <Compile Include="Events\GameEvents.cs" />
-    <Compile Include="Events\Initializer.cs" />
     <Compile Include="Extensions\UnitExtensions.cs" />
     <Compile Include="Extensions\Vector2Extensions.cs" />
     <Compile Include="Extensions\Vector3Extensions.cs" />
@@ -80,8 +79,8 @@
     <Compile Include="Menu\Components\MenuSliderBool.cs" />
     <Compile Include="Menu\IReturns.cs" />
     <Compile Include="Menu\MenuComponent.cs" />
-    <Compile Include="Menu\SDKMenuInstance\AimTecMenu.cs" />
-    <Compile Include="Menu\SDKMenuInstance\GlobalKeys.cs" />
+    <Compile Include="Menu\Config\AimTecMenu.cs" />
+    <Compile Include="Menu\Config\GlobalKeys.cs" />
     <Compile Include="Menu\Theme\Default\DefaultMenu.cs" />
     <Compile Include="Menu\Theme\Default\DefaultMenuBool.cs" />
     <Compile Include="Menu\Theme\Default\DefaultMenuKeybind.cs" />

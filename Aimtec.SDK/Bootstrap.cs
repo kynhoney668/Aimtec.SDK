@@ -4,8 +4,12 @@
     using System.IO;
     using System.Reflection;
 
+    using Aimtec.SDK.Menu.Config;
+    using Aimtec.SDK.TargetSelector;
+
     using NLog;
     using NLog.Config;
+    using NLog.Fluent;
     using NLog.Layouts;
     using NLog.Targets;
     using NLog.Targets.Wrappers;
@@ -48,6 +52,14 @@
 
             SetupLogging();
             LogUnhandledExceptions();
+
+            Logger.Info("Loading Global Keys");
+            GlobalKeys.Load();
+            Logger.Info("GlobalKeys loaded!");
+
+            Logger.Info("Creating default menu");
+            AimtecMenu.Instance.Attach();
+            Logger.Info("Default Aimtec menu created!");
 
             Logger.Info($"Aimtec.SDK version {Assembly.GetExecutingAssembly().GetName().Version} loaded.");
 
@@ -96,7 +108,8 @@
             var consoleTarget = new AsyncTargetWrapper(
                 new ColoredConsoleTarget("ColoredConsoleTarget")
                 {
-                    Layout = new SimpleLayout("${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${message}")
+                    Layout = new SimpleLayout("${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${message}"),
+                    DetectConsoleAvailable = false
                 });
 
             config.AddTarget("AsyncWrapper1", consoleTarget);

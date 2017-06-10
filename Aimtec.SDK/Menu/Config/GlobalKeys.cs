@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Aimtec.SDK.Menu.SDKMenuInstance
+﻿namespace Aimtec.SDK.Menu.Config
 {
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Util;
@@ -49,7 +43,7 @@ namespace Aimtec.SDK.Menu.SDKMenuInstance
 
             ComboNoOrbwalkKey = new Key("ComboNoOrbwalk", "Combo - No Orbwalk", KeyCode.J, KeybindType.Toggle, false);
 
-            AimTecMenu.Instance.Add(KeyConfig);
+            AimtecMenu.Instance.Add(KeyConfig);
         }
 
         public class Key

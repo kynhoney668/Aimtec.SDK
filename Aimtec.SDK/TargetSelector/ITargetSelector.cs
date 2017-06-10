@@ -17,7 +17,6 @@
         /// <summary>
         /// Gets the target for the Orbwalker to attack
         /// </summary>
-        /// <param name="range"></param>
         /// <returns></returns>
         Obj_AI_Hero GetOrbwalkingTarget();
     

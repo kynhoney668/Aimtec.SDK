@@ -9,12 +9,16 @@
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
-    using Aimtec.SDK.Menu.SDKMenuInstance;
+    using Aimtec.SDK.Menu.Config;
+
+    using NLog;
+    using NLog.Fluent;
 
     using Menu = Aimtec.SDK.Menu.Menu;
 
     public class TargetSelectorImpl : ITargetSelector
     {
+        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
         private static Menu Config { get; set; }
 
@@ -60,8 +64,7 @@
 
         private static IEnumerable<Obj_AI_Hero> Enemies => ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy);
 
-
-        internal static void Load()
+        public TargetSelectorImpl()
         {
             CreateMenu();
             CreateWeights();
@@ -71,7 +74,7 @@
         private static void RenderManagerOnOnRender()
         {
             var ordered = GetTargetsInOrder(10000).ToList();
-            var basepos = new Vector2(RenderManager.Width / 2, 0.10f * RenderManager.Height);
+            var basepos = new Vector2(RenderManager.Width / 2f, 0.10f * RenderManager.Height);
             for (int i = 0; i < ordered.Count(); i++)
             {
                 var targ = ordered[i];
@@ -327,6 +330,8 @@
         
         private static void CreateMenu()
         {
+            Logger.Info("Add default target selector menu");
+
             Config = new Menu("Aimtec.TS", "Target Selector");
 
             var weights = new Menu("WeightsMenu", "Weights");
@@ -344,7 +349,7 @@
 
             Config.Add(new MenuBool("UseWeights", "Use Weights"));
 
-            AimTecMenu.Instance.Add(Config);
+            AimtecMenu.Instance.Add(Config);
         }
 
 

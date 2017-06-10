@@ -1,30 +1,22 @@
 ﻿namespace Aimtec.SDK.Prediction.Health
 {
-    public class HealthPrediction 
+    /// <summary>
+    /// Class HealthPrediction.
+    /// </summary>
+    /// <seealso cref="Aimtec.SDK.Prediction.Health.IHealthPrediction" />
+    public class HealthPrediction : IHealthPrediction
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="HealthPrediction"/> class.
+        /// Gets the instance.
         /// </summary>
-        /// <param name="impl">The implementation.</param>
-        public HealthPrediction(IHealthPrediction impl)
-        {
-            Implementation = impl;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HealthPrediction"/> class.
-        /// </summary>
-        public HealthPrediction()
-            : this(new HealthPredictionImplB())
-        {
-
-        }
+        /// <value>The instance.</value>
+        public static HealthPrediction Instance { get; } = new HealthPrediction();
 
         /// <summary>
         /// Gets or sets the implementation.
         /// </summary>
         /// <value>The implementation.</value>
-        public static IHealthPrediction Implementation { get; set; }
+        public static IHealthPrediction Implementation { get; set; } = new HealthPredictionImplB();
 
         /// <summary>
         /// Gets the predicted health of the target.
