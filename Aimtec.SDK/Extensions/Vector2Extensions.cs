@@ -1,4 +1,4 @@
-﻿namespace Aimtec.SDK.Extensions
+namespace Aimtec.SDK.Extensions
 {
     using System;
     using System.Drawing;
@@ -247,6 +247,41 @@
             return new Vector2(
                 (float) ((vector2.X * cos) - (vector2.Y * sin)),
                 (float) ((vector2.Y * cos) + (vector2.X * sin)));
+        }
+
+        /// <summary>
+        ///     Extends a Vector2 to another Vector2.
+        /// </summary>
+        /// <param name="vector2">Extended SharpDX Vector2 (From)</param>
+        /// <param name="toVector2">SharpDX Vector2 (To)</param>
+        /// <param name="distance">Distance (float units)</param>
+        /// <returns>Extended Vector2</returns>
+        public static Vector2 Extend(this Vector2 vector2, Vector2 toVector2, float distance)
+        {
+            return vector2 + distance * (toVector2 - vector2).Normalized();
+        }
+
+        /// <summary>
+        ///     Extends a Vector2 to a Vector3.
+        /// </summary>
+        /// <param name="vector2">Extended SharpDX Vector2 (From)</param>
+        /// <param name="toVector3">SharpDX Vector3 (To)</param>
+        /// <param name="distance">Distance (float units)</param>
+        /// <returns>Extended Vector2</returns>
+        public static Vector2 Extend(this Vector2 vector2, Vector3 toVector3, float distance)
+        {
+            return vector2 + distance * ((Vector2)toVector3 - vector2).Normalized();
+        }
+
+        /// <summary>
+        ///     Normalizes a Vector2.
+        /// </summary>
+        /// <param name="vector2">SharpDX Vector2</param>
+        /// <returns>Normalized Vector2</returns>
+        public static Vector2 Normalized(this Vector2 vector2)
+        {
+            vector2.Normalize();
+            return vector2;
         }
 
         #endregion
