@@ -175,21 +175,21 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
-        /// Returns the current health a determined Obj_AI_Hero has in percentual.
+        /// Returns the current health a determined unit has, in percentual.
         /// </summary>
         /// <param name="target">The target.</param>
-        public static float HealthPercent(this Obj_AI_Hero target)
+        public static float HealthPercent(this Obj_AI_Hero unit)
         {
-            return target.Health / target.MaxHealth * 100;
+            return unit.Health / unit.MaxHealth * 100;
         }
 
         /// <summary>
-        /// Returns the current mana a determined Obj_AI_Hero has in percentual.
+        /// Returns the current mana a determined unit has, in percentual.
         /// </summary>
         /// <param name="target">The target.</param>
-        public static float ManaPercent(this Obj_AI_Hero target)
+        public static float ManaPercent(this Obj_AI_Hero unit)
         {
-            return target.Mana / target.MaxMana * 100;
+            return unit.Mana / unit.MaxMana * 100;
         }
     }
 }
