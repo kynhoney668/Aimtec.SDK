@@ -187,12 +187,10 @@ namespace Aimtec.SDK.Extensions
             return Math.Pow(x, 2);
         }
 
-        public static bool PointUnderEnemyTurret(this Vector2 Point)
+        public static bool PointUnderEnemyTurret(this Vector2 point)
         {
-            var EnemyTurrets =
-                ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && Vector2.Distance(Point, t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
-
-            return EnemyTurrets;
+            var enemyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && Vector2.Distance(point, t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            return enemyTurrets;
         }
 
  
@@ -236,7 +234,7 @@ namespace Aimtec.SDK.Extensions
         /// <summary>
         ///     Rotates the Vector2 to a set angle.
         /// </summary>
-        /// <param name="vector2">Extended SharpDX Vector2</param>
+        /// <param name="vector2">Extended Vector2</param>
         /// <param name="angle">Angle (in radians)</param>
         /// <returns>Rotated Vector2</returns>
         public static Vector2 Rotated(this Vector2 vector2, float angle)
@@ -245,14 +243,14 @@ namespace Aimtec.SDK.Extensions
             var sin = Math.Sin(angle);
 
             return new Vector2(
-                (float) ((vector2.X * cos) - (vector2.Y * sin)),
-                (float) ((vector2.Y * cos) + (vector2.X * sin)));
+                (float)(vector2.X * cos - vector2.Y * sin),
+                (float)(vector2.Y * cos + vector2.X * sin));
         }
 
         /// <summary>
         ///     Extends a Vector2 to another Vector2.
         /// </summary>
-        /// <param name="vector2">Extended SharpDX Vector2 (From)</param>
+        /// <param name="vector2">Extended Vector2 (From)</param>
         /// <param name="toVector2">SharpDX Vector2 (To)</param>
         /// <param name="distance">Distance (float units)</param>
         /// <returns>Extended Vector2</returns>
@@ -264,7 +262,7 @@ namespace Aimtec.SDK.Extensions
         /// <summary>
         ///     Extends a Vector2 to a Vector3.
         /// </summary>
-        /// <param name="vector2">Extended SharpDX Vector2 (From)</param>
+        /// <param name="vector2">Extended Vector2 (From)</param>
         /// <param name="toVector3">SharpDX Vector3 (To)</param>
         /// <param name="distance">Distance (float units)</param>
         /// <returns>Extended Vector2</returns>
