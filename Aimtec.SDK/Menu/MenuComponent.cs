@@ -6,6 +6,7 @@
     using System.Drawing;
     using System.IO;
     using System.Linq;
+    using System.Web.UI.HtmlControls;
 
     using Newtonsoft.Json;
 
@@ -15,20 +16,25 @@
     /// <seealso cref="Aimtec.SDK.Menu.IMenuComponent" />
     public abstract class MenuComponent : IMenuComponent
     {
-        #region Public Properties
 
-        /// <summary>
-        ///     Gets the children.
-        /// </summary>
-        /// <value>The children.</value>
-        public virtual Dictionary<string, MenuComponent> Children { get; }
-
-        public virtual MenuComponent this[string name] => null;
-
-        internal virtual string ConfigName => this.CleanFileName(
-            $"{this.DisplayName}-{this.InternalName}-{this.GetType().Name}");
+        #region Internal Properties
+        internal abstract string Serialized { get; }
 
         internal virtual bool SavableMenuItem { get; set; } = true;
+
+        internal virtual string ConfigName
+        {
+            get
+            {
+                if (this.IsMenu)
+                {
+                    return this.CleanFileName(this.InternalName);
+                }
+
+                return this.CleanFileName($"{this.InternalName}.{this.GetType().Name}");
+            }
+        }
+
 
         internal string ConfigBaseFolder
         {
@@ -39,12 +45,12 @@
                     return MenuManager.Instance.SharedSettingsPath;
                 }
 
-                return Path.Combine(MenuManager.Instance.MenuSettingsPath, this.CallingAssemblyName);
+                return Path.Combine(MenuManager.Instance.MenuSettingsPath, this.AssemblyConfigDirectoryName);
             }
         }
 
 
-        public string ConfigPath
+        internal string ConfigPath
         {
             get
             {
@@ -62,14 +68,19 @@
             }
         }
 
+        private string _AssemblyConfigDirectoryName;
 
-        internal string CallingAssemblyName { get; set; }
-
-        internal abstract string Serialized { get; }
-
-        public delegate void ValueChangedHandler(MenuComponent sender, ValueChangedArgs args);
-
-        public virtual event ValueChangedHandler ValueChanged;
+        internal string AssemblyConfigDirectoryName
+        {
+            get
+            {
+                return (this.Root || this.Parent == null) ? this._AssemblyConfigDirectoryName : this.Parent.AssemblyConfigDirectoryName;
+            }
+            set
+            {
+                this._AssemblyConfigDirectoryName = value;
+            }
+        }
 
         protected virtual void FireOnValueChanged(MenuComponent sender, ValueChangedArgs args)
         {
@@ -79,13 +90,28 @@
                 this.ValueChanged(sender, args);
             }
 
-
             //Fire the value changed on the parent menu 
             if (this.Parent != null)
             {
                 this.Parent.FireOnValueChanged(sender, args);
             }
         }
+
+
+        #endregion
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets the children.
+        /// </summary>
+        /// <value>The children.</value>
+        public virtual Dictionary<string, MenuComponent> Children { get; }
+
+        public virtual MenuComponent this[string name] => null;
+
+        public delegate void ValueChangedHandler(MenuComponent sender, ValueChangedArgs args);
+
+        public virtual event ValueChangedHandler ValueChanged;
 
         /// <summary>
         ///     Gets or sets the display name.
@@ -229,6 +255,7 @@
         public virtual void WndProc(uint message, uint wparam, int lparam)
         {
         }
+
 
         internal virtual void Save()
         {

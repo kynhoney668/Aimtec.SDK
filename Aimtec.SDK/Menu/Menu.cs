@@ -7,6 +7,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.InteropServices;
 
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Theme;
@@ -41,14 +42,18 @@
         /// </summary>
         /// <param name="internalName">Name of the internal.</param>
         /// <param name="displayName">The display name.</param>
+        /// <param name="isRoot">Whether this Menu is a root menu</param>
         public Menu(string internalName, string displayName, bool isRoot = false)
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
-
             this.Root = isRoot;
 
-            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
+            var calling = Assembly.GetCallingAssembly();
+
+            GuidAttribute GUID = (GuidAttribute)Attribute.GetCustomAttribute(calling, typeof(GuidAttribute));
+
+            this.AssemblyConfigDirectoryName = $"{Assembly.GetCallingAssembly().GetName().Name}.{GUID.Value.Substring(0, 5)}";
         }
 
         #endregion
@@ -114,10 +119,6 @@
         /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
         public override bool IsMenu => true;
 
-        public bool Enabled => throw new NotImplementedException();
-
-        public int Value => throw new NotImplementedException();
-
 
         #endregion
 
@@ -148,6 +149,13 @@
                 if (menuComponent.Root)
                 {
                     throw new Exception("You cannot add a root menu to another menu.");
+                }
+
+                //Don't try to add this item if we already have an existing item with the same name
+                if (this.Children.ContainsKey(menuComponent.InternalName))
+                {
+                    Console.WriteLine($"The Menu {this.InternalName} already contains a child with the name {menuComponent.InternalName}");
+                    return this;
                 }
 
                 //Set this menu instance as its parent
@@ -197,19 +205,6 @@
             return this;
         }
 
-        /// <summary>
-        ///     Gets the bounds.
-        /// </summary>
-        /// <param name="pos">The position.</param>
-        /// <returns>Rectangle.</returns>
-        public override Rectangle GetBounds(Vector2 pos)
-        {
-            return new Rectangle(
-                (int) pos.X,
-                (int) pos.Y,
-                this.Parent.Width,
-                MenuManager.Instance.Theme.MenuHeight);
-        }
 
         /// <summary>
         ///     Returns an enumerator that iterates through a collection.
@@ -219,8 +214,6 @@
         {
             return this.Children.GetEnumerator();
         }
-
-  
 
         /// <summary>
         ///     Gets the render manager.

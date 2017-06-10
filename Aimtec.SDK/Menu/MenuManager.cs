@@ -23,7 +23,6 @@
         private MenuManager() : base("AimtecSDK-RootMenu", string.Empty, true)
         {
             //Sets the base menu position
-
             this.Position = new Vector2(10, 10);
 
             if (!Directory.Exists(this.AppDataConfigPath))
@@ -36,7 +35,7 @@
                 Directory.CreateDirectory(this.MenuSettingsPath);
             }
 
-            RenderManager.OnPresent += () => this.Render(this.Position);
+            RenderManager.OnRender += () => this.Render(this.Position);
             Game.OnWndProc += args => this.WndProc(args.Message, args.WParam, args.LParam);
 
             Game.OnEnd += delegate { this.Save(); };
@@ -79,6 +78,8 @@
 
         #region Public Properties
 
+        public override bool IsMenu { get; } = false;
+
         public static MenuManager Instance { get; } = new MenuManager();
 
         public override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
@@ -114,10 +115,16 @@
 
         public Menu Add(MenuComponent menu)
         {
+            if (this.Children.ContainsKey(menu.AssemblyConfigDirectoryName))
+            {
+                throw new Exception($"The menu {menu.InternalName} already exists.");
+            }
+
             menu.Parent = this;
-            this.Children.Add(menu.InternalName, menu);
+            this.Children.Add(menu.AssemblyConfigDirectoryName, menu);
             this.UpdateWidth();
-            return (Menu) menu;
+
+            return (Menu)menu;
         }
 
         public override Rectangle GetBounds(Vector2 pos)

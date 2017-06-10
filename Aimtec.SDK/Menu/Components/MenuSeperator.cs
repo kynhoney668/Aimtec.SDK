@@ -1,8 +1,5 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
-    using System;
-    using System.Reflection;
-
     using Aimtec.SDK.Menu.Theme;
 
     using Newtonsoft.Json;
@@ -17,7 +14,6 @@
             this.InternalName = internalName;
             this.DisplayName = text;
             this.Value = text;
-            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
         }
 
         #endregion

@@ -31,7 +31,6 @@
             this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Value = enabled;
-            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
             this.Shared = shared;
         }
 

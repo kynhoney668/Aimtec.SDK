@@ -1,31 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Aimtec.SDK.Menu
+﻿namespace Aimtec.SDK.Menu.SDKMenuInstance
 {
-    using Aimtec.SDK.Menu.SDKMenuInstance;
-    using Aimtec.SDK.TargetSelector;
-
     class AimTecMenu : Menu
     {
-        internal static AimTecMenu Instance;
+        internal static AimTecMenu Instance { get; } = new AimTecMenu();
 
-        internal AimTecMenu()
-            : base("Aimtec.Menu", "Aimtec", true)
+        internal AimTecMenu() : base("Aimtec.Menu", "Aimtec", true)
         {
-            Instance = this;
-
-            GlobalKeys.Load();
-
-            TargetSelectorImpl.Load();
-
-            Instance.Attach();
         }
-
-  
     }
-
 }

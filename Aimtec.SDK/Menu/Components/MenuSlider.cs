@@ -37,7 +37,6 @@
             this.Value = value;
             this.MinValue = minValue;
             this.MaxValue = maxValue;
-            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
 
             this.Shared = shared;
         }

@@ -40,7 +40,6 @@
             this.Value = selectedValue;
             this.Items = items;
             this.Shared = shared;
-            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
         }
 
         [JsonConstructor]

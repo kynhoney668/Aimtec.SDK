@@ -36,10 +36,6 @@
             this.Value = active;
 
             this.Shared = shared;
-
-            var callingAssembly = Assembly.GetCallingAssembly();
-
-            this.CallingAssemblyName = $"{callingAssembly.GetName().Name}.{callingAssembly.GetType().GUID}";
         }
 
         [JsonConstructor]

@@ -40,10 +40,7 @@
             this.Value = value;
             this.MinValue = minValue;
             this.MaxValue = maxValue;
-
             this.Shared = shared;
-
-            this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
         }
 
         [JsonConstructor]
@@ -51,6 +48,7 @@
         {
             
         }
+
         #endregion
 
         #region Public Properties

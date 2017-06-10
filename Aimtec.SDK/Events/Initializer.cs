@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 
 namespace Aimtec.SDK.Events
 {
-    using Aimtec.SDK.Menu;
+    using Aimtec.SDK.Menu.SDKMenuInstance;
+    using Aimtec.SDK.TargetSelector;
 
     class Initializer
     {
         public static void Initialize()
         {
-            new AimTecMenu();
+            GlobalKeys.Load();
+
+            TargetSelectorImpl.Load();
+
+            AimTecMenu.Instance.Attach();
         }
     }
 }
