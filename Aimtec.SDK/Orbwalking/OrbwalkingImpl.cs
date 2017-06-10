@@ -80,7 +80,11 @@ namespace Aimtec.SDK.Orbwalking
 
         private float LastAttackCommandSentTime;
 
-        public OrbwalkingMode Mode { get; set; }
+        public OrbwalkingMode Mode
+        {
+            get => this.GetCurrentMode();
+            set { }
+        }
 
         //Don't think we really needs this since we have an auto attack detection event
         private string[] Attacks =
@@ -559,7 +563,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 var autos = Math.Ceiling(predHealth / this.Player.GetAutoAttackDamage(minion));
   
-                if (autos > 2)
+                if (autos >= 2)
                 {
                     return minion;
                 } 
@@ -579,9 +583,10 @@ namespace Aimtec.SDK.Orbwalking
         //In mixed mode we prioritize killable units, then structures, then heros. If none are found, then we don't attack anything.
         AttackableUnit GetMixedModeTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange());
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => !x.IsHero && x.IsValidAutoRange());
 
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
+
             var killable = this.GetLastHitTarget(attackableUnits);
 
             //Killable unit 

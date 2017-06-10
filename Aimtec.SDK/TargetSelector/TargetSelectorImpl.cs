@@ -199,11 +199,8 @@
 
                     foreach (var weight in Weights.Where(x => x.MenuItem.Enabled))
                     {
-                        Console.WriteLine(weight.Name + " IS ENABLED");
                         heroWeight += weight.ComputeWeight(hero);
                     }
-
-                    Console.WriteLine(heroWeight);
 
                     var result = new WeightResult { Target = hero };
 
