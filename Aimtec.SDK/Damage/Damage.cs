@@ -137,7 +137,7 @@
                 else if (target is Obj_AI_Minion)
                 {
                     // RiftHerald P
-                    if (!hero.IsMelee() && target.Team == GameObjectTeam.Neutral
+                    if (!hero.IsMelee && target.Team == GameObjectTeam.Neutral
                         && Regex.IsMatch(target.Name, "SRU_RiftHerald"))
                     {
                         dmgReduce *= 0.65;

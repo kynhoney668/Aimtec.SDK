@@ -26,11 +26,13 @@
 
         public void Render(Vector2 pos)
         {
-            this.Theme.DrawMenuItemBorder(pos, this.Component.Root);
+            var width = this.Component.Parent.Width;
+
+            this.Theme.DrawMenuItemBorder(pos, width);
    
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBox(position, this.Component.Root);
+            this.Theme.DrawMenuItemBox(position, width);
 
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
@@ -39,7 +41,6 @@
                 this.Theme.TextColor,
                 this.Component.DisplayName, RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalLeft);
 
-            var width = this.Component.Root ? this.Theme.RootMenuWidth : this.Theme.ComponentWidth;
 
             // Render arrow outline
             RenderManager.RenderLine(

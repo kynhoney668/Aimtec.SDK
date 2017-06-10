@@ -23,9 +23,14 @@ namespace Aimtec.SDK.Extensions
             return (Vector2) v;
         }
 
-        //public static float Distance(this Vector3 from, Vector3 to)
-        //{
-        //    return Vector3.Distance(from, to);
-        //}
+        public static bool PointUnderEnemyTurret(this Vector3 Point)
+        {
+            var EnemyTurrets =
+                ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && Vector3.Distance(Point, t.Position) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+
+            return EnemyTurrets;
+        }
+
+ 
     }
 }

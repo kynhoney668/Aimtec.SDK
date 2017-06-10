@@ -28,13 +28,15 @@
 
         public void Render(Vector2 pos)
         {
-            this.Theme.DrawMenuItemBorder(pos);
+            var width = this.Component.Parent.Width;
+
+            this.Theme.DrawMenuItemBorder(pos, width);
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBox(position);
+            this.Theme.DrawMenuItemBox(position, width);
 
-            var centerPoint = pos + new Vector2(this.Theme.ComponentWidth - (DefaultMenuTheme.LineWidth * 2) / 2, this.Theme.MenuHeight - (DefaultMenuTheme.LineWidth * 2) / 2);
+            var centerPoint = pos + new Vector2(width - (DefaultMenuTheme.LineWidth * 2) / 2, this.Theme.MenuHeight - (DefaultMenuTheme.LineWidth * 2) / 2);
 
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
@@ -45,14 +47,14 @@
 
             // Render indicator box outline
             RenderManager.RenderLine(
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
             // Draw indicator box
-            var indBoxPosition = position + new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth, 0);
+            var indBoxPosition = position + new Vector2(width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth, 0);
 
             var boolColor = this.Component.Value ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 

@@ -28,16 +28,18 @@
 
         public void Render(Vector2 pos)
         {
+            var width = this.Component.Parent.Width;
+
             var beforeSliderWidth = (float) (this.Component.Value - this.Component.MinValue)
-                / (this.Component.MaxValue - this.Component.MinValue) * (this.Theme.ComponentWidth - DefaultMenuTheme.LineWidth * 2);
+                / (this.Component.MaxValue - this.Component.MinValue) * (width - DefaultMenuTheme.LineWidth * 2);
 
-            var afterSliderWidth = this.Theme.ComponentWidth - beforeSliderWidth - DefaultMenuTheme.LineWidth;
+            var afterSliderWidth = width - beforeSliderWidth - DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBorder(pos);
+            this.Theme.DrawMenuItemBorder(pos, width);
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBox(position);
+            this.Theme.DrawMenuItemBox(position, width);
 
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2f);
 
@@ -74,7 +76,7 @@
             RenderManager.RenderText(
                 pos + DefaultMenuTheme.LineWidth
                 + new Vector2(
-                    this.Theme.ComponentWidth - DefaultMenuTheme.TextSpacing,
+                    width - DefaultMenuTheme.TextSpacing,
                     (this.Theme.MenuHeight) / 2f),
                 Color.FromArgb(207, 195, 149),
                 this.Component.Value.ToString(), RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);

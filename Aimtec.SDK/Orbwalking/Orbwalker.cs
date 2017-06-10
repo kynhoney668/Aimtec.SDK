@@ -2,7 +2,6 @@
 
 namespace Aimtec.SDK.Orbwalking
 {
-    using Aimtec.SDK.Damage;
     using Aimtec.SDK.Menu;
 
     public class Orbwalker : IOrbwalker
@@ -16,11 +15,14 @@ namespace Aimtec.SDK.Orbwalking
             Implementation = impl;
         }
 
+
         /// <summary>
         ///     Initializes a new instance of the <see cref="Orbwalker" /> class.
         /// </summary>
         public Orbwalker()
+            : this(new OrbwalkingImpl())
         {
+
         }
 
         /// <summary>
@@ -31,10 +33,7 @@ namespace Aimtec.SDK.Orbwalking
         /// </value>
         public static IOrbwalker Implementation
         {
-            get
-            {
-                return impl;
-            }
+            get => impl;
             set
             {
                 impl?.Dispose();
@@ -48,7 +47,7 @@ namespace Aimtec.SDK.Orbwalking
         public float AnimationTime => Implementation.AnimationTime;
 
         /// <inheritdoc cref="IOrbwalker" />
-        public float AutoAttackRange => Implementation.AutoAttackRange;
+        public float WindUpTime => Implementation.WindUpTime;
 
         /// <inheritdoc cref="IOrbwalker" />
         public bool CanMove => Implementation.CanMove;
@@ -59,29 +58,27 @@ namespace Aimtec.SDK.Orbwalking
         /// <inheritdoc cref="IOrbwalker" />
         public bool DisableAttacks
         {
-            get { return Implementation.DisableAttacks; }
-            set { Implementation.DisableAttacks = value; }
+            get => Implementation.DisableAttacks;
+            set => Implementation.DisableAttacks = value;
         }
 
         /// <inheritdoc cref="IOrbwalker" />
         public bool DisableMove
         {
-            get { return Implementation.DisableMove; }
-            set { Implementation.DisableMove = value; }
+            get => Implementation.DisableMove;
+            set => Implementation.DisableMove = value;
         }
 
-        /// <inheritdoc cref="IOrbwalker" />
-        public float WindUpTime => Implementation.WindUpTime;
 
         /// <inheritdoc cref="IOrbwalker" />
         public OrbwalkingMode Mode
         {
-            get { return Implementation.Mode; }
-            set { Implementation.Mode = value; }
+            get => Implementation.Mode;
+            set => Implementation.Mode = value;
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public Obj_AI_Base GetTarget()
+        public AttackableUnit GetTarget()
         {
             return Implementation.GetTarget();
         }
@@ -99,42 +96,32 @@ namespace Aimtec.SDK.Orbwalking
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public void AutoAttack(AttackableUnit unit)
-        {
-            Implementation.AutoAttack(unit);
-        }
-
-        /// <inheritdoc cref="IOrbwalker" />
         public void ForceTarget(AttackableUnit unit)
         {
             Implementation.ForceTarget(unit);
         }
 
+   
         /// <inheritdoc cref="IOrbwalker" />
-        public bool IsAutoAttack(string missileName)
+        public event EventHandler<PreAttackEventArgs> PreAttack
         {
-            return Implementation.IsAutoAttack(missileName);
+            add => Implementation.PreAttack += value;
+            remove => Implementation.PreAttack -= value;
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public event EventHandler<BeforeAttackEventArgs> BeforeAttack
+        public event EventHandler<PostAttackEventArgs> PostAttack
         {
-            add { Implementation.BeforeAttack += value; }
-            remove { Implementation.BeforeAttack -= value; }
+            add => Implementation.PostAttack += value;
+            remove => Implementation.PostAttack -= value;
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public event EventHandler<AttackEventArgs> Attack
+        public event EventHandler<PreMoveEventArgs> PreMove
         {
-            add { Implementation.Attack += value; }
-            remove { Implementation.Attack -= value; }
-        }
+            add => Implementation.PreMove += value;
+            remove => Implementation.PreMove -= value;
 
-        /// <inheritdoc cref="IOrbwalker" />
-        public event EventHandler<AfterAttackEventArgs> AfterAttack
-        {
-            add { Implementation.AfterAttack += value; }
-            remove { Implementation.AfterAttack -= value; }
         }
 
         /// <summary>
@@ -144,5 +131,6 @@ namespace Aimtec.SDK.Orbwalking
         {
             Implementation.Dispose();
         }
+
     }
 }

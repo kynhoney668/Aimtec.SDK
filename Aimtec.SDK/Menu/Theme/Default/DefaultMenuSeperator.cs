@@ -28,14 +28,16 @@
 
         public void Render(Vector2 pos)
         {
-            this.Theme.DrawMenuItemBorder(pos);
+            var width = this.Component.Parent.Width;
+
+            this.Theme.DrawMenuItemBorder(pos, width);
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBoxFull(position);
+            this.Theme.DrawMenuItemBoxFull(position, width);
 
             RenderManager.RenderText(
-                position + new Vector2(this.Theme.ComponentWidth / 2f, this.Theme.MenuHeight / 2f),
+                position + new Vector2(width / 2f, this.Theme.MenuHeight / 2f),
                 Color.FromArgb(207, 195, 149),
                 this.Component.Value, RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
         }

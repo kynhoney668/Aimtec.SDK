@@ -40,8 +40,6 @@
             this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
 
             this.Shared = shared;
-
-            this.LoadValue();
         }
 
         [JsonConstructor]
@@ -106,7 +104,7 @@
 
         public override Rectangle GetBounds(Vector2 pos)
         {
-            return MenuManager.Instance.Theme.GetMenuSliderControlBounds(pos);
+            return MenuManager.Instance.Theme.GetMenuSliderControlBounds(pos, this.Parent.Width);
         }
 
 
@@ -161,7 +159,7 @@
 
             this.Value = newVal;
 
-            this.SaveValue();
+            this.Save();
 
             this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }

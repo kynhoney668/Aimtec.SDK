@@ -1,6 +1,6 @@
 ﻿namespace Aimtec.SDK.Prediction.Health
 {
-    public class HealthPrediction : IHealthPrediction
+    public class HealthPrediction 
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="HealthPrediction"/> class.
@@ -8,22 +8,23 @@
         /// <param name="impl">The implementation.</param>
         public HealthPrediction(IHealthPrediction impl)
         {
-            this.Implementation = impl;
+            Implementation = impl;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HealthPrediction"/> class.
         /// </summary>
-        public HealthPrediction() : this(new HealthPredictionImplB())
+        public HealthPrediction()
+            : this(new HealthPredictionImplB())
         {
-            
+
         }
 
         /// <summary>
         /// Gets or sets the implementation.
         /// </summary>
         /// <value>The implementation.</value>
-        public IHealthPrediction Implementation { get; set; }
+        public static IHealthPrediction Implementation { get; set; }
 
         /// <summary>
         /// Gets the predicted health of the target.
@@ -33,7 +34,7 @@
         /// <returns>System.Single.</returns>
         public float GetPrediction(Obj_AI_Base target, int time)
         {
-            return this.Implementation.GetPrediction(target, time);
+            return Implementation.GetPrediction(target, time);
         }
     }
 }

@@ -32,11 +32,10 @@
             this.DisplayName = displayName;
             this.Value = enabled;
             this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
-
             this.Shared = shared;
-
-            this.LoadValue();
         }
+
+
 
         [JsonConstructor]
         private MenuBool()
@@ -84,7 +83,7 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                if (MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position).Contains(x, y))
+                if (MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position, this.Parent.Width).Contains(x, y))
                 {
                     this.UpdateValue(!this.Value);
                 }
@@ -106,7 +105,7 @@
 
             this.Value = newVal;
 
-            this.SaveValue();
+            this.Save();
 
             this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }

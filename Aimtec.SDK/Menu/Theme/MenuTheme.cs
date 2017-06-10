@@ -19,14 +19,8 @@
         /// <summary>
         ///     Gets the width of the menu.
         /// </summary>
-        /// <value>The width of the root menu items.</value>
-        public abstract int RootMenuWidth { get; set; }
-
-        /// <summary>
-        ///     Gets the width of the menu components.
-        /// </summary>
-        /// <value>The width of the menu.</value>
-        public abstract int ComponentWidth { get; set; }
+        /// <value>The base width of a Menu</value>
+        public abstract int BaseMenuWidth { get; set; }
 
 
         #endregion
@@ -82,13 +76,13 @@
         /// <returns>IRenderManager&lt;MenuSlider&gt;.</returns>
         public abstract IRenderManager<MenuSlider> BuildMenuSliderRenderer(MenuSlider slider);
 
-        public abstract Rectangle GetMenuBoolControlBounds(Vector2 pos);
+        public abstract Rectangle GetMenuBoolControlBounds(Vector2 pos, int width);
 
-        public abstract Rectangle GetMenuSliderControlBounds(Vector2 pos);
+        public abstract Rectangle GetMenuSliderControlBounds(Vector2 pos, int width);
 
-        public abstract Rectangle[] GetMenuListControlBounds(Vector2 pos);
+        public abstract Rectangle[] GetMenuListControlBounds(Vector2 pos, int width);
 
-        public abstract Rectangle[] GetMenuSliderBoolControlBounds(Vector2 pos);
+        public abstract Rectangle[] GetMenuSliderBoolControlBounds(Vector2 pos, int width);
 
 
         #endregion

@@ -28,16 +28,18 @@
 
         public void Render(Vector2 pos)
         {
+            var width = this.Component.Parent.Width;
+
             var beforeSliderWidth = (float)(this.Component.Value - this.Component.MinValue)
-                / (this.Component.MaxValue - this.Component.MinValue) * (this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth * 2);
+                / (this.Component.MaxValue - this.Component.MinValue) * (width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth * 2);
 
-            var afterSliderWidth = this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - beforeSliderWidth - DefaultMenuTheme.LineWidth;
+            var afterSliderWidth = width - DefaultMenuTheme.IndicatorWidth - beforeSliderWidth - DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBorder(pos);
+            this.Theme.DrawMenuItemBorder(pos, width);
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBox(position);
+            this.Theme.DrawMenuItemBox(position, width);
 
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
@@ -74,7 +76,7 @@
             RenderManager.RenderText(
                 pos + DefaultMenuTheme.LineWidth
                 + new Vector2(
-                    this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.TextSpacing,
+                    width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.TextSpacing,
                     this.Theme.MenuHeight / 2),
                 Color.FromArgb(207, 195, 149),
                 this.Component.Value.ToString(), RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
@@ -82,16 +84,16 @@
 
             // Render indicator box outline
             RenderManager.RenderLine(
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth,
                 pos.Y,
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
             // Draw indicator box
             var boolColor = this.Component.Enabled ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 
-            var indBoxPosition = position + new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth, 0);
+            var indBoxPosition = position + new Vector2(width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth, 0);
 
             RenderManager.RenderRectangle(
                 indBoxPosition,

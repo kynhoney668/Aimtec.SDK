@@ -26,6 +26,8 @@
 
         internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
 
+        internal override bool SavableMenuItem { get; set; } = false;
+
         public string Value { get; set; }
 
         public string StringValue => Value;

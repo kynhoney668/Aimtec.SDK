@@ -41,8 +41,6 @@
             this.Items = items;
             this.Shared = shared;
             this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
-
-            this.LoadValue();
         }
 
         [JsonConstructor]
@@ -56,6 +54,7 @@
         #region Public Properties
 
         internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
+
 
         /// <summary>
         ///     Gets or sets the value, which is the index of the string list.
@@ -107,7 +106,7 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                var controls = MenuManager.Instance.Theme.GetMenuListControlBounds(this.Position);
+                var controls = MenuManager.Instance.Theme.GetMenuListControlBounds(this.Position, this.Parent.Width);
                 var leftControl = controls[0];
                 var rightControl = controls[1];
 
@@ -153,7 +152,7 @@
 
             this.Value = newVal;
 
-            this.SaveValue();
+            this.Save();
 
             this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }

@@ -68,6 +68,12 @@
         Menu Parent { get; set; }
 
         /// <summary>
+        ///     Gets whether this cref="MenuComponent" /> is shared.
+        /// </summary>
+        /// <value><c>true</c> if shared; otherwise, <c>false</c>.</value>
+        bool Shared { get; set; }
+
+        /// <summary>
         ///     Gets or sets whether this <see cref="MenuComponent" /> is a Menu.
         /// </summary>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>

@@ -8,6 +8,7 @@
     using System.Linq;
     using System.Reflection;
 
+    using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
 
@@ -30,6 +31,7 @@
         /// </summary>
         private bool visible;
 
+
         #endregion
 
         #region Constructors and Destructors
@@ -51,6 +53,14 @@
 
         #endregion
 
+        #region Internal Properties
+
+        internal override string Serialized { get; }
+
+        internal int Width { get; set; }
+
+        #endregion
+
         #region Public Properties
 
         /// <summary>
@@ -58,9 +68,6 @@
         /// </summary>
         /// <value>The children.</value>
         public override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
-
-        internal override string Serialized { get; }
-
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
@@ -75,16 +82,7 @@
 
                 foreach (var child in this.Children.Values)
                 {
-                    //Avoid pre opening sub menus when root menu is clicked
-                    if (!child.IsMenu)
-                    {
-                        child.Visible = value;
-                    }
-
-                    if (!this.toggled)
-                    {
-                        child.Toggled = false;
-                    }
+                    child.Visible = value;
                 }
             }
         }
@@ -100,7 +98,7 @@
             {
                 this.visible = value;
 
-                if (this.toggled)
+                if (this.Toggled)
                 {
                     foreach (var child in this.Children.Values)
                     {
@@ -109,7 +107,6 @@
                 }
             }
         }
-
 
         /// <summary>
         /// Gets a value indicating whether this instance is a menu.
@@ -144,13 +141,22 @@
         /// </summary>
         /// <param name="menuComponent">The menu.</param>
         /// <returns>IMenu.</returns>
-        public Menu Add(MenuComponent menuComponent)
+        public virtual Menu Add(MenuComponent menuComponent)
         {
             if (menuComponent != null)
             {
+                if (menuComponent.Root)
+                {
+                    throw new Exception("You cannot add a root menu to another menu.");
+                }
+
+                //Set this menu instance as its parent
                 menuComponent.Parent = this;
 
                 this.Children.Add(menuComponent.InternalName, menuComponent);
+
+                this.UpdateWidth();
+
             }
 
             return this;
@@ -160,17 +166,21 @@
         ///     Attaches this instance.
         /// </summary>
         /// <returns>IMenu.</returns>
-        public Menu Attach()
+        public virtual Menu Attach()
         {
             if (!this.Root)
             {
-                throw new Exception($"You can only attach a Root Menu. If this is supposed to be your root menu, set isRoot to true in the constructor.");
+                throw new Exception(
+                    $"You can only attach a Root Menu. If this is supposed to be your root menu, set isRoot to true in the constructor.");
             }
+
+            this.LoadValue();
 
             MenuManager.Instance.Add(this);
 
             return this;
         }
+
 
         /// <summary>
         /// Sets this menu instance to true will make it shared resulting in all its children becoming shared.
@@ -197,7 +207,7 @@
             return new Rectangle(
                 (int) pos.X,
                 (int) pos.Y,
-                this.Root ? MenuManager.Instance.Theme.RootMenuWidth : MenuManager.Instance.Theme.ComponentWidth,
+                this.Parent.Width,
                 MenuManager.Instance.Theme.MenuHeight);
         }
 
@@ -232,16 +242,12 @@
                 this.GetRenderManager().Render(position);
             }
 
-            if (!this.Toggled)
-            {
-                return;
-            }
 
             for (var i = 0; i < this.Children.Values.Count; i++)
             {
                 var child = this.Children.Values.ToList()[i];
                 child.Position = position
-                    + new Vector2(this.Root ? MenuManager.Instance.Theme.RootMenuWidth : MenuManager.Instance.Theme.ComponentWidth, i * MenuManager.Instance.Theme.MenuHeight);
+                    + new Vector2(this.Parent.Width, i * MenuManager.Instance.Theme.MenuHeight);
                 child.Render(child.Position);
             }
         }
@@ -254,7 +260,7 @@
         /// <param name="lparam">Additional message information.</param>
         public override void WndProc(uint message, uint wparam, int lparam)
         {
-            if (message == (ulong) WindowsMessages.WM_LBUTTONUP && this.Visible)
+            if (this.Visible && message == (ulong)WindowsMessages.WM_LBUTTONUP)
             {
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
@@ -263,30 +269,9 @@
                 {
                     this.Toggled = !this.Toggled;
 
-                    if (!this.Root && this.Parent != null)
+                    foreach (var m in this.Parent.Children.Values.Where(z => z.IsMenu && z.InternalName != this.InternalName))
                     {
-                        foreach (var m in this.Parent.Children)
-                        {
-                            var menu = m.Value;
-                            if (menu != this)
-                            {
-                                if (menu.Toggled)
-                                {
-                                    menu.Toggled = false;
-                                }
-                            }
-                        }
-                    }
-
-                    if (this.Root)
-                    {
-                        foreach (var m in MenuManager.Instance.Menus)
-                        {
-                            if (m.Toggled && m != this)
-                            {
-                                m.Toggled = false;
-                            } 
-                        }
+                        m.Toggled = false;
                     }
                 }
             }
@@ -298,14 +283,58 @@
             }
         }
 
+        internal virtual void UpdateWidth()
+        {
+            var children = this.Children.Values;
+
+            int maxWidth = 0;
+
+            foreach (var child in children)
+            {
+                int width = 0;
+                if (child is MenuList)
+                {
+                    var mList = child as MenuList;
+                    var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
+                    if (longestItem != null)
+                    {
+                        width = (int) MenuManager.Instance.TextWidth(mList.DisplayName + longestItem);
+                    }
+                }
+
+                if (child is MenuKeyBind)
+                {
+                    var kb = child as MenuKeyBind;
+                    width = (int)MenuManager.Instance.TextWidth(kb.DisplayName + "PRESS KEY");
+                }
+
+                else
+                {
+                    width = (int)MenuManager.Instance.TextWidth(child.DisplayName);
+                }
+
+                if (width > maxWidth)
+                {
+                    maxWidth = width;
+                }
+            }
+
+            this.Width = (int)(maxWidth + (MenuManager.Instance.Theme.BaseMenuWidth));
+        }
+
+
         internal override void LoadValue()
         {
-            throw new NotImplementedException();
+            //Load the saved value if applicable
+            foreach (var item in this.Children.Values)
+            {
+                item.LoadValue();
+            }
         }
 
         #endregion
 
-        internal override void SaveValue()
+        internal override void Save()
         {
             if (!Directory.Exists(this.ConfigBaseFolder))
             {
@@ -314,8 +343,7 @@
 
             foreach (var item in this.Children.Values)
             {
-                var mc = (MenuComponent)item;
-                mc.SaveValue();
+                item.Save();
             }
         }
     }

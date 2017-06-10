@@ -21,9 +21,8 @@
 
         public override int MenuHeight { get; } = 32;
 
-        public override int RootMenuWidth { get; set; } = 160;
+        public override int BaseMenuWidth { get; set; } = 80;
 
-        public override int ComponentWidth { get; set; } = 250;
 
         public Color TextColor { get; } = Color.FromArgb(207, 195, 149);
 
@@ -93,61 +92,61 @@
 
         #region Methods
 
-        internal void DrawMenuItemBox(Vector2 position, bool isRoot = false)
+        internal void DrawMenuItemBox(Vector2 position, int boxWidth)
         {
             RenderManager.RenderRectangle(
                 position,
-                (isRoot ? this.RootMenuWidth : this.ComponentWidth) - IndicatorWidth - LineWidth,
+                (boxWidth) - IndicatorWidth - LineWidth,
                 this.MenuHeight - LineWidth,
                 this.MenuBoxBackgroundColor);
         }
 
-        internal void DrawMenuItemBoxFull(Vector2 position, bool isRoot = false)
+        internal void DrawMenuItemBoxFull(Vector2 position, int boxWidth)
         {
             RenderManager.RenderRectangle(
                 position,
-                (isRoot ? this.RootMenuWidth : this.ComponentWidth) - LineWidth,
+                (boxWidth) - LineWidth,
                 this.MenuHeight - LineWidth,
                 this.MenuBoxBackgroundColor);
         }
 
-        internal void DrawMenuItemBorder(Vector2 pos, bool isRoot = false)
+        internal void DrawMenuItemBorder(Vector2 pos, int width)
         {
-            DrawRectangleOutline(pos.X, pos.Y, isRoot ? this.RootMenuWidth : this.ComponentWidth, this.MenuHeight, LineWidth, this.LineColor);
+            DrawRectangleOutline(pos.X, pos.Y, width, this.MenuHeight, LineWidth, this.LineColor);
         }
 
 
-        public override Rectangle GetMenuBoolControlBounds(Vector2 pos)
+        public override Rectangle GetMenuBoolControlBounds(Vector2 pos, int width)
         {
-            var newPos = pos + new Vector2(this.ComponentWidth - IndicatorWidth - LineWidth, 0);
+            var newPos = pos + new Vector2(width - IndicatorWidth - LineWidth, 0);
             return new Rectangle((int) newPos.X, (int) newPos.Y, IndicatorWidth, MenuHeight);
         }
 
-        public override Rectangle GetMenuSliderControlBounds(Vector2 pos)
+        public override Rectangle GetMenuSliderControlBounds(Vector2 pos, int width)
         {
             var sliderPosition = pos;
-            var sliderBounds = new Rectangle((int)sliderPosition.X, (int)sliderPosition.Y, this.ComponentWidth, this.MenuHeight);
+            var sliderBounds = new Rectangle((int)sliderPosition.X, (int)sliderPosition.Y, width, this.MenuHeight);
             return sliderBounds;
         }
 
-        public override Rectangle[] GetMenuListControlBounds(Vector2 pos)
+        public override Rectangle[] GetMenuListControlBounds(Vector2 pos, int width)
         {
-            var leftBox = pos + new Vector2(this.ComponentWidth - IndicatorWidth * 2.1f - LineWidth, 0);
-            var rightBox = pos + new Vector2(this.ComponentWidth - IndicatorWidth - LineWidth, 0);
+            var leftBox = pos + new Vector2(width - IndicatorWidth * 2.1f - LineWidth, 0);
+            var rightBox = pos + new Vector2(width - IndicatorWidth - LineWidth, 0);
             var rect1 = new Rectangle((int) leftBox.X,(int) leftBox.Y, IndicatorWidth, MenuHeight);
             var rect2 = new Rectangle((int) rightBox.X, (int) rightBox.Y, IndicatorWidth, MenuHeight);
             return new Rectangle[] { rect1, rect2 };
         }
 
-        public override Rectangle[] GetMenuSliderBoolControlBounds(Vector2 pos)
+        public override Rectangle[] GetMenuSliderBoolControlBounds(Vector2 pos, int width)
         {
-            var boolPosition = pos + new Vector2(this.ComponentWidth - IndicatorWidth - LineWidth, 0);
+            var boolPosition = pos + new Vector2(width - IndicatorWidth - LineWidth, 0);
 
             var sliderPosition = pos;
 
             var boolBounds = new Rectangle((int)boolPosition.X, (int)boolPosition.Y, IndicatorWidth, MenuHeight); ;
 
-            var sliderBounds = new Rectangle((int)sliderPosition.X, (int)sliderPosition.Y, ComponentWidth - IndicatorWidth, MenuHeight);
+            var sliderBounds = new Rectangle((int)sliderPosition.X, (int)sliderPosition.Y, width - IndicatorWidth, MenuHeight);
 
             return new Rectangle[] { sliderBounds, boolBounds };
         }

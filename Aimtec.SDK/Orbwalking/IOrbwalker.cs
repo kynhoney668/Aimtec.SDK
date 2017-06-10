@@ -15,14 +15,15 @@ namespace Aimtec.SDK.Orbwalking
         ///     The animation time.
         /// </value>
         float AnimationTime { get; }
-
+       
         /// <summary>
-        ///     Gets the automatic attack range.
+        ///     Gets the wind up time.
         /// </summary>
         /// <value>
-        ///     The automatic attack range.
+        ///     The wind up time.
         /// </value>
-        float AutoAttackRange { get; }
+        float WindUpTime { get; }
+
 
         /// <summary>
         ///     Gets the if the player can move.
@@ -40,7 +41,6 @@ namespace Aimtec.SDK.Orbwalking
         /// </value>
         bool CanAttack { get; }
 
-
         /// <summary>
         ///     Gets or sets a value indicating whether the orbwalker should disable attacking.
         /// </summary>
@@ -49,7 +49,6 @@ namespace Aimtec.SDK.Orbwalking
         /// </value>
         bool DisableAttacks { get; set; }
 
-
         /// <summary>
         ///     Gets or sets a value indicating whether the orbwalker should disable moving.
         /// </summary>
@@ -57,14 +56,6 @@ namespace Aimtec.SDK.Orbwalking
         ///     <c>true</c> if the orbwalker should disable moving; otherwise, <c>false</c>.
         /// </value>
         bool DisableMove { get; set; }
-
-        /// <summary>
-        ///     Gets the wind up time.
-        /// </summary>
-        /// <value>
-        ///     The wind up time.
-        /// </value>
-        float WindUpTime { get; }
 
         /// <summary>
         ///     Gets or sets the mode.
@@ -78,7 +69,7 @@ namespace Aimtec.SDK.Orbwalking
         ///     Gets the target.
         /// </summary>
         /// <returns></returns>
-        Obj_AI_Base GetTarget();
+        AttackableUnit GetTarget();
 
         /// <summary>
         ///     Resets the automatic attack timer.
@@ -92,42 +83,25 @@ namespace Aimtec.SDK.Orbwalking
         void AddToMenu(IMenu menu);
 
         /// <summary>
-        ///     Launches an auto attack on the unit.
-        /// </summary>
-        /// <param name="unit">The unit.</param>
-        void AutoAttack(AttackableUnit unit);
-
-        /// <summary>
         ///     Forces the target.
         /// </summary>
         /// <param name="unit">The unit.</param>
         void ForceTarget(AttackableUnit unit);
 
         /// <summary>
-        ///     Determines whether the specified missile name is an automatic attack.
-        /// </summary>
-        /// <param name="missileName">Name of the missile.</param>
-        /// <returns>
-        ///     <c>true</c> if the specified missile name is an automatic attack; otherwise, <c>false</c>.
-        /// </returns>
-        bool IsAutoAttack(string missileName);
-
-
-        /// <summary>
         ///     Occurs when the orbwalking is about to launch an attack.
         /// </summary>
-        event EventHandler<BeforeAttackEventArgs> BeforeAttack;
-
-        /// <summary>
-        ///     Occurs when the player issues an attack order.
-        /// </summary>
-        event EventHandler<AttackEventArgs> Attack;
+        event EventHandler<PreAttackEventArgs> PreAttack;
 
         /// <summary>
         ///     Occurs when after an attack has been launched and acknowledged by the server.
         /// </summary>
-        event EventHandler<AfterAttackEventArgs> AfterAttack;
+        event EventHandler<PostAttackEventArgs> PostAttack;
 
+        /// <summary>
+        ///     Occurs before a movement order is issued.
+        /// </summary>
+        event EventHandler<PreMoveEventArgs> PreMove;
 
     }
 
@@ -147,27 +121,29 @@ namespace Aimtec.SDK.Orbwalking
     }
 
     /// <summary>
-    ///     The event arguements for the <see cref="IOrbwalker.AfterAttack" /> event.
+    ///     The event arguements for the <see cref="IOrbwalker.PreAttack" /> event.
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
-    public class AfterAttackEventArgs : OrbwalkingEventArgs
-    {
-    }
-
-    /// <summary>
-    ///     The event arguements for the <see cref="IOrbwalker.Attack" /> event.
-    /// </summary>
-    /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
-    public class AttackEventArgs : OrbwalkingEventArgs
-    {
-    }
-
-    /// <summary>
-    ///     The event arguements for the <see cref="IOrbwalker.BeforeAttack" /> event.
-    /// </summary>
-    /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
-    public class BeforeAttackEventArgs : OrbwalkingEventArgs
+    public class PreAttackEventArgs : OrbwalkingEventArgs
     {
         public bool Cancel { get; set; } = false;
+    }
+
+    /// <summary>
+    ///     The event arguements for the <see cref="IOrbwalker.PostAttack" /> event.
+    /// </summary>
+    /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
+    public class PostAttackEventArgs : OrbwalkingEventArgs
+    {
+    }
+
+    /// <summary>
+    ///     The event arguements for the <see cref="IOrbwalker.PreMove" /> event.
+    /// </summary>
+    /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
+    public class PreMoveEventArgs : EventArgs
+    {
+        public Vector3 MovePosition { get; set; }
+        public bool Cancel { get; set; }
     }
 }

@@ -51,11 +51,13 @@
         /// <param name="pos">The position.</param>
         public void Render(Vector2 pos)
         {
-            this.Theme.DrawMenuItemBorder(pos);
+            var width = this.Component.Parent.Width;
+
+            this.Theme.DrawMenuItemBorder(pos, width);
 
             var position = pos + DefaultMenuTheme.LineWidth;
 
-            this.Theme.DrawMenuItemBox(position);
+            this.Theme.DrawMenuItemBox(position, width);
 
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
@@ -66,24 +68,24 @@
 
             // Render arrow outline 1 - left arrow 
             RenderManager.RenderLine(
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  * 2.1F - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth  * 2.1F - DefaultMenuTheme.LineWidth,
                 pos.Y,
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  * 2.1F - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth  * 2.1F - DefaultMenuTheme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
   
             // Render arrow outline 2 - right arrow
             RenderManager.RenderLine(
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
-                pos.X + this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
+                pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
 
-            var leftBoxPosition = position + new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth * 2.1f - DefaultMenuTheme.LineWidth, 0);
-            var rightBoxPosition = position + new Vector2(this.Theme.ComponentWidth - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth, 0);
+            var leftBoxPosition = position + new Vector2(width - DefaultMenuTheme.IndicatorWidth * 2.1f - DefaultMenuTheme.LineWidth, 0);
+            var rightBoxPosition = position + new Vector2(width - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth, 0);
 
             RenderManager.RenderText(
                 leftBoxPosition

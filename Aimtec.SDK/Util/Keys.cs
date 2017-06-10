@@ -6,7 +6,7 @@ namespace Aimtec.SDK.Util
     ///     Specifies key codes and modifiers.
     /// </summary>
     [Flags]
-    public enum Keys
+    public enum KeyCode
     {
         /// <summary>
         ///     The bitmask to extract a key code from a key value.

@@ -27,6 +27,7 @@
         /// </summary>
         /// <param name="internalName">The internal name.</param>
         /// <param name="displayName">The display name.</param>
+        /// <param name="enabled">Whether this is enabled by default</param>
         /// <param name="value">The value.</param>
         /// <param name="minValue">The minimum value.</param>
         /// <param name="maxValue">The maximum value.</param>
@@ -43,8 +44,6 @@
             this.Shared = shared;
 
             this.CallingAssemblyName = $"{Assembly.GetCallingAssembly().GetName().Name}.{Assembly.GetCallingAssembly().GetType().GUID}";
-
-            this.LoadValue();
         }
 
         [JsonConstructor]
@@ -62,7 +61,6 @@
         [JsonProperty(Order = 3)]
         public new int Value { get; set; }
 
-    
 
         /// <summary>
         ///     Gets or sets the maximum value.
@@ -105,7 +103,7 @@
 
         public override Rectangle GetBounds(Vector2 pos)
         {
-            var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(pos);
+            var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(pos, this.Parent.Width);
             return Rectangle.Union(bounds[0], bounds[1]);
         }
 
@@ -129,7 +127,7 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position);
+                var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position, this.Parent.Width);
                 var sliderBounds = bounds[0];
 
                 if (sliderBounds.Contains(x, y))
@@ -145,7 +143,7 @@
                 {
                     var x = lparam & 0xffff;
                     var y = lparam >> 16;
-                    var boolBounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position)[1];
+                    var boolBounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position, this.Parent.Width)[1];
                     if (boolBounds.Contains(x, y))
                     {
                         this.UpdateEnabled(!this.Enabled);
@@ -166,7 +164,7 @@
         /// <param name="x">The x.</param>
         private void SetSliderValue(int x)
         {
-            var sliderbounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position)[0];
+            var sliderbounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position, this.Parent.Width)[0];
             this.UpdateValue(Math.Max(this.MinValue, Math.Min(this.MaxValue, (int)((x - this.Position.X) / (sliderbounds.Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue))));
         }
 
@@ -181,7 +179,7 @@
 
             this.Value = newVal;
 
-            this.SaveValue();
+            this.Save();
 
             this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }
@@ -196,7 +194,7 @@
 
             this.Enabled = newVal;
 
-            this.SaveValue();
+            this.Save();
 
             this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }

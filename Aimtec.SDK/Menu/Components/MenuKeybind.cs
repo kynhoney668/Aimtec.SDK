@@ -25,21 +25,21 @@
         /// <param name="displayName">The display name.</param>
         /// <param name="key">The key.</param>
         /// <param name="keybindType">Type of the keybind.</param>
+        /// <param name="active">Whether this item should be active by default</param>
         /// <param name="shared">Whether this item is shared across instances</param>
-        public MenuKeyBind(string internalName, string displayName, Keys key, KeybindType keybindType, bool shared = false)
+        public MenuKeyBind(string internalName, string displayName, KeyCode key, KeybindType keybindType, bool active = false, bool shared = false)
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Key = key;
             this.KeybindType = keybindType;
+            this.Value = active;
 
             this.Shared = shared;
 
             var callingAssembly = Assembly.GetCallingAssembly();
 
             this.CallingAssemblyName = $"{callingAssembly.GetName().Name}.{callingAssembly.GetType().GUID}";
-
-            this.LoadValue();
         }
 
         [JsonConstructor]
@@ -67,7 +67,7 @@
         /// </summary>
         /// <value>The key.</value>
         [JsonProperty(Order = 4)]
-        public Keys Key { get; set; }
+        public KeyCode Key { get; set; }
 
         /// <summary>
         ///     Gets or sets the type of the keybind.
@@ -110,6 +110,12 @@
         /// <param name="lparam">Additional message information.</param>
         public override void WndProc(uint message, uint wparam, int lparam)
         {
+            //No need to process if the item does not belong to a menu yet
+            if (this.Parent == null)
+            {
+                return;
+            }
+
             if (this.Visible)
             {
                 var x = lparam & 0xffff;
@@ -119,21 +125,21 @@
                 {
                     if (!this.KeyIsBeingSet && this.GetBounds(this.Position).Contains(x, y))
                     {
-                        if (!MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position).Contains(x, y))
+                        if (!MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position, this.Parent.Width).Contains(x, y))
                         {
                             this.KeyIsBeingSet = true;
                         }
 
                         else
                         {
-                            UpdateValue(!this.Value);
+                            this.UpdateValue(!this.Value);
                         }
                     }
                 }
 
                 if (this.KeyIsBeingSet && message == (ulong)WindowsMessages.WM_KEYUP)
                 {
-                    this.UpdateKey((Keys)wparam);
+                    this.UpdateKey((KeyCode)wparam);
                     this.KeyIsBeingSet = false;
                 }
             }
@@ -178,19 +184,19 @@
 
             if (this.KeybindType == KeybindType.Toggle)
             {
-                this.SaveValue();
+                this.Save();
             }
 
             this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }
 
-        private void UpdateKey(Keys key)
+        private void UpdateKey(KeyCode key)
         {
             var oldClone = new MenuKeyBind { Value = this.Value, InternalName = this.InternalName, DisplayName = this.DisplayName, Key = this.Key, KeybindType = this.KeybindType };
 
             this.Key = key;
 
-            this.SaveValue();
+            this.Save();
 
             this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }

@@ -1,5 +1,7 @@
 ﻿namespace Aimtec.SDK.TargetSelector
 {
+    using Aimtec.SDK.Menu;
+
     /// <summary>
     ///     Selects the best enemy to target.
     /// </summary>
@@ -38,5 +40,11 @@
         {
             return Implementation.GetTarget(range);
         }
+
+        public Obj_AI_Hero GetOrbwalkingTarget()
+        {
+            return Implementation.GetOrbwalkingTarget();
+        }
+
     }
 }

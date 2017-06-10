@@ -18,6 +18,15 @@ namespace Aimtec.SDK.Extensions
         {
             return Math.Pow(x, 2);
         }
+
+        public static bool PointUnderEnemyTurret(this Vector2 Point)
+        {
+            var EnemyTurrets =
+                ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && Vector2.Distance(Point, t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+
+            return EnemyTurrets;
+        }
+
     }
 
 }
