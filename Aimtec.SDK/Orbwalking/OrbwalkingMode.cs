@@ -31,6 +31,11 @@
         /// <summary>
         ///     Orbwalker will last hit minions as late as possible.
         /// </summary>
-        Freeze
+        Freeze,
+
+        /// <summary>
+        ///     Orbwalker will be in a custom mode.
+        /// </summary>
+        Custom
     }
 }

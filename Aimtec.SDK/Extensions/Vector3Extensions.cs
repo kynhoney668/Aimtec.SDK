@@ -23,7 +23,6 @@ namespace Aimtec.SDK.Extensions
             return (Vector2) v;
         }
 
-<<<<<<< HEAD
         public static bool PointUnderEnemyTurret(this Vector3 Point)
         {
             var EnemyTurrets =
@@ -31,15 +30,5 @@ namespace Aimtec.SDK.Extensions
 
             return EnemyTurrets;
         }
-
- 
-=======
-        //public static float Distance(this Vector3 from, Vector3 to)
-        //{
-        //    return Vector3.Distance(from, to);
-        //}
-
-       
->>>>>>> 8f618b10bc1489be311005d19840e9faa0e9d4ac
     }
 }

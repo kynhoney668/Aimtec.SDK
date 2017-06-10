@@ -21,9 +21,14 @@ namespace Aimtec.SDK.Events
         }
 
         /// <summary>
+        /// The GameStart Delegate
+        /// </summary>
+        public delegate void GameStartDelegate();
+
+        /// <summary>
         /// Occurs when the game is started.
         /// </summary>
-        public static event EventHandler<EventArgs> GameStart;
+        public static event GameStartDelegate GameStart;
 
         /// <summary>
         /// Handles the <see cref="GameStart"/> event.
@@ -38,6 +43,8 @@ namespace Aimtec.SDK.Events
             Game.OnStart -= GameStartHandler;
             Game.OnUpdate -= GameStartHandler;
 
+            Initializer.Initialize();
+
             var invocationList = GameStart?.GetInvocationList();
 
             if (invocationList == null)
@@ -49,7 +56,7 @@ namespace Aimtec.SDK.Events
             {
                 try
                 {
-                    del.DynamicInvoke(null, EventArgs.Empty);
+                    del.DynamicInvoke();
                 }
                 catch (Exception e)
                 {

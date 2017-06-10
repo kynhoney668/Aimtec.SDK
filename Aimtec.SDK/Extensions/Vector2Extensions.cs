@@ -2,6 +2,7 @@
 {
     using System;
     using System.Drawing;
+    using System.Linq;
 
     /// <summary>
     /// Class Vector2Extensions.
@@ -185,7 +186,6 @@
         {
             return Math.Pow(x, 2);
         }
-<<<<<<< HEAD
 
         public static bool PointUnderEnemyTurret(this Vector2 Point)
         {
@@ -195,10 +195,7 @@
             return EnemyTurrets;
         }
 
-    }
-=======
->>>>>>> 8f618b10bc1489be311005d19840e9faa0e9d4ac
-
+ 
         /// <summary>
         ///     Returns the projection of the Vector2 on the segment.
         /// </summary>

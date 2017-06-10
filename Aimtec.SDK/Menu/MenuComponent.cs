@@ -25,14 +25,16 @@
 
         public virtual MenuComponent this[string name] => null;
 
-        internal virtual string ConfigName => CleanFileName(
+        internal virtual string ConfigName => this.CleanFileName(
             $"{this.DisplayName}-{this.InternalName}-{this.GetType().Name}");
 
-        internal virtual string ConfigBaseFolder
+        internal virtual bool SavableMenuItem { get; set; } = true;
+
+        internal string ConfigBaseFolder
         {
             get
             {
-                if (this.Shared || (this.Parent != null && this.Parent.Shared))
+                if (this.Shared || this.Parent != null && this.Parent.Shared)
                 {
                     return MenuManager.Instance.SharedSettingsPath;
                 }
@@ -42,9 +44,24 @@
         }
 
 
-        internal virtual string ConfigPath => Path.Combine(this.ConfigBaseFolder, this.ConfigName + ".json");
+        public string ConfigPath
+        {
+            get
+            {
+                if (this.Root || this.Shared)
+                {
+                    return Path.Combine(this.ConfigBaseFolder, this.ConfigName);
+                }
 
-        internal bool Shared { get; set; }
+                if (this.IsMenu)
+                {
+                    return Path.Combine(this.Parent.ConfigPath, this.ConfigName);
+                }
+
+                return Path.Combine(this.Parent.ConfigPath, this.ConfigName + ".json");
+            }
+        }
+
 
         internal string CallingAssemblyName { get; set; }
 
@@ -59,7 +76,7 @@
             if (this.ValueChanged != null)
             {
                 //Fire the value changed of this menucomponent instance
-                ValueChanged(sender, args);
+                this.ValueChanged(sender, args);
             }
 
 
@@ -91,7 +108,7 @@
         ///    This property will only succeed for MenuBool, MenuKeybind and MenuSliderBool.
         /// </remarks>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        public bool Enabled => ((IReturns<bool>) this).Value;
+        public bool Enabled => ((IReturns<bool>)this).Value;
 
         /// <summary>
         ///     Gets a numeric value associated with MenuComponent <see cref="MenuComponent" />.
@@ -138,6 +155,8 @@
         /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
         public virtual bool IsMenu => false;
 
+        public bool Shared { get; set; }
+
         #endregion
 
         #region Public Methods and Operators
@@ -164,7 +183,7 @@
         /// <returns>T.</returns>
         public T As<T>() where T : MenuComponent
         {
-            return (T) this;
+            return (T)this;
         }
 
         /// <summary>
@@ -175,9 +194,9 @@
         public virtual Rectangle GetBounds(Vector2 pos)
         {
             return new Rectangle(
-                (int) pos.X,
-                (int) pos.Y,
-                this.Root ? MenuManager.Instance.Theme.RootMenuWidth : MenuManager.Instance.Theme.ComponentWidth,
+                (int)pos.X,
+                (int)pos.Y,
+                this.Parent.Width,
                 MenuManager.Instance.Theme.MenuHeight);
         }
 
@@ -211,18 +230,34 @@
         {
         }
 
-        internal virtual void SaveValue()
+        internal virtual void Save()
         {
-            if (!Directory.Exists(this.ConfigBaseFolder))
+            //no point to save things like seperators
+            if (!this.SavableMenuItem)
             {
-                Directory.CreateDirectory(this.ConfigBaseFolder);
+                return;
+            }
+
+            if (this.Shared)
+            {
+                if (!Directory.Exists(MenuManager.Instance.SharedSettingsPath))
+                {
+                    Directory.CreateDirectory(MenuManager.Instance.SharedSettingsPath);
+                }
+            }
+
+            else
+            {
+                if (!Directory.Exists(this.Parent.ConfigPath))
+                {
+                    Directory.CreateDirectory(this.Parent.ConfigPath);
+                }
             }
 
             File.WriteAllText(this.ConfigPath, this.Serialized);
         }
 
         internal abstract void LoadValue();
-
 
         private string CleanFileName(string fileName)
         {
