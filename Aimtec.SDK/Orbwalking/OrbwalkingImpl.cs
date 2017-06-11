@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Aimtec.SDK.Orbwalking
 {
@@ -28,9 +28,9 @@ namespace Aimtec.SDK.Orbwalking
         private static Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
 
         // TODO this completely breaks the modular design, Orbwalker and health prediction shouldnt be tightly coupled!
-        private HealthPredictionImplB HealthPrediction { get; }= new HealthPredictionImplB();
+        private HealthPredictionImplB HealthPrediction { get; } = new HealthPredictionImplB();
 
-        private Menu Config;
+        private Menu config;
 
         private List<CustomMode> CustomModes { get; } = new List<CustomMode>();
 
@@ -51,8 +51,7 @@ namespace Aimtec.SDK.Orbwalking
         protected bool CanMoveLocal => Game.TickCount
                                        >= this.LastAttackCommandSentTime + this.AnimationTime + this.ExtraWindUp;
 
-        public bool CanMove => this.CanMoveServer && this.CanMoveLocal
-                               && Player.Distance(Game.CursorPos) > this.HoldPositionRadius;
+        public bool CanMove => Player.Distance(Game.CursorPos) > this.HoldPositionRadius && (NoCancelChamps.Contains(Player.ChampionName) || this.CanMoveServer && this.CanMoveLocal);
 
         public bool CanAttack => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick >= this.WindUpTime;
 
@@ -69,9 +68,9 @@ namespace Aimtec.SDK.Orbwalking
 
 
         //Menu Getters
-        protected int HoldPositionRadius => this.Config["holdPositionRadius"].Value;
+        protected int HoldPositionRadius => this.config["holdPositionRadius"].Value;
 
-        protected int ExtraWindUp => this.Config["extraWindup"].Value;
+        protected int ExtraWindUp => this.config["extraWindup"].Value;
 
 
 
@@ -87,7 +86,7 @@ namespace Aimtec.SDK.Orbwalking
         }
 
         //Don't think we really needs this since we have an auto attack detection event
-        private string[] Attacks =
+        private string[] attacks =
             {
                 "caitlynheadshotmissile", "frostarrow", "garenslash2", "kennenmegaproc", "masteryidoublestrike",
                 "quinnwenhanced", "renektonexecute", "renektonsuperexecute", "rengarnewpassivebuffdash", "trundleq",
@@ -95,7 +94,7 @@ namespace Aimtec.SDK.Orbwalking
             };
 
         //Don't think we really needs this since we have an auto attack detection event
-        private string[] BlacklistedAttacks =
+        private string[] blacklistedAttacks =
             {
                 "volleyattack", "volleyattackwithsound", "jarvanivcataclysmattack", "monkeykingdoubleattack",
                 "shyvanadoubleattack", "shyvanadoubleattackdragon", "zyragraspingplantattack",
@@ -109,7 +108,7 @@ namespace Aimtec.SDK.Orbwalking
             };
 
 
-        private string[] AttackResets =
+        private readonly string[] AttackResets =
             {
                 "dariusnoxiantacticsonh", "fiorae", "garenq", "gravesmove", "hecarimrapidslash", "jaxempowertwo",
                 "jaycehypercharge", "leonashieldofdaybreak", "luciane", "monkeykingdoubleattack",
@@ -120,9 +119,12 @@ namespace Aimtec.SDK.Orbwalking
                 "meditate", "sejuaninorthernwinds", "asheq", "camilleq", "camilleq2"
             };
 
+
+        private static readonly string[] NoCancelChamps = { "Kalista" };
+
         private void CreateMenu()
         {
-            this.Config = new Menu("Orbwalker", "Orbwalker")
+            this.config = new Menu("Orbwalker", "Orbwalker")
                               {
                                   new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
                                   new MenuSlider("extraWindup", "Additional Windup", 0, 0, 200, true),
@@ -132,9 +134,9 @@ namespace Aimtec.SDK.Orbwalking
 
 
         //Situations where it does not make sense to cast an auto attack (independent of target)
-        protected bool ShouldNotAttack => BlindCheck;
+        protected bool ShouldNotAttack => this.BlindCheck;
 
-        private bool BlindCheck => this.Config["noBlindAA"].Enabled && !Player.ChampionName.Equals("Kalista")
+        private bool BlindCheck => this.config["noBlindAA"].Enabled && !Player.ChampionName.Equals("Kalista")
             && !Player.ChampionName.Equals("Twitch")
             && Player.BuffManager.HasBuffOfType(BuffType.Blind);
 
@@ -160,7 +162,6 @@ namespace Aimtec.SDK.Orbwalking
                     break;
             }
         }
-
 
         private void ObjAiBaseOnOnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs args)
         {
@@ -242,10 +243,7 @@ namespace Aimtec.SDK.Orbwalking
         {
             var args = new PreAttackEventArgs { Target = target };
 
-            if (this.PreAttack != null)
-            {
-                this.PreAttack.Invoke(Player, args);
-            }
+            this.PreAttack?.Invoke(Player, args);
 
             return args;
         }
@@ -259,7 +257,6 @@ namespace Aimtec.SDK.Orbwalking
             return args;
         }
 
-
         private PreMoveEventArgs FirePreMove(Vector3 position)
         {
             var args = new PreMoveEventArgs { MovePosition = position };
@@ -268,8 +265,6 @@ namespace Aimtec.SDK.Orbwalking
 
             return args;
         }
-
-
 
         private OrbwalkingMode GetCurrentMode()
         {
@@ -333,7 +328,6 @@ namespace Aimtec.SDK.Orbwalking
             return "None";
         }
 
-
         public CustomMode ActiveCustomMode
         {
             get
@@ -387,7 +381,7 @@ namespace Aimtec.SDK.Orbwalking
 
         public void AddToMenu(IMenu menu)
         {
-            menu.Add(this.Config);
+            menu.Add(this.config);
         }
 
         public void ForceTarget(AttackableUnit unit)
@@ -395,13 +389,21 @@ namespace Aimtec.SDK.Orbwalking
 
         }
 
+        public bool IsSimpleAttack(Obj_AI_BaseMissileClientDataEventArgs args)
+        {
+            return !this.AttackResets.Contains(args.SpellData.Name);
+        }
+
+        public bool IsAttack(Obj_AI_BaseMissileClientDataEventArgs args)
+        {
+            return true;
+        }
 
         public bool IsReset(string missileName)
         {
             var missileNameLc = missileName.ToLower();
             return this.AttackResets.Contains(missileNameLc);
         }
-
 
         AttackableUnit GetHeroTarget()
         {
@@ -424,7 +426,6 @@ namespace Aimtec.SDK.Orbwalking
 
             return bestMinionTarget;
         }
-
 
         AttackableUnit GetWaveClearTarget()
         {
@@ -496,7 +497,6 @@ namespace Aimtec.SDK.Orbwalking
                 return null;
             }
 
-
             //Killable
             AttackableUnit killableMinion = minions.FirstOrDefault(x => this.CanKillMinion(x));
 
@@ -544,7 +544,6 @@ namespace Aimtec.SDK.Orbwalking
                     return minion;
                 } 
             }
-
 
             //Heros
             var hero = this.GetHeroTarget();
@@ -617,7 +616,6 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             return null;
-
         }
 
         int TimeForAutoToReachTarget(AttackableUnit minion)
@@ -627,7 +625,6 @@ namespace Aimtec.SDK.Orbwalking
 
             return (int)(this.AnimationTime + (Game.Ping / 2f) + (int)Math.Max(0, dist / ms));
         }
-
 
         bool CanKillMinion(Obj_AI_Base minion, int time = 0)
         {
@@ -703,7 +700,7 @@ namespace Aimtec.SDK.Orbwalking
             var mode = new CustomMode(modeName, modeKey, movingEnabled, attackingEnabled);
 
             this.CustomModes.Add(mode);
-            this.Config.Add(mode.MenuItem);
+            this.config.Add(mode.MenuItem);
         }
 
         //Adding a custom mode that will be using a key from the Global Keys
@@ -742,7 +739,6 @@ namespace Aimtec.SDK.Orbwalking
                 this.AttackingEnabled = attackingEnabled;
                 this.MovingEnabled = movingEnabled;
             }
-
 
             public bool AttackingEnabled;
             public bool MovingEnabled;
