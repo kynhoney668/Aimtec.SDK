@@ -51,7 +51,8 @@ namespace Aimtec.SDK.Orbwalking
         protected bool CanMoveLocal => Game.TickCount
                                        >= this.LastAttackCommandSentTime + this.AnimationTime + this.ExtraWindUp;
 
-        public bool CanMove => Player.Distance(Game.CursorPos) > this.HoldPositionRadius && (NoCancelChamps.Contains(Player.ChampionName) || this.CanMoveServer && this.CanMoveLocal);
+        public bool CanMove => Player.Distance(Game.CursorPos) > this.HoldPositionRadius &&
+            (NoCancelChamps.Contains(Player.ChampionName) || this.CanMoveServer && this.CanMoveLocal);
 
         public bool CanAttack => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick >= this.WindUpTime;
 
