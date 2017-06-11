@@ -158,8 +158,7 @@ namespace Aimtec.SDK.Extensions
             if (Player.ChampionName.Equals("Caitlyn"))
             {
                 var unit = target as Obj_AI_Base;
-
-                if (unit != null)
+                if (unit != null && unit.HasBuff("caitlynyordletrapinternal"))
                 {
                     baseRange = 1300 + Player.BoundingRadius;
                 }
