@@ -144,9 +144,18 @@
         ///     Returns the current health a determined unit has, in percentual.
         /// </summary>
         /// <param name="unit">The unit.</param>
-        public static float HealthPercent(this Obj_AI_Hero unit)
+        public static float HealthPercent(this Obj_AI_Base unit)
         {
             return unit.Health / unit.MaxHealth * 100;
+        }
+        
+        /// <summary>
+        ///     Returns the current mana a determined unit has, in percentual.
+        /// </summary>
+        /// <param name="unit">The unit.</param>
+        public static float ManaPercent(this Obj_AI_Base unit)
+        {
+            return unit.Mana / unit.MaxMana * 100;
         }
 
         /// <summary>
@@ -202,15 +211,6 @@
                 && ((allyIsValidTarget || target.Team != ObjectManager.GetLocalPlayer().Team) && Vector3.Distance(
                     target.Position,
                     ObjectManager.GetLocalPlayer().Position) < range);
-        }
-
-        /// <summary>
-        ///     Returns the current mana a determined unit has, in percentual.
-        /// </summary>
-        /// <param name="unit">The unit.</param>
-        public static float ManaPercent(this Obj_AI_Hero unit)
-        {
-            return unit.Mana / unit.MaxMana * 100;
         }
 
         #endregion
