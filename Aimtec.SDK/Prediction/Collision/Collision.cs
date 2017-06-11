@@ -93,7 +93,7 @@
 
             if (minion.Path.Length > 1)
             {
-                var vppol = from2D.ProjectOn((Vector2) position, mpos);
+                var vppol = mpos.ProjectOn(from2D, (Vector2)position);
 
                 if (vppol.IsOnSegment && Vector2.DistanceSquared(mpos, vppol.SegmentPoint)
                     <= Math.Pow(minion.BoundingRadius + radius + buffer, 2))
@@ -102,7 +102,7 @@
                 }
             }
 
-            var vppol2 = from2D.ProjectOn((Vector2) position, (Vector2) minion.Position);
+            var vppol2 = ((Vector2)minion.Position).ProjectOn(from2D, (Vector2)position);
 
             return vppol2.IsOnSegment && Vector2.DistanceSquared((Vector2) minion.Position, vppol2.SegmentPoint)
                 <= Math.Pow(minion.BoundingRadius + radius + buffer, 2);
