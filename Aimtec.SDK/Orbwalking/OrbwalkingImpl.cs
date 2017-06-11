@@ -108,7 +108,6 @@ namespace Aimtec.SDK.Orbwalking
                 "gravesautoattackrecoil"
             };
 
-
         private readonly string[] AttackResets =
             {
                 "dariusnoxiantacticsonh", "fiorae", "garenq", "gravesmove", "hecarimrapidslash", "jaxempowertwo",
@@ -119,7 +118,6 @@ namespace Aimtec.SDK.Orbwalking
                 "yorickspectral", "reksaiq", "itemtitanichydracleave", "masochism", "illaoiw", "elisespiderw", "fiorae",
                 "meditate", "sejuaninorthernwinds", "asheq", "camilleq", "camilleq2"
             };
-
 
         private static readonly string[] NoCancelChamps = { "Kalista" };
 
@@ -212,7 +210,6 @@ namespace Aimtec.SDK.Orbwalking
                 }
             }
         }
-
 
         private void GameObject_OnCreate(GameObject sender)
         {
@@ -388,16 +385,6 @@ namespace Aimtec.SDK.Orbwalking
         public void ForceTarget(AttackableUnit unit)
         {
 
-        }
-
-        public bool IsSimpleAttack(Obj_AI_BaseMissileClientDataEventArgs args)
-        {
-            return !this.AttackResets.Contains(args.SpellData.Name);
-        }
-
-        public bool IsAttack(Obj_AI_BaseMissileClientDataEventArgs args)
-        {
-            return true;
         }
 
         public bool IsReset(string missileName)
