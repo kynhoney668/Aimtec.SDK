@@ -43,8 +43,6 @@ namespace Aimtec.SDK.Events
             Game.OnStart -= GameStartHandler;
             Game.OnUpdate -= GameStartHandler;
 
-            Initializer.Initialize();
-
             var invocationList = GameStart?.GetInvocationList();
 
             if (invocationList == null)
