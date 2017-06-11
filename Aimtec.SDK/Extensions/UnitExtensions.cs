@@ -28,11 +28,17 @@ namespace Aimtec.SDK.Extensions
                     Vector3.Distance(target.Position, ObjectManager.GetLocalPlayer().Position) < range);
         }
 
+        /// <summary>
+        /// Determines whether the target is a valid target in the auto attack range from the specified check range from vector.
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <param name="checkRangeFrom">The check range from.</param>
+        /// <returns><c>true</c> if the target is a valid target in the auto attack range; otherwise, <c>false</c>.</returns>
         public static bool IsValidAutoRange(this AttackableUnit target, Vector3 checkRangeFrom = default(Vector3))
         {
             return target != null && !target.IsDead && !target.IsInvulnerable && target.IsVisible && target.IsTargetable &&
                    (target.Team != ObjectManager.GetLocalPlayer().Team) &&
-                   Vector3.Distance(target.Position, ObjectManager.GetLocalPlayer().Position) < Player.FullAttackRange((target));
+                   Vector3.Distance(target.Position, ObjectManager.GetLocalPlayer().Position) < Player.GetFullAttackRange((target));
         }
 
         /// <summary>
@@ -134,7 +140,13 @@ namespace Aimtec.SDK.Extensions
             return from.Inventory.HasItem(itemId);
         }
 
-        public static float FullAttackRange(this Obj_AI_Base source, AttackableUnit target)
+        /// <summary>
+        /// Gets the full attack range.
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="target">The target.</param>
+        /// <returns>System.Single.</returns>
+        public static float GetFullAttackRange(this Obj_AI_Base source, AttackableUnit target)
         {
             var baseRange = source.AttackRange + source.BoundingRadius;
 

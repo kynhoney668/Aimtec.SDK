@@ -122,6 +122,7 @@
     <Compile Include="Util\KeyboardEvents.cs" />
     <Compile Include="Util\Keys.cs" />
     <Compile Include="Util\Geometry.cs" />
+    <Compile Include="Util\MEC.cs" />
     <Compile Include="Util\Requires.cs" />
     <Compile Include="Util\ThirdParty\Clipper.cs" />
     <Compile Include="Util\WindowsMessages.cs" />
