@@ -43,6 +43,9 @@ namespace Aimtec.SDK.Events
             Game.OnStart -= GameStartHandler;
             Game.OnUpdate -= GameStartHandler;
 
+            //Call the Bootstrapper
+            Bootstrap.Load();
+
             var invocationList = GameStart?.GetInvocationList();
 
             if (invocationList == null)

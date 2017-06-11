@@ -236,6 +236,11 @@
                 return TargetPriority.MaxPriority;
             }
 
+            if (HighPriority.Contains(name))
+            {
+                return TargetPriority.HighPriority;
+            }
+
             if (MediumPriority.Contains(name))
             {
                 return TargetPriority.MediumPriority;

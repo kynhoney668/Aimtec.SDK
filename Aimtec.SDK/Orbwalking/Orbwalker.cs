@@ -7,6 +7,15 @@ namespace Aimtec.SDK.Orbwalking
     public class Orbwalker : IOrbwalker
     {
         /// <summary>
+        ///     Initializes the default implementation
+        /// </summary>
+        /// <param name="impl">The implementation.</param>
+        static Orbwalker()
+        {
+            Implementation = new OrbwalkingImpl();
+        }
+
+        /// <summary>
         ///     Initializes a new instance of the <see cref="Orbwalker" /> class.
         /// </summary>
         /// <param name="impl">The implementation.</param>
@@ -101,7 +110,7 @@ namespace Aimtec.SDK.Orbwalking
             Implementation.ForceTarget(unit);
         }
 
-   
+
         /// <inheritdoc cref="IOrbwalker" />
         public event EventHandler<PreAttackEventArgs> PreAttack
         {
