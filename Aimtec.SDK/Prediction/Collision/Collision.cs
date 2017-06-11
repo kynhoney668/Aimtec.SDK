@@ -36,7 +36,7 @@
             return ObjectManager.Get<Obj_AI_Minion>()
                                 .Where(
                                     x => x.IsValidTarget()
-                                        && Vector3.DistanceSquared(x.Position, from)
+                                        && Vector3.Distance(x.Position, from)
                                         <= range + 500 * (delay + range / speed))
                                 .Any(x => WillCollideWith(unit, x, position, delay, radius, range, speed, from));
         }
@@ -76,36 +76,36 @@
                             .UnitPosition
                 : minion.Position);
 
-            if (!(Vector2.DistanceSquared((Vector2) from, mpos) <= range * range)
-                || !(Vector2.DistanceSquared((Vector2) from, (Vector2) minion.Position) <= Math.Pow(range + 100, 2)))
+            if (Vector2.DistanceSquared((Vector2) from, mpos) <= range * range
+                && Vector2.DistanceSquared((Vector2) from, (Vector2) minion.Position) <= Math.Pow(range + 100, 2))
             {
-                return false;
-            }
+                var buffer = 8;
 
-            var buffer = 8;
-
-            if (minion.Type == GameObjectType.AIHeroClient)
-            {
-                buffer += (int) minion.BoundingRadius; // todo make sure this is ~65
-            }
-
-            var from2D = (Vector2) from;
-
-            if (minion.Path.Length > 1)
-            {
-                var vppol = mpos.ProjectOn(from2D, (Vector2)position);
-
-                if (vppol.IsOnSegment && Vector2.DistanceSquared(mpos, vppol.SegmentPoint)
-                    <= Math.Pow(minion.BoundingRadius + radius + buffer, 2))
+                if (minion.Type == GameObjectType.AIHeroClient)
                 {
-                    return true;
+                    buffer += (int) minion.BoundingRadius; // todo make sure this is ~65
                 }
+
+                var from2D = (Vector2) from;
+
+                if (minion.Path.Length > 1)
+                {
+                    var vppol = mpos.ProjectOn(from2D, (Vector2) position);
+
+                    if (vppol.IsOnSegment && Vector2.DistanceSquared(mpos, vppol.SegmentPoint)
+                        <= Math.Pow(minion.BoundingRadius + radius + buffer, 2))
+                    {
+                        return true;
+                    }
+                }
+
+                var vppol2 = ((Vector2) minion.Position).ProjectOn(from2D, (Vector2) position);
+
+                return vppol2.IsOnSegment && Vector2.DistanceSquared((Vector2) minion.Position, vppol2.SegmentPoint)
+                    <= Math.Pow(minion.BoundingRadius + radius + buffer, 2);
             }
 
-            var vppol2 = ((Vector2)minion.Position).ProjectOn(from2D, (Vector2)position);
-
-            return vppol2.IsOnSegment && Vector2.DistanceSquared((Vector2) minion.Position, vppol2.SegmentPoint)
-                <= Math.Pow(minion.BoundingRadius + radius + buffer, 2);
+            return false;
         }
 
         #endregion
