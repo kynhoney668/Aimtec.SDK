@@ -4,6 +4,7 @@
     using System.IO;
     using System.Reflection;
 
+    using Aimtec.SDK.Damage;
     using Aimtec.SDK.Menu.Config;
     using Aimtec.SDK.TargetSelector;
 
@@ -52,6 +53,8 @@
 
             SetupLogging();
             LogUnhandledExceptions();
+
+            DamageLibrary.LoadDamages();
 
             Logger.Info("Loading Global Keys");
             GlobalKeys.Load();
@@ -104,7 +107,7 @@
             // Setup NLog with async console and file logging.
             // Only logs to file if the log level is greater or equal to the warn level.
             var layout = new SimpleLayout(
-                "${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${message} ${exception:format=tostring}");
+                "${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${pad:padding=25:inner=${callsite:includeNamespace=false}}|${message} ${exception:format=tostring}");
             var config = new LoggingConfiguration();
 
             var consoleTarget = new AsyncTargetWrapper(
