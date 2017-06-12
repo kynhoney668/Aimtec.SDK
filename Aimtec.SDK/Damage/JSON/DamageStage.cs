@@ -68,8 +68,6 @@
         /// <summary>
         ///     The empowered damage stage.
         /// </summary>
-        Empowered,
-
-        OverTime // todo what the fuck is this (blitzcrank R)
+        Empowered
     }
 }
