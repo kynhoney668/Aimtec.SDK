@@ -9,6 +9,7 @@
     using Aimtec.SDK.TargetSelector;
 
     using NLog;
+    using NLog.Conditions;
     using NLog.Config;
     using NLog.Fluent;
     using NLog.Layouts;
@@ -114,7 +115,30 @@
                 new ColoredConsoleTarget("ColoredConsoleTarget")
                 {
                     Layout = layout,
-                    DetectConsoleAvailable = false
+                    DetectConsoleAvailable = false,
+                    RowHighlightingRules =
+                    {
+                        new ConsoleRowHighlightingRule(
+                            "level == LogLevel.Debug",
+                            ConsoleOutputColor.White,
+                            ConsoleOutputColor.NoChange),
+                        new ConsoleRowHighlightingRule(
+                            "level == LogLevel.Info",
+                            ConsoleOutputColor.Cyan,
+                            ConsoleOutputColor.NoChange),
+                        new ConsoleRowHighlightingRule(
+                            "level == LogLevel.Warn",
+                            ConsoleOutputColor.Yellow,
+                            ConsoleOutputColor.NoChange),
+                        new ConsoleRowHighlightingRule(
+                            "level == LogLevel.Error",
+                            ConsoleOutputColor.Red,
+                            ConsoleOutputColor.NoChange),
+                        new ConsoleRowHighlightingRule(
+                            "level == LogLevel.Fatal",
+                            ConsoleOutputColor.Red,
+                            ConsoleOutputColor.White)
+                    }
                 });
 
             config.AddTarget("AsyncWrapper1", consoleTarget);

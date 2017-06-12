@@ -1,7 +1,6 @@
 namespace Aimtec.SDK
 {
     using System.Collections.Generic;
-    using System.Collections.Immutable;
     using System.Linq;
 
     /// <summary>

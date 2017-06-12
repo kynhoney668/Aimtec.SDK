@@ -64,11 +64,16 @@
 
         private static IEnumerable<Obj_AI_Hero> Enemies => ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy);
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TargetSelectorImpl"/> class.
+        /// </summary>
         public TargetSelectorImpl()
         {
             CreateMenu();
             CreateWeights();
             //RenderManager.OnRender += RenderManagerOnOnRender;
+
+            Logger.Info("Target Selector Created");
         }
 
         private static void RenderManagerOnOnRender()

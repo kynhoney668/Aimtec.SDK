@@ -2,6 +2,8 @@
 
 namespace Aimtec.SDK.Prediction
 {
+    using Aimtec.SDK.Prediction.Skillshots;
+
     public class PredictionOutput
     {
         /// <summary>

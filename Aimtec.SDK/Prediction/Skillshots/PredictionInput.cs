@@ -3,6 +3,7 @@
 namespace Aimtec.SDK.Prediction
 {
     using Aimtec.SDK.Prediction.Collision;
+    using Aimtec.SDK.Prediction.Skillshots;
 
     /// <summary>
     ///     The input parameters to calculate skillshot prediction.

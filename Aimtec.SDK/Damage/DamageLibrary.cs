@@ -161,6 +161,8 @@
                     {
                         Damages =
                             JsonConvert.DeserializeObject<Dictionary<string, ChampionDamage>>(streamReader.ReadToEnd());
+
+                        Logger.Info("Damage Library Loaded");
                     }
                 }
             }

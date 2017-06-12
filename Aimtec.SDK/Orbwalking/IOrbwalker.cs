@@ -126,6 +126,10 @@ namespace Aimtec.SDK.Orbwalking
     /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
     public class PreAttackEventArgs : OrbwalkingEventArgs
     {
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="PreAttackEventArgs"/> is cancel.
+        /// </summary>
+        /// <value><c>true</c> if cancel; otherwise, <c>false</c>.</value>
         public bool Cancel { get; set; } = false;
     }
 
@@ -143,7 +147,16 @@ namespace Aimtec.SDK.Orbwalking
     /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
     public class PreMoveEventArgs : EventArgs
     {
+        /// <summary>
+        /// Gets or sets the move position.
+        /// </summary>
+        /// <value>The move position.</value>
         public Vector3 MovePosition { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="PreMoveEventArgs"/> is cancel.
+        /// </summary>
+        /// <value><c>true</c> if cancel; otherwise, <c>false</c>.</value>
         public bool Cancel { get; set; }
     }
 }

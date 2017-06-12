@@ -106,13 +106,14 @@
     <Compile Include="Prediction\Health\HealthPredictionImpl.cs" />
     <Compile Include="Prediction\Health\HealthPredictionImplB.cs" />
     <Compile Include="Prediction\Health\IHealthPrediction.cs" />
-    <Compile Include="Prediction\HitChance.cs" />
+    <Compile Include="Prediction\Skillshots\HitChance.cs" />
     <Compile Include="Prediction\Skillshots\PredictionInput.cs" />
     <Compile Include="Prediction\Skillshots\PredictionOutput.cs" />
     <Compile Include="Prediction\Skillshots\IPrediction.cs" />
     <Compile Include="Prediction\Skillshots\Prediction.cs" />
     <Compile Include="Prediction\Skillshots\PredictionImpl.cs" />
-    <Compile Include="Prediction\SkillType.cs" />
+    <Compile Include="Prediction\Skillshots\SkillType.cs" />
+    <Compile Include="Spell.cs" />
     <Compile Include="TargetSelector\ITargetSelector.cs" />
     <Compile Include="TargetSelector\TargetSelector.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -123,7 +124,6 @@
     <Compile Include="Util\Keys.cs" />
     <Compile Include="Util\Geometry.cs" />
     <Compile Include="Util\MEC.cs" />
-    <Compile Include="Util\Requires.cs" />
     <Compile Include="Util\ThirdParty\Clipper.cs" />
     <Compile Include="Util\WindowsMessages.cs" />
   </ItemGroup>

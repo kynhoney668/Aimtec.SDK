@@ -1,4 +1,4 @@
-﻿namespace Aimtec.SDK.Prediction
+﻿namespace Aimtec.SDK.Prediction.Skillshots
 {
     /// <summary>
     ///     The chance that the prediction will hit the target.

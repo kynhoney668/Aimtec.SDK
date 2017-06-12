@@ -1,4 +1,4 @@
-﻿namespace Aimtec.SDK
+﻿namespace Aimtec.SDK.Prediction.Skillshots
 {
     public enum SkillType
     {
