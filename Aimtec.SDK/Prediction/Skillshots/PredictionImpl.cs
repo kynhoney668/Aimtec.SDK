@@ -193,7 +193,7 @@
                 {
                     if (e.SpellData.Name.ToLower() == spell.Name)
                     {
-                        this.TargetsImmobile[sender.NetworkId] = this.GetTime() + spell.Duration;
+                        this.TargetsImmobile[sender.NetworkId] = GetTime() + spell.Duration;
                         return;
                     }
                 }
@@ -210,8 +210,8 @@
                         {
                             IsBlink = true,
                             Duration = spell.Delay,
-                            EndTime = this.GetTime() + spell.Delay,
-                            EndTime2 = this.GetTime() + spell.Delay2,
+                            EndTime = GetTime() + spell.Delay,
+                            EndTime2 = GetTime() + spell.Delay2,
                             StartPosition = sender.Position,
                             EndPosition = landingPos
                         };
@@ -223,7 +223,8 @@
                 {
                     if (e.SpellData.Name.ToLower() == spell.Name)
                     {
-                        this.DontShoot[sender.NetworkId] = this.GetTime() + spell.Duration;
+                        Logger.Warn("WHY IS THIS CALLED");
+                        this.DontShoot[sender.NetworkId] = GetTime() + spell.Duration;
                         return;
                     }
                 }
@@ -232,7 +233,7 @@
                 {
                     if (e.SpellData.Name.ToLower() == spell.Name)
                     {
-                        this.DontShoot2[sender.NetworkId] = this.GetTime() + spell.Duration;
+                        this.DontShoot2[sender.NetworkId] = GetTime() + spell.Duration;
                     }
                 }
             }
@@ -250,7 +251,7 @@
             {
                 var extraDelay = Math.Abs(speed - float.MaxValue) < float.Epsilon ? 0 : Vector3.Distance(from, unit.Position) / speed;
 
-                if (this.TargetsImmobile[unit.NetworkId] > this.GetTime() + delay + extraDelay
+                if (this.TargetsImmobile[unit.NetworkId] > GetTime() + delay + extraDelay
                     && spellType == SkillType.Circle)
                 {
                     return new ImmobileResult()
@@ -262,7 +263,7 @@
                 }
 
                 if (this.TargetsImmobile[unit.NetworkId] + radius / unit.MoveSpeed
-                    > this.GetTime() + delay + extraDelay)
+                    > GetTime() + delay + extraDelay)
                 {
                     return new ImmobileResult()
                     {
@@ -286,20 +287,20 @@
             {
                 var dash = this.TargetsDashing[unit.NetworkId];
 
-                if (dash.EndTime >= this.GetTime())
+                if (dash.EndTime >= GetTime())
                 {
                     targetDashing = true;
 
                     if (dash.IsBlink)
                     {
-                        if (dash.EndTime - this.GetTime() <= delay + Vector3.Distance(from, dash.EndPosition) / speed)
+                        if (dash.EndTime - GetTime() <= delay + Vector3.Distance(from, dash.EndPosition) / speed)
                         {
                             position = dash.EndPosition;
                             canHit = (unit.MoveSpeed * (delay + Vector3.Distance(from, dash.EndPosition) / speed
-                                - (dash.EndTime2 - this.GetTime()))) < radius;
+                                - (dash.EndTime2 - GetTime()))) < radius;
                         }
 
-                        if (dash.EndTime - this.GetTime()
+                        if (dash.EndTime - GetTime()
                             >= (delay + Vector3.Distance(from, dash.StartPosition) / speed) && !canHit)
                         {
                             position = dash.EndPosition;
@@ -314,7 +315,7 @@
                             dash.Speed,
                             (Vector2) @from,
                             speed,
-                            this.GetTime() - dash.StartTime + delay);
+                            GetTime() - dash.StartTime + delay);
 
                         if (Math.Abs(vmc.Time) > float.Epsilon) // TODO Check if this is correct
                         {
@@ -325,7 +326,7 @@
                         {
                             position = dash.EndPosition;
                             canHit = unit.MoveSpeed * (delay + Vector3.Distance(from, position) / speed
-                                - (dash.EndTime - this.GetTime())) < radius;
+                                - (dash.EndTime - GetTime())) < radius;
                         }
                     }
                 }
@@ -342,9 +343,9 @@
         private void OnUpdate()
         {
             // update every 2/10 of a second
-            if (float.IsNaN(this.lastTick) || this.GetTime() - this.lastTick > 2 / 10f)
+            if (float.IsNaN(this.lastTick) || GetTime() - this.lastTick > 2 / 10f)
             {
-                this.lastTick = this.GetTime();
+                this.lastTick = GetTime();
 
                 // update the path anaylsis of enemies
                 foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy))
@@ -353,7 +354,7 @@
 
                     foreach (var path in paths.ToArray())
                     {
-                        if (this.GetTime() - 1.5 > path.Time)
+                        if (GetTime() - 1.5 > path.Time)
                         {
                             paths.Remove(path);
                         }
@@ -364,7 +365,7 @@
                 var playerPaths = this.PathAnalysis[Player.NetworkId];
                 foreach (var path in playerPaths.ToArray())
                 {
-                    if (this.GetTime() - 1.5 > path.Time)
+                    if (GetTime() - 1.5 > path.Time)
                     {
                         playerPaths.Remove(path);
                     }
@@ -376,7 +377,7 @@
                     // value - list of waypoints
                     foreach (var waypoint in targetWaypoints.Value.ToArray())
                     {
-                        if (waypoint.Time + WaypointsTime < this.GetTime())
+                        if (waypoint.Time + WaypointsTime < GetTime())
                         {
                             targetWaypoints.Value.Remove(waypoint);
                         }
@@ -408,12 +409,12 @@
 
                     if (angle > 20)
                     {
-                       this.PathAnalysis[sender.NetworkId].Add(new Path(){Time = Environment.TickCount / 1000f, Position = e.Path.Last()});
+                       this.PathAnalysis[sender.NetworkId].Add(new Path(){Time = GetTime(), Position = e.Path.Last()});
                     }
                 }
                 else
                 {
-                    this.PathAnalysis[sender.NetworkId].Add(new Path(){Time = Environment.TickCount / 1000f, Position =  e.Path.Last()});
+                    this.PathAnalysis[sender.NetworkId].Add(new Path(){Time = GetTime(), Position =  e.Path.Last()});
                 }
             }
 
@@ -430,7 +431,7 @@
                         {
                             UnitPosition = sender.Position,
                             Waypoint = waypointsToAdd.Last(),
-                            Time = this.GetTime(),
+                            Time = GetTime(),
                             N = waypointsToAdd.Count
                         });
                 }
@@ -449,7 +450,7 @@
                         StartPosition = e.Path[0],
                         EndPosition = e.Path.Last(),
                         Speed = 1000, // todo proper api
-                        StartTime = this.GetTime() - Game.Ping / 2000f,
+                        StartTime = GetTime() - Game.Ping / 2000f,
                         
                     };
 
@@ -462,10 +463,7 @@
             }         
         }
 
-        private float GetTime()
-        {
-            return Environment.TickCount / 1000f;
-        }
+        private static float GetTime() => (Environment.TickCount & int.MaxValue) / 1000f;
 
         private List<Vector3> GetCurrentWaypoints(Obj_AI_Base @object)
         {
@@ -604,9 +602,11 @@
             radius = Math.Abs(radius) < float.Epsilon ? 1 : radius + this.GetHitBox(unit) - 4;
             from = from.IsZero ? ObjectManager.GetLocalPlayer().Position : from;
 
+            Logger.Info("From: {0} | Player Pos: {1}", from, ObjectManager.GetLocalPlayer().Position);
+
             var isFromPlayer = Vector3.DistanceSquared(from, ObjectManager.GetLocalPlayer().Position) < 50 * 50;
             delay = delay + (0.07f + Game.Ping / 2000f);
-            Console.WriteLine(isFromPlayer);
+
             Vector3 position;
             Vector3 castPosition;
             int hitchance;
@@ -624,8 +624,10 @@
             }
             else
             {
-                if (this.DontShoot[unit.NetworkId] > this.GetTime())
+
+                if (this.DontShoot[unit.NetworkId] > GetTime())
                 {
+                    Logger.Info("{0} > {1}", this.DontShoot[unit.NetworkId], GetTime());
                     position = unit.Position;
                     castPosition = unit.Position;
                     hitchance = 0;
@@ -633,6 +635,7 @@
                 }
                 else if (dashResult)
                 {
+                    Logger.Info("Target is dashing!");
                     if (dashResult.CanHit)
                     {
                         hitchance = 5;
@@ -645,7 +648,7 @@
                     position = dashResult.Position;
                     castPosition = dashResult.Position;
                 }
-                else if (this.DontShoot2[unit.NetworkId] > this.GetTime())
+                else if (this.DontShoot2[unit.NetworkId] > GetTime())
                 {
                     position = unit.Position;
                     castPosition = unit.Position;
@@ -659,10 +662,12 @@
                 }
                 else
                 {
+                    Logger.Info("Analyze waypoints");
                     var wpa = this.AnalyzeWaypoints(unit, delay, radius, range, speed, from,type);
                     castPosition = wpa.CastPosition;
                     hitchance = (int) wpa.HitChance;
                     position = wpa.PredictedPosition;
+                    Logger.Info("Waypoints analysis hitchance result: {0}", hitchance);
                 }
 
             }
@@ -670,6 +675,7 @@
             {
                 if (type == SkillType.Line && Vector3.DistanceSquared(from, position) >= range * range)
                 {
+                    Logger.Info("Type == Line OOR. DS: {0} | Range^2: {1}", Vector3.DistanceSquared(from, position), range*range);
                     hitchance = 0;
                 }
 
@@ -680,6 +686,7 @@
 
                 if (Vector3.DistanceSquared(from, castPosition) > range * range)
                 {
+                    Logger.Info("V3 DS OOR. DS: {0} | Range^2: {1}", Vector3.DistanceSquared(from, castPosition), range * range);
                     hitchance = 0;
                 }
             }
@@ -713,7 +720,7 @@
 
             var savedWaypoints = this.TargetsWaypoints[unit.NetworkId];
             var currentWaypoints = this.GetCurrentWaypoints(unit);
-            var visibleSince = this.GetTime();
+            var visibleSince = GetTime();
 
             if (delay < 0.25)
             {
@@ -728,8 +735,8 @@
             var position = calculatedTargetPosition.UnitPosition;
             var castPosition = calculatedTargetPosition.CastPosition;
 
-            if (this.CountWaypoints(unit.NetworkId, this.GetTime() - 0.1f) >= 1
-                || this.CountWaypoints(unit.NetworkId, this.GetTime() - 1) == 1)
+            if (this.CountWaypoints(unit.NetworkId, GetTime() - 0.1f) >= 1
+                || this.CountWaypoints(unit.NetworkId, GetTime() - 1) == 1)
             {
                 hitchance = 2;
             }
@@ -737,27 +744,27 @@
             var n = 2;
             var t1 = 0.5f;
 
-            if (this.CountWaypoints(unit.NetworkId, this.GetTime() - 0.75f) >= n)
+            if (this.CountWaypoints(unit.NetworkId, GetTime() - 0.75f) >= n)
             {
-                var angle = this.MaxAngle(unit, currentWaypoints.Last(), this.GetTime() - t1);
+                var angle = this.MaxAngle(unit, currentWaypoints.Last(), GetTime() - t1);
                 if (angle > 90)
                 {
                     hitchance = 1;
                 }
-                else if(angle < 30 && this.CountWaypoints(unit.NetworkId, this.GetTime() -0.1f -t1) >= 1)
+                else if(angle < 30 && this.CountWaypoints(unit.NetworkId, GetTime() -0.1f -t1) >= 1)
                 {
                     hitchance = 2;
                 }
             }
 
             n = 1;
-            if (this.CountWaypoints(unit.NetworkId, this.GetTime() - n) == 0)
+            if (this.CountWaypoints(unit.NetworkId, GetTime() - n) == 0)
             {
                 hitchance = 2;
             }
             
             // todo p fm
-            if (currentWaypoints.Count <= 1 && this.GetTime() - visibleSince > 1)
+            if (currentWaypoints.Count <= 1 && GetTime() - visibleSince > 1)
             {
                 hitchance = 2;
             }
@@ -789,7 +796,7 @@
                 castPosition = calculatedTargetPosition.CastPosition;
             }
 
-            if (savedWaypoints.Count == 0 && this.GetTime() - visibleSince > 3)
+            if (savedWaypoints.Count == 0 && GetTime() - visibleSince > 3)
             {
                 hitchance = 2;
             }
@@ -817,7 +824,7 @@
 
         private List<WaypointInfo> GetWaypoints(int networkId, float from, float to = float.NaN)
         {
-            return this.TargetsWaypoints[networkId].Where(x => from <= x.Time && (float.IsNaN(to) ? this.GetTime() : to) >= x.Time).ToList();
+            return this.TargetsWaypoints[networkId].Where(x => from <= x.Time && (float.IsNaN(to) ? GetTime() : to) >= x.Time).ToList();
         }
 
         private int CountWaypoints(int networkId, float from, float to = float.NaN)

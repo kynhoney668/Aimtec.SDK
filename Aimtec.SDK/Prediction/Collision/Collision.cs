@@ -6,6 +6,8 @@
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Prediction.Skillshots;
 
+    using NLog.Fluent;
+
     /// <summary>
     ///     Class Collision.
     /// </summary>
@@ -65,6 +67,7 @@
         {
             if (unit.NetworkId == minion.NetworkId)
             {
+                Log.Warn().Message("Unit was minion in collision").Write();
                 return false;
             }
 

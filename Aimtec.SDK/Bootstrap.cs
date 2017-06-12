@@ -103,12 +103,14 @@
         {
             // Setup NLog with async console and file logging.
             // Only logs to file if the log level is greater or equal to the warn level.
+            var layout = new SimpleLayout(
+                "${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${message} ${exception:format=tostring}");
             var config = new LoggingConfiguration();
 
             var consoleTarget = new AsyncTargetWrapper(
                 new ColoredConsoleTarget("ColoredConsoleTarget")
                 {
-                    Layout = new SimpleLayout("${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${message}"),
+                    Layout = layout,
                     DetectConsoleAvailable = false
                 });
 
@@ -118,7 +120,7 @@
             var asyncFileTarget = new AsyncTargetWrapper(
                 new FileTarget("FileTarget")
                 {
-                    Layout = new SimpleLayout("${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${message}"),
+                    Layout = layout,
                     LineEnding = LineEndingMode.Default,
                     DeleteOldFileOnStartup = true,
                     FileName = new SimpleLayout(

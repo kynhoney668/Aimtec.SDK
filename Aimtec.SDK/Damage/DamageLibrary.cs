@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Reflection;
 
     using Aimtec.SDK.Damage.JSON;
@@ -18,57 +17,23 @@
     /// </summary>
     internal static class DamageLibrary
     {
-        #region Constructors and Destructors
-
-        /// <summary>
-        /// Gets the logger.
-        /// </summary>
-        /// <value>The logger.</value>
-        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
-
-        /// <summary>
-        ///     Initializes static members of the <see cref="DamageLibrary" /> class.
-        /// </summary>
-        static DamageLibrary()
-        {
-            try
-            {
-                // Todo makes this load based on game version
-                using (var stream = Assembly.GetExecutingAssembly()
-                                            .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.11.json"))
-                {
-                    if (stream == null)
-                    {
-                        Logger.Error($"Could not load the damage library. {nameof(stream)} was null.");
-                        return;
-                    }
-
-                    using (var streamReader = new StreamReader(stream))
-                    {
-                        Damages =
-                            JsonConvert.DeserializeObject<Dictionary<string, ChampionDamage>>(streamReader.ReadToEnd());
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Could not load damages. Subsequent Damage API calls will return 0.");
-
-                // Create empty damages to supress errors
-                Damages = new Dictionary<string, ChampionDamage>();
-            }
-            
-        }
-
-        #endregion
-
         #region Public Properties
 
         /// <summary>
         ///     Gets the damages.
         /// </summary>
         /// <value>The damages.</value>
-        public static IReadOnlyDictionary<string, ChampionDamage> Damages { get; }
+        public static IReadOnlyDictionary<string, ChampionDamage> Damages { get; private set; }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        ///     Gets the logger.
+        /// </summary>
+        /// <value>The logger.</value>
+        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
         #endregion
 
@@ -168,6 +133,44 @@
             }
 
             return dmg;
+        }
+
+        /// <summary>
+        ///     Loads the damages.
+        /// </summary>
+        internal static void LoadDamages()
+        {
+            Logger.Debug(
+                "Embedded Resources: " + string.Join(
+                    " | ",
+                    Assembly.GetExecutingAssembly().GetManifestResourceNames()));
+
+            try
+            {
+                // Todo makes this load based on game version
+                using (var stream = Assembly.GetExecutingAssembly()
+                                            .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.11.json"))
+                {
+                    if (stream == null)
+                    {
+                        Logger.Error($"Could not load the damage library. {nameof(stream)} was null.");
+                        return;
+                    }
+
+                    using (var streamReader = new StreamReader(stream))
+                    {
+                        Damages =
+                            JsonConvert.DeserializeObject<Dictionary<string, ChampionDamage>>(streamReader.ReadToEnd());
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                Logger.Fatal(e, "Could not load damages. Subsequent Damage API calls will return 0.");
+
+                // Create empty damages to supress errors
+                Damages = new Dictionary<string, ChampionDamage>();
+            }
         }
 
         #endregion
