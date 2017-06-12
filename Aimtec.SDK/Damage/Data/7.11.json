@@ -1169,7 +1169,7 @@
         }
       },
       {
-        "Stage":"OverTime",
+        "Stage":"SecondForm",
         "SpellData":{
           "SpellEffectType":"Single",
           "DamageType":"Magical",
