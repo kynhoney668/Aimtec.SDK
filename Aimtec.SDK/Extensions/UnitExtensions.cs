@@ -1,5 +1,8 @@
-﻿namespace Aimtec.SDK.Extensions
+namespace Aimtec.SDK.Extensions
 {
+    using System;
+    using System.Linq;
+
     /// <summary>
     ///     Class UnitExtensions.
     /// </summary>
