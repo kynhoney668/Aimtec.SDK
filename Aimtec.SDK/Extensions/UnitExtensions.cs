@@ -111,7 +111,7 @@
         /// </returns>
         public static bool HasBuff(this Obj_AI_Base from, string buffname)
         {
-            return from.BuffManager.HasBuff(buffname);
+            return from.Buffs.Any(b => b.IsValid && string.Equals(b.Name, buffname, StringComparison.CurrentCultureIgnoreCase));
         }
 
         /// <summary>
