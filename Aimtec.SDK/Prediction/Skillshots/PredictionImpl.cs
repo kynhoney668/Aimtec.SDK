@@ -504,7 +504,8 @@
             {
                 if (this.PathAnalysis[unit.NetworkId].Count > 4)
                 {
-                    return new PredictedTargetPosition(){CastPosition = unit.Position, UnitPosition = unit.Position};
+                    Logger.Warn("Path count > 4");
+                    //return new PredictedTargetPosition(){CastPosition = unit.Position, UnitPosition = unit.Position};
                 }
 
                 if (this.PathAnalysis[unit.NetworkId].Count > 3)
@@ -516,7 +517,6 @@
 
             var spot = Vector3.Zero;
 
-            if (unit.IsValidTarget()) // todo eh
             {
                 var p90x = second.IsZero ? unit.Position : second;
                 var pathPot = unit.MoveSpeed * (Vector3.Distance(Player.Position, p90x) / speed + delay);
@@ -561,11 +561,11 @@
 
                             if (!second.IsZero)
                             {
-                                return new PredictedTargetPosition(){UnitPosition = spot, CastPosition = spot};
+                                return new PredictedTargetPosition() { UnitPosition = spot, CastPosition = spot };
                             }
                             else
                             {
-                                return this.CalculateTargetPosition(unit, delay, radius, speed, from, type, spot);
+                                return this.CalculateTargetPosition(unit, delay, radius, speed, @from, type, spot);
                             }
                         }
                     }
@@ -650,6 +650,7 @@
                 }
                 else if (this.DontShoot2[unit.NetworkId] > GetTime())
                 {
+                    Logger.Info("Dont shoot 2");
                     position = unit.Position;
                     castPosition = unit.Position;
                     hitchance = 7;
