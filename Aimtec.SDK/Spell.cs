@@ -32,7 +32,7 @@
         public Spell(SpellSlot slot, float range)
             : this(slot)
         {
-            this.Range = range;       
+            this.Range = range;
         }
 
         #endregion
@@ -64,6 +64,12 @@
         public float Range { get; set; } = float.MaxValue;
 
         /// <summary>
+        ///     Gets a value indicating whether this <see cref="Spell" /> is ready.
+        /// </summary>
+        /// <value><c>true</c> if ready; otherwise, <c>false</c>.</value>
+        public bool Ready => Player.SpellBook.GetSpellState(this.Slot) == SpellState.Ready;
+
+        /// <summary>
         ///     Gets or sets the slot.
         /// </summary>
         /// <value>The slot.</value>
@@ -92,7 +98,7 @@
         #region Properties
 
         /// <summary>
-        /// Gets the logger.
+        ///     Gets the logger.
         /// </summary>
         /// <value>The logger.</value>
         private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
@@ -200,7 +206,7 @@
         #region Methods
 
         /// <summary>
-        /// Gets the prediction input.
+        ///     Gets the prediction input.
         /// </summary>
         /// <param name="target">The target.</param>
         /// <returns>PredictionInput.</returns>

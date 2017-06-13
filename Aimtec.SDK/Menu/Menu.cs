@@ -13,6 +13,8 @@
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
 
+    using NLog.Fluent;
+
     /// <summary>
     ///     Class Menu.
     /// </summary>
@@ -176,8 +178,11 @@
         /// <returns>IMenu.</returns>
         public virtual Menu Attach()
         {
+            Log.Info().Message("Creating default menu").Write();
+
             if (!this.Root)
             {
+                Log.Error().Message("Cannot attach a menu that is not a root menu.").Write();
                 throw new Exception(
                     $"You can only attach a Root Menu. If this is supposed to be your root menu, set isRoot to true in the constructor.");
             }

@@ -3,6 +3,8 @@
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Util;
 
+    using NLog.Fluent;
+
     public class GlobalKeys
     {
         internal static Menu KeyConfig;
@@ -24,6 +26,8 @@
 
         internal static void Load()
         {
+            Log.Info().Message("Loading Global Keys").Write();
+
             KeyConfig = new Menu("Keys", "Keys");
 
             KeyConfig.Add(new MenuSeperator("seperator", "Main Keys"));

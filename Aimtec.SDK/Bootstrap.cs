@@ -55,15 +55,10 @@
             SetupLogging();
             LogUnhandledExceptions();
 
-            DamageLibrary.LoadDamages();
-
-            Logger.Info("Loading Global Keys");
+            DamageLibrary.LoadDamages();       
             GlobalKeys.Load();
-            Logger.Info("GlobalKeys loaded!");
-
-            Logger.Info("Creating default menu");
+            
             AimtecMenu.Instance.Attach();
-            Logger.Info("Default Aimtec menu created!");
 
             Logger.Info($"Aimtec.SDK version {Assembly.GetExecutingAssembly().GetName().Version} loaded.");
 
@@ -108,7 +103,7 @@
             // Setup NLog with async console and file logging.
             // Only logs to file if the log level is greater or equal to the warn level.
             var layout = new SimpleLayout(
-                "${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${pad:padding=25:inner=${callsite:includeNamespace=false}}|${message} ${exception:format=tostring}");
+                "${longdate}|${pad:padding=5:inner=${level:uppercase=true}}|${pad:padding=30:inner=${callsite:includeNamespace=false}}|${message} ${exception:format=tostring}");
             var config = new LoggingConfiguration();
 
             var consoleTarget = new AsyncTargetWrapper(
