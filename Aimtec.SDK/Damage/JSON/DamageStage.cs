@@ -68,6 +68,11 @@
         /// <summary>
         ///     The empowered damage stage.
         /// </summary>
-        Empowered
+        Empowered,
+        
+        /// <summary>
+        ///     The effect damage stage.
+        /// </summary>
+        Effect
     }
 }
