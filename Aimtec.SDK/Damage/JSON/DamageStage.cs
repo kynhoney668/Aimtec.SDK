@@ -73,6 +73,11 @@
         /// <summary>
         ///     The effect damage stage.
         /// </summary>
-        Effect
+        Effect,
+        
+        /// <summary>
+        ///     The reduced damage stage.
+        /// </summary>
+        ReducedDamage
     }
 }
