@@ -46,9 +46,19 @@
         ThirdCast,
         
         /// <summary>
-        ///     The against minion damage stage.
+        ///     The against minions damage stage.
         /// </summary>
-        AgainstMinion,
+        AgainstMinions,
+
+        /// <summary>
+        ///     The against monsters damage stage.
+        /// </summary>
+        AgainstMonsters,
+
+        /// <summary>
+        ///     The against turrets damage stage.
+        /// </summary>
+        AgainstTurrets,
 
         /// <summary>
         ///     The buff damage stage.
