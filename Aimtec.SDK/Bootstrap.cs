@@ -55,6 +55,7 @@
             SetupLogging();
             LogUnhandledExceptions();
 
+            TargetSelector.TargetSelector.Load();
             DamageLibrary.LoadDamages();       
             GlobalKeys.Load();
             

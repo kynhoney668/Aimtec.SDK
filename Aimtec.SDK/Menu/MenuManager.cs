@@ -113,25 +113,34 @@
 
         #region Public Methods and Operators
 
-        public Menu Add(MenuComponent menu)
+        public Menu Add(MenuComponent mc)
         {
-            if (this.Children.ContainsKey(menu.AssemblyConfigDirectoryName))
+            var menu = mc as Menu;
+            if (menu != null)
             {
-                throw new Exception($"The menu {menu.InternalName} already exists.");
+                if (menu.Root && menu.RootMenuKey != null)
+                {
+                    if (this.Children.ContainsKey(menu.RootMenuKey))
+                    {
+                        throw new Exception($"The menu {menu.InternalName} already exists.");
+                    }
+
+                    menu.Parent = this;
+
+                    this.Children.Add(menu.RootMenuKey, menu);
+
+                    this.UpdateWidth();
+                }
             }
 
-            menu.Parent = this;
-            this.Children.Add(menu.AssemblyConfigDirectoryName, menu);
-            this.UpdateWidth();
-
-            return (Menu)menu;
+            return menu;
         }
 
         public override Rectangle GetBounds(Vector2 pos)
         {
             return new Rectangle(
-                (int) pos.X,
-                (int) pos.Y,
+                (int)pos.X,
+                (int)pos.Y,
                 this.Width,
                 this.Theme.MenuHeight * this.Menus.Count);
         }
@@ -162,13 +171,13 @@
         public override void WndProc(uint message, uint wparam, int lparam)
         {
             // Drag menu
-            if (message == (int) WindowsMessages.WM_KEYDOWN && wparam == (ulong) KeyCode.ShiftKey)
+            if (message == (int)WindowsMessages.WM_KEYDOWN && wparam == (ulong)KeyCode.ShiftKey)
             {
                 //Console.WriteLine("visible?? key = {0}", (Keys) wparam);
                 this.Visible = true;
             }
 
-            if (message == (int) WindowsMessages.WM_KEYUP && wparam == (ulong) KeyCode.ShiftKey)
+            if (message == (int)WindowsMessages.WM_KEYUP && wparam == (ulong)KeyCode.ShiftKey)
             {
                 //Console.WriteLine("not visible?? key = {0}", (Keys) wparam);
                 this.Visible = false;

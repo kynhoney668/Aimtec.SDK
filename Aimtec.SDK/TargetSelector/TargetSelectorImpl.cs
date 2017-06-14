@@ -10,6 +10,7 @@
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Config;
+    using Aimtec.SDK.Util;
 
     using NLog;
     using NLog.Fluent;
@@ -18,17 +19,17 @@
 
     public class TargetSelectorImpl : ITargetSelector
     {
-        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
-
-        private static Menu Config { get; set; }
+        public Menu Config { get; set; }
 
         private static Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
 
-        private static List<Weight> Weights = new List<Weight>();
+        private Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
-        private static Obj_AI_Hero SelectedHero => HudManager.SelectedUnit as Obj_AI_Hero;
+        private List<Weight> Weights = new List<Weight>();
 
-        private static string[] MaxPriority =
+        public Obj_AI_Hero SelectedHero { get; set; }
+
+        private readonly string[] MaxPriority =
             {
                 "Ahri", "Anivia", "Annie", "Ashe", "Azir", "Brand", "Caitlyn", "Cassiopeia", "Corki", "Draven",
                 "Ezreal", "Graves", "Jinx", "Kalista", "Karma", "Karthus", "Katarina", "Kennen", "KogMaw", "Kindred",
@@ -38,14 +39,14 @@
             };
 
 
-        private static string[] HighPriority =
+        private readonly string[] HighPriority =
             {
                 "Akali", "Diana", "Ekko", "Fiddlesticks", "Fiora", "Fizz", "Heimerdinger", "Jayce", "Kassadin",
                 "Kayle", "Kha'Zix", "Lissandra", "Mordekaiser", "Nidalee", "Riven", "Shaco", "Vladimir", "Yasuo",
                 "Zilean"
             };
 
-        private static string[] MediumPriority =
+        private readonly string[] MediumPriority =
             {
                 "Aatrox", "Darius", "Elise", "Evelynn", "Galio", "Gangplank", "Gragas", "Irelia", "Jax",
                 "Lee Sin", "Maokai", "Morgana", "Nocturne", "Pantheon", "Poppy", "Rengar", "Rumble", "Ryze", "Swain",
@@ -53,7 +54,7 @@
             };
 
 
-        private static string[] LowPriority =
+        private readonly string[] LowPriority =
             {
                 "Alistar", "Amumu", "Bard", "Blitzcrank", "Braum", "Cho'Gath", "Dr. Mundo", "Garen", "Gnar",
                 "Hecarim", "Janna", "Jarvan IV", "Leona", "Lulu", "Malphite", "Nami", "Nasus", "Nautilus", "Nunu",
@@ -62,106 +63,118 @@
             };
 
 
-        private static IEnumerable<Obj_AI_Hero> Enemies => ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy);
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TargetSelectorImpl"/> class.
-        /// </summary>
         public TargetSelectorImpl()
         {
-            CreateMenu();
-            CreateWeights();
-            //RenderManager.OnRender += RenderManagerOnOnRender;
-
-            Logger.Info("Target Selector Created");
+            this.CreateMenu();
+            this.CreateWeights();
+            RenderManager.OnRender += this.RenderManagerOnOnRender;
+            Game.OnWndProc += this.GameOnOnWndProc;
         }
 
-        private static void RenderManagerOnOnRender()
+        private void GameOnOnWndProc(WndProcEventArgs args)
         {
-            var ordered = GetTargetsInOrder(10000).ToList();
-            var basepos = new Vector2(RenderManager.Width / 2f, 0.10f * RenderManager.Height);
-            for (int i = 0; i < ordered.Count(); i++)
+            var message = args.Message;
+            if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
             {
-                var targ = ordered[i];
-                var target = targ.Target;
-                if (target != null)
+                var clickPosition = Game.CursorPos;
+
+                var targets = ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(5000)).OrderBy(x => x.Distance(clickPosition));
+
+                var closestHero = targets.FirstOrDefault(x => x.IsHero);
+
+                if (closestHero != null && Game.CursorPos.Distance(closestHero.Position) <= 300)
                 {
-                    RenderManager.RenderText(basepos + new Vector2(0, i * 15), Color.Red, target.Name + " " + targ.TotalWeight);
+                    this.SelectedHero = closestHero;
+                }
+
+                else
+                {
+                    this.SelectedHero = null;
                 }
             }
         }
 
-        public static void AddWeight(Weight weight)
+        private void RenderManagerOnOnRender()
         {
-            Weights.Add(weight);
+            var indicateSelected = this.Config["Drawings"]["IndicateSelected"].Enabled;
+            var showOrder = this.Config["Drawings"]["ShowOrder"].Enabled;
 
-            var weightMenu = (Menu)Config["WeightsMenu"];
-            var item = weight.MenuItem;
-            weightMenu.Add(item);
+            if (indicateSelected)
+            {
+                if (this.SelectedHero != null && this.SelectedHero.IsValidTarget())
+                {
+                    RenderManager.RenderCircle(
+                        this.SelectedHero.Position,
+                        this.SelectedHero.BoundingRadius,
+                        30,
+                        Color.Red);
+                }
+            }
+
+            if (showOrder)
+            {
+                var ordered = this.GetTargetsInOrder(50000).ToList();
+                var basepos = new Vector2(RenderManager.Width / 2f, 0.10f * RenderManager.Height);
+                for (int i = 0; i < ordered.Count(); i++)
+                {
+                    var targ = ordered[i];
+                    var target = targ.Target;
+                    if (target != null)
+                    {
+                        RenderManager.RenderText(
+                            basepos + new Vector2(0, i * 15),
+                            Color.Red,
+                            target.Name + " " + targ.WeightedAverage);
+                    }
+                }
+            }
         }
 
-
-        public static IOrderedEnumerable<WeightResult> GetTargetsInOrder(float range)
+        public void AddWeight(Weight weight)
         {
-            List<WeightResult> WeightResults = new List<WeightResult>();
+            this.Weights.Add(weight);
+            this.Config["WeightsMenu"].As<Menu>().Add(weight.MenuItem);
+        }
+
+        public IOrderedEnumerable<WeightResult> GetTargetsInOrder(float range)
+        {
+            List<WeightResult> weightResults = new List<WeightResult>();
 
             foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(range)))
             {
-                var weightsValueTotal = Weights.Sum(x => x.WeightValue);
-
-                double heroWeight = 0;
-
-                foreach (var weight in Weights.Where(x => x.MenuItem.Enabled))
-                {
-                    heroWeight += weight.ComputeWeight(hero);
-                }
-
-                var result = new WeightResult { Target = hero, TotalWeight = heroWeight / weightsValueTotal };
-
-
-                WeightResults.Add(result);
+                var result = this.GetWeightedResult(hero);
+                weightResults.Add(result);
             }
 
-            if (SelectedHero != null)
+            if (this.SelectedHero != null)
             {
-                return WeightResults.OrderBy(x => x.Target.NetworkId == SelectedHero.NetworkId).ThenByDescending(x => x.TotalWeight);
+                return weightResults.OrderByDescending(x => x.Target.NetworkId == this.SelectedHero.NetworkId).ThenByDescending(x => x.WeightedAverage);
             }
 
-            var results = WeightResults.OrderByDescending(x => x.TotalWeight);
+            var results = weightResults.OrderByDescending(x => x.WeightedAverage);
 
             return results;
         }
 
-        public static Obj_AI_Hero GetTarget(float range)
+
+        public Obj_AI_Hero GetTarget(float range)
         {
-            if (SelectedHero != null && SelectedHero.IsValidTarget(range))
+            if (this.SelectedHero != null && this.SelectedHero.IsValidTarget(range))
             {
-                return SelectedHero;
+                return this.SelectedHero;
             }
 
-            if (Config["UseWeights"].Enabled)
+            if (this.Config["UseWeights"].Enabled)
             {
-                List<WeightResult> WeightResults = new List<WeightResult>();
+                List<WeightResult> weightResults = new List<WeightResult>();
 
                 foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(range)))
                 {
-                    var weightsValueTotal = Weights.Sum(x => x.WeightValue);
-
-                    double heroWeight = 0;
-
-                    foreach (var weight in Weights.Where(x => x.MenuItem.Enabled))
-                    {
-                        heroWeight += weight.ComputeWeight(hero);
-                    }
-
-                    var result = new WeightResult { Target = hero };
-
-                    result.TotalWeight = heroWeight / weightsValueTotal;
-
-                    WeightResults.Add(result);
+                    var result = this.GetWeightedResult(hero);
+                    weightResults.Add(result);
                 }
 
-                var bestResult = WeightResults.OrderByDescending(x => x.TotalWeight).FirstOrDefault();
+                var bestResult = weightResults.OrderByDescending(x => x.WeightedAverage).FirstOrDefault();
 
                 if (bestResult != null)
                 {
@@ -172,53 +185,52 @@
                 return null;
             }
 
-            return GetHighestPriority(range);
+            return this.GetHighestPriority(range);
 
         }
 
-        public static Obj_AI_Hero GetHighestPriority(float range, bool orbwalkTarget = false)
+        public WeightResult GetWeightedResult(Obj_AI_Hero hero)
         {
-            var validEnemies = Enemies.Where(x => (orbwalkTarget ? x.IsValidAutoRange() : x.IsValidTarget(range)));
-            return validEnemies.OrderByDescending(GetPriority).FirstOrDefault();
+            var weightsValueTotal = this.Weights.Sum(x => x.WeightValue);
+
+            float heroWeight = 0;
+
+            foreach (var weight in this.Weights.Where(x => x.MenuItem.Enabled))
+            {
+                heroWeight += weight.ComputeWeight(hero);
+            }
+
+            var result = new WeightResult { Target = hero, WeightedAverage = heroWeight / weightsValueTotal };
+
+            return result;
+
         }
 
-       
-        Obj_AI_Hero ITargetSelector.GetTarget(float range)
+        public Obj_AI_Hero GetHighestPriority(float range, bool orbwalkTarget = false)
         {
-            return GetTarget(range);
+            var validEnemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => (orbwalkTarget ? x.IsValidAutoRange() : x.IsValidTarget(range)));
+            return validEnemies.OrderByDescending(this.GetPriority).FirstOrDefault();
         }
 
 
         public Obj_AI_Hero GetOrbwalkingTarget()
         {
-            if (SelectedHero != null && SelectedHero.IsValidAutoRange())
+            if (this.SelectedHero != null && this.SelectedHero.IsValidAutoRange())
             {
-                return SelectedHero;
+                return this.SelectedHero;
             }
 
-            if (Config["UseWeights"].Enabled)
+            if (this.Config["UseWeights"].Enabled)
             {
-                List<WeightResult> WeightResults = new List<WeightResult>();
- 
+                List<WeightResult> weightResults = new List<WeightResult>();
+
                 foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsValidAutoRange()))
                 {
-                    var weightsValueTotal = Weights.Sum(x => x.WeightValue);
- 
-                    double heroWeight = 0;
-
-                    foreach (var weight in Weights.Where(x => x.MenuItem.Enabled))
-                    {
-                        heroWeight += weight.ComputeWeight(hero);
-                    }
-
-                    var result = new WeightResult { Target = hero };
-
-                    result.TotalWeight = heroWeight / weightsValueTotal;
-
-                    WeightResults.Add(result);
+                    var result = this.GetWeightedResult(hero);
+                    weightResults.Add(result);
                 }
 
-                var bestResult = WeightResults.OrderByDescending(x => x.TotalWeight).FirstOrDefault();
+                var bestResult = weightResults.OrderByDescending(x => x.WeightedAverage).FirstOrDefault();
 
                 if (bestResult != null)
                 {
@@ -229,29 +241,29 @@
                 return null;
             }
 
-            return GetHighestPriority(0, true);
+            return this.GetHighestPriority(0, true);
         }
 
-        public static TargetPriority GetPriority(Obj_AI_Hero hero)
+        public TargetPriority GetPriority(Obj_AI_Hero hero)
         {
             var name = hero.ChampionName;
 
-            if (MaxPriority.Contains(name))
+            if (this.MaxPriority.Contains(name))
             {
                 return TargetPriority.MaxPriority;
             }
 
-            if (HighPriority.Contains(name))
+            if (this.HighPriority.Contains(name))
             {
                 return TargetPriority.HighPriority;
             }
 
-            if (MediumPriority.Contains(name))
+            if (this.MediumPriority.Contains(name))
             {
                 return TargetPriority.MediumPriority;
             }
 
-            if (LowPriority.Contains(name))
+            if (this.LowPriority.Contains(name))
             {
                 return TargetPriority.LowPriority;
             }
@@ -259,9 +271,7 @@
             return TargetPriority.MinPriority;
         }
 
-
-        //Redefinable weights - these weights can be modified by assemblies so they can be customized per champion if necessary
-        public static Weight DistanceToPlayerWeight = new Weight(
+        public Weight DistanceToPlayerWeight = new Weight(
             "DistanceToPlayerWeight",
             "Distance to Player",
             true,
@@ -269,7 +279,7 @@
             target => target.Distance(Player),
             WeightEffect.LowerIsBetter);
 
-        public static Weight DistanceToMouseWeight = new Weight(
+        public Weight DistanceToMouseWeight = new Weight(
             "DistanceToMouse",
             "Distance to Mouse",
             true,
@@ -277,96 +287,100 @@
             target => target.Distance(Game.CursorPos),
             WeightEffect.LowerIsBetter);
 
-        public static Weight LeastAttacksWeight = new Weight(
+        public Weight LeastAttacksWeight = new Weight(
             "LeastAttacksWeight",
             "Least Attacks",
             true,
             100,
-            target => (int) Math.Ceiling(target.Health / Player.GetAutoAttackDamage(target)), 
+            target => (int)Math.Ceiling(target.Health / Player.GetAutoAttackDamage(target)),
             WeightEffect.LowerIsBetter);
 
 
-        private static void CreateWeights()
+        private void CreateWeights()
         {
-            AddWeight(DistanceToPlayerWeight);
-            AddWeight(DistanceToMouseWeight);
-           //AddWeight(LeastAttacksWeight); //GetAutoAttackDamage(Obj_AI_Hero) is bugsplatting
+            this.AddWeight(this.DistanceToPlayerWeight);
+            this.AddWeight(this.DistanceToMouseWeight);
+            //AddWeight(LeastAttacksWeight); //GetAutoAttackDamage(Obj_AI_Hero) is bugsplatting
 
-            AddWeight(new Weight(
+            this.AddWeight(new Weight(
                 "PriorityWeight",
                 "Most Priority",
                 true,
                 100,
                 target => (int)GetPriority(target), WeightEffect.HigherIsBetter));
 
-            AddWeight(new Weight(
+            this.AddWeight(new Weight(
                 "MaxAttackDamageWeight",
                 "Most AD",
                 true,
                 100,
                 target => target.TotalAttackDamage, WeightEffect.HigherIsBetter));
 
-            AddWeight(new Weight(
+            this.AddWeight(new Weight(
                 "MaxAbilityPowerWeight",
                 "Most AP",
                 true,
                 100,
                 target => target.TotalAbilityDamage, WeightEffect.HigherIsBetter));
 
-            AddWeight(new Weight(
+            this.AddWeight(new Weight(
                 "MinArmorWeight",
                 "Min Armor",
                 true,
                 100,
                 target => target.Armor + target.BonusArmor, WeightEffect.LowerIsBetter));
 
-            AddWeight(new Weight(
+            this.AddWeight(new Weight(
                 "MinMRWeight",
-                "Max MR",
+                "Min MR",
                 true,
                 100,
                 target => target.SpellBlock, WeightEffect.LowerIsBetter));
 
-            AddWeight(new Weight(
+            this.AddWeight(new Weight(
                 "MinHealthWeight",
                 "Min Health",
                 true,
                 100,
-                target => target.TotalAttackDamage, WeightEffect.LowerIsBetter));
-
-
+                target => target.Health, WeightEffect.LowerIsBetter));
         }
 
-        
-        private static void CreateMenu()
-        {
-            Logger.Info("Add default target selector menu");
 
-            Config = new Menu("Aimtec.TS", "Target Selector");
+        private void CreateMenu()
+        {
+            this.Logger.Info("Constructing Menu for default Target Selector");
+
+            this.Config = new Menu("Aimtec.TS", "Target Selector");
 
             var weights = new Menu("WeightsMenu", "Weights");
 
-            Config.Add(weights);
+            this.Config.Add(weights);
 
             var targetsMenu = new Menu("TargetsMenu", "Targets");
 
-            foreach (var enemy in Enemies)
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy))
             {
-                targetsMenu.Add(new MenuSlider("priority" + enemy.ChampionName, enemy.ChampionName, (int) GetPriority(enemy), 1, 5));
+                targetsMenu.Add(new MenuSlider("priority" + enemy.ChampionName, enemy.ChampionName, (int)this.GetPriority(enemy), 1, 5));
             }
 
-            Config.Add(targetsMenu);
+            this.Config.Add(targetsMenu);
 
-            Config.Add(new MenuBool("UseWeights", "Use Weights"));
+            var drawings = new Menu("Drawings", "Drawings");
+            drawings.Add(new MenuBool("IndicateSelected", "Indicate Selected Target"));
+            drawings.Add(new MenuBool("ShowOrder", "Show Target Order"));
+            this.Config.Add(drawings);
 
-            AimtecMenu.Instance.Add(Config);
+
+            this.Config.Add(new MenuBool("UseWeights", "Use Weights"));
+
+    
         }
 
 
         public class WeightResult
         {
             public Obj_AI_Hero Target { get; set; }
-            public double TotalWeight { get; set; }
+            public float WeightedAverage { get; set; }
         }
 
         public class Weight
@@ -428,5 +442,11 @@
             MinPriority = 1,
         }
 
+
+        public void Dispose()
+        {
+            RenderManager.OnRender -= this.RenderManagerOnOnRender;
+            Game.OnWndProc -= this.GameOnOnWndProc;
+        }
     }
 }

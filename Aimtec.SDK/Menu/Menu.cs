@@ -13,8 +13,6 @@
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
 
-    using NLog.Fluent;
-
     /// <summary>
     ///     Class Menu.
     /// </summary>
@@ -47,15 +45,23 @@
         /// <param name="isRoot">Whether this Menu is a root menu</param>
         public Menu(string internalName, string displayName, bool isRoot = false)
         {
-            this.InternalName = internalName;
-            this.DisplayName = displayName;
+            var callingAssembly = Assembly.GetCallingAssembly();
+            GuidAttribute GUID = (GuidAttribute)Attribute.GetCustomAttribute(callingAssembly, typeof(GuidAttribute));
+            var assemblyGuidShort = GUID.Value.Substring(0, 5);
+            var assemblyName = Assembly.GetCallingAssembly().GetName().Name;
+
             this.Root = isRoot;
 
-            var calling = Assembly.GetCallingAssembly();
+            this.AssemblyConfigDirectoryName = $"{assemblyName}.{assemblyGuidShort}";
 
-            GuidAttribute GUID = (GuidAttribute)Attribute.GetCustomAttribute(calling, typeof(GuidAttribute));
+            this.InternalName = internalName;
 
-            this.AssemblyConfigDirectoryName = $"{Assembly.GetCallingAssembly().GetName().Name}.{GUID.Value.Substring(0, 5)}";
+            if (this.Root)
+            {
+                this.RootMenuKey = $"{internalName}.{assemblyGuidShort}";
+            }
+
+            this.DisplayName = displayName;
         }
 
         #endregion
@@ -65,6 +71,12 @@
         internal override string Serialized { get; }
 
         internal int Width { get; set; }
+
+        /// <summary>
+        ///     The internal name of this Menu - adjusted with GUID so it is unique per assembly.
+        ///     This is to allow using the same internal name for root menus across different assemblies.
+        /// </summary>
+        internal string RootMenuKey { get; set; }
 
         #endregion
 
@@ -165,6 +177,12 @@
 
                 this.Children.Add(menuComponent.InternalName, menuComponent);
 
+                //If this instance's root menu is null then it has not been attached and its settings can not be loaded
+                if (this.RootMenu != null)
+                {
+                    menuComponent.LoadValue();
+                }
+
                 this.UpdateWidth();
 
             }
@@ -178,11 +196,8 @@
         /// <returns>IMenu.</returns>
         public virtual Menu Attach()
         {
-            Log.Info().Message("Creating default menu").Write();
-
             if (!this.Root)
             {
-                Log.Error().Message("Cannot attach a menu that is not a root menu.").Write();
                 throw new Exception(
                     $"You can only attach a Root Menu. If this is supposed to be your root menu, set isRoot to true in the constructor.");
             }
@@ -245,7 +260,7 @@
             {
                 var child = this.Children.Values.ToList()[i];
                 child.Position = position
-                    + new Vector2(this.Parent.Width, i * MenuManager.Instance.Theme.MenuHeight);
+                                 + new Vector2(this.Parent.Width, i * MenuManager.Instance.Theme.MenuHeight);
                 child.Render(child.Position);
             }
         }
@@ -296,7 +311,7 @@
                     var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
                     if (longestItem != null)
                     {
-                        width = (int) MenuManager.Instance.TextWidth(mList.DisplayName + longestItem);
+                        width = (int)MenuManager.Instance.TextWidth(mList.DisplayName + longestItem);
                     }
                 }
 

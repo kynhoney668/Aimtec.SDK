@@ -39,14 +39,25 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
-        ///     Ases the point.
+        ///     Converts the Vector2 to a Point
         /// </summary>
         /// <param name="pos">The position.</param>
         /// <returns>Point.</returns>
         public static Point AsPoint(this Vector2 pos)
         {
-            return new Point((int) pos.X, (int) pos.Y);
+            return new Point((int)pos.X, (int)pos.Y);
         }
+
+        /// <summary>
+        ///    Converts the Vector2 To a Vector3
+        /// </summary>
+        /// <param name="pos">The position.</param>
+        /// <returns>Point.</returns>
+        public static Vector3 To3D(this Vector2 v)
+        {
+            return (Vector3)v;
+        }
+
 
         /// <summary>
         ///     Gets distance squared from the segments.
@@ -65,8 +76,8 @@ namespace Aimtec.SDK.Extensions
             var objects = point.ProjectOn(segmentStart, segmentEnd);
 
             return (objects.IsOnSegment || onlyIfOnSegment == false)
-                ? Vector2.DistanceSquared(objects.SegmentPoint, point)
-                : float.MaxValue;
+                       ? Vector2.DistanceSquared(objects.SegmentPoint, point)
+                       : float.MaxValue;
         }
 
         /// <summary>
@@ -131,8 +142,8 @@ namespace Aimtec.SDK.Extensions
             return new IntersectionResult(
                 true,
                 new Vector2(
-                    (float) (lineSegment1Start.X + (r * deltaBAx)),
-                    (float) (lineSegment1Start.Y + (r * deltaBAy))));
+                    (float)(lineSegment1Start.X + (r * deltaBAx)),
+                    (float)(lineSegment1Start.Y + (r * deltaBAy))));
         }
 
         /// <summary>
@@ -174,7 +185,7 @@ namespace Aimtec.SDK.Extensions
                 theta += 360;
             }
 
-            return (float) theta;
+            return (float)theta;
         }
 
         /// <summary>
@@ -193,7 +204,7 @@ namespace Aimtec.SDK.Extensions
             return enemyTurrets;
         }
 
- 
+
         /// <summary>
         ///     Returns the projection of the Vector2 on the segment.
         /// </summary>
@@ -210,7 +221,7 @@ namespace Aimtec.SDK.Extensions
             var bx = segmentEnd.X;
             var by = segmentEnd.Y;
             var rL = (((cx - ax) * (bx - ax)) + ((cy - ay) * (by - ay)))
-                / ((float) Math.Pow(bx - ax, 2) + (float) Math.Pow(by - ay, 2));
+                     / ((float)Math.Pow(bx - ax, 2) + (float)Math.Pow(by - ay, 2));
             var pointLine = new Vector2(ax + (rL * (bx - ax)), ay + (rL * (by - ay)));
             float rS;
             if (rL < 0)

@@ -31,7 +31,7 @@
                     return this.CleanFileName(this.InternalName);
                 }
 
-                return this.CleanFileName($"{this.InternalName}.{this.GetType().Name}");
+                return this.CleanFileName($"{this.InternalName}.{this.GetType().Name}.json");
             }
         }
 
@@ -59,12 +59,7 @@
                     return Path.Combine(this.ConfigBaseFolder, this.ConfigName);
                 }
 
-                if (this.IsMenu)
-                {
-                    return Path.Combine(this.Parent.ConfigPath, this.ConfigName);
-                }
-
-                return Path.Combine(this.Parent.ConfigPath, this.ConfigName + ".json");
+                return Path.Combine(this.Parent.ConfigPath, this.ConfigName);
             }
         }
 
@@ -94,6 +89,39 @@
             if (this.Parent != null)
             {
                 this.Parent.FireOnValueChanged(sender, args);
+            }
+        }
+
+        /// <summary>
+        ///     Gets the Root Menu that this Menu belongs to
+        /// </summary>
+        internal Menu RootMenu
+        {
+            get
+            {
+                if (this.Root)
+                {
+                    return (Menu)this;
+                }
+
+                if (this.Parent != null)
+                {
+                    return this.Parent.RootMenu;
+                }
+
+                return null;
+            }
+        }
+
+
+        /// <summary>
+        /// Removes this component from its parent menu
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.Parent != null)
+            {
+                this.Parent.Children.Remove(this.InternalName);
             }
         }
 
@@ -199,7 +227,9 @@
                 return this.Children[name];
             }
 
-            throw new Exception($"[Menu] Item: {name} was not found in the menu: {this.InternalName}");
+            Console.WriteLine($"[Menu] Item: {name} was not found in the menu: {this.InternalName}");
+
+            return null;
         }
 
         /// <summary>
