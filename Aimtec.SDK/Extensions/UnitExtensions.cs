@@ -109,9 +109,8 @@ namespace Aimtec.SDK.Extensions
         /// </summary>
         /// <param name="unit">the unit.</param>
         /// <param name="range">The range.</param>
-        /// <param name="originalUnit">The original unit.</param>
-        /// <returns>The count.</returns>
-        public static int CountAllyHeroesInRange(this GameObject unit, float range, Obj_AI_Base originalUnit = null)
+        /// <returns>How many ally heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
+        public static int CountAllyHeroesInRange(this GameObject unit, float range)
         {
             return unit.Position.CountAllyHeroesInRange(range);
         }
@@ -122,7 +121,7 @@ namespace Aimtec.SDK.Extensions
         /// <param name="unit">the unit.</param>
         /// <param name="range">The range.</param>
         /// <param name="originalUnit">The original unit.</param>
-        /// <returns>The count.</returns>
+        /// <returns>How many enemy heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
         public static int CountEnemyHeroesInRange(this GameObject unit, float range, Obj_AI_Base originalUnit = null)
         {
             return unit.Position.CountEnemyHeroesInRange(range, originalUnit);
