@@ -149,7 +149,7 @@
             {
                 // Todo makes this load based on game version
                 using (var stream = Assembly.GetExecutingAssembly()
-                                            .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.11.json"))
+                                            .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.12.json"))
                 {
                     if (stream == null)
                     {
