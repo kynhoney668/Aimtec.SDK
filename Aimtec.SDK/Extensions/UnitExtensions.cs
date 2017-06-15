@@ -120,11 +120,11 @@ namespace Aimtec.SDK.Extensions
         /// </summary>
         /// <param name="unit">the unit.</param>
         /// <param name="range">The range.</param>
-        /// <param name="originalUnit">The original unit.</param>
+        /// <param name="dontIncludeStartingUnit">The original unit.</param>
         /// <returns>How many enemy heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
-        public static int CountEnemyHeroesInRange(this GameObject unit, float range, Obj_AI_Base originalUnit = null)
+        public static int CountEnemyHeroesInRange(this GameObject unit, float range, Obj_AI_Base dontIncludeStartingUnit = null)
         {
-            return unit.Position.CountEnemyHeroesInRange(range, originalUnit);
+            return unit.Position.CountEnemyHeroesInRange(range, dontIncludeStartingUnit);
         }
 
         /// <summary>
