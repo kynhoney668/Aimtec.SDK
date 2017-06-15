@@ -160,6 +160,16 @@ namespace Aimtec.SDK.Extensions
         {
             return unit.Mana / unit.MaxMana * 100;
         }
+        
+        /// <summary>
+        ///     Returns a determined buff a determined unit has.
+        /// </summary>
+        /// <param name="unit">The unit.</param>
+        /// <param name="buffName">The buff's stringname</param>
+        public static Buff GetBuff(this Obj_AI_Base unit, string buffName)
+        {
+            return unit.BuffManager.GetBuff(buffName);
+        }
 
         /// <summary>
         ///     Determines whether the specified target is inside a determined range.
