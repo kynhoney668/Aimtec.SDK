@@ -113,7 +113,7 @@
 
         #region Public Methods and Operators
 
-        public Menu Add(MenuComponent mc)
+        public new Menu Add(MenuComponent mc)
         {
             var menu = mc as Menu;
             if (menu != null)
@@ -195,7 +195,7 @@
             }
         }
 
-        public override Menu Attach()
+        public new Menu Attach()
         {
             throw new NotImplementedException();
         }

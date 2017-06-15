@@ -5,6 +5,7 @@
 
     using NLog;
     using NLog.Fluent;
+    using System.Linq;
 
     /// <summary>
     ///     Target Selector Class
@@ -87,6 +88,15 @@
         {
             return Implementation.GetOrbwalkingTarget();
         }
+
+        /// <summary>
+        ///     Gets an ordered enumerable of the available targets within the range based on their priority ranking by the Target Selector
+        /// </summary>
+        public IOrderedEnumerable<Obj_AI_Hero> GetOrderedTargets(float range)
+        {
+            return Implementation.GetOrderedTargets(range);
+        }
+            
 
         /// <summary>
         ///     Disposes the current instance

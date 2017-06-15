@@ -3,6 +3,8 @@
     using System;
 
     using Aimtec.SDK.Menu;
+    using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>
     /// The base class for target selector.
@@ -20,6 +22,13 @@
         /// <param name="range">The range.</param>
         /// <returns></returns>
         Obj_AI_Hero GetTarget(float range);
+
+        /// <summary>
+        /// Gets the target.
+        /// </summary>
+        /// <param name="range">The range.</param>
+        /// <returns></returns>
+        IOrderedEnumerable<Obj_AI_Hero> GetOrderedTargets(float range);
 
         /// <summary>
         /// Gets the target for the Orbwalker to attack

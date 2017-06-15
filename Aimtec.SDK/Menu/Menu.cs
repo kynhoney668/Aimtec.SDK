@@ -156,7 +156,7 @@
         /// </summary>
         /// <param name="menuComponent">The menu.</param>
         /// <returns>IMenu.</returns>
-        public virtual Menu Add(MenuComponent menuComponent)
+        public Menu Add(MenuComponent menuComponent)
         {
             if (menuComponent != null)
             {
@@ -194,7 +194,7 @@
         ///     Attaches this instance.
         /// </summary>
         /// <returns>IMenu.</returns>
-        public virtual Menu Attach()
+        public Menu Attach()
         {
             if (!this.Root)
             {

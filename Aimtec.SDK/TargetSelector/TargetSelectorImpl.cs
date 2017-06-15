@@ -130,13 +130,8 @@
             }
         }
 
-        public void AddWeight(Weight weight)
-        {
-            this.Weights.Add(weight);
-            this.Config["WeightsMenu"].As<Menu>().Add(weight.MenuItem);
-        }
-
-        public IOrderedEnumerable<WeightResult> GetTargetsInOrder(float range)
+        //For testing purposes...
+        internal IOrderedEnumerable<WeightResult> GetTargetsInOrder(float range)
         {
             List<WeightResult> weightResults = new List<WeightResult>();
 
@@ -154,6 +149,25 @@
             var results = weightResults.OrderByDescending(x => x.WeightedAverage);
 
             return results;
+        }
+
+
+
+        public void AddWeight(Weight weight)
+        {
+            this.Weights.Add(weight);
+            this.Config["WeightsMenu"].As<Menu>().Add(weight.MenuItem);
+        }
+
+
+        public IOrderedEnumerable<Obj_AI_Hero> GetOrderedTargets(float range)
+        {
+            var enemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(range));
+            if (this.SelectedHero != null && this.SelectedHero.IsValidTarget(range))
+            {
+                return enemies.OrderByDescending(x => x.NetworkId == this.SelectedHero.NetworkId).ThenByDescending(x => GetWeightedResult(x).WeightedAverage);
+            }
+            return enemies.OrderByDescending(x => GetWeightedResult(x).WeightedAverage);
         }
 
 
@@ -191,19 +205,15 @@
 
         public WeightResult GetWeightedResult(Obj_AI_Hero hero)
         {
-            var weightsValueTotal = this.Weights.Sum(x => x.WeightValue);
+            var enabledWeights = this.Weights.Where(x => x.MenuItem.Enabled);
 
-            float heroWeight = 0;
+            var heroWeight = enabledWeights.Sum(x => x.ComputeWeight(hero));
 
-            foreach (var weight in this.Weights.Where(x => x.MenuItem.Enabled))
-            {
-                heroWeight += weight.ComputeWeight(hero);
-            }
+            var weightsValueTotal = enabledWeights.Sum(x => x.WeightValue);
 
-            var result = new WeightResult { Target = hero, WeightedAverage = heroWeight / weightsValueTotal };
+            var weightedAverage = heroWeight / weightsValueTotal;
 
-            return result;
-
+            return new WeightResult { Target = hero, WeightedAverage = weightedAverage };
         }
 
         public Obj_AI_Hero GetHighestPriority(float range, bool orbwalkTarget = false)
@@ -448,5 +458,7 @@
             RenderManager.OnRender -= this.RenderManagerOnOnRender;
             Game.OnWndProc -= this.GameOnOnWndProc;
         }
+
+  
     }
 }
