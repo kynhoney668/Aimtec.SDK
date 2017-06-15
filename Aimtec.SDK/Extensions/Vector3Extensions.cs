@@ -51,11 +51,11 @@ namespace Aimtec.SDK.Extensions
         /// </summary>
         /// <param name="vector3">The vector3.</param>
         /// <param name="range">The range.</param>
-        /// <param name="originalUnit">The original unit.</param>
+        /// <param name="dontIncludeStartingUnit">The starting unit which should not be included in the counting.</param>
         /// <returns>How many enemy heroes are inside a 'float' range from the starting 'vector3' point.</returns>
-        public static int CountEnemyHeroesInRange(this Vector3 vector3, float range, Obj_AI_Base originalUnit = null)
+        public static int CountEnemyHeroesInRange(this Vector3 vector3, float range, Obj_AI_Base dontIncludeStartingUnit = null)
         {
-            return GameObjects.EnemyHeroes.Count(h => h.NetworkId != originalUnit?.NetworkId && h.IsValidTarget(range, true, vector3));
+            return GameObjects.EnemyHeroes.Count(h => h.NetworkId != dontIncludeStartingUnit?.NetworkId && h.IsValidTarget(range, true, vector3));
         }
         
         /// <summary>
