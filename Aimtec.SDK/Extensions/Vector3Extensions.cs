@@ -36,6 +36,29 @@ namespace Aimtec.SDK.Extensions
         }
         
         /// <summary>
+        ///     Counts the ally heroes in range.
+        /// </summary>
+        /// <param name="vector3">The vector3.</param>
+        /// <param name="range">The range.</param>
+        /// <returns>How many ally heroes are inside a 'float' range from the starting 'vector3' point.</returns>
+        public static int CountAllyHeroesInRange(this Vector3 vector3, float range)
+        {
+            return GameObjects.AllyHeroes.Count(h => !h.IsMe && h.IsValidTarget(range, false, vector3));
+        }
+
+        /// <summary>
+        ///     Counts the enemy heroes in range.
+        /// </summary>
+        /// <param name="vector3">The vector3.</param>
+        /// <param name="range">The range.</param>
+        /// <param name="originalUnit">The original unit.</param>
+        /// <returns>How many enemy heroes are inside a 'float' range from the starting 'vector3' point.</returns>
+        public static int CountEnemyHeroesInRange(this Vector3 vector3, float range, Obj_AI_Base originalUnit = null)
+        {
+            return GameObjects.EnemyHeroes.Count(h => h.NetworkId != originalUnit?.NetworkId && h.IsValidTarget(range, true, vector3));
+        }
+        
+        /// <summary>
         ///     Extends a Vector3 to another Vector3.
         /// </summary>
         /// <param name="vector3">the starting position.</param>
