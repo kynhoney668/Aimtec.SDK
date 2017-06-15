@@ -103,6 +103,30 @@ namespace Aimtec.SDK.Extensions
 
             return baseRange + target.BoundingRadius;
         }
+        
+        /// <summary>
+        ///     Counts the ally heroes in range.
+        /// </summary>
+        /// <param name="unit">the unit.</param>
+        /// <param name="range">The range.</param>
+        /// <param name="originalUnit">The original unit.</param>
+        /// <returns>The count.</returns>
+        public static int CountAllyHeroesInRange(this GameObject unit, float range, Obj_AI_Base originalUnit = null)
+        {
+            return unit.Position.CountAllyHeroesInRange(range);
+        }
+
+        /// <summary>
+        ///     Counts the enemy heroes in range.
+        /// </summary>
+        /// <param name="unit">the unit.</param>
+        /// <param name="range">The range.</param>
+        /// <param name="originalUnit">The original unit.</param>
+        /// <returns>The count.</returns>
+        public static int CountEnemyHeroesInRange(this GameObject unit, float range, Obj_AI_Base originalUnit = null)
+        {
+            return unit.Position.CountEnemyHeroesInRange(range, originalUnit);
+        }
 
         /// <summary>
         ///     Determines whether the specified target has a determined buff.
