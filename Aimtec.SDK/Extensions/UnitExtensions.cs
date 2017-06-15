@@ -114,7 +114,7 @@ namespace Aimtec.SDK.Extensions
         /// </returns>
         public static bool HasBuff(this Obj_AI_Base from, string buffname)
         {
-            return from.Buffs.Any(b => b.IsValid && string.Equals(b.Name, buffname, StringComparison.CurrentCultureIgnoreCase));
+            return from.Buffs.Any(b => b.IsActive && string.Equals(b.Name, buffname, StringComparison.CurrentCultureIgnoreCase));
         }
 
         /// <summary>

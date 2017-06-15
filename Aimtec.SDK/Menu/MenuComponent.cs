@@ -232,7 +232,6 @@
 
             Logger.Info("[Menu] Item: {0} was not found in the menu: {1}", name, this.InternalName);
 
-
             return null;
         }
 
