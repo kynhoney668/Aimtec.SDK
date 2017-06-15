@@ -200,10 +200,25 @@ namespace Aimtec.SDK.Extensions
 
         public static bool PointUnderEnemyTurret(this Vector2 point)
         {
-            var enemyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && Vector2.Distance(point, t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            var enemyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && point.Distance(t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
             return enemyTurrets;
         }
 
+        public static bool PointUnderAllyTurret(this Vector2 point)
+        {
+            var allyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsAlly && point.Distance(t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            return allyTurrets;
+        }
+
+        public static bool IsUnderEnemyTurret(this GameObject obj)
+        {
+            return obj.Position.PointUnderEnemyTurret();
+        }
+
+        public static bool IsUnderAllyTurret(this GameObject obj)
+        {
+            return obj.Position.PointUnderAllyTurret();
+        }
 
         /// <summary>
         ///     Returns the projection of the Vector2 on the segment.
