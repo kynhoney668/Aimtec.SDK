@@ -23,12 +23,16 @@ namespace Aimtec.SDK.Extensions
             return (Vector2) v;
         }
 
-        public static bool PointUnderEnemyTurret(this Vector3 Point)
+        public static bool PointUnderEnemyTurret(this Vector3 point)
         {
-            var EnemyTurrets =
-                ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && Vector3.Distance(Point, t.Position) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            var enemyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && point.Distance(t.Position) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            return enemyTurrets;
+        }
 
-            return EnemyTurrets;
+        public static bool PointUnderAllyTurret(this Vector3 point)
+        {
+            var allyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsAlly && point.Distance(t.Position) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            return allyTurrets;
         }
     }
 }
