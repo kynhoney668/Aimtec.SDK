@@ -10,12 +10,15 @@
 
     using Newtonsoft.Json;
 
+    using NLog;
+
     /// <summary>
     ///     Class MenuComponent.
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Menu.IMenuComponent" />
     public abstract class MenuComponent : IMenuComponent
     {
+        private static Logger Logger => LogManager.GetCurrentClassLogger();
 
         #region Internal Properties
         internal abstract string Serialized { get; }
@@ -227,7 +230,8 @@
                 return this.Children[name];
             }
 
-            Console.WriteLine($"[Menu] Item: {name} was not found in the menu: {this.InternalName}");
+            Logger.Info("[Menu] Item: {0} was not found in the menu: {1}", name, this.InternalName);
+
 
             return null;
         }
