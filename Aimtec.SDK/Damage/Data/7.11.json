@@ -3131,7 +3131,7 @@
         }
       },
       {
-        "Stage":"AgainstMinion",
+        "Stage":"AgainstMinions",
         "SpellData":{
           "SpellEffectType":"Attack",
           "DamageType":"Magical",
@@ -5396,7 +5396,7 @@
         }
       },
       {
-        "Stage":"AgainstMinion",
+        "Stage":"AgainstMinions",
         "SpellData":{
           "SpellEffectType":"AoE",
           "DamageType":"Physical",
@@ -6462,7 +6462,7 @@
         }
       },
       {
-        "Stage":"AgainstMinion",
+        "Stage":"AgainstMinions",
         "SpellData":{
           "SpellEffectType":"AoE",
           "DamageType":"Magical",
@@ -6606,7 +6606,7 @@
         }
       },
       {
-        "Stage":"AgainstMinion",
+        "Stage":"AgainstMinions",
         "SpellData":{
           "SpellEffectType":"AoE",
           "DamageType":"Physical",
@@ -6852,7 +6852,7 @@
         }
       },
       {
-        "Stage":"AgainstMinion",
+        "Stage":"AgainstMinions",
         "SpellData":{
           "SpellEffectType":"AoE",
           "DamageType":"Physical",
