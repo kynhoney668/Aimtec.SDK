@@ -102,16 +102,10 @@
         public bool IsChargedSpell { get; set; }
 
         /// <summary>
-        ///     Gets or sets a value indicating whether this instance is charging.
-        /// </summary>
-        /// <value><c>true</c> if this instance is charging; otherwise, <c>false</c>.</value>
-        public bool IsCharging { get; set; }
-
-        /// <summary>
         ///     Gets a value indicating whether this instance is charing.
         /// </summary>
         /// <value><c>true</c> if this instance is charing; otherwise, <c>false</c>.</value>
-        public bool IsCharing => this.Ready && (Player.HasBuff(this.ChargedBuffName)
+        public bool IsCharging => this.Ready && (Player.HasBuff(this.ChargedBuffName)
             || GameData.TickCount - this.chargedCastedT < 300 + Game.Ping);
 
         /// <summary>
