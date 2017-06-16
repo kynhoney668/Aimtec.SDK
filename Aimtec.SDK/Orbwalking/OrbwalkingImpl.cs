@@ -21,7 +21,6 @@ namespace Aimtec.SDK.Orbwalking
             Obj_AI_Base.OnProcessAutoAttack += this.ObjAiHeroOnProcessAutoAttack;
             Obj_AI_Base.OnProcessSpellCast += this.ObjAiBaseOnOnProcessSpellCast;
             Game.OnUpdate += this.Game_OnUpdate;
-            GameObject.OnCreate += this.GameObject_OnCreate;
             this.CreateMenu();
         }
 
@@ -38,23 +37,26 @@ namespace Aimtec.SDK.Orbwalking
 
         public float AnimationTime => Player.AttackCastDelay * 1000;
 
-        public float WindUpTime => Player.AttackDelay * 1000;
+        public float WindUpTime => AnimationTime + ExtraWindUp;
+
+        public float AttackCoolDownTime => Player.AttackDelay * 1000;
 
         protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick
-                                      >= this.WindUpTime;
+                                      >= AttackCoolDownTime;
 
         //if we can move without cancelling the autoattack using the time the server processed our auto attack
-        private bool CanMoveServer => Game.TickCount + Game.Ping / 2
-                                      >= this.ServerAttackDetectionTick + this.AnimationTime + this.ExtraWindUp;
+        private bool CanMoveServer => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick >= this.WindUpTime;
 
         //if we can move without cancelling the autoattack using the time the we actually sent out the auto attack
         protected bool CanMoveLocal => Game.TickCount
-                                       >= this.LastAttackCommandSentTime + this.AnimationTime + this.ExtraWindUp;
+                                       >= this.LastAttackCommandSentTime + this.WindUpTime;
 
         public bool CanMove => Player.Distance(Game.CursorPos) > this.HoldPositionRadius &&
             (NoCancelChamps.Contains(Player.ChampionName) || this.CanMoveServer && this.CanMoveLocal);
 
-        public bool CanAttack => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick >= this.WindUpTime;
+        public bool CanAttack => AttackReady;
+
+        public bool SafeToIssueCommand => CanMoveServer && CanMoveLocal;
 
         public bool DisableAttacks { get; set; }
 
@@ -72,7 +74,6 @@ namespace Aimtec.SDK.Orbwalking
         protected int HoldPositionRadius => this.config["holdPositionRadius"].Value;
 
         protected int ExtraWindUp => this.config["extraWindup"].Value;
-
 
 
         //Members
@@ -120,6 +121,8 @@ namespace Aimtec.SDK.Orbwalking
             };
 
         private static readonly string[] NoCancelChamps = { "Kalista" };
+
+        private AttackableUnit ForcedTarget { get; set; }
 
         private void CreateMenu()
         {
@@ -177,53 +180,42 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (sender.IsMe)
             {
-                this.ServerAttackDetectionTick = Game.TickCount - Game.Ping / 2;
-
                 var targ = args.Target as AttackableUnit;
                 if (targ != null)
                 {
+                    this.ServerAttackDetectionTick = Game.TickCount - Game.Ping / 2;
                     this.LastTarget = targ;
+                    this.ForcedTarget = null;
+                    DelayAction.Queue((int)WindUpTime + 50, () => FirePostAttack(targ));
                 }
             }
         }
 
         public void Orbwalk(AttackableUnit target, bool move = true, bool attack = true)
         {
+            if (!this.SafeToIssueCommand)
+            {
+                return;
+            }
+
             if (this.AttackReady && target != null && !this.ShouldNotAttack)
             {
-                var args = this.FirePreAttack(target);
+                var preAttackargs = this.FirePreAttack(target);
 
-                if (!args.Cancel)
+                if (!preAttackargs.Cancel)
                 {
                     Player.IssueOrder(OrderType.AttackUnit, target);
-                    this.LastAttackCommandSentTime = Game.TickCount;
+                    this.LastAttackCommandSentTime = Game.TickCount;           
                 }
             }
 
             if (this.CanMove)
             {
-                var args = this.FirePreMove(Game.CursorPos);
+                var preMoveArgs = this.FirePreMove(Game.CursorPos);
 
-                if (!args.Cancel)
+                if (!preMoveArgs.Cancel)
                 {
                     Player.IssueOrder(OrderType.MoveTo, Game.CursorPos);
-                }
-            }
-        }
-
-        private void GameObject_OnCreate(GameObject sender)
-        {
-            if (sender != null)
-            {
-                var mc = sender as MissileClient;
-
-                if (mc != null && mc.SpellCaster.IsMe)
-                {
-                    var unit = mc.Target as AttackableUnit;
-                    if (unit != null)
-                    {
-                        this.FirePostAttack(unit);
-                    }
                 }
             }
         }
@@ -342,8 +334,12 @@ namespace Aimtec.SDK.Orbwalking
 
         public AttackableUnit GetTarget()
         {
-            var mode = this.GetCurrentMode();
+            if (this.ForcedTarget != null && this.ForcedTarget.IsValidAutoRange())
+            {
+                return ForcedTarget;
+            }
 
+            var mode = this.GetCurrentMode();
             if (mode == OrbwalkingMode.Combo)
             {
                 var targ = this.GetHeroTarget();
@@ -384,7 +380,7 @@ namespace Aimtec.SDK.Orbwalking
 
         public void ForceTarget(AttackableUnit unit)
         {
-
+            this.ForcedTarget = unit;
         }
 
         public bool IsReset(string missileName)
@@ -422,7 +418,7 @@ namespace Aimtec.SDK.Orbwalking
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
             IEnumerable<Obj_AI_Base> minions = attackableUnits.Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>()
-                .OrderByDescending(x => x.MaxHealth).ThenBy(x => x.NetworkId == this.LastTarget?.NetworkId);
+                .OrderByDescending(x => x.MaxHealth).ThenByDescending(x => x.NetworkId == this.LastTarget?.NetworkId);
 
             var minionTurretAggro = minions.FirstOrDefault(x => this.HealthPrediction.GetAggroData(x).HasTurretAggro);
 
@@ -452,7 +448,7 @@ namespace Aimtec.SDK.Orbwalking
                     //Our auto can reach sooner than the turret auto
                     else
                     {
-                        if (dmgauto > minionTurretAggro.Health || dmgauto > predHealth1Auto)
+                        if (Math.Ceiling(dmgauto - minionTurretAggro.Health) <= 0 || dmgauto > predHealth1Auto)
                         {
                             return minionTurretAggro;
                         }
@@ -506,7 +502,7 @@ namespace Aimtec.SDK.Orbwalking
                 return structure;
             }
 
-            foreach (var minion in minions.OrderByDescending(x => Math.Ceiling(this.GetPredictedHealth(x) / Player.GetAutoAttackDamage(x))).ThenBy(x => x.NetworkId == this.LastTarget?.NetworkId))
+            foreach (var minion in minions.OrderByDescending(x => Math.Ceiling(this.GetPredictedHealth(x) / Player.GetAutoAttackDamage(x))).ThenByDescending(x => x.NetworkId == this.LastTarget?.NetworkId))
             {
                 var predHealth = this.GetPredictedHealth(minion) - 1;
 
@@ -527,10 +523,12 @@ namespace Aimtec.SDK.Orbwalking
 
                 var autos = Math.Ceiling(predHealth / Player.GetAutoAttackDamage(minion));
   
-                if (autos >= 2)
+                if (data.IncomingAttacks.Count >= 1 && autos == 2)
                 {
-                    return minion;
-                } 
+                    return null;
+                }
+
+                return minion;
             }
 
             //Heros
@@ -609,9 +607,9 @@ namespace Aimtec.SDK.Orbwalking
         int TimeForAutoToReachTarget(AttackableUnit minion)
         {
             var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
-            var ms = Player.BasicAttack.MissileSpeed * 1000;
+            var ms = Player.IsMelee ? int.MaxValue : Player.BasicAttack.MissileSpeed * 1000;
 
-            return (int)(this.AnimationTime + (Game.Ping / 2f) + (int)Math.Max(0, dist / ms));
+            return (int)(this.WindUpTime + (Game.Ping / 2f) + (int)Math.Max(0, dist / ms));
         }
 
         bool CanKillMinion(Obj_AI_Base minion, int time = 0)
@@ -663,7 +661,7 @@ namespace Aimtec.SDK.Orbwalking
         int GetPredictedHealth(Obj_AI_Base minion, int time = 0)
         {
             var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
-            return (int)this.HealthPrediction.GetPrediction(minion, rtime);
+            return (int) Math.Ceiling(this.HealthPrediction.GetPrediction(minion, rtime));
         }
 
         bool ShouldWaitMinion(Obj_AI_Base minion)

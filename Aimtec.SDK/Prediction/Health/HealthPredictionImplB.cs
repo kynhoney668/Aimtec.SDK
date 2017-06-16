@@ -7,7 +7,7 @@
     using Damage;
 
     using Aimtec.SDK.Extensions;
-
+    using System.Drawing;
 
     class HealthPredictionImplB : IHealthPrediction
     {
@@ -21,7 +21,6 @@
         {
             Game.OnUpdate += this.GameOnUpdate;
             Obj_AI_Base.OnProcessAutoAttack += this.ObjAiBaseOnOnProcessAutoAttack;
-            SpellBook.OnStopCast += this.SpellBookOnOnStopCast;
             GameObject.OnDestroy += this.GameObjectOnOnDestroy;
             Obj_AI_Base.OnPerformCast += this.Obj_AI_Base_OnPerformCast;
         }
@@ -32,7 +31,7 @@
             {
                 foreach (var value in this.incomingAttacks.Values)
                 {
-                    value.RemoveAll(x => (x.Sender.IsMelee && x.Sender.NetworkId == sender.NetworkId));
+                    value.RemoveAll(x => ((x.Sender == null || x.Target == null) || x.Sender.IsMelee && x.Sender.NetworkId == sender.NetworkId));
                 }
             }
         }
@@ -53,20 +52,6 @@
             }
         }
 
-
-        private void SpellBookOnOnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
-        {
-            if (!e.StopAnimation || (!(sender is Obj_AI_Minion) || sender.Type == GameObjectType.obj_AI_Turret))
-            {
-                return;
-            }
-
-            foreach (var value in this.incomingAttacks.Values)
-            {
-                value.RemoveAll(x => (x.Sender.IsMelee && x.Sender.NetworkId == sender.NetworkId));
-            }
-        }
-
         private void GameObjectOnOnDestroy(GameObject sender)
         {
             var mc = sender as MissileClient;
@@ -76,7 +61,7 @@
                 var source = mc.SpellCaster;
                 var targ = mc.Target as Obj_AI_Base;
 
-                if (targ != null)
+                if (source != null && targ != null)
                 {
                     foreach (var value in this.incomingAttacks.Values)
                     {
@@ -189,7 +174,7 @@
             foreach (var attack in incAttacksUnit)
             {
                 //if this attack will take longer than the specified time to reach the target, then ignore it
-                if (attack.ETA > time && (!attack.Sender.IsMelee || attack.Active))
+                if (attack.ETA > time)
                 {
                     continue;
                 }
@@ -307,7 +292,7 @@
             private float extraDelay = 0;
 
             public override float RangedTravelTime => (this.Distance / this.Missilespeed) * 1000
-                                                      + (this.Sender.AttackCastDelay * 1000) + this.extraDelay;
+                                                      + (this.Sender.AttackCastDelay * 1000) + this.extraDelay + 40;
 
             public override float MeleeTravelTime => (this.Sender.AttackCastDelay * 1000) + this.extraDelay;
 
