@@ -1,8 +1,12 @@
 ﻿namespace Aimtec.SDK
 {
+    using System;
+
+    using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Prediction;
     using Aimtec.SDK.Prediction.Collision;
     using Aimtec.SDK.Prediction.Skillshots;
+    using Aimtec.SDK.Util;
 
     using NLog;
 
@@ -11,6 +15,16 @@
     /// </summary>
     public class Spell
     {
+        #region Fields
+
+        private int chargedCastedT;
+
+        private int chargeReqSentT;
+
+        private float range = float.MaxValue;
+
+        #endregion
+
         #region Constructors and Destructors
 
         /// <summary>
@@ -40,6 +54,36 @@
         #region Public Properties
 
         /// <summary>
+        ///     Gets or sets the name of the charged buff.
+        /// </summary>
+        /// <value>The name of the charged buff.</value>
+        public string ChargedBuffName { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the charged maximum range.
+        /// </summary>
+        /// <value>The charged maximum range.</value>
+        public int ChargedMaxRange { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the charged minimum range.
+        /// </summary>
+        /// <value>The charged minimum range.</value>
+        public int ChargedMinRange { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the name of the charged spell.
+        /// </summary>
+        /// <value>The name of the charged spell.</value>
+        public string ChargedSpellName { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the duration of the charge.
+        /// </summary>
+        /// <value>The duration of the charge.</value>
+        public float ChargeDuration { get; set; }
+
+        /// <summary>
         ///     Gets or sets the delay.
         /// </summary>
         /// <value>The delay.</value>
@@ -52,6 +96,25 @@
         public HitChance HitChance { get; set; }
 
         /// <summary>
+        ///     Gets or sets a value indicating whether this instance is charged spell.
+        /// </summary>
+        /// <value><c>true</c> if this instance is charged spell; otherwise, <c>false</c>.</value>
+        public bool IsChargedSpell { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether this instance is charging.
+        /// </summary>
+        /// <value><c>true</c> if this instance is charging; otherwise, <c>false</c>.</value>
+        public bool IsCharging { get; set; }
+
+        /// <summary>
+        ///     Gets a value indicating whether this instance is charing.
+        /// </summary>
+        /// <value><c>true</c> if this instance is charing; otherwise, <c>false</c>.</value>
+        public bool IsCharing => this.Ready && (Player.HasBuff(this.ChargedBuffName)
+            || GameData.TickCount - this.chargedCastedT < 300 + Game.Ping);
+
+        /// <summary>
         ///     Gets or sets a value indicating whether this instance is skill shot.
         /// </summary>
         /// <value><c>true</c> if this instance is skill shot; otherwise, <c>false</c>.</value>
@@ -61,7 +124,28 @@
         ///     Gets or sets the range.
         /// </summary>
         /// <value>The range.</value>
-        public float Range { get; set; } = float.MaxValue;
+        public float Range
+        {
+            get
+            {
+                if (!this.IsChargedSpell)
+                {
+                    return this.range;
+                }
+
+                if (this.IsCharging)
+                {
+                    return this.ChargedMinRange + Math.Min(
+                        this.ChargedMaxRange - this.ChargedMinRange,
+                        (GameData.TickCount - this.chargedCastedT) * (this.ChargedMaxRange - this.ChargedMinRange)
+                        / this.ChargeDuration - 150);
+                }
+
+                return this.ChargedMaxRange;
+            }
+
+            set => this.range = value;
+        }
 
         /// <summary>
         ///     Gets a value indicating whether this <see cref="Spell" /> is ready.
@@ -120,15 +204,24 @@
         /// <returns><c>true</c> if the spell was casted, <c>false</c> otherwise.</returns>
         public bool Cast(Obj_AI_Base target)
         {
-            if (!this.IsSkillShot)
+            if (!this.IsSkillShot && !this.IsChargedSpell)
             {
                 return Player.SpellBook.CastSpell(this.Slot, target);
             }
 
             var prediction = Prediction.Skillshots.Prediction.Instance.GetPrediction(this.GetPredictionInput(target));
 
-            return prediction.HitChance >= this.HitChance
-                && Player.SpellBook.CastSpell(this.Slot, prediction.CastPosition);
+            if (prediction.HitChance < this.HitChance)
+            {
+                return false;
+            }
+
+            if (this.IsChargedSpell)
+            {
+                return this.IsCharging ? ShootChargedSpell(this.Slot, prediction.CastPosition) : this.StartCharging();
+            }
+
+            return Player.SpellBook.CastSpell(this.Slot, prediction.CastPosition);
         }
 
         /// <summary>
@@ -165,6 +258,102 @@
         public bool Cast(Vector3 position)
         {
             return Player.SpellBook.CastSpell(this.Slot, position);
+        }
+
+        /// <summary>
+        ///     Casts the on unit.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        public bool CastOnUnit(GameObject obj)
+        {
+            return Player.SpellBook.CastSpell(this.Slot, obj);
+        }
+
+        /// <summary>
+        ///     Gets the prediction.
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns>PredictionOutput.</returns>
+        public PredictionOutput GetPrediction(Obj_AI_Base target)
+        {
+            return Prediction.Skillshots.Prediction.Implementation.GetPrediction(this.GetPredictionInput(target));
+        }
+
+        /// <summary>
+        ///     Gets the prediction input.
+        /// </summary>
+        /// <param name="target">The target.</param>
+        /// <returns>PredictionInput.</returns>
+        public PredictionInput GetPredictionInput(Obj_AI_Base target)
+        {
+            return new PredictionInput()
+            {
+                CollisionObjects = CollisionableObjects.Minions,
+                Delay = this.Delay,
+                Radius = this.Width,
+                Speed = this.Speed,
+                Range = this.Range,
+                Target = target,
+                Unit = Player
+            };
+        }
+
+        /// <summary>
+        ///     Sets the charged.
+        /// </summary>
+        /// <param name="spellName">Name of the spell.</param>
+        /// <param name="buffName">Name of the buff.</param>
+        /// <param name="minRange">The minimum range.</param>
+        /// <param name="maxRange">The maximum range.</param>
+        /// <param name="chargeDurationSeconds">The charge duration in seconds.</param>
+        public void SetCharged(
+            string spellName,
+            string buffName,
+            int minRange,
+            int maxRange,
+            float chargeDurationSeconds)
+        {
+            this.IsChargedSpell = true;
+            this.ChargedSpellName = spellName;
+            this.ChargedBuffName = buffName;
+            this.ChargedMaxRange = maxRange;
+            this.ChargedMinRange = minRange;
+            this.ChargeDuration = chargeDurationSeconds * 1000;
+            this.chargedCastedT = 0;
+
+            Obj_AI_Base.OnProcessSpellCast += (sender, args) =>
+            {
+                if (sender.IsMe && args.SpellData.Name == this.ChargedSpellName)
+                {
+                    this.chargedCastedT = GameData.TickCount;
+                }
+            };
+
+            SpellBook.OnUpdateChargedSpell += (sender, args) =>
+            {
+                if (sender.IsMe && GameData.TickCount - this.chargeReqSentT < 3000 && args.ReleaseCast)
+                {
+                    //args.Process = false;
+                }
+            };
+
+            SpellBook.OnCastSpell += (sender, args) =>
+            {
+                if (args.Slot == (int) this.Slot && GameData.TickCount - this.chargeReqSentT > 500 && this.IsCharging)
+                {
+                    this.Cast((Vector2) args.End);
+                }
+            };
+
+            Logger.Debug(
+                "{0} Set as Charged -> Spell Name: {1}, Buff Name: {2}, Min Range: {3}, Max Range: {4}, Charge Duration: {5}s",
+                this.Slot,
+                spellName,
+                buffName,
+                minRange,
+                maxRange,
+                chargeDurationSeconds);
         }
 
         /// <summary>
@@ -205,23 +394,21 @@
 
         #region Methods
 
-        /// <summary>
-        ///     Gets the prediction input.
-        /// </summary>
-        /// <param name="target">The target.</param>
-        /// <returns>PredictionInput.</returns>
-        private PredictionInput GetPredictionInput(Obj_AI_Base target)
+        private static bool ShootChargedSpell(SpellSlot slot, Vector3 position, bool releaseCast = true)
         {
-            return new PredictionInput()
+            return Player.SpellBook.CastSpell(slot, position)
+                && Player.SpellBook.UpdateChargedSpell(slot, position, releaseCast);
+        }
+
+        private bool StartCharging()
+        {
+            if (this.IsCharging || GameData.TickCount - this.chargeReqSentT <= 400 + Game.Ping)
             {
-                CollisionObjects = CollisionableObjects.Minions,
-                Delay = this.Delay,
-                Radius = this.Width,
-                Speed = this.Speed,
-                Range = this.Range,
-                Target = target,
-                Unit = Player
-            };
+                return false;
+            }
+
+            this.chargeReqSentT = GameData.TickCount;
+            return Player.SpellBook.CastSpell(this.Slot);
         }
 
         #endregion
