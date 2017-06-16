@@ -103,6 +103,29 @@ namespace Aimtec.SDK.Extensions
 
             return baseRange + target.BoundingRadius;
         }
+        
+        /// <summary>
+        ///     Counts the ally heroes in range.
+        /// </summary>
+        /// <param name="unit">the unit.</param>
+        /// <param name="range">The range.</param>
+        /// <returns>How many ally heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
+        public static int CountAllyHeroesInRange(this GameObject unit, float range)
+        {
+            return unit.Position.CountAllyHeroesInRange(range);
+        }
+
+        /// <summary>
+        ///     Counts the enemy heroes in range.
+        /// </summary>
+        /// <param name="unit">the unit.</param>
+        /// <param name="range">The range.</param>
+        /// <param name="dontIncludeStartingUnit">The original unit.</param>
+        /// <returns>How many enemy heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
+        public static int CountEnemyHeroesInRange(this GameObject unit, float range, Obj_AI_Base dontIncludeStartingUnit = null)
+        {
+            return unit.Position.CountEnemyHeroesInRange(range, dontIncludeStartingUnit);
+        }
 
         /// <summary>
         ///     Determines whether the specified target has a determined buff.
@@ -114,7 +137,20 @@ namespace Aimtec.SDK.Extensions
         /// </returns>
         public static bool HasBuff(this Obj_AI_Base from, string buffname)
         {
-            return from.Buffs.Any(b => b.IsActive && string.Equals(b.Name, buffname, StringComparison.CurrentCultureIgnoreCase));
+            return from.Buffs.Any(b => b.IsActive && b.IsValid && string.Equals(b.Name, buffname, StringComparison.CurrentCultureIgnoreCase));
+        }
+        
+        /// <summary>
+        ///     Determines whether the specified unit is affected by a determined bufftype.
+        /// </summary>
+        /// <param name="unit">The unit.</param>
+        /// <param name="buffType">The buff type.</param>
+        /// <returns>
+        ///     <c>true</c> if the specified unit is affected by the 'buffType' BuffType; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool HasBuffOfType(this Obj_AI_Base unit, BuffType buffType)
+        {
+            return unit.BuffManager.HasBuffOfType(buffType);
         }
 
         /// <summary>
@@ -159,6 +195,16 @@ namespace Aimtec.SDK.Extensions
         public static float ManaPercent(this Obj_AI_Base unit)
         {
             return unit.Mana / unit.MaxMana * 100;
+        }
+        
+        /// <summary>
+        ///     Returns a determined buff a determined unit has.
+        /// </summary>
+        /// <param name="unit">The unit.</param>
+        /// <param name="buffName">The buff's stringname</param>
+        public static Buff GetBuff(this Obj_AI_Base unit, string buffName)
+        {
+            return unit.BuffManager.GetBuff(buffName);
         }
 
         /// <summary>

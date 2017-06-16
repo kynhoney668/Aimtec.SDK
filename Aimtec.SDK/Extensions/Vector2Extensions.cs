@@ -20,8 +20,8 @@ namespace Aimtec.SDK.Extensions
         /// <returns>System.Single.</returns>
         public static float AngleBetween(this Vector2 self, Vector2 v1, Vector2 v2)
         {
-            var p1 = (-self + v1);
-            var p2 = (-self + v2);
+            var p1 = -self + v1;
+            var p2 = -self + v2;
 
             var theta = p1.Polar() - p2.Polar();
 
@@ -53,9 +53,9 @@ namespace Aimtec.SDK.Extensions
         /// </summary>
         /// <param name="pos">The position.</param>
         /// <returns>Point.</returns>
-        public static Vector3 To3D(this Vector2 v)
+        public static Vector3 To3D(this Vector2 pos)
         {
-            return (Vector3)v;
+            return (Vector3)pos;
         }
 
 
@@ -75,7 +75,7 @@ namespace Aimtec.SDK.Extensions
         {
             var objects = point.ProjectOn(segmentStart, segmentEnd);
 
-            return (objects.IsOnSegment || onlyIfOnSegment == false)
+            return objects.IsOnSegment || onlyIfOnSegment == false
                        ? Vector2.DistanceSquared(objects.SegmentPoint, point)
                        : float.MaxValue;
         }
@@ -101,8 +101,8 @@ namespace Aimtec.SDK.Extensions
             double deltaBAx = lineSegment1End.X - lineSegment1Start.X;
             double deltaBAy = lineSegment1End.Y - lineSegment1Start.Y;
 
-            var denominator = (deltaBAx * deltaDCy) - (deltaBAy * deltaDCx);
-            var numerator = (deltaACy * deltaDCx) - (deltaACx * deltaDCy);
+            var denominator = deltaBAx * deltaDCy - deltaBAy * deltaDCx;
+            var numerator = deltaACy * deltaDCx - deltaACx * deltaDCy;
 
             if (Math.Abs(denominator) < float.Epsilon)
             {
@@ -133,7 +133,7 @@ namespace Aimtec.SDK.Extensions
                 return default(IntersectionResult);
             }
 
-            var s = ((deltaACy * deltaBAx) - (deltaACx * deltaBAy)) / denominator;
+            var s = (deltaACy * deltaBAx - deltaACx * deltaBAy) / denominator;
             if (s < 0 || s > 1)
             {
                 return default(IntersectionResult);
@@ -142,8 +142,8 @@ namespace Aimtec.SDK.Extensions
             return new IntersectionResult(
                 true,
                 new Vector2(
-                    (float)(lineSegment1Start.X + (r * deltaBAx)),
-                    (float)(lineSegment1Start.Y + (r * deltaBAy))));
+                    (float)(lineSegment1Start.X + r * deltaBAx),
+                    (float)(lineSegment1Start.Y + r * deltaBAy)));
         }
 
         /// <summary>
@@ -154,7 +154,7 @@ namespace Aimtec.SDK.Extensions
         /// <returns>Vector2.</returns>
         public static Vector2 Perpendicular(this Vector2 vector2, int offset = 0)
         {
-            return (offset == 0) ? new Vector2(-vector2.Y, vector2.X) : new Vector2(vector2.Y, -vector2.X);
+            return offset == 0 ? new Vector2(-vector2.Y, vector2.X) : new Vector2(vector2.Y, -vector2.X);
         }
 
         /// <summary>
@@ -200,10 +200,25 @@ namespace Aimtec.SDK.Extensions
 
         public static bool PointUnderEnemyTurret(this Vector2 point)
         {
-            var enemyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && Vector2.Distance(point, t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            var enemyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && point.Distance(t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
             return enemyTurrets;
         }
 
+        public static bool PointUnderAllyTurret(this Vector2 point)
+        {
+            var allyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsAlly && point.Distance(t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            return allyTurrets;
+        }
+
+        public static bool IsUnderEnemyTurret(this GameObject obj)
+        {
+            return obj.Position.PointUnderEnemyTurret();
+        }
+
+        public static bool IsUnderAllyTurret(this GameObject obj)
+        {
+            return obj.Position.PointUnderAllyTurret();
+        }
 
         /// <summary>
         ///     Returns the projection of the Vector2 on the segment.
@@ -220,9 +235,9 @@ namespace Aimtec.SDK.Extensions
             var ay = segmentStart.Y;
             var bx = segmentEnd.X;
             var by = segmentEnd.Y;
-            var rL = (((cx - ax) * (bx - ax)) + ((cy - ay) * (by - ay)))
+            var rL = ((cx - ax) * (bx - ax) + (cy - ay) * (by - ay))
                      / ((float)Math.Pow(bx - ax, 2) + (float)Math.Pow(by - ay, 2));
-            var pointLine = new Vector2(ax + (rL * (bx - ax)), ay + (rL * (by - ay)));
+            var pointLine = new Vector2(ax + rL * (bx - ax), ay + rL * (by - ay));
             float rS;
             if (rL < 0)
             {
@@ -238,7 +253,7 @@ namespace Aimtec.SDK.Extensions
             }
 
             var isOnSegment = Math.Abs(rS - rL) < float.Epsilon;
-            var pointSegment = isOnSegment ? pointLine : new Vector2(ax + (rS * (bx - ax)), ay + (rS * (by - ay)));
+            var pointSegment = isOnSegment ? pointLine : new Vector2(ax + rS * (bx - ax), ay + rS * (by - ay));
             return new ProjectionInfo(isOnSegment, pointSegment, pointLine);
         }
 
