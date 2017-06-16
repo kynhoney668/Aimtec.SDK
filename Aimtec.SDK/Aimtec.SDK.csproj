@@ -55,8 +55,8 @@
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
     <Compile Include="Util\GameData.cs" />
-    <Compile Include="GameObjectEqualityComparer.cs" />
-    <Compile Include="GameObjects.cs" />
+    <Compile Include="Util\Cache\GameObjectEqualityComparer.cs" />
+    <Compile Include="Util\Cache\GameObjects.cs" />
     <Compile Include="Damage\Damage.cs" />
     <Compile Include="Damage\DamageLibrary.cs" />
     <Compile Include="Damage\ItemId.cs" />

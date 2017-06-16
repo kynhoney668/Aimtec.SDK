@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 
 namespace Aimtec.SDK.Extensions
 {
+    using Aimtec.SDK.Util.Cache;
+
     public static class Vector3Extensions
     {
         /// <summary>

@@ -1,4 +1,4 @@
-﻿namespace Aimtec.SDK
+﻿namespace Aimtec.SDK.Util.Cache
 {
     using System.Collections.Generic;
 
