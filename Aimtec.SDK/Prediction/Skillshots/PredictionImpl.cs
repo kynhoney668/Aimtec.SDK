@@ -335,7 +335,7 @@
             return new DashResult(){TargetDashing = targetDashing, CanHit = canHit, Position = position};
         }
 
-        private float lastTick = float.NaN;
+        private float lastTick;
 
         // Store waypoints for 10 seconds
         private const float WaypointsTime = 10;
@@ -343,7 +343,7 @@
         private void OnUpdate()
         {
             // update every 2/10 of a second
-            if (float.IsNaN(this.lastTick) || GetTime() - this.lastTick > 2 / 10f)
+            if (Math.Abs(this.lastTick) < float.Epsilon|| GetTime() - this.lastTick > 2 / 10f)
             {
                 this.lastTick = GetTime();
 
@@ -405,7 +405,7 @@
                 {
                     var p1 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 2].Position;
                     var p2 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 1].Position;
-                    var angle = ((Vector2) sender.Position).AngleBetween((Vector2) p1, (Vector2) p2);
+                    var angle = ((Vector2) sender.Position).AngleBetween((Vector2) p2, (Vector2) p1);
 
                     if (angle > 20)
                     {
@@ -517,25 +517,19 @@
 
             var spot = Vector3.Zero;
 
+            var p90x = second.IsZero ? unit.Position : second;
+            var pathPot = unit.MoveSpeed * (Vector3.Distance(Player.Position, p90x) / speed + delay);
+
+            if (unit.Path.Length < 3)
             {
-                var p90x = second.IsZero ? unit.Position : second;
-                var pathPot = unit.MoveSpeed * (Vector3.Distance(Player.Position, p90x) / speed + delay);
+                var v = unit.Position + Vector3.Normalize(unit.Path.Last() - unit.Position)
+                    * (pathPot - unit.BoundingRadius + 10);
 
-                if (unit.Path.Length < 3)
+                if (Vector3.Distance(unit.Position, v) > 1)
                 {
-                    var v = unit.Position + Vector3.Normalize(unit.Path.Last() - unit.Position)
-                        * (pathPot - unit.BoundingRadius + 10);
-
-                    if (Vector3.Distance(unit.Position, v) > 1)
+                    if (Vector3.Distance(unit.Path.Last(), unit.Position) >= Vector3.Distance(unit.Position, v))
                     {
-                        if (Vector3.Distance(unit.Path.Last(), unit.Position) >= Vector3.Distance(unit.Position, v))
-                        {
-                            spot = v;
-                        }
-                        else
-                        {
-                            spot = unit.Path.Last();
-                        }
+                        spot = v;
                     }
                     else
                     {
@@ -544,40 +538,44 @@
                 }
                 else
                 {
-                    for (var i = 1; i < unit.Path.Length; i++)
+                    spot = unit.Path.Last();
+                }
+            }
+            else
+            {
+                for (var i = 1; i < unit.Path.Length; i++)
+                {
+                    var pStart = unit.Path[i - i];
+                    var pEnd = unit.Path[i];
+                    var iPathDist = Vector3.Distance(pStart, pEnd);
+
+                    if (pathPot > iPathDist)
                     {
-                        var pStart = unit.Path[i - i];
-                        var pEnd = unit.Path[i];
-                        var iPathDist = Vector3.Distance(pStart, pEnd);
-
-                        if (pathPot > iPathDist)
-                        {
-                            pathPot = pathPot - iPathDist;
-                        }
-                        else
-                        {
-                            var v = pStart + Vector3.Normalize(pEnd - pStart) * (pathPot - unit.BoundingRadius + 10);
-                            spot = v;
-
-                            if (!second.IsZero)
-                            {
-                                return new PredictedTargetPosition() { UnitPosition = spot, CastPosition = spot };
-                            }
-                            else
-                            {
-                                return this.CalculateTargetPosition(unit, delay, radius, speed, @from, type, spot);
-                            }
-                        }
-                    }
-
-                    if (Vector3.Distance(unit.Position, unit.Path.Last()) > unit.BoundingRadius)
-                    {
-                        spot = unit.Path.Last();
+                        pathPot = pathPot - iPathDist;
                     }
                     else
                     {
-                        spot = unit.Position;
+                        var v = pStart + Vector3.Normalize(pEnd - pStart) * (pathPot - unit.BoundingRadius + 10);
+                        spot = v;
+
+                        if (!second.IsZero)
+                        {
+                            return new PredictedTargetPosition() { UnitPosition = spot, CastPosition = spot };
+                        }
+                        else
+                        {
+                            return this.CalculateTargetPosition(unit, delay, radius, speed, @from, type, spot);
+                        }
                     }
+                }
+
+                if (Vector3.Distance(unit.Position, unit.Path.Last()) > unit.BoundingRadius)
+                {
+                    spot = unit.Path.Last();
+                }
+                else
+                {
+                    spot = unit.Position;
                 }
             }
 
@@ -585,7 +583,7 @@
 
             if (!second.IsZero)
             {
-                return new PredictedTargetPosition(){CastPosition = spot, UnitPosition = spot };
+                return new PredictedTargetPosition() { CastPosition = spot, UnitPosition = spot };
             }
 
             return this.CalculateTargetPosition(unit, delay, radius, speed, from, type, spot);
