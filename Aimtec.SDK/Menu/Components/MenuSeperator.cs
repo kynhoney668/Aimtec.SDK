@@ -24,9 +24,7 @@
 
         internal override bool SavableMenuItem { get; set; } = false;
 
-        public string Value { get; set; }
-
-        public string StringValue => Value;
+        public new string Value { get; set; }
 
         #endregion
 

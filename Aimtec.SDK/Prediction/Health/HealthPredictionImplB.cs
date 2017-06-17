@@ -7,7 +7,6 @@
     using Damage;
 
     using Aimtec.SDK.Extensions;
-    using System.Drawing;
 
     class HealthPredictionImplB : IHealthPrediction
     {
@@ -25,6 +24,7 @@
             Obj_AI_Base.OnPerformCast += this.Obj_AI_Base_OnPerformCast;
         }
 
+  
         private void Obj_AI_Base_OnPerformCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
             if (sender.IsValid && sender.IsMelee)
@@ -40,7 +40,7 @@
         {
             foreach (var value in this.incomingAttacks.Values)
             {
-                value.RemoveAll(x => Game.TickCount - x.CastTime > 3500);
+                value.RemoveAll(x => Game.TickCount - x.CastTime > 1800);
             }
 
             foreach (var value in this.MinionAggroData.Values.ToList())
@@ -154,7 +154,6 @@
                     {
                         this.MinionAggroData[auto.Target.NetworkId].LastMinionAttack = auto;
                     }
-
                 }
             }
         }
@@ -263,13 +262,13 @@
 
             public virtual float MeleeTravelTime { get; set; }
 
-            public virtual float TravelTime => this.Sender.IsMelee ? this.MeleeTravelTime : this.RangedTravelTime;
+            public virtual float TravelTime => this.Sender.IsMelee ? this.MeleeTravelTime + 100 : this.RangedTravelTime + 80;
 
             //Gets the time passed by since this auto attack was detected
             public float TimeElapsed => Game.TickCount - this.CastTime;
 
             //Gets the time left until this auto reaches target by subtracting the time elapsed from total travel time
-            public float ETA => (this.TravelTime - this.TimeElapsed);
+            public float ETA => (this.TravelTime - this.TimeElapsed) + 100;
 
             //If there is time left until arrival, this auto has not arrived yet and is active, otherwise this auto attack has already reached the target and is inactive
             public virtual bool Active => this.ETA >= 0;
@@ -291,10 +290,10 @@
 
             private float extraDelay = 0;
 
-            public override float RangedTravelTime => (this.Distance / this.Missilespeed) * 1000
-                                                      + (this.Sender.AttackCastDelay * 1000) + this.extraDelay + 40;
+            public override float RangedTravelTime => (this.Distance / this.Missilespeed) * 1000f
+                                                      + (this.Sender.AttackCastDelay * 1000f) + this.extraDelay;
 
-            public override float MeleeTravelTime => (this.Sender.AttackCastDelay * 1000) + this.extraDelay;
+            public override float MeleeTravelTime => (this.Sender.AttackCastDelay * 1000f) + this.extraDelay;
 
             public bool Melee { get; set; }
 
@@ -389,7 +388,7 @@
             public int TimeElapsedSinceLastMinionAttack => Game.TickCount + Game.Ping / 2
                                                            - (this.LastMinionAttack?.CastTime ?? 0);
 
-            public List<Attack> IncomingAttacks => this.HealthPredInstance.incomingAttacks[this.Unit.NetworkId];
+            public List<Attack> IncomingAttacks => this.HealthPredInstance.incomingAttacks.ContainsKey(this.Unit.NetworkId) ? this.HealthPredInstance.incomingAttacks[this.Unit.NetworkId] : null;
 
             public IEnumerable<TurretAttack> IncomingTurretAttacks => this.IncomingAttacks.Where(x => x is TurretAttack)
                 .Cast<TurretAttack>();

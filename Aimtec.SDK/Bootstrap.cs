@@ -55,10 +55,10 @@
             SetupLogging();
             LogUnhandledExceptions();
 
-            TargetSelector.TargetSelector.Load();
             DamageLibrary.LoadDamages();       
             GlobalKeys.Load();
-            
+            TargetSelector.TargetSelector.Load();
+
             AimtecMenu.Instance.Attach();
 
             Logger.Info($"Aimtec.SDK version {Assembly.GetExecutingAssembly().GetName().Version} loaded.");

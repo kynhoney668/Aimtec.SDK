@@ -138,12 +138,6 @@
 
         #region Public Indexers
 
-        public T As<T>()
-            where T : MenuComponent
-        {
-            throw new NotImplementedException();
-        }
-
         public override MenuComponent this[string name] => this.GetItem(name);
 
 
