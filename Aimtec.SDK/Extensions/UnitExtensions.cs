@@ -235,7 +235,7 @@ namespace Aimtec.SDK.Extensions
         /// <returns><c>true</c> if the target is a valid target in the auto attack range; otherwise, <c>false</c>.</returns>
         public static bool IsValidAutoRange(this AttackableUnit target, Vector3 checkRangeFrom = default(Vector3))
         {
-            return target != null && target.IsVisible && !target.IsDead && !target.IsInvulnerable && target.IsTargetable
+            return target != null && target.IsValid && target.IsVisible && !target.IsDead && !target.IsInvulnerable && target.IsTargetable
                 && (target.Team != ObjectManager.GetLocalPlayer().Team)
                 && Vector3.Distance(target.Position, ObjectManager.GetLocalPlayer().Position)
                 < Player.GetFullAttackRange((target));
@@ -257,7 +257,7 @@ namespace Aimtec.SDK.Extensions
             bool allyIsValidTarget = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            return target != null && !target.IsDead && !target.IsInvulnerable && target.IsVisible && target.IsTargetable
+            return target != null && target.IsValid && !target.IsDead && !target.IsInvulnerable && target.IsVisible && target.IsTargetable
                 && ((allyIsValidTarget || target.Team != ObjectManager.GetLocalPlayer().Team) && Vector3.Distance(
                     target.Position,
                     ObjectManager.GetLocalPlayer().Position) < range);

@@ -447,7 +447,7 @@ namespace Aimtec.SDK.Orbwalking
 
         AttackableUnit GetWaveClearTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => !x.IsHero && x.IsValidAutoRange());
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
    
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
