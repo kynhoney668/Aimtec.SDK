@@ -507,7 +507,7 @@ namespace Aimtec.SDK.Orbwalking
                 return structure;
             }
 
-            foreach (var minion in minions.OrderByDescending(x => Math.Ceiling(this.GetPredictedHealth(x) / Player.GetAutoAttackDamage(x))).ThenByDescending(x => x.NetworkId == this.LastTarget?.NetworkId))
+            foreach (var minion in minions.OrderBy(x => Math.Ceiling(this.GetPredictedHealth(x) / Player.GetAutoAttackDamage(x))))
             {
                 var predHealth = this.GetPredictedHealth(minion) - 1;
 
@@ -524,13 +524,6 @@ namespace Aimtec.SDK.Orbwalking
                 if (data != null && data.HasMinionAggro && data.IncomingAttacks?.Count >= 3 && predHealth > dmg)
                 {
                     continue;
-                }
-
-                var autos = Math.Ceiling(predHealth / Player.GetAutoAttackDamage(minion));
-  
-                if (data.IncomingAttacks?.Count >= 1 && autos == 2)
-                {
-                    return null;
                 }
 
                 return minion;
