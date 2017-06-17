@@ -7,15 +7,6 @@ namespace Aimtec.SDK.Orbwalking
     public class Orbwalker : IOrbwalker
     {
         /// <summary>
-        ///     Initializes the default implementation
-        /// </summary>
-        /// <param name="impl">The implementation.</param>
-        static Orbwalker()
-        {
-            Implementation = new OrbwalkingImpl();
-        }
-
-        /// <summary>
         ///     Initializes a new instance of the <see cref="Orbwalker" /> class.
         /// </summary>
         /// <param name="impl">The implementation.</param>
@@ -42,7 +33,16 @@ namespace Aimtec.SDK.Orbwalking
         /// </value>
         public static IOrbwalker Implementation
         {
-            get => impl;
+            get
+            {
+                if (impl == null)
+                {
+                    impl = new OrbwalkingImpl();
+                }
+
+                return impl;
+            }
+
             set
             {
                 impl?.Dispose();
@@ -59,7 +59,11 @@ namespace Aimtec.SDK.Orbwalking
         public float WindUpTime => Implementation.WindUpTime;
 
         /// <inheritdoc cref="IOrbwalker" />
-        public bool CanMove => Implementation.CanMove;
+        public bool CanMove()
+        {
+            return Implementation.CanMove();
+        }
+
 
         /// <inheritdoc cref="IOrbwalker" />
         public bool CanAttack => Implementation.CanAttack;
@@ -99,9 +103,9 @@ namespace Aimtec.SDK.Orbwalking
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public void AddToMenu(IMenu menu)
+        public void Attach(IMenu menu)
         {
-            Implementation.AddToMenu(menu);
+            Implementation.Attach(menu);
         }
 
         /// <inheritdoc cref="IOrbwalker" />

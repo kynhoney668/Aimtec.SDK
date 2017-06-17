@@ -140,7 +140,7 @@
                 }
             }
 
-            if (wparam != (ulong)this.Key || this.KeyIsBeingSet || MenuGUI.IsShopOpen() || MenuGUI.IsChatOpen())
+            if (wparam != (ulong)this.Key || this.KeyIsBeingSet) //|| MenuGUI.IsShopOpen() || MenuGUI.IsChatOpen())
             {
                 return;
             }

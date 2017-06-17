@@ -209,13 +209,20 @@
                 return this.MinionAggroData[unit.NetworkId];
             }
 
-            else
+            return null;
+        }
+
+        public bool HasTurretAggro(Obj_AI_Base unit)
+        {
+            var data = GetAggroData(unit);
+            if (data != null)
             {
-                this.MinionAggroData[unit.NetworkId] = new AggroData(unit, this);
+                return data.HasTurretAggro;
             }
 
-            return this.MinionAggroData[unit.NetworkId];
+            return false;
         }
+
 
         public float GetPrediction(Obj_AI_Base unit, int time)
         {

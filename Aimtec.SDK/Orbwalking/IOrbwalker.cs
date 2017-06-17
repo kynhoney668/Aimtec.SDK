@@ -31,7 +31,7 @@ namespace Aimtec.SDK.Orbwalking
         /// <value>
         ///     If the player can move.
         /// </value>
-        bool CanMove { get; }
+        bool CanMove();
 
         /// <summary>
         ///     Gets the if the player can attack.
@@ -80,7 +80,7 @@ namespace Aimtec.SDK.Orbwalking
         ///     Adds to menu.
         /// </summary>
         /// <param name="menu">The menu.</param>
-        void AddToMenu(IMenu menu);
+        void Attach(IMenu menu);
 
         /// <summary>
         ///     Forces the target.
