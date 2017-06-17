@@ -117,7 +117,7 @@ namespace Aimtec.SDK.Damage
                         break;
                     // TODO getting the actual buffname
                     case "Sejuani":
-                        if (target.HasBuff("sejuanistun"))
+                        if (target.HasBuff("sejuanistun") && targetHero != null)
                         {
                             switch (target.Type)
                             {
