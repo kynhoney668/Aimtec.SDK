@@ -56,7 +56,7 @@ namespace Aimtec.SDK.Orbwalking
 
         public float WindUpTime => this.AnimationTime + this.ExtraWindUp;
 
-        public float AttackCoolDownTime => Player.AttackDelay * 1000;
+        public float AttackCoolDownTime => (Player.AttackDelay * 1000) - this.LowerCD;
 
         protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick
                                       >= this.AttackCoolDownTime + this.ExtraWindUp;
@@ -89,7 +89,8 @@ namespace Aimtec.SDK.Orbwalking
 
         protected int ExtraWindUp => this.config["extraWindup"].Value;
 
-
+        protected int LowerCD => this.config["lesserCD"].Value;
+      
         //Members
         private float ServerAttackDetectionTick { get; set; }
 
@@ -145,6 +146,7 @@ namespace Aimtec.SDK.Orbwalking
             this.config = new Menu("Orbwalker", "Orbwalker")
                               {
                                   new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
+                                  new MenuSlider("lesserCD", "Lower Attack CD", 180, 0, 400, true),
                                   new MenuSlider("extraWindup", "Additional Windup", 20, 0, 200, true),
                                   new MenuBool("noBlindAA", "No AA when Blind", true, true),
                               };
