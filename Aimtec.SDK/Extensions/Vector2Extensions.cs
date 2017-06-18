@@ -39,6 +39,29 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
+        /// Get the angles between the two points.
+        /// </summary>
+        /// <param name="self">The self.</param>
+        /// <param name="v1">The v1.</param>
+        /// <returns>System.Single.</returns>
+        public static float AngleBetween(this Vector2 self, Vector2 v1)
+        {
+            var theta = self.Polar() - v1.Polar();
+
+            if (theta < 0)
+            {
+                theta = theta + 360;
+            }
+
+            if (theta > 180)
+            {
+                theta = 360 - theta;
+            }
+
+            return theta;
+        }
+
+        /// <summary>
         ///     Converts the Vector2 to a Point
         /// </summary>
         /// <param name="pos">The position.</param>
