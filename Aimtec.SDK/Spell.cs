@@ -84,6 +84,12 @@
         public float ChargeDuration { get; set; }
 
         /// <summary>
+        ///     Gets or sets a value indicating whether this <see cref="Spell" /> has collision.
+        /// </summary>
+        /// <value><c>true</c> if the spell has collision; otherwise, <c>false</c>.</value>
+        public bool Collision { get; set; }
+
+        /// <summary>
         ///     Gets or sets the delay.
         /// </summary>
         /// <value>The delay.</value>
@@ -198,6 +204,11 @@
         /// <returns><c>true</c> if the spell was casted, <c>false</c> otherwise.</returns>
         public bool Cast(Obj_AI_Base target)
         {
+            if (!this.Ready)
+            {
+                return false;
+            }
+
             if (!this.IsSkillShot && !this.IsChargedSpell)
             {
                 return Player.SpellBook.CastSpell(this.Slot, target);
@@ -224,6 +235,11 @@
         /// <returns><c>true</c> if the spell was casted, <c>false</c> otherwise.</returns>
         public bool Cast()
         {
+            if (!this.Ready)
+            {
+                return false;
+            }
+
             if (this.IsSkillShot)
             {
                 Logger.Warn("{0} is a skillshot, but casted like a self-activated ability.", this.Slot);
@@ -283,7 +299,7 @@
         {
             return new PredictionInput()
             {
-                CollisionObjects = CollisionableObjects.Minions,
+                CollisionObjects = this.Collision ? CollisionableObjects.Minions : 0,
                 Delay = this.Delay,
                 Radius = this.Width,
                 Speed = this.Speed,
@@ -356,12 +372,14 @@
         /// <param name="delay">The delay.</param>
         /// <param name="width">The width.</param>
         /// <param name="speed">The speed.</param>
+        /// <param name="collision">if set to <c>true</c> the spell has collision.</param>
         /// <param name="type">The type.</param>
         /// <param name="hitchance">The hitchance.</param>
         public void SetSkillshot(
             float delay,
             float width,
             float speed,
+            bool collision,
             SkillType type,
             HitChance hitchance = HitChance.Low)
         {
@@ -369,17 +387,18 @@
             this.Width = width;
             this.Speed = speed;
             this.Type = type;
-
+            this.Collision = collision;
             this.IsSkillShot = true;
             this.HitChance = hitchance;
 
             Logger.Debug(
-                "{0} Set as SkillShot -> Range: {1}, Delay: {2},  Width: {3}, Speed: {4}, Type: {5}, MinHitChance: {6}",
+                "{0} Set as SkillShot -> Range: {1}, Delay: {2},  Width: {3}, Speed: {4}, Collision: {5}, Type: {6}, MinHitChance: {7}",
                 this.Slot,
                 this.Range,
                 delay,
                 width,
                 speed,
+                collision,
                 type,
                 hitchance);
         }
