@@ -95,5 +95,12 @@ namespace Aimtec.SDK.Prediction
         ///     The target.
         /// </value>
         public Obj_AI_Base Target { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the spell is an area effect spell.
+        /// </summary>
+        /// <value><c>true</c> if the spell is an area effect spell; otherwise, <c>false</c>.</value>
+        public bool AoE { get; set; }
+
     }
 }

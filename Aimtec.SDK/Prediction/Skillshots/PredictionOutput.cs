@@ -4,6 +4,9 @@ namespace Aimtec.SDK.Prediction
 {
     using Aimtec.SDK.Prediction.Skillshots;
 
+    /// <summary>
+    /// Class PredictionOutput.
+    /// </summary>
     public class PredictionOutput
     {
         /// <summary>
@@ -47,19 +50,18 @@ namespace Aimtec.SDK.Prediction
         public Vector3 PredictedPosition { get; set; }
 
         /// <summary>
-        ///     Gets or sets the hit chance percent.
-        /// </summary>
-        /// <value>
-        ///     The hit chance percent.
-        /// </value>
-        public float HitChancePercent { get; set; }
-
-        /// <summary>
         ///     Gets a value indicating whether the <see cref="CastPosition" /> will collide with another GameObject.
         /// </summary>
         /// <value>
         ///     <c>true</c> if the <see cref="CastPosition" /> will collide with another GameObject; otherwise, <c>false</c>.
         /// </value>
-        public bool Collision => this.Collisions.Count > 0;
+        public bool Collision => this.Collisions.Count > 0 || this.HitChance == HitChance.Collision;
+
+        /// <summary>
+        /// Gets or sets the number of targets hit by the area of effect spell.
+        /// </summary>
+        /// <value>The number of targets hit by the area of effect spell.</value>
+        public int AoeTargetsHit { get; set; }
+
     }
 }

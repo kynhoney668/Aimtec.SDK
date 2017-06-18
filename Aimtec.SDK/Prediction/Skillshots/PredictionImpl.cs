@@ -313,7 +313,7 @@
                             (Vector2) dash.StartPosition,
                             (Vector2) dash.EndPosition,
                             dash.Speed,
-                            (Vector2) @from,
+                            (Vector2) from,
                             speed,
                             GetTime() - dash.StartTime + delay);
 
@@ -491,6 +491,97 @@
             return this.GetCastPosition(unit, delay, radius, range, speed, from.Position, collision, SkillType.Line);
         }
 
+        /// <summary>
+        /// Gets the circular aoe cast position.
+        /// </summary>
+        /// <param name="unit">The unit.</param>
+        /// <param name="delay">The delay.</param>
+        /// <param name="radius">The radius.</param>
+        /// <param name="range">The range.</param>
+        /// <param name="speed">The speed.</param>
+        /// <param name="from">From.</param>
+        /// <param name="collision">if set to <c>true</c> the spell has collision.</param>
+        /// <returns>PredictionOutput.</returns>
+        public PredictionOutput GetCircularAoeCastPosition(
+            Obj_AI_Base unit,
+            float delay,
+            float radius,
+            float range,
+            float speed,
+            Vector3 from,
+            bool collision)
+        {
+            var result = this.GetCastPosition(unit, delay, radius, range, speed, from, collision, SkillType.Circle);
+            var points = new List<Vector3>();
+
+            var mainCastPoisition = result.CastPosition;
+            var mainHitChance = result.HitChance;
+            var mainPosition = result.PredictedPosition;
+
+            points.Add(mainPosition);
+
+            points.AddRange(
+                ObjectManager.Get<Obj_AI_Hero>()
+                             .Where(x => x.NetworkId != unit.NetworkId && x.IsValidTarget(range * 1.5f))
+                             .Select(
+                                 x => this.GetCastPosition(
+                                     x,
+                                     delay,
+                                     radius,
+                                     range,
+                                     speed,
+                                     from,
+                                     collision,
+                                     SkillType.Circle))
+                             .Where(
+                                 x => x.PredictedPosition.Distance(from) < range + radius
+                                     && x.HitChance != HitChance.Collision).Select(x => x.PredictedPosition));
+
+            while (points.Count > 1)
+            {
+                var mec = Mec.FindMinimumEnclosingCircle(points.Cast<Vector2>());
+
+                if (mec.Radius <= radius + unit.BoundingRadius - 8)
+                {
+                    return new PredictionOutput()
+                    {
+                        CastPosition = new Vector3(
+                            mec.Center.X,
+                            NavMesh.GetHeightForWorld(mec.Center.X, mec.Center.Y),
+                            mec.Center.Y),
+                        HitChance = mainHitChance,
+                        AoeTargetsHit = points.Count
+                    };
+                }
+
+                var maxDist = -1f;
+                var maxDistIndex = 0;
+
+                for (var i = 1; i < points.Count; i++)
+                {
+                    var d = Vector3.DistanceSquared(points[i], points[0]);
+
+                    if (!(d > maxDist) && !(Math.Abs(maxDist - (-1)) < float.Epsilon))
+                    {
+                        continue;
+                    }
+
+                    maxDistIndex = i;
+                    maxDist = d;
+                }
+
+                points.RemoveAt(maxDistIndex);
+            }
+
+            return new PredictionOutput()
+            {
+                CastPosition = mainCastPoisition,
+                HitChance = mainHitChance,
+                AoeTargetsHit = points.Count,
+                PredictedPosition = mainPosition
+            };
+        }
+
         public PredictedTargetPosition CalculateTargetPosition(
             Obj_AI_Base unit,
             float delay,
@@ -564,7 +655,7 @@
                         }
                         else
                         {
-                            return this.CalculateTargetPosition(unit, delay, radius, speed, @from, type, spot);
+                            return this.CalculateTargetPosition(unit, delay, radius, speed, from, type, spot);
                         }
                     }
                 }
@@ -842,7 +933,7 @@
             float delay,
             float radius,
             float speed,
-            Vector3 @from,
+            Vector3 from,
             SkillType type)
         {
             return this.CalculateTargetPosition(target, delay, radius, speed, from, type, default(Vector3));
@@ -851,6 +942,17 @@
         // todo implement rangecheckfrom
         public PredictionOutput GetPrediction(PredictionInput input)
         {
+            if (input.AoE)
+            {
+                if (input.SkillType == SkillType.Circle)
+                {
+                    return this.GetCircularAoeCastPosition(input.Target, input.Delay, input.Radius, input.Range, input
+                            .Speed, input.From, Enum
+                            .GetValues(typeof(CollisionableObjects)).Cast<CollisionableObjects>()
+                            .Any(x => input.CollisionObjects.HasFlag(x)));
+                }
+            }
+
             return this.GetLineCastPosition(
                 input.Target,
                 input.Delay,
