@@ -211,6 +211,8 @@ namespace Aimtec.SDK.Extensions
             return (float)theta;
         }
 
+
+
         /// <summary>
         ///     Raises <paramref name="x" /> to the second power.
         /// </summary>
