@@ -14,15 +14,15 @@ namespace Aimtec.SDK.Orbwalking
     using Aimtec.SDK.TargetSelector;
     using Aimtec.SDK.Util;
     using NLog;
-
-    internal class OrbwalkingImpl : IOrbwalker
+  
+    internal class OrbwalkingImpl : AOrbwalker
     {
-        public OrbwalkingImpl()
+        internal OrbwalkingImpl()
         {
-            this.CreateMenu();
+            this.Initialize();
         }
 
-        public void Attach(IMenu menu)
+        public override void Attach(IMenu menu)
         {
             if (!this.Attached)
             {
@@ -30,7 +30,7 @@ namespace Aimtec.SDK.Orbwalking
                 Obj_AI_Base.OnProcessAutoAttack += this.ObjAiHeroOnProcessAutoAttack;
                 Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
                 Game.OnUpdate += this.Game_OnUpdate;
-                menu.Add(this.config);
+                menu.Add(this.Config);
             }
 
             else
@@ -39,129 +39,151 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-        private static Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
+        public override float WindUpTime => this.AnimationTime + this.ExtraWindUp;
 
         // TODO this completely breaks the modular design, Orbwalker and health prediction shouldnt be tightly coupled!
         private HealthPredictionImplB HealthPrediction { get; } = new HealthPredictionImplB();
-
-        private Menu config;
-
-        private List<CustomMode> CustomModes { get; } = new List<CustomMode>();
-
-        private Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
         private AttackableUnit LastTarget { get; set; }
 
         public float AnimationTime => Player.AttackCastDelay * 1000;
 
-        public float WindUpTime => this.AnimationTime + this.ExtraWindUp;
-
         public float AttackCoolDownTime => (Player.AttackDelay * 1000) - this.LowerCD;
 
         protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick
-                                      >= this.AttackCoolDownTime + this.ExtraWindUp;
+                                      >= this.AttackCoolDownTime;
 
-        public bool CanAttack => AttackReady;
+        /// <summary>
+        ///     Gets or sets the Forced Target 
+        /// </summary>
+        private AttackableUnit ForcedTarget { get; set; }
 
-        public bool SafeToIssueCommand
+        /// <summary>
+        ///     The time the last attack command was sent (determined locally)
+        /// </summary>
+        protected float LastAttackCommandSentTime;
+
+        public override bool IsWindingUp
         {
             get
             {
+                if (this.NoCancelChamps.Contains(Player.ChampionName))
+                {
+                    return false;
+                }
+
                 var detectionTime = Math.Max(this.ServerAttackDetectionTick, this.LastAttackCommandSentTime);
-                return (Game.TickCount + Game.Ping / 2) - detectionTime >= this.WindUpTime;
+                return (Game.TickCount + Game.Ping / 2) - detectionTime <= this.WindUpTime;
             }
         }
 
-        public bool DisableAttacks { get; set; }
-
-        public bool DisableMove { get; set; }
-
-        //Events
-        public event EventHandler<PreAttackEventArgs> PreAttack;
-
-        public event EventHandler<PostAttackEventArgs> PostAttack;
-
-        public event EventHandler<PreMoveEventArgs> PreMove;
-
-
         //Menu Getters
-        protected int HoldPositionRadius => this.config["holdPositionRadius"].Value;
+        protected int HoldPositionRadius => this.Config["holdPositionRadius"].Value;
 
-        protected int ExtraWindUp => this.config["extraWindup"].Value;
+        protected int ExtraWindUp => this.Config["extraWindup"].Value;
 
-        protected int LowerCD => this.config["lesserCD"].Value;
-      
+        protected int LowerCD => this.Config["Advanced"]["lowerAttackCD"].Value;
+
         //Members
         private float ServerAttackDetectionTick { get; set; }
-
-        private float LastAttackCommandSentTime { get; set; }
-
-        public OrbwalkingMode Mode
-        {
-            get => this.GetCurrentMode();
-            set { }
-        }
-
-        //Don't think we really needs this since we have an auto attack detection event
-        private string[] attacks =
-            {
-                "caitlynheadshotmissile", "frostarrow", "garenslash2", "kennenmegaproc", "masteryidoublestrike",
-                "quinnwenhanced", "renektonexecute", "renektonsuperexecute", "rengarnewpassivebuffdash", "trundleq",
-                "xenzhaothrust", "xenzhaothrust2", "xenzhaothrust3", "viktorqbuff", "lucianpassiveshot"
-            };
-
-        //Don't think we really needs this since we have an auto attack detection event
-        private string[] blacklistedAttacks =
-            {
-                "volleyattack", "volleyattackwithsound", "jarvanivcataclysmattack", "monkeykingdoubleattack",
-                "shyvanadoubleattack", "shyvanadoubleattackdragon", "zyragraspingplantattack",
-                "zyragraspingplantattack2", "zyragraspingplantattackfire", "zyragraspingplantattack2fire",
-                "viktorpowertransfer", "sivirwattackbounce", "asheqattacknoonhit", "elisespiderlingbasicattack",
-                "heimertyellowbasicattack", "heimertyellowbasicattack2", "heimertbluebasicattack",
-                "annietibbersbasicattack", "annietibbersbasicattack2", "yorickdecayedghoulbasicattack",
-                "yorickravenousghoulbasicattack", "yorickspectralghoulbasicattack", "malzaharvoidlingbasicattack",
-                "malzaharvoidlingbasicattack2", "malzaharvoidlingbasicattack3", "kindredwolfbasicattack",
-                "gravesautoattackrecoil"
-            };
-
-        private readonly string[] AttackResets =
-            {
-                "dariusnoxiantacticsonh", "fiorae", "garenq", "gravesmove", "hecarimrapidslash", "jaxempowertwo",
-                "jaycehypercharge", "leonashieldofdaybreak", "luciane", "monkeykingdoubleattack",
-                "mordekaisermaceofspades", "nasusq", "nautiluspiercinggaze", "netherblade", "gangplankqwrapper",
-                "powerfist", "renektonpreexecute", "rengarq", "shyvanadoubleattack", "sivirw", "takedown",
-                "talonnoxiandiplomacy", "trundletrollsmash", "vaynetumble", "vie", "volibearq", "xenzhaocombotarget",
-                "yorickspectral", "reksaiq", "itemtitanichydracleave", "masochism", "illaoiw", "elisespiderw", "fiorae",
-                "meditate", "sejuaninorthernwinds", "asheq", "camilleq", "camilleq2"
-            };
-
-        private static readonly string[] NoCancelChamps = { "Kalista" };
-
-        private AttackableUnit ForcedTarget { get; set; }
-
+       
         private bool Attached { get; set; }
 
-        private void CreateMenu()
+        private void Initialize()
         {
-            this.config = new Menu("Orbwalker", "Orbwalker")
-                              {
-                                  new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
-                                  new MenuSlider("lesserCD", "Lower Attack CD", 180, 0, 400, true),
-                                  new MenuSlider("extraWindup", "Additional Windup", 20, 0, 200, true),
-                                  new MenuBool("noBlindAA", "No AA when Blind", true, true),
-                              };
+            this.Config = new Menu("Orbwalker", "Orbwalker")
+            {
+                new Menu("Advanced", "Advanced")
+                {
+                    new MenuSlider("lowerAttackCD", "Lower Attack CD", 90, 0, 400, true),
+                },
+
+                new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
+                new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
+                new MenuBool("noBlindAA", "No AA when Blind", true, true),
+            };
+
+            this.AddMode(Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, GetHeroTarget, null));
+            this.AddMode(LaneClear = new OrbwalkerMode("Laneclear", GlobalKeys.WaveClearKey, GetLaneClearTarget, null));
+            this.AddMode(LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, GetLastHitTarget, null));
+            this.AddMode(Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, GetMixedModeTarget, null));
         }
 
 
-        //Situations where it does not make sense to cast an auto attack (independent of target)
-        protected bool ShouldNotAttack => this.BlindCheck;
-
-        private bool BlindCheck => this.config["noBlindAA"].Enabled && !Player.ChampionName.Equals("Kalista")
-            && !Player.ChampionName.Equals("Twitch")
-            && Player.BuffManager.HasBuffOfType(BuffType.Blind);
-
-        public bool CanMove()
+        protected void Game_OnUpdate()
         {
+            Orbwalk();
+        }
+
+        public bool BlindCheck()
+        {
+            if (!this.Config["noBlindAA"].Enabled)
+            {
+                return true;
+            }
+
+            if (!Player.ChampionName.Equals("Kalista") && !Player.ChampionName.Equals("Twitch"))
+            {
+                if (Player.BuffManager.HasBuffOfType(BuffType.Blind))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+
+        public override bool CanMove()
+        {
+            return this.CanMove(this.GetActiveMode());
+        }
+
+        public override bool CanAttack()
+        {
+            return this.CanAttack(this.GetActiveMode());
+        }
+
+
+        public bool CanAttack(OrbwalkerMode mode)
+        {
+            if (mode == null)
+            {
+                return false;
+            }
+
+            if (!this.AttackingEnabled || !mode.AttackingEnabled)
+            {
+                return false;
+            }
+
+            if (!this.BlindCheck())
+            {
+                return false;
+            }
+
+            
+            if (this.IsWindingUp)
+            {
+                return false;
+            }
+            
+
+            return this.NoCancelChamps.Contains(Player.ChampionName) || this.AttackReady;
+        }
+
+        public bool CanMove(OrbwalkerMode mode)
+        {
+            if (mode == null)
+            {
+                return false;
+            }
+
+            if (!this.MovingEnabled || !mode.MovingEnabled)
+            {
+                return false;
+            }
+
             if (Player.Distance(Game.CursorPos) < this.HoldPositionRadius)
             {
                 return false;
@@ -172,35 +194,12 @@ namespace Aimtec.SDK.Orbwalking
                 return true;
             }
 
-            if (this.SafeToIssueCommand)
+            if (this.IsWindingUp)
             {
-                return true;
+                return false;
             }
 
-            return false;
-        }
-
-        protected void Game_OnUpdate()
-        {
-            this.Orbwalker();
-        }
-
-        private void Orbwalker()
-        {
-            var activeMode = this.GetCurrentMode();
-
-            switch (activeMode)
-            {
-                case OrbwalkingMode.None:
-                    return;
-                case OrbwalkingMode.Custom:
-                    this.CustomModeOrbwalking();
-                    break;
-                default:
-                    var target = this.GetTarget();
-                    this.Orbwalk(target);
-                    break;
-            }
+            return true;
         }
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
@@ -230,199 +229,54 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-        public void Orbwalk(AttackableUnit target, bool move = true, bool attack = true)
+
+        public override void Orbwalk()
         {
-            if (!this.SafeToIssueCommand)
+            OrbwalkerMode mode = this.GetActiveMode();
+
+            if (mode == null)
             {
                 return;
             }
 
-            if (this.AttackReady && target != null && !this.ShouldNotAttack)
-            {
-                var preAttackargs = this.FirePreAttack(target);
 
-                if (!preAttackargs.Cancel)
+            /// <summary>
+            ///     Execute the specific logic for this mode if any
+            /// </summary>
+            mode.Execute();
+
+            
+            if (!mode.BaseOrbwalkingEnabled)
+            {
+                return;
+            }
+
+            if (this.CanAttack(mode))
+            {
+
+                var target = GetTarget(mode);
+                if (target != null)
                 {
-                    Player.IssueOrder(OrderType.AttackUnit, target);
-                    this.LastAttackCommandSentTime = Game.TickCount;
+                    this.Attack(target);
+                    
                 }
             }
 
-            if (this.CanMove())
+            if (this.CanMove(mode))
             {
-                var preMoveArgs = this.FirePreMove(Game.CursorPos);
-
-                if (!preMoveArgs.Cancel)
-                {
-                    Player.IssueOrder(OrderType.MoveTo, Game.CursorPos);
-                }
+                this.Move(Game.CursorPos);
             }
         }
 
-        protected void CustomModeOrbwalking()
-        {
-            var activeMode = this.ActiveCustomMode;
-            if (activeMode != null)
-            {
-                this.Orbwalk(null, activeMode.MovingEnabled, activeMode.AttackingEnabled);
-            }
-        }
-
-        private PreAttackEventArgs FirePreAttack(AttackableUnit target)
-        {
-            var args = new PreAttackEventArgs { Target = target };
-
-            this.PreAttack?.Invoke(Player, args);
-
-            return args;
-        }
-
-        private PostAttackEventArgs FirePostAttack(AttackableUnit target)
-        {
-            var args = new PostAttackEventArgs { Target = target };
-
-            this.PostAttack?.Invoke(Player, args);
-
-            return args;
-        }
-
-        private PreMoveEventArgs FirePreMove(Vector3 position)
-        {
-            var args = new PreMoveEventArgs { MovePosition = position };
-
-            this.PreMove?.Invoke(Player, args);
-
-            return args;
-        }
-
-        private OrbwalkingMode GetCurrentMode()
-        {
-            if (GlobalKeys.ComboKey.Active)
-            {
-                return OrbwalkingMode.Combo;
-            }
-
-            if (GlobalKeys.MixedKey.Active)
-            {
-                return OrbwalkingMode.Mixed;
-            }
-
-            if (GlobalKeys.WaveClearKey.Active)
-            {
-                return OrbwalkingMode.Laneclear;
-            }
-
-            if (GlobalKeys.LastHitKey.Active)
-            {
-                return OrbwalkingMode.Lasthit;
-            }
-
-            if (this.ActiveCustomMode != null)
-            {
-                return OrbwalkingMode.Custom;
-            }
-
-            return OrbwalkingMode.None;
-        }
-
-        private string GetCurrentModeString()
-        {
-            if (GlobalKeys.ComboKey.Active)
-            {
-                return "Combo";
-            }
-
-            if (GlobalKeys.MixedKey.Active)
-            {
-                return "Mixed";
-            }
-
-            if (GlobalKeys.WaveClearKey.Active)
-            {
-                return "Laneclear";
-            }
-
-            if (GlobalKeys.LastHitKey.Active)
-            {
-                return "Lasthit";
-            }
-
-
-            var active = this.ActiveCustomMode;
-            if (active != null)
-            {
-                return active.Name;
-            }
-
-            return "None";
-        }
-
-        public CustomMode ActiveCustomMode
-        {
-            get
-            {
-                var activeCustomMode = this.CustomModes.Find(x => x.Active);
-                if (activeCustomMode != null)
-                {
-                    return activeCustomMode;
-                }
-
-                return null;
-            }
-        }
-
-        public AttackableUnit GetTarget()
-        {
-            if (this.ForcedTarget != null && this.ForcedTarget.IsValidAutoRange())
-            {
-                return ForcedTarget;
-            }
-
-            var mode = this.GetCurrentMode();
-            if (mode == OrbwalkingMode.Combo)
-            {
-                var targ = this.GetHeroTarget();
-
-                if (targ != null)
-                {
-                    return targ;
-                }
-            }
-
-            else if (mode == OrbwalkingMode.Mixed)
-            {
-                return this.GetMixedModeTarget();
-            }
-
-            else if (mode == OrbwalkingMode.Laneclear)
-            {
-                return this.GetWaveClearTarget();
-            }
-
-            else if (mode == OrbwalkingMode.Lasthit)
-            {
-                return this.GetLastHitTarget();
-            }
-
-            return null;
-        }
-
-        public void ResetAutoAttackTimer()
+        public override void ResetAutoAttackTimer()
         {
             this.ServerAttackDetectionTick = 0;
             this.LastAttackCommandSentTime = 0;
         }
 
- 
-        public void ForceTarget(AttackableUnit unit)
+        public override void ForceTarget(AttackableUnit unit)
         {
             this.ForcedTarget = unit;
-        }
-
-        public bool IsReset(string missileName)
-        {
-            var missileNameLc = missileName.ToLower();
-            return this.AttackResets.Contains(missileNameLc);
         }
 
         AttackableUnit GetHeroTarget()
@@ -430,11 +284,16 @@ namespace Aimtec.SDK.Orbwalking
             return TargetSelector.Implementation.GetOrbwalkingTarget();
         }
 
-        AttackableUnit GetLastHitTarget(IEnumerable<AttackableUnit> attackable = null)
+        AttackableUnit GetLastHitTarget()
+        {
+            return this.GetLastHitTarget(null);
+        }
+
+        AttackableUnit GetLastHitTarget(IEnumerable<AttackableUnit> attackable)
         {
             if (attackable == null)
             {
-                attackable = ObjectManager.Get<AttackableUnit>().Where(x => !x.IsHero && x.IsValidAutoRange());
+                attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
             }
 
             var availableMinionTargets = attackable.Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>()
@@ -447,7 +306,7 @@ namespace Aimtec.SDK.Orbwalking
             return bestMinionTarget;
         }
 
-        AttackableUnit GetWaveClearTarget()
+        AttackableUnit GetLaneClearTarget()
         {
             var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
    
@@ -575,7 +434,7 @@ namespace Aimtec.SDK.Orbwalking
         //In mixed mode we prioritize killable units, then structures, then heros. If none are found, then we don't attack anything.
         AttackableUnit GetMixedModeTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => !x.IsHero && x.IsValidAutoRange());
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
 
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
@@ -640,7 +499,7 @@ namespace Aimtec.SDK.Orbwalking
             var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
             var ms = Player.IsMelee ? int.MaxValue : Player.BasicAttack.MissileSpeed;
             var attackTravelTime = (dist / ms) * 1000f;
-            var totalTime = (int) (this.AnimationTime + attackTravelTime) + 85 + Game.Ping / 2;
+            var totalTime = (int) (this.AnimationTime + attackTravelTime + 70 + Game.Ping / 2);
             return totalTime;
         }
 
@@ -653,6 +512,7 @@ namespace Aimtec.SDK.Orbwalking
             //The minions health will already be 0 by the time our auto attack reaches it, so no point attacking it...
             if (pred <= 0)
             {
+                this.FireNonKillableMinion(minion);
                 return false;
             }
 
@@ -706,68 +566,54 @@ namespace Aimtec.SDK.Orbwalking
             return Player.GetAutoAttackDamage(minion) - pred >= 0;
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
-            
+            Obj_AI_Base.OnProcessAutoAttack -= this.ObjAiHeroOnProcessAutoAttack;
+            Obj_AI_Base.OnProcessSpellCast -= Obj_AI_Base_OnProcessSpellCast;
+            Game.OnUpdate -= this.Game_OnUpdate;
+            this.Config.Dispose();
         }
 
-        //Adding a custom mode that will be in this orbwalker's menu instance because it is not using a standard key
-        public void AddCustomMode(string modeName, KeyCode modeKey, bool movingEnabled = true, bool attackingEnabled = false)
+        public override AttackableUnit GetTarget(OrbwalkerMode mode)
         {
-            if (this.CustomModes.Any(x => x.Name == modeName) || Enum.GetNames(typeof(OrbwalkingMode)).Contains(modeName))
+            if (this.ForcedTarget != null && this.ForcedTarget.IsValidAutoRange())
             {
-                throw new Exception($"Unable to add a custom mode with the name \"{modeName}\" because it already exists.");
+                return ForcedTarget;
             }
 
-            var mode = new CustomMode(modeName, modeKey, movingEnabled, attackingEnabled);
+            if (mode != null)
+            {
+                return mode.GetTarget();
+            }
 
-            this.CustomModes.Add(mode);
-            this.config.Add(mode.MenuItem);
+            return null;
         }
 
-        //Adding a custom mode that will be using a key from the Global Keys
-        public void AddCustomMode(string modeName, GlobalKeys.Key key, bool movingEnabled = true, bool attackingEnabled = false)
+        public override bool Move(Vector3 movePosition)
         {
-            if (this.CustomModes.Any(x => x.Name == modeName) || Enum.GetNames(typeof(OrbwalkingMode)).Contains(modeName))
+            var preMoveArgs = this.FirePreMove(Game.CursorPos);
+
+            if (!preMoveArgs.Cancel)
             {
-                throw new Exception($"Unable to add a custom mode with the name \"{modeName}\" because it already exists.");
+                Player.IssueOrder(OrderType.MoveTo, movePosition);
+                return true;
             }
 
-            var mode = new CustomMode(modeName, key, movingEnabled, attackingEnabled);
-
-            this.CustomModes.Add(mode);
+            return false;
         }
 
-        // TODO Let developer customize what to do in regards to attacking and moving, instead of just letting them
-        // disable/enable moving and attacking.
-        public class CustomMode
+        public override bool Attack(AttackableUnit target)
         {
-            //Using a GlobalKey
-            public CustomMode(string name, GlobalKeys.Key key, bool movingEnabled = true, bool attackingEnabled = false)
-            {
-                this.Name = name;
-                this.MenuItem = key.KeyBindItem;
-                this.AttackingEnabled = attackingEnabled;
-                this.MovingEnabled = movingEnabled;
+            var preAttackargs = this.FirePreAttack(target);
 
-                key.Activate();
+            if (!preAttackargs.Cancel)
+            {
+                Player.IssueOrder(OrderType.AttackUnit, target);
+                this.LastAttackCommandSentTime = Game.TickCount;
+                return true;
             }
 
-            //Using a custom key
-            public CustomMode(string name, KeyCode key, bool movingEnabled = true, bool attackingEnabled = false)
-            {
-                this.Name = name;
-                this.MenuItem = new MenuKeyBind(name, name, key, KeybindType.Press);
-                this.AttackingEnabled = attackingEnabled;
-                this.MovingEnabled = movingEnabled;
-            }
-
-            public bool AttackingEnabled;
-            public bool MovingEnabled;
-
-            public string Name;
-            public MenuKeyBind MenuItem;
-            public bool Active => this.MenuItem.Enabled;
+            return false;
         }
     }
 }

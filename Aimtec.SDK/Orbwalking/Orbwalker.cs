@@ -3,7 +3,12 @@
 namespace Aimtec.SDK.Orbwalking
 {
     using Aimtec.SDK.Menu;
+    using Aimtec.SDK.Menu.Config;
+    using Aimtec.SDK.Util;
 
+    /// <summary>
+    ///     Orbwalker class
+    /// </summary>
     public class Orbwalker : IOrbwalker
     {
         /// <summary>
@@ -52,11 +57,44 @@ namespace Aimtec.SDK.Orbwalking
 
         private static IOrbwalker impl;
 
+
         /// <inheritdoc cref="IOrbwalker" />
-        public float AnimationTime => Implementation.AnimationTime;
+        public string[] AttackResets { get => Implementation.AttackResets; set => Implementation.AttackResets = value; }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public event EventHandler<PreAttackEventArgs> PreAttack
+        {
+            add => Implementation.PreAttack += value;
+            remove => Implementation.PreAttack -= value;
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public event EventHandler<PostAttackEventArgs> PostAttack
+        {
+            add => Implementation.PostAttack += value;
+            remove => Implementation.PostAttack -= value;
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public event EventHandler<NonKillableMinionEventArgs> OnNonKillableMinion
+        {
+            add => Implementation.OnNonKillableMinion += value;
+            remove => Implementation.OnNonKillableMinion -= value;
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public event EventHandler<PreMoveEventArgs> PreMove
+        {
+            add => Implementation.PreMove += value;
+            remove => Implementation.PreMove -= value;
+        }
 
         /// <inheritdoc cref="IOrbwalker" />
         public float WindUpTime => Implementation.WindUpTime;
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public bool IsWindingUp => Implementation.IsWindingUp;
+
 
         /// <inheritdoc cref="IOrbwalker" />
         public bool CanMove()
@@ -64,22 +102,24 @@ namespace Aimtec.SDK.Orbwalking
             return Implementation.CanMove();
         }
 
-
         /// <inheritdoc cref="IOrbwalker" />
-        public bool CanAttack => Implementation.CanAttack;
-
-        /// <inheritdoc cref="IOrbwalker" />
-        public bool DisableAttacks
+        public bool CanAttack()
         {
-            get => Implementation.DisableAttacks;
-            set => Implementation.DisableAttacks = value;
+            return Implementation.CanAttack();
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public bool DisableMove
+        public bool AttackingEnabled
         {
-            get => Implementation.DisableMove;
-            set => Implementation.DisableMove = value;
+            get => Implementation.AttackingEnabled;
+            set => Implementation.AttackingEnabled = value;
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public bool MovingEnabled
+        {
+            get => Implementation.MovingEnabled;
+            set => Implementation.MovingEnabled = value;
         }
 
 
@@ -87,13 +127,24 @@ namespace Aimtec.SDK.Orbwalking
         public OrbwalkingMode Mode
         {
             get => Implementation.Mode;
-            set => Implementation.Mode = value;
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public AttackableUnit GetTarget()
+        public string ModeName => Implementation.ModeName;
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public OrbwalkerMode Combo { get => Implementation.Combo; set => Implementation.Combo = value; }
+        /// <inheritdoc cref="IOrbwalker" />
+        public OrbwalkerMode LaneClear { get => Implementation.LaneClear; set => Implementation.LaneClear = value; }
+        /// <inheritdoc cref="IOrbwalker" />
+        public OrbwalkerMode LastHit { get => Implementation.LastHit; set => Implementation.LastHit = value; }
+        /// <inheritdoc cref="IOrbwalker" />
+        public OrbwalkerMode Mixed { get => Implementation.Mixed; set => Implementation.Mixed = value; }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public AttackableUnit GetTarget(OrbwalkerMode mode)
         {
-            return Implementation.GetTarget();
+            return Implementation.GetTarget(mode);
         }
 
         /// <inheritdoc cref="IOrbwalker" />
@@ -114,36 +165,66 @@ namespace Aimtec.SDK.Orbwalking
             Implementation.ForceTarget(unit);
         }
 
-
         /// <inheritdoc cref="IOrbwalker" />
-        public event EventHandler<PreAttackEventArgs> PreAttack
+        public void Orbwalk()
         {
-            add => Implementation.PreAttack += value;
-            remove => Implementation.PreAttack -= value;
+            Implementation.Orbwalk();
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public event EventHandler<PostAttackEventArgs> PostAttack
+        public void AddMode(OrbwalkerMode mode)
         {
-            add => Implementation.PostAttack += value;
-            remove => Implementation.PostAttack -= value;
+            Implementation.AddMode(mode);
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public event EventHandler<PreMoveEventArgs> PreMove
+        public OrbwalkerMode DuplicateMode(OrbwalkerMode mode, string newName, KeyCode key)
         {
-            add => Implementation.PreMove += value;
-            remove => Implementation.PreMove -= value;
-
+            return Implementation.DuplicateMode(mode, newName, key);
         }
 
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
+        /// <inheritdoc cref="IOrbwalker" />
+        public OrbwalkerMode DuplicateMode(OrbwalkerMode mode, string newName, GlobalKey key)
+        {
+            return Implementation.DuplicateMode(mode, newName, key);
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public AttackableUnit GetTarget()
+        {
+            return Implementation.GetTarget();
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public bool Move(Vector3 movePosition)
+        {
+            return Implementation.Move(movePosition);
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public bool Attack(AttackableUnit target)
+        {
+            return Implementation.Attack(target);
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public OrbwalkerMode GetActiveMode()
+        {
+            return Implementation.GetActiveMode();
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public bool IsReset(string missileName)
+        {
+            return Implementation.IsReset(missileName);
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
         public void Dispose()
         {
             Implementation.Dispose();
         }
 
+ 
     }
 }

@@ -3,19 +3,98 @@
 namespace Aimtec.SDK.Orbwalking
 {
     using Aimtec.SDK.Menu;
+    using Aimtec.SDK.Menu.Config;
+    using Aimtec.SDK.Util;
 
     /// <summary>
     /// </summary>
     public interface IOrbwalker : IDisposable
     {
         /// <summary>
-        ///     Gets the animation time.
+        ///     Adds a new mode to this Orbwalker Instance
         /// </summary>
-        /// <value>
-        ///     The animation time.
+        void AddMode(OrbwalkerMode mode);
+
+        /// <summary>
+        ///     Duplicates an existing Orbwalker mode to a new name and key, useful if your assembly needs additional modes
+        /// </summary>
+        OrbwalkerMode DuplicateMode(OrbwalkerMode mode, string newName, KeyCode key);
+
+        /// <summary>
+        ///     Duplicates an existing Orbwalker mode to a new name and key, useful if your assembly needs additional modes
+        /// </summary>
+        OrbwalkerMode DuplicateMode(OrbwalkerMode mode, string newName, GlobalKey key);
+
+        /// <summary>
+        ///     The Combo Orbwalker Mode
+        /// </summary>
+        OrbwalkerMode Combo { get; set; }
+
+        /// <summary>
+        ///     The Laneclear Orbwalker Mode
+        /// </summary>
+        OrbwalkerMode LaneClear { get; set; }
+
+        /// <summary>
+        ///     The Laneclear Orbwalker Mode
+        /// </summary>
+        OrbwalkerMode LastHit { get; set; }
+
+        /// <summary>
+        ///     The Mixed Orbwalker Mode
+        /// </summary>
+        OrbwalkerMode Mixed { get; set; }
+
+        /// <summary>
+        ///     Gets the current active OrbwalkerMode
+        /// </summary>
+        OrbwalkerMode GetActiveMode();
+
+        /// <summary>
+        ///     Processes a movement command through the Orbwalker, firing events, etc.
+        /// </summary>
+        bool Move(Vector3 movePosition);
+
+        /// <summary>
+        ///     Processes a movement command through the Orbwalker, firing events, etc.
+        /// </summary>
+        bool Attack(AttackableUnit target);
+
+        /// <summary>
+        ///     Gets the target for this orbwalker mode
+        /// </summary>
+        AttackableUnit GetTarget(OrbwalkerMode mode);
+
+        /// <summary>
+        ///     Gets the target.
+        /// </summary>
+        /// <returns></returns>
+        AttackableUnit GetTarget();
+
+        /// <summary>
+        ///     Gets the target for this orbwalker mode
+        /// </summary>
+        string[] AttackResets { get; set; }
+
+        /// <summary>
+        ///     Gets if the orbwalker is in the middle of casting an auto attack
+        ///     If true, then it is not safe to cast any commands. If false, then commands can be issued without interrupting the attack.
+        /// </summary>
+        /// /// <value>
+        ///     <c>true</c> if the orbwalker is in the process of auto attacking, otherwise <c>false</c>.
         /// </value>
-        float AnimationTime { get; }
-       
+        bool IsWindingUp { get; }
+
+        /// <summary>
+        ///     Returns the current Orbwalker Mode Name as a string
+        /// </summary>
+        string ModeName { get; }
+
+        /// <summary>
+        ///     The Orbwalking logic
+        /// </summary>
+        void Orbwalk();
+
         /// <summary>
         ///     Gets the wind up time.
         /// </summary>
@@ -23,7 +102,6 @@ namespace Aimtec.SDK.Orbwalking
         ///     The wind up time.
         /// </value>
         float WindUpTime { get; }
-
 
         /// <summary>
         ///     Gets the if the player can move.
@@ -39,7 +117,7 @@ namespace Aimtec.SDK.Orbwalking
         /// <value>
         ///     If the player can attack.
         /// </value>
-        bool CanAttack { get; }
+        bool CanAttack();
 
         /// <summary>
         ///     Gets or sets a value indicating whether the orbwalker should disable attacking.
@@ -47,7 +125,7 @@ namespace Aimtec.SDK.Orbwalking
         /// <value>
         ///     <c>true</c> if the orbwalker should disable attacking; otherwise, <c>false</c>.
         /// </value>
-        bool DisableAttacks { get; set; }
+        bool AttackingEnabled { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether the orbwalker should disable moving.
@@ -55,7 +133,7 @@ namespace Aimtec.SDK.Orbwalking
         /// <value>
         ///     <c>true</c> if the orbwalker should disable moving; otherwise, <c>false</c>.
         /// </value>
-        bool DisableMove { get; set; }
+        bool MovingEnabled { get; set; }
 
         /// <summary>
         ///     Gets or sets the mode.
@@ -63,13 +141,7 @@ namespace Aimtec.SDK.Orbwalking
         /// <value>
         ///     The mode.
         /// </value>
-        OrbwalkingMode Mode { get; set; }
-
-        /// <summary>
-        ///     Gets the target.
-        /// </summary>
-        /// <returns></returns>
-        AttackableUnit GetTarget();
+        OrbwalkingMode Mode { get; }
 
         /// <summary>
         ///     Resets the automatic attack timer.
@@ -89,9 +161,19 @@ namespace Aimtec.SDK.Orbwalking
         void ForceTarget(AttackableUnit unit);
 
         /// <summary>
+        ///     Returns whether this the missile name is an auto attack reset
+        /// </summary>
+        bool IsReset(string missileName);
+
+        /// <summary>
         ///     Occurs when the orbwalking is about to launch an attack.
         /// </summary>
         event EventHandler<PreAttackEventArgs> PreAttack;
+
+        /// <summary>
+        ///     Occurs when there is a non killable minion
+        /// </summary>
+       event EventHandler<NonKillableMinionEventArgs> OnNonKillableMinion;
 
         /// <summary>
         ///     Occurs when after an attack has been launched and acknowledged by the server.
@@ -139,6 +221,15 @@ namespace Aimtec.SDK.Orbwalking
     /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
     public class PostAttackEventArgs : OrbwalkingEventArgs
     {
+    }
+
+    /// <summary>
+    ///     The event arguements for the <see cref="AOrbwalker.OnNonKillableMinion" /> event.
+    /// </summary>
+    /// <seealso cref="Aimtec.SDK.Orbwalking.OrbwalkingEventArgs" />
+    public class NonKillableMinionEventArgs : OrbwalkingEventArgs
+    {
+
     }
 
     /// <summary>

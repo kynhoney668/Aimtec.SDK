@@ -54,6 +54,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
+    <Compile Include="Orbwalking\AOrbwalker.cs" />
+    <Compile Include="Orbwalking\IOrbwalker.cs" />
+    <Compile Include="Orbwalking\OrbwalkerMode.cs" />
     <Compile Include="Util\GameData.cs" />
     <Compile Include="Util\Cache\GameObjectEqualityComparer.cs" />
     <Compile Include="Util\Cache\GameObjects.cs" />
@@ -97,7 +100,6 @@
     <Compile Include="Menu\Menu.cs" />
     <Compile Include="Menu\MenuManager.cs" />
     <Compile Include="Menu\ValueChangedArgs.cs" />
-    <Compile Include="Orbwalking\IOrbwalker.cs" />
     <Compile Include="Orbwalking\Orbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkingImpl.cs" />
     <Compile Include="Orbwalking\OrbwalkingMode.cs" />

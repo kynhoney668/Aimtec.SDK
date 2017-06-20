@@ -10,18 +10,18 @@
         internal static Menu KeyConfig;
 
         //Main Keys - To be enabled by default
-        public static Key ComboKey { get; set; }
-        public static Key MixedKey { get; set; }
-        public static Key WaveClearKey { get; set; }
-        public static Key LastHitKey { get; set; }
+        public static GlobalKey ComboKey { get; set; }
+        public static GlobalKey MixedKey { get; set; }
+        public static GlobalKey WaveClearKey { get; set; }
+        public static GlobalKey LastHitKey { get; set; }
 
         //Additional Keys that can be enabled by assemblies if they require it
-        public static Key HarassKey { get; set; }
-        public static Key FreezeKey { get; set; }
-        public static Key BurstKey { get; set; }
-        public static Key FleeKey { get; set; }
-        public static Key ComboNoOrbwalkKey { get; set; }
-        public static Key TowerDiveKey { get; set; }
+        public static GlobalKey HarassKey { get; set; }
+        public static GlobalKey FreezeKey { get; set; }
+        public static GlobalKey BurstKey { get; set; }
+        public static GlobalKey FleeKey { get; set; }
+        public static GlobalKey ComboNoOrbwalkKey { get; set; }
+        public static GlobalKey TowerDiveKey { get; set; }
 
 
         internal static void Load()
@@ -32,64 +32,64 @@
 
             KeyConfig.Add(new MenuSeperator("seperator", "Main Keys"));
 
-            ComboKey = new Key("Combo", "Combo", KeyCode.Space, KeybindType.Press, true);
-            MixedKey = new Key("Mixed", "Mixed", KeyCode.C, KeybindType.Press, true);
-            WaveClearKey = new Key("WaveClear", "Waveclear", KeyCode.V, KeybindType.Press, true);
-            LastHitKey = new Key("LastHit", "LastHit", KeyCode.X, KeybindType.Press, true);
+            ComboKey = new GlobalKey("Combo", "Combo", KeyCode.Space, KeybindType.Press, true);
+            MixedKey = new GlobalKey("Mixed", "Mixed", KeyCode.C, KeybindType.Press, true);
+            WaveClearKey = new GlobalKey("WaveClear", "Waveclear", KeyCode.V, KeybindType.Press, true);
+            LastHitKey = new GlobalKey("LastHit", "LastHit", KeyCode.X, KeybindType.Press, true);
 
             KeyConfig.Add(new MenuSeperator("seperator2", "Additional Keys"));
 
-            HarassKey = new Key("Harass", "Harass", KeyCode.H, KeybindType.Toggle, false);
-            FreezeKey = new Key("Freeze", "Freeze", KeyCode.M, KeybindType.Toggle, false);
-            BurstKey = new Key("Burst", "Burst", KeyCode.K, KeybindType.Press, false);
-            FleeKey = new Key("Flee", "Flee", KeyCode.L, KeybindType.Press, false);
-            TowerDiveKey = new Key("TowerDive", "Tower Dive", KeyCode.T, KeybindType.Press, false);
+            HarassKey = new GlobalKey("Harass", "Harass", KeyCode.H, KeybindType.Toggle, false);
+            FreezeKey = new GlobalKey("Freeze", "Freeze", KeyCode.M, KeybindType.Toggle, false);
+            BurstKey = new GlobalKey("Burst", "Burst", KeyCode.K, KeybindType.Press, false);
+            FleeKey = new GlobalKey("Flee", "Flee", KeyCode.L, KeybindType.Press, false);
+            TowerDiveKey = new GlobalKey("TowerDive", "Tower Dive", KeyCode.T, KeybindType.Press, false);
 
-            ComboNoOrbwalkKey = new Key("ComboNoOrbwalk", "Combo - No Orbwalk", KeyCode.J, KeybindType.Toggle, false);
+            ComboNoOrbwalkKey = new GlobalKey("ComboNoOrbwalk", "Combo - No Orbwalk", KeyCode.J, KeybindType.Toggle, false);
 
             AimtecMenu.Instance.Add(KeyConfig);
         }
+    }
 
-        public class Key
+    public class GlobalKey
+    {
+        internal GlobalKey(string internalName, string displayName, KeyCode keyCode, KeybindType type, bool enabled)
         {
-            internal Key(string internalName, string displayName, KeyCode keyCode, KeybindType type, bool enabled)
+            this.KeyBindItem = new MenuKeyBind(internalName, displayName, keyCode, type);
+
+            if (enabled)
             {
-                this.KeyBindItem = new MenuKeyBind(internalName, displayName, keyCode, type);
-
-                if (enabled)
-                {
-                    this.Activate();
-                }
+                this.Activate();
             }
+        }
 
-            private bool AddedToMenu { get; set; }
+        private bool AddedToMenu { get; set; }
 
-            //Gets whether the keybind is active
-            public bool Active
-            {
-                get
-                {
-                    if (!this.AddedToMenu)
-                    {
-                        this.Activate();
-                    }
-
-                    return this.KeyBindItem.Value;
-                }
-            }
-
-            //The Menu item associated with this Key
-            public MenuKeyBind KeyBindItem { get; }
-
-
-            //Enables the key by adding it to the keylist
-            public void Activate()
+        //Gets whether the keybind is active
+        public bool Active
+        {
+            get
             {
                 if (!this.AddedToMenu)
                 {
-                    KeyConfig.Add(this.KeyBindItem);
-                    this.AddedToMenu = true;
+                    this.Activate();
                 }
+
+                return this.KeyBindItem.Value;
+            }
+        }
+
+        //The Menu item associated with this Key
+        public MenuKeyBind KeyBindItem { get; }
+
+
+        //Enables the key by adding it to the keylist
+        public void Activate()
+        {
+            if (!this.AddedToMenu)
+            {
+                GlobalKeys.KeyConfig.Add(this.KeyBindItem);
+                this.AddedToMenu = true;
             }
         }
     }

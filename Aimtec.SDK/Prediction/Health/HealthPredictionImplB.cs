@@ -173,7 +173,7 @@
             foreach (var attack in incAttacksUnit)
             {
                 //if this attack will take longer than the specified time to reach the target, then ignore it
-                if (attack.ETA > time)
+                if (attack.ETA + 120 > time)
                 {
                     continue;
                 }
@@ -269,7 +269,7 @@
 
             public virtual float MeleeTravelTime { get; set; }
 
-            public virtual float TravelTime => this.Sender.IsMelee ? this.MeleeTravelTime + 100 : this.RangedTravelTime + 80;
+            public virtual float TravelTime => this.Sender.IsMelee ? this.MeleeTravelTime : this.RangedTravelTime;
 
             //Gets the time passed by since this auto attack was detected
             public float TimeElapsed => Game.TickCount - this.CastTime;

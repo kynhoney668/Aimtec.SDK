@@ -11,13 +11,10 @@
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Config;
     using Aimtec.SDK.Util;
-
     using NLog;
-    using NLog.Fluent;
 
-    using Menu = Aimtec.SDK.Menu.Menu;
 
-    public class TargetSelectorImpl : ITargetSelector
+    internal class TargetSelectorImpl : ITargetSelector
     {
         public Menu Config { get; set; }
 
@@ -74,6 +71,7 @@
         private void GameOnOnWndProc(WndProcEventArgs args)
         {
             var message = args.Message;
+
             if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
             {
                 var clickPosition = Game.CursorPos;
@@ -98,6 +96,7 @@
         {
             var indicateSelected = this.Config["Drawings"]["IndicateSelected"].Enabled;
             var showOrder = this.Config["Drawings"]["ShowOrder"].Enabled;
+            var ShowOrderAuto = this.Config["Drawings"]["ShowOrderAuto"].Enabled;
 
             if (indicateSelected)
             {
@@ -113,7 +112,7 @@
 
             if (showOrder)
             {
-                var ordered = this.GetTargetsInOrder(50000).ToList();
+                var ordered = this.GetTargetsInOrder(50000, ShowOrderAuto).ToList();
                 var basepos = new Vector2(RenderManager.Width / 2f, 0.10f * RenderManager.Height);
                 for (int i = 0; i < ordered.Count(); i++)
                 {
@@ -131,11 +130,11 @@
         }
 
         //For testing purposes...
-        internal IOrderedEnumerable<WeightResult> GetTargetsInOrder(float range)
+        internal IOrderedEnumerable<WeightResult> GetTargetsInOrder(float range, bool autoRangeOnly)
         {
             List<WeightResult> weightResults = new List<WeightResult>();
 
-            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(range)))
+            foreach (var hero in ObjectManager.Get<Obj_AI_Hero>().Where(x => autoRangeOnly ? x.IsValidAutoRange() : x.IsValidTarget(range)))
             {
                 var result = this.GetWeightedResult(hero);
                 weightResults.Add(result);
@@ -150,7 +149,6 @@
 
             return results;
         }
-
 
 
         public void AddWeight(Weight weight)
@@ -281,36 +279,35 @@
             return TargetPriority.MinPriority;
         }
 
-        public Weight DistanceToPlayerWeight = new Weight(
-            "DistanceToPlayerWeight",
-            "Distance to Player",
-            true,
-            100,
-            target => target.Distance(Player),
-            WeightEffect.LowerIsBetter);
-
-        public Weight DistanceToMouseWeight = new Weight(
-            "DistanceToMouse",
-            "Distance to Mouse",
-            true,
-            100,
-            target => target.Distance(Game.CursorPos),
-            WeightEffect.LowerIsBetter);
-
-        public Weight LeastAttacksWeight = new Weight(
-            "LeastAttacksWeight",
-            "Least Attacks",
-            true,
-            100,
-            target => (int)Math.Ceiling(target.Health / Player.GetAutoAttackDamage(target)),
-            WeightEffect.LowerIsBetter);
-
 
         private void CreateWeights()
         {
-            this.AddWeight(this.DistanceToPlayerWeight);
-            this.AddWeight(this.DistanceToMouseWeight);
-            //AddWeight(LeastAttacksWeight); //GetAutoAttackDamage(Obj_AI_Hero) is bugsplatting
+            this.AddWeight(new Weight(
+                "DistanceToPlayerWeight",
+                "Distance to Player",
+                true,
+                100,
+                target => target.Distance(Player),
+                WeightEffect.LowerIsBetter));
+
+
+            this.AddWeight(new Weight(
+                "DistanceToMouse",
+                "Distance to Mouse",
+                true,
+                100,
+                target => target.Distance(Game.CursorPos),
+                WeightEffect.LowerIsBetter));
+
+            /*
+            this.AddWeight(new Weight(
+                "LeastAttacksWeight",
+                "Least Attacks",
+                true,
+                100,
+                target => (int)Math.Ceiling(target.Health / Player.GetAutoAttackDamage(target)),
+                WeightEffect.LowerIsBetter));
+                */
 
             this.AddWeight(new Weight(
                 "PriorityWeight",
@@ -355,7 +352,6 @@
                 target => target.Health, WeightEffect.LowerIsBetter));
         }
 
-
         private void CreateMenu()
         {
             this.Logger.Info("Constructing Menu for default Target Selector");
@@ -378,12 +374,11 @@
             var drawings = new Menu("Drawings", "Drawings");
             drawings.Add(new MenuBool("IndicateSelected", "Indicate Selected Target"));
             drawings.Add(new MenuBool("ShowOrder", "Show Target Order"));
+            drawings.Add(new MenuBool("ShowOrderAuto", "Auto range only"));
             this.Config.Add(drawings);
 
 
             this.Config.Add(new MenuBool("UseWeights", "Use Weights"));
-
-    
         }
 
 
@@ -459,6 +454,6 @@
             Game.OnWndProc -= this.GameOnOnWndProc;
         }
 
-  
+
     }
 }
