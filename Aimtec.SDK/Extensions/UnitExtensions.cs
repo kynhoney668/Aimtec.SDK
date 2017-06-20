@@ -196,7 +196,17 @@ namespace Aimtec.SDK.Extensions
         {
             return unit.Mana / unit.MaxMana * 100;
         }
-        
+
+
+        /// <summary>
+        ///     Gets the buffs of the unit which are valid and active
+        /// </summary>
+        /// <param name="buff">The unit.</param>
+        public static Buff[] ValidActiveBuffs(this Obj_AI_Base unit)
+        {
+            return unit.Buffs.Where(buff => buff.IsValid && buff.IsActive).ToArray();
+        }
+
         /// <summary>
         ///     Returns a determined buff a determined unit has.
         /// </summary>
@@ -260,6 +270,20 @@ namespace Aimtec.SDK.Extensions
                 && ((allyIsValidTarget || target.Team != ObjectManager.GetLocalPlayer().Team) && Vector3.Distance(
                     target.Position,
                     ObjectManager.GetLocalPlayer().Position) < range);
+        }
+
+  
+
+        /// <summary>
+        ///     Determines whether or not the specified unit is recalling.
+        /// </summary>
+        /// <param name="unit">The unit</param>
+        /// <returns>
+        ///     <c>true</c> if the specified unit is recalling; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsRecalling(this Obj_AI_Hero unit)
+        {
+            return unit.ValidActiveBuffs().Any(buff => buff.Name.ToLower().Contains("recall") && buff.Type == BuffType.Aura);
         }
 
         #endregion
