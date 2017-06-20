@@ -57,7 +57,6 @@
     <Compile Include="Orbwalking\AOrbwalker.cs" />
     <Compile Include="Orbwalking\IOrbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkerMode.cs" />
-    <Compile Include="Util\GameData.cs" />
     <Compile Include="Util\Cache\GameObjectEqualityComparer.cs" />
     <Compile Include="Util\Cache\GameObjects.cs" />
     <Compile Include="Damage\Damage.cs" />

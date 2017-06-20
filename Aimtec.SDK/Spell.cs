@@ -112,7 +112,7 @@
         /// </summary>
         /// <value><c>true</c> if this instance is charing; otherwise, <c>false</c>.</value>
         public bool IsCharging => this.Ready && (Player.HasBuff(this.ChargedBuffName)
-            || GameData.TickCount - this.chargedCastedT < 300 + Game.Ping);
+            || Game.TickCount - this.chargedCastedT < 300 + Game.Ping);
 
         /// <summary>
         ///     Gets or sets a value indicating whether this instance is skill shot.
@@ -137,7 +137,7 @@
                 {
                     return this.ChargedMinRange + Math.Min(
                         this.ChargedMaxRange - this.ChargedMinRange,
-                        (GameData.TickCount - this.chargedCastedT) * (this.ChargedMaxRange - this.ChargedMinRange)
+                        (Game.TickCount - this.chargedCastedT) * (this.ChargedMaxRange - this.ChargedMinRange)
                         / this.ChargeDuration - 150);
                 }
 
@@ -336,13 +336,13 @@
             {
                 if (sender.IsMe && args.SpellData.Name == this.ChargedSpellName)
                 {
-                    this.chargedCastedT = GameData.TickCount;
+                    this.chargedCastedT = Game.TickCount;
                 }
             };
 
             SpellBook.OnUpdateChargedSpell += (sender, args) =>
             {
-                if (sender.IsMe && GameData.TickCount - this.chargeReqSentT < 3000 && args.ReleaseCast)
+                if (sender.IsMe && Game.TickCount - this.chargeReqSentT < 3000 && args.ReleaseCast)
                 {
                     //args.Process = false;
                 }
@@ -350,7 +350,7 @@
 
             SpellBook.OnCastSpell += (sender, args) =>
             {
-                if (args.Slot == (int) this.Slot && GameData.TickCount - this.chargeReqSentT > 500 && this.IsCharging)
+                if (args.Slot == (int) this.Slot && Game.TickCount - this.chargeReqSentT > 500 && this.IsCharging)
                 {
                     this.Cast((Vector2) args.End);
                 }
@@ -415,12 +415,12 @@
 
         private bool StartCharging()
         {
-            if (this.IsCharging || GameData.TickCount - this.chargeReqSentT <= 400 + Game.Ping)
+            if (this.IsCharging || Game.TickCount - this.chargeReqSentT <= 400 + Game.Ping)
             {
                 return false;
             }
 
-            this.chargeReqSentT = GameData.TickCount;
+            this.chargeReqSentT = Game.TickCount;
             return Player.SpellBook.CastSpell(this.Slot);
         }
 
