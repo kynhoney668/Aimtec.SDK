@@ -179,10 +179,41 @@
             this.TargetsWaypoints = objAiHeroes.ToDictionary(x => x.NetworkId, x => new List<WaypointInfo>());
             this.DontShoot = objAiHeroes.ToDictionary(x => x.NetworkId, x => 0f);
             this.DontShoot2 = objAiHeroes.ToDictionary(x => x.NetworkId, x => 0f);
+            this.VisibleSince = objAiHeroes.ToDictionary(x => x.NetworkId, x => 0f);
 
             Obj_AI_Base.OnNewPath += this.OnNewPath;
             Game.OnUpdate += this.OnUpdate;
             Obj_AI_Base.OnProcessSpellCast += this.OnProcessSpellCast;
+            AttackableUnit.OnEnterVisible += this.OnEnterVisible;
+        }
+
+        private void OnEnterVisible(AttackableUnit sender, EventArgs eventArgs)
+        {
+            if (sender.Type != GameObjectType.AIHeroClient || !sender.IsEnemy)
+            {
+                return;
+            }
+
+            this.VisibleSince[sender.NetworkId] = GetTime();
+
+            // update path analysis
+            var hero = (Obj_AI_Hero) sender;
+
+            if (this.PathAnalysis[sender.NetworkId].Count == 2)
+            {
+                var p1 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 2].Position;
+                var p2 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 1].Position;
+                var angle = ((Vector2)sender.Position).AngleBetween((Vector2)p2, (Vector2)p1);
+
+                if (angle > 20)
+                {
+                    this.PathAnalysis[sender.NetworkId].Add(new Path() { Time = GetTime(), Position = hero.Path.Last() });
+                }
+            }
+            else
+            {
+                this.PathAnalysis[sender.NetworkId].Add(new Path() { Time = GetTime(), Position = hero.Path.Last() });
+            }
         }
 
         private void OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
@@ -395,6 +426,7 @@
         private Dictionary<int, float> TargetsImmobile { get; } = new Dictionary<int, float>();
         private Dictionary<int, float> DontShoot { get; } = new Dictionary<int, float>();
         private Dictionary<int, float> DontShoot2 { get; } = new Dictionary<int, float>();
+        private Dictionary<int, float> VisibleSince { get; }
 
         private void OnNewPath(Obj_AI_Base sender, Obj_AI_BaseNewPathEventArgs e)
         {
@@ -435,10 +467,6 @@
                             N = waypointsToAdd.Count
                         });
                 }
-            }
-            else
-            {
-                // could do healthrped stuff
             }
 
             if (e.IsDash)
@@ -810,7 +838,9 @@
 
             var savedWaypoints = this.TargetsWaypoints[unit.NetworkId];
             var currentWaypoints = this.GetCurrentWaypoints(unit);
-            var visibleSince = GetTime();
+            var visibleSince = this.VisibleSince.ContainsKey(unit.NetworkId)
+                ? this.VisibleSince[unit.NetworkId]
+                : GetTime();
 
             if (delay < 0.25)
             {
@@ -854,7 +884,7 @@
             }
             
             // todo p fm
-            if (currentWaypoints.Count <= 1 && GetTime() - visibleSince > 1)
+            if (currentWaypoints.Count <= 1 && GetTime() - visibleSince > 1 && unit.IsVisible)
             {
                 hitchance = 2;
             }
@@ -886,7 +916,7 @@
                 castPosition = calculatedTargetPosition.CastPosition;
             }
 
-            if (savedWaypoints.Count == 0 && GetTime() - visibleSince > 3)
+            if (savedWaypoints.Count == 0 && GetTime() - visibleSince > 3 && unit.IsVisible)
             {
                 hitchance = 2;
             }
