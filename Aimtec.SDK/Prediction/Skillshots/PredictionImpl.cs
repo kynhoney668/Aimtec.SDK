@@ -463,7 +463,7 @@
             }         
         }
 
-        private static float GetTime() => Game.TickCount;
+        private static float GetTime() => (Environment.TickCount & int.MaxValue) / 1000f;
 
         private List<Vector3> GetCurrentWaypoints(Obj_AI_Base @object)
         {
