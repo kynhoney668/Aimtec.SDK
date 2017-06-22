@@ -91,6 +91,7 @@
                 if (task.Item3.IsCancellationRequested)
                 {
                     TaskQueue.RemoveAt(i);
+                    continue;
                 }
 
                 if (Game.TickCount >= task.Item1)
