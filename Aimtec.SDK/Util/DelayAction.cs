@@ -1,24 +1,38 @@
-﻿using System;
-using System.Threading;
-using System.Threading.Tasks;
-
-namespace Aimtec.SDK.Util
+﻿namespace Aimtec.SDK.Util
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Threading;
+
     /// <summary>
-    /// Runs actions at a later time.
+    ///     Runs actions at a later time.
     /// </summary>
-    /// <remarks>
-    /// The action will be run in a different thread. Ensure your types are thread safe.
-    /// </remarks>
     public class DelayAction
     {
+        #region Constructors and Destructors
+
         /// <summary>
-        /// Gets the scheduler.
+        ///     Initializes static members of the <see cref="DelayAction" /> class.
         /// </summary>
-        /// <value>
-        /// The scheduler.
-        /// </value>
-        public static TaskFactory Scheduler { get; } = new TaskFactory(TaskScheduler.Current);
+        static DelayAction()
+        {
+            Game.OnUpdate += UpdateDelayedActions;
+        }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        ///     Gets or sets the task queue.
+        /// </summary>
+        /// <value>The task queue.</value>
+        private static List<Tuple<int, Action, CancellationToken>> TaskQueue { get; } =
+            new List<Tuple<int, Action, CancellationToken>>();
+
+        #endregion
+
+        #region Public Methods and Operators
 
         /// <summary>
         ///     Queues the action to be run after a specified time.
@@ -42,7 +56,55 @@ namespace Aimtec.SDK.Util
         /// <param name="token">The token.</param>
         public static void Queue(int milliseconds, Action action, CancellationToken token)
         {
-            Task.Delay(milliseconds, token).ContinueWith(task => action(), token);
+            if (milliseconds == 0)
+            {
+                action();
+                return;
+            }
+
+            TaskQueue.Add(new Tuple<int, Action, CancellationToken>(milliseconds, action, token));
+            SortList();
         }
+
+        #endregion
+
+        #region Methods
+
+        /// <summary>
+        ///     Sorts the list.
+        /// </summary>
+        private static void SortList()
+        {
+            // sort list backwards
+            TaskQueue.Sort((x, y) => x.Item1 == y.Item1 ? 0 : x.Item1 > y.Item1 ? -1 : 1);
+        }
+
+        /// <summary>
+        ///     Updates the delayed actions.
+        /// </summary>
+        private static void UpdateDelayedActions()
+        {
+            for (var i = TaskQueue.Count - 1; i >= 0; i--)
+            {
+                var task = TaskQueue[i];
+
+                if (task.Item3.IsCancellationRequested)
+                {
+                    TaskQueue.RemoveAt(i);
+                }
+
+                if (Game.TickCount >= task.Item1)
+                {
+                    task.Item2();
+                    TaskQueue.RemoveAt(i);
+                }
+                else
+                {
+                    return;
+                }
+            }
+        }
+
+        #endregion
     }
 }
