@@ -62,7 +62,7 @@
                 return;
             }
 
-            TaskQueue.Add(new Tuple<int, Action, CancellationToken>(milliseconds, action, token));
+            TaskQueue.Add(new Tuple<int, Action, CancellationToken>(Game.TickCount + milliseconds, action, token));
             SortList();
         }
 
