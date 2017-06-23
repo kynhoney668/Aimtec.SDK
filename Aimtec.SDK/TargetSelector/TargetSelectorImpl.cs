@@ -299,7 +299,7 @@
                 target => target.Distance(Game.CursorPos),
                 WeightEffect.LowerIsBetter));
 
-            /*
+            
             this.AddWeight(new Weight(
                 "LeastAttacksWeight",
                 "Least Attacks",
@@ -307,7 +307,7 @@
                 100,
                 target => (int)Math.Ceiling(target.Health / Player.GetAutoAttackDamage(target)),
                 WeightEffect.LowerIsBetter));
-                */
+                
 
             this.AddWeight(new Weight(
                 "PriorityWeight",
