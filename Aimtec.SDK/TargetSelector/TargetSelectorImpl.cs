@@ -123,7 +123,7 @@
                         RenderManager.RenderText(
                             basepos + new Vector2(0, i * 15),
                             Color.Red,
-                            target.Name + " " + targ.WeightedAverage);
+                            target.ChampionName + " " + targ.WeightedAverage);
                     }
                 }
             }
