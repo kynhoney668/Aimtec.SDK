@@ -350,7 +350,7 @@
 
             SpellBook.OnCastSpell += (sender, args) =>
             {
-                if (args.Slot == (int) this.Slot && Game.TickCount - this.chargeReqSentT > 500 && this.IsCharging)
+                if (args.Slot == this.Slot && Game.TickCount - this.chargeReqSentT > 500 && this.IsCharging)
                 {
                     this.Cast((Vector2) args.End);
                 }
