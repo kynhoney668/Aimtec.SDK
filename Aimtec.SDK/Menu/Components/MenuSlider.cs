@@ -66,14 +66,12 @@
         ///     Gets or sets the maximum value.
         /// </summary>
         /// <value>The maximum value.</value>
-        [JsonProperty(Order = 4)]
         public int MaxValue { get; set; }
 
         /// <summary>
         ///     Gets or sets the minimum value.
         /// </summary>
         /// <value>The minimum value.</value>
-        [JsonProperty(Order = 5)]
         public int MinValue { get; set; }
 
 
@@ -179,8 +177,6 @@
                 if (sValue?.InternalName != null)
                 {
                     this.Value = sValue.Value;
-                    this.MaxValue = sValue.MaxValue;
-                    this.MinValue = sValue.MinValue;
                 }
             }
         }

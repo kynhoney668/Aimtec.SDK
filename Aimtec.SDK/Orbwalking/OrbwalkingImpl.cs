@@ -27,11 +27,12 @@ namespace Aimtec.SDK.Orbwalking
             if (!this.Attached)
             {
                 this.Attached = true;
+                menu.Add(this.Config);
                 Obj_AI_Base.OnProcessAutoAttack += this.ObjAiHeroOnProcessAutoAttack;
                 Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
                 Game.OnUpdate += this.Game_OnUpdate;
                 SpellBook.OnStopCast += SpellBook_OnStopCast;
-                menu.Add(this.Config);
+                RenderManager.OnRender += RenderManager_OnRender;
             }
 
             else
@@ -49,9 +50,9 @@ namespace Aimtec.SDK.Orbwalking
 
         public float AnimationTime => Player.AttackCastDelay * 1000;
 
-        public float AttackCoolDownTime => (Player.AttackDelay * 1000) - this.LowerCD;
+        public float AttackCoolDownTime => (Player.AttackDelay * 1000) - this.AttackDelayReduction;
 
-        protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - Math.Max(this.ServerAttackDetectionTick, this.LastAttackCommandSentTime)
+        protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick
                                       >= this.AttackCoolDownTime;
 
         /// <summary>
@@ -68,22 +69,22 @@ namespace Aimtec.SDK.Orbwalking
         {
             get
             {
-                if (this.NoCancelChamps.Contains(Player.ChampionName))
-                {
-                    return false;
-                }
-
                 var detectionTime = Math.Max(this.ServerAttackDetectionTick, this.LastAttackCommandSentTime);
                 return (Game.TickCount + Game.Ping / 2) - detectionTime <= this.WindUpTime;
             }
         }
 
         //Menu Getters
-        protected int HoldPositionRadius => this.Config["holdPositionRadius"].Value;
+        private int HoldPositionRadius => this.Config["holdPositionRadius"].Value;
 
-        protected int ExtraWindUp => this.Config["extraWindup"].Value;
+        private int ExtraWindUp => this.Config["extraWindup"].Value;
 
-        protected int LowerCD => this.Config["Advanced"]["lowerAttackCD"].Value;
+        private int AttackDelayReduction => this.Config["Advanced"]["attackDelayReduction"].Value;
+
+        private bool DrawHoldPosition => this.Config["Drawings"]["drawHoldRadius"].Enabled;
+
+        private bool DrawAttackRange => this.Config["Drawings"]["drawAttackRange"].Enabled;
+
 
         //Members
         private float ServerAttackDetectionTick { get; set; }
@@ -96,12 +97,19 @@ namespace Aimtec.SDK.Orbwalking
             {
                 new Menu("Advanced", "Advanced")
                 {
-                    new MenuSlider("lowerAttackCD", "Lower Attack CD", 90, 0, 400, true),
+                    new MenuSlider("attackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true),
                 },
 
                 new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
                 new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
                 new MenuBool("noBlindAA", "No AA when Blind", true, true),
+
+                new Menu("Drawings", "Drawings")
+                {
+                    new MenuBool("drawAttackRange", "Draw Attack Range", true),
+                    new MenuBool("drawHoldRadius", "Draw Hold Radius", false),
+                },
+
             };
 
             this.AddMode(Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, GetHeroTarget, null));
@@ -163,13 +171,17 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
-            
+            if (this.NoCancelChamps.Contains(Player.ChampionName))
+            {
+                return true;
+            }
+
             if (this.IsWindingUp)
             {
                 return false;
             }
             
-            return this.NoCancelChamps.Contains(Player.ChampionName) || this.AttackReady;
+            return this.AttackReady;
         }
 
         public bool CanMove(OrbwalkerMode mode)
@@ -200,6 +212,19 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             return true;
+        }
+
+        private void RenderManager_OnRender()
+        {
+            if (this.DrawAttackRange)
+            {
+                RenderManager.RenderCircle(Player.Position, Player.AttackRange + Player.BoundingRadius, 30, System.Drawing.Color.Red);
+            }
+
+            if (this.DrawHoldPosition)
+            {
+                RenderManager.RenderCircle(Player.Position, this.HoldPositionRadius, 30, System.Drawing.Color.White);
+            }
         }
 
         private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
@@ -585,11 +610,13 @@ namespace Aimtec.SDK.Orbwalking
 
         public override void Dispose()
         {
+            this.Config.Dispose();
             Obj_AI_Base.OnProcessAutoAttack -= this.ObjAiHeroOnProcessAutoAttack;
             Obj_AI_Base.OnProcessSpellCast -= Obj_AI_Base_OnProcessSpellCast;
             Game.OnUpdate -= this.Game_OnUpdate;
             SpellBook.OnStopCast -= SpellBook_OnStopCast;
-            this.Config.Dispose();
+            RenderManager.OnRender -= RenderManager_OnRender;
+            this.Attached = false;
         }
 
         public override AttackableUnit GetTarget(OrbwalkerMode mode)
