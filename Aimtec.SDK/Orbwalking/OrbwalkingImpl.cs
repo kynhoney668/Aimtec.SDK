@@ -30,6 +30,7 @@ namespace Aimtec.SDK.Orbwalking
                 Obj_AI_Base.OnProcessAutoAttack += this.ObjAiHeroOnProcessAutoAttack;
                 Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
                 Game.OnUpdate += this.Game_OnUpdate;
+                SpellBook.OnStopCast += SpellBook_OnStopCast;
                 menu.Add(this.Config);
             }
 
@@ -50,7 +51,7 @@ namespace Aimtec.SDK.Orbwalking
 
         public float AttackCoolDownTime => (Player.AttackDelay * 1000) - this.LowerCD;
 
-        protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick
+        protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - Math.Max(this.ServerAttackDetectionTick, this.LastAttackCommandSentTime)
                                       >= this.AttackCoolDownTime;
 
         /// <summary>
@@ -168,7 +169,6 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
             
-
             return this.NoCancelChamps.Contains(Player.ChampionName) || this.AttackReady;
         }
 
@@ -202,10 +202,27 @@ namespace Aimtec.SDK.Orbwalking
             return true;
         }
 
+        private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
+        {
+            if (sender.IsMe && (e.DestroyMissile || e.ForceStop || e.StopAnimation))
+            {
+                this.ResetAutoAttackTimer();
+            }
+        }
+
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
             if (sender.IsMe)
             {
+                /* Detect Caitlyn W Headshot */
+                if (Player.ChampionName == "Caitlyn")
+                {
+                    if (e.SpellData.Name.ToLower().Contains("caitlynheadshotmissile"))
+                    {
+                        this.ServerAttackDetectionTick = Game.TickCount;
+                    }
+                }
+       
                 if (this.IsReset(e.SpellData.Name))
                 {
                     this.ResetAutoAttackTimer();
@@ -571,6 +588,7 @@ namespace Aimtec.SDK.Orbwalking
             Obj_AI_Base.OnProcessAutoAttack -= this.ObjAiHeroOnProcessAutoAttack;
             Obj_AI_Base.OnProcessSpellCast -= Obj_AI_Base_OnProcessSpellCast;
             Game.OnUpdate -= this.Game_OnUpdate;
+            SpellBook.OnStopCast -= SpellBook_OnStopCast;
             this.Config.Dispose();
         }
 
@@ -591,12 +609,14 @@ namespace Aimtec.SDK.Orbwalking
 
         public override bool Move(Vector3 movePosition)
         {
-            var preMoveArgs = this.FirePreMove(Game.CursorPos);
+            var preMoveArgs = this.FirePreMove(movePosition);
 
             if (!preMoveArgs.Cancel)
             {
-                Player.IssueOrder(OrderType.MoveTo, movePosition);
-                return true;
+                if (Player.IssueOrder(OrderType.MoveTo, preMoveArgs.MovePosition))
+                {
+                    return true;
+                }
             }
 
             return false;
@@ -608,9 +628,11 @@ namespace Aimtec.SDK.Orbwalking
 
             if (!preAttackargs.Cancel)
             {
-                Player.IssueOrder(OrderType.AttackUnit, target);
-                this.LastAttackCommandSentTime = Game.TickCount;
-                return true;
+                if (Player.IssueOrder(OrderType.AttackUnit, target))
+                {
+                    this.LastAttackCommandSentTime = Game.TickCount;
+                    return true;
+                }
             }
 
             return false;
