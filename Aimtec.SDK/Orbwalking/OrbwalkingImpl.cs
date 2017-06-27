@@ -218,7 +218,7 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (this.DrawAttackRange)
             {
-                RenderManager.RenderCircle(Player.Position, Player.AttackRange + Player.BoundingRadius, 30, System.Drawing.Color.Red);
+                RenderManager.RenderCircle(Player.Position, Player.AttackRange + Player.BoundingRadius, 30, System.Drawing.Color.DeepSkyBlue);
             }
 
             if (this.DrawHoldPosition)
