@@ -75,9 +75,9 @@ namespace Aimtec.SDK.Orbwalking
         }
 
         //Menu Getters
-        private int HoldPositionRadius => this.Config["holdPositionRadius"].Value;
+        private int HoldPositionRadius => this.Config["Misc"]["holdPositionRadius"].Value;
 
-        private int ExtraWindUp => this.Config["extraWindup"].Value;
+        private int ExtraWindUp => this.Config["Misc"]["extraWindup"].Value;
 
         private int AttackDelayReduction => this.Config["Advanced"]["attackDelayReduction"].Value;
 
@@ -108,9 +108,9 @@ namespace Aimtec.SDK.Orbwalking
 
                 new Menu("Misc", "Misc")
                 {
-                new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
-                new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
-                new MenuBool("noBlindAA", "No AA when Blind", true, true),
+                    new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
+                    new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
+                    new MenuBool("noBlindAA", "No AA when Blind", true, true),
                 }
             };
 
@@ -128,7 +128,7 @@ namespace Aimtec.SDK.Orbwalking
 
         public bool BlindCheck()
         {
-            if (!this.Config["noBlindAA"].Enabled)
+            if (!this.Config["Misc"]["noBlindAA"].Enabled)
             {
                 return true;
             }
