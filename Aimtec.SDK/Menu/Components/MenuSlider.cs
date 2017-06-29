@@ -34,17 +34,34 @@
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
-            this.Value = value;
+            this.Shared = shared;
+
             this.MinValue = minValue;
             this.MaxValue = maxValue;
 
-            this.Shared = shared;
+            if (value > maxValue)
+            {
+                Logger.Warn($"The value for slider {this.InternalName} is greater than the maximum value of the slider. Setting to maximum.");
+                this.Value = maxValue;
+            }
+
+            else if (value < minValue)
+            {
+                Logger.Warn($"The value for slider {this.InternalName} is lower than the minimum value of the slider. Setting to minimum.");
+                this.Value = minValue;
+            }
+
+            if (this.MinValue > this.MaxValue)
+            {
+                Logger.Error($"The minimum value is greater than the maximum value for slider with name \"{internalName}\"");
+                throw new ArgumentException("The minimum value cannot be greater than the maximum value. Item name: {internalName}");
+            }
         }
 
         [JsonConstructor]
         private MenuSlider()
         {
-            
+
         }
 
         #endregion

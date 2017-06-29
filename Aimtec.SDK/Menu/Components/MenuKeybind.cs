@@ -71,19 +71,22 @@
         /// <value>The type of the keybind.</value>
         public KeybindType KeybindType { get; set; }
 
-
         /// <summary>
-        ///     Gets whether this menu componenet is enabled if applicable
+        ///     Gets if this keybind is currently active 
         /// </summary>
         /// <value>The value.</value>
         public new bool Enabled => Value;
-
 
         /// <summary>
         /// Gets or sets a value indicating whether the key is being set.
         /// </summary>
         /// <value><c>true</c> if the key is being set; otherwise, <c>false</c>.</value>
         internal bool KeyIsBeingSet { get; set; }
+
+        /// <summary>
+        /// Gets whether this keybind is currently listening for key presses
+        /// </summary>
+        internal bool Inactive { get; set; }
 
         #endregion
 
@@ -140,7 +143,7 @@
                 }
             }
 
-            if (wparam != (ulong)this.Key || this.KeyIsBeingSet || MenuGUI.IsShopOpen() || MenuGUI.IsChatOpen())
+            if (this.Inactive || wparam != (ulong)this.Key || this.KeyIsBeingSet || MenuGUI.IsShopOpen() || MenuGUI.IsChatOpen())
             {
                 return;
             }
@@ -188,6 +191,14 @@
 
         private void UpdateKey(KeyCode key)
         {
+            //Unregister the keybind if escape is pressed
+            if (key == KeyCode.Escape)
+            {
+                this.Inactive = true;
+                this.Value = false;
+                return;
+            }
+
             var oldClone = new MenuKeyBind { Value = this.Value, InternalName = this.InternalName, DisplayName = this.DisplayName, Key = this.Key, KeybindType = this.KeybindType };
 
             this.Key = key;

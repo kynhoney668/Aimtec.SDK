@@ -83,5 +83,16 @@ namespace Aimtec.SDK.Extensions
         {
             return vector3 + distance * ((Vector3)toVector2 - vector3).Normalized();
         }
+
+        /// <summary>
+        ///     Converts a Vector3 World Position to a Vector2 Screen Position 
+        /// </summary>
+        /// <param name="vector3">The World Position.</param>
+        public static Vector2 ToScreenPosition(this Vector3 worldPos)
+        {
+            Vector2 screenPosition;
+            RenderManager.WorldToScreen(worldPos, out screenPosition);
+            return screenPosition;
+        }
     }
 }

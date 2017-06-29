@@ -18,7 +18,7 @@
     /// <seealso cref="Aimtec.SDK.Menu.IMenuComponent" />
     public abstract class MenuComponent : IMenuComponent
     {
-        private static Logger Logger => LogManager.GetCurrentClassLogger();
+        protected static Logger Logger => LogManager.GetCurrentClassLogger();
 
         #region Internal Properties
         internal abstract string Serialized { get; }

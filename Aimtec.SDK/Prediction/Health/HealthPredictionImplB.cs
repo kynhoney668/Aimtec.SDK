@@ -22,9 +22,28 @@
             Obj_AI_Base.OnProcessAutoAttack += this.ObjAiBaseOnOnProcessAutoAttack;
             GameObject.OnDestroy += this.GameObjectOnOnDestroy;
             Obj_AI_Base.OnPerformCast += this.Obj_AI_Base_OnPerformCast;
+            SpellBook.OnStopCast += SpellBook_OnStopCast;
         }
 
-  
+        private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
+        {
+            if (sender.IsValid)
+            {
+                if (sender is Obj_AI_Turret)
+                {
+                    return;
+                }
+
+                if (sender is Obj_AI_Base && (e.DestroyMissile || e.StopAnimation))
+                {
+                    foreach (var value in this.incomingAttacks.Values)
+                    {
+                        value.RemoveAll(x => x.Sender.NetworkId == sender.NetworkId);
+                    }
+                }
+            }
+        }
+
         private void Obj_AI_Base_OnPerformCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
             if (sender.IsValid && sender.IsMelee)

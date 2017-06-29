@@ -100,16 +100,18 @@ namespace Aimtec.SDK.Orbwalking
                     new MenuSlider("attackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true),
                 },
 
-                new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
-                new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
-                new MenuBool("noBlindAA", "No AA when Blind", true, true),
-
                 new Menu("Drawings", "Drawings")
                 {
                     new MenuBool("drawAttackRange", "Draw Attack Range", true),
                     new MenuBool("drawHoldRadius", "Draw Hold Radius", false),
                 },
 
+                new Menu("Misc", "Misc")
+                {
+                new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
+                new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
+                new MenuBool("noBlindAA", "No AA when Blind", true, true),
+                }
             };
 
             this.AddMode(Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, GetHeroTarget, null));

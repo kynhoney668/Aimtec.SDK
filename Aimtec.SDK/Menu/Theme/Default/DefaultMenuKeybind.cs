@@ -74,12 +74,12 @@
             //Draw Key indicator
             var keyIndicatorPos = pos + new Vector2(width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth - DefaultMenuTheme.TextSpacing, this.Theme.MenuHeight / 2);
 
+            var text = this.Component.KeyIsBeingSet ? "PRESS KEY" : this.Component.Inactive ? "None" : $"[{this.Component.Key}]";
+
             RenderManager.RenderText(
               keyIndicatorPos,
                Color.FromArgb(207, 195, 149),
-               this.Component.KeyIsBeingSet ? "PRESS KEY" : "[" + this.Component.Key + "]", RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
-
-
+               text, RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
         }
 
         #endregion
