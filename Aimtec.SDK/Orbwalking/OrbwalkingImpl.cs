@@ -298,6 +298,7 @@ namespace Aimtec.SDK.Orbwalking
                 var target = GetTarget(mode);
                 if (target != null)
                 {
+                    this.Attack(target);
                 }
             }
 

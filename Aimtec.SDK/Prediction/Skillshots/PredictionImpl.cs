@@ -123,7 +123,6 @@
             new SpellInfo() { Name = "monkeykingnimbus", Duration = 0.25f }, //wukong q
             new SpellInfo() { Name = "xenzhaosweep", Duration = 0.25f }, //xin xhao q
             new SpellInfo() { Name = "yasuodashwrapper", Duration = 0.25f }, //yasuo e
-
         };
 
         private List<SpellInfo> Spells { get; } = new List<SpellInfo>()
@@ -157,13 +156,7 @@
             new Blink() { Name = "riftwalk", Range = 700, Delay = 0.25f, Delay2 = 0.8f }, //KassadinR
             new Blink() { Name = "gate", Range = 5500, Delay = 1.5f, Delay2 = 1.5f }, //Twisted fate R
             new Blink() { Name = "katarinae", Range = float.MaxValue, Delay = 0.25f, Delay2 = 0.8f }, //Katarinas E
-            new Blink()
-            {
-                Name = "elisespideredescent",
-                Range = float.MaxValue,
-                Delay = 0.25f,
-                Delay2 = 0.8f
-            }, //Elise E
+            new Blink() { Name = "elisespideredescent", Range = float.MaxValue, Delay = 0.25f, Delay2 = 0.8f }, //Elise E
             new Blink() { Name = "elisespidere", Range = float.MaxValue, Delay = 0.25f, Delay2 = 0.8f } //Elise insta E
         };
 
@@ -458,9 +451,8 @@
                     {
                         StartPosition = e.Path[0],
                         EndPosition = e.Path.Last(),
-                        Speed = 1000, // todo proper api
-                        StartTime = GetTime() - Game.Ping / 2000f,
-                        
+                        Speed = e.Speed,
+                        StartTime = GetTime() - Game.Ping / 2000f,     
                     };
 
                     var dist = Vector3.Distance(dash.StartPosition, dash.EndPosition);
@@ -481,7 +473,6 @@
 
             if (@object.HasPath)
             {
-
                 result.AddRange(@object.Path);
             }
 
@@ -768,7 +759,6 @@
                     position = wpa.PredictedPosition;
                     Logger.Info("Waypoints analysis hitchance result: {0}", hitchance);
                 }
-
             }
             if (isFromPlayer)
             {
@@ -871,7 +861,6 @@
             }
 
             // todo slowed
-
             if(!position.IsZero && !castPosition.IsZero && ((radius / unit.MoveSpeed >= delay + Vector3.Distance(from, castPosition)/speed) || (radius / unit.MoveSpeed) >= delay + Vector3.Distance(from, position)/speed))
             {
                 hitchance = 3;
@@ -910,7 +899,6 @@
             }
 
             return new PredictionOutput(){CastPosition = castPosition, PredictedPosition = position, HitChance = (HitChance) hitchance};
-
         }
 
         private float MaxAngle(GameObject unit, Vector3 currentWaypoint, float from)
