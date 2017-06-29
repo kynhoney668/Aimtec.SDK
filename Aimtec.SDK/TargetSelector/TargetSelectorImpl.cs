@@ -279,7 +279,6 @@
             return TargetPriority.MinPriority;
         }
 
-
         private void CreateWeights()
         {
             this.AddWeight(new Weight(
@@ -290,7 +289,6 @@
                 target => target.Distance(Player),
                 WeightEffect.LowerIsBetter));
 
-
             this.AddWeight(new Weight(
                 "DistanceToMouse",
                 "Distance to Mouse",
@@ -298,8 +296,7 @@
                 100,
                 target => target.Distance(Game.CursorPos),
                 WeightEffect.LowerIsBetter));
-
-            
+           
             this.AddWeight(new Weight(
                 "LeastAttacksWeight",
                 "Least Attacks",
@@ -308,7 +305,6 @@
                 target => (int)Math.Ceiling(target.Health / Player.GetAutoAttackDamage(target)),
                 WeightEffect.LowerIsBetter));
                 
-
             this.AddWeight(new Weight(
                 "PriorityWeight",
                 "Most Priority",
@@ -381,7 +377,6 @@
             this.Config.Add(new MenuBool("UseWeights", "Use Weights"));
         }
 
-
         public class WeightResult
         {
             public Obj_AI_Hero Target { get; set; }
@@ -431,7 +426,6 @@
             public WeightEffect Effect { get; set; }
         }
 
-
         public enum WeightEffect
         {
             HigherIsBetter,
@@ -447,13 +441,10 @@
             MinPriority = 1,
         }
 
-
         public void Dispose()
         {
             RenderManager.OnRender -= this.RenderManagerOnOnRender;
             Game.OnWndProc -= this.GameOnOnWndProc;
         }
-
-
     }
 }

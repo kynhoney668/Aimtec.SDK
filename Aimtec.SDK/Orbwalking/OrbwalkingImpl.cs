@@ -34,7 +34,6 @@ namespace Aimtec.SDK.Orbwalking
                 SpellBook.OnStopCast += SpellBook_OnStopCast;
                 RenderManager.OnRender += RenderManager_OnRender;
             }
-
             else
             {
                 Logger.Info("This Orbwalker instance is already attached to a Menu.");
@@ -144,7 +143,6 @@ namespace Aimtec.SDK.Orbwalking
             return true;
         }
 
-
         public override bool CanMove()
         {
             return this.CanMove(this.GetActiveMode());
@@ -154,7 +152,6 @@ namespace Aimtec.SDK.Orbwalking
         {
             return this.CanAttack(this.GetActiveMode());
         }
-
 
         public bool CanAttack(OrbwalkerMode mode)
         {
@@ -169,6 +166,11 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             if (!this.BlindCheck())
+            {
+                return false;
+            }
+
+            if (Player.ChampionName.Equals("Jhin") && Player.HasBuff("JhinPassiveReload"))
             {
                 return false;
             }
@@ -257,7 +259,6 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-
         protected void ObjAiHeroOnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs args)
         {
             if (sender.IsMe)
@@ -273,7 +274,6 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-
         public override void Orbwalk()
         {
             OrbwalkerMode mode = this.GetActiveMode();
@@ -283,13 +283,11 @@ namespace Aimtec.SDK.Orbwalking
                 return;
             }
 
-
             /// <summary>
             ///     Execute the specific logic for this mode if any
             /// </summary>
             mode.Execute();
 
-            
             if (!mode.BaseOrbwalkingEnabled)
             {
                 return;
@@ -297,12 +295,9 @@ namespace Aimtec.SDK.Orbwalking
 
             if (this.CanAttack(mode))
             {
-
                 var target = GetTarget(mode);
                 if (target != null)
                 {
-                    this.Attack(target);
-                    
                 }
             }
 
@@ -429,7 +424,6 @@ namespace Aimtec.SDK.Orbwalking
                 return killableMinion;
             }
 
-
             var waitableMinion = minions.Any(this.ShouldWaitMinion);
             if (waitableMinion)
             {
@@ -550,7 +544,6 @@ namespace Aimtec.SDK.Orbwalking
         bool CanKillMinion(Obj_AI_Base minion, int time = 0)
         {
             var rtime = time == 0 ? (this.TimeForAutoToReachTarget(minion)) : (time);
-
             var pred = this.GetPredictedHealth(minion, rtime);
 
             //The minions health will already be 0 by the time our auto attack reaches it, so no point attacking it...
@@ -580,9 +573,7 @@ namespace Aimtec.SDK.Orbwalking
                 adjustedTime = time - basetimePerAuto;
             }
 
-
             var fullTimePerAuto = basetimePerAuto + sender.AttackDelay * 1000;
-
             var additionalAutos = (int)Math.Ceiling(adjustedTime / fullTimePerAuto);
 
             numberOfAutos += additionalAutos;

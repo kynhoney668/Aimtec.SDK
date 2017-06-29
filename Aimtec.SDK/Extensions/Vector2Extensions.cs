@@ -81,7 +81,6 @@ namespace Aimtec.SDK.Extensions
             return (Vector3)pos;
         }
 
-
         /// <summary>
         ///     Gets distance squared from the segments.
         /// </summary>
@@ -210,8 +209,6 @@ namespace Aimtec.SDK.Extensions
 
             return (float)theta;
         }
-
-
 
         /// <summary>
         ///     Raises <paramref name="x" /> to the second power.

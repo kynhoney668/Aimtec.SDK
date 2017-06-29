@@ -197,7 +197,6 @@ namespace Aimtec.SDK.Extensions
             return unit.Mana / unit.MaxMana * 100;
         }
 
-
         /// <summary>
         ///     Gets the buffs of the unit which are valid and active
         /// </summary>
@@ -229,7 +228,7 @@ namespace Aimtec.SDK.Extensions
         {
             if (unit != null)
             {
-                return Vector3.Distance(unit.Position, ObjectManager.GetLocalPlayer().Position) <= range;
+                return Vector3.Distance(unit.Position, Player.Position) <= range;
             }
 
             return false;
@@ -245,8 +244,8 @@ namespace Aimtec.SDK.Extensions
         public static bool IsValidAutoRange(this AttackableUnit target, Vector3 checkRangeFrom = default(Vector3))
         {
             return target != null && target.IsValid && target.IsVisible && !target.IsDead && !target.IsInvulnerable && target.IsTargetable
-                && (target.Team != ObjectManager.GetLocalPlayer().Team)
-                && Vector3.Distance(target.Position, ObjectManager.GetLocalPlayer().Position)
+                && (target.Team != Player.Team)
+                && Vector3.Distance(target.Position, Player.Position)
                 < Player.GetFullAttackRange((target));
         }
 
@@ -267,12 +266,10 @@ namespace Aimtec.SDK.Extensions
             Vector3 checkRangeFrom = default(Vector3))
         {
             return target != null && target.IsValid && !target.IsDead && !target.IsInvulnerable && target.IsVisible && target.IsTargetable
-                && ((allyIsValidTarget || target.Team != ObjectManager.GetLocalPlayer().Team) && Vector3.Distance(
+                && ((allyIsValidTarget || target.Team != Player.Team) && Vector3.Distance(
                     target.Position,
-                    ObjectManager.GetLocalPlayer().Position) < range);
+                    Player.Position) < range);
         }
-
-  
 
         /// <summary>
         ///     Determines whether or not the specified unit is recalling.

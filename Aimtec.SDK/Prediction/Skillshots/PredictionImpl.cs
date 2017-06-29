@@ -698,11 +698,11 @@
 
             range = Math.Abs(range) < float.Epsilon ? float.MaxValue : range - 15;
             radius = Math.Abs(radius) < float.Epsilon ? 1 : radius + this.GetHitBox(unit) - 4;
-            from = from.IsZero ? ObjectManager.GetLocalPlayer().Position : from;
+            from = from.IsZero ? Player.Position : from;
 
-            Logger.Info("From: {0} | Player Pos: {1}", from, ObjectManager.GetLocalPlayer().Position);
+            Logger.Info("From: {0} | Player Pos: {1}", from, Player.Position);
 
-            var isFromPlayer = Vector3.DistanceSquared(from, ObjectManager.GetLocalPlayer().Position) < 50 * 50;
+            var isFromPlayer = Vector3.DistanceSquared(from, Player.Position) < 50 * 50;
             delay = delay + (0.07f + Game.Ping / 2000f);
 
             Vector3 position;

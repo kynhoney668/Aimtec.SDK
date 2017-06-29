@@ -97,7 +97,6 @@
             return Implementation.GetOrderedTargets(range);
         }
             
-
         /// <summary>
         ///     Disposes the current instance
         /// </summary>
