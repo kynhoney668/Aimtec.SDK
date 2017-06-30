@@ -571,16 +571,10 @@ namespace Aimtec.SDK.Damage
             {
                 var minion = target as Obj_AI_Minion;
 
-                if (minion != null)
+                if (minion != null &&
+                    minion.Name.Contains("Siege"))
                 {
-                    if (minion.Name.Contains("Siege"))
-                    {
-                        amount *= 0.7;
-                    }
-                    else if (minion.Name.Contains("MinionMelee") || minion.Name.Contains("MinionRanged"))
-                    {
-                        amount *= 1.14285714285714;
-                    }
+                    amount *= 0.7;
                 }
             }
 
