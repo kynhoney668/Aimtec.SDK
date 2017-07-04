@@ -190,7 +190,7 @@
             this.VisibleSince[sender.NetworkId] = GetTime();
 
             // update path analysis
-            var hero = (Obj_AI_Hero)sender;
+            /*var hero = (Obj_AI_Hero)sender;
             if (this.PathAnalysis[sender.NetworkId].Count == 2)
             {
                 var p1 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 2].Position;
@@ -207,7 +207,7 @@
                     this.PathAnalysis[sender.NetworkId]
                         .Add(new Path() { Time = GetTime(), Position = hero.Path.Last() });
                 }
-            }
+            }*/
         }
  
         private void OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
