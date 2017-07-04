@@ -188,8 +188,28 @@
             }
 
             this.VisibleSince[sender.NetworkId] = GetTime();
-        }
 
+            // update path analysis
+            var hero = (Obj_AI_Hero)sender;
+            if (this.PathAnalysis[sender.NetworkId].Count == 2)
+            {
+                var p1 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 2].Position;
+                var p2 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 1].Position;
+                var angle = ((Vector2)sender.Position).AngleBetween((Vector2)p2, (Vector2)p1);
+
+                if (angle > 20)
+                {
+                    this.PathAnalysis[sender.NetworkId]
+                        .Add(new Path() { Time = GetTime(), Position = hero.Path.Last() });
+                }
+                else
+                {
+                    this.PathAnalysis[sender.NetworkId]
+                        .Add(new Path() { Time = GetTime(), Position = hero.Path.Last() });
+                }
+            }
+        }
+ 
         private void OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
             if (sender.Type == GameObjectType.AIHeroClient)
@@ -452,7 +472,7 @@
                         StartPosition = e.Path[0],
                         EndPosition = e.Path.Last(),
                         Speed = e.Speed,
-                        StartTime = GetTime() - Game.Ping / 2000f,     
+                        StartTime = GetTime() - Game.Ping / 2000f,
                     };
 
                     var dist = Vector3.Distance(dash.StartPosition, dash.EndPosition);
