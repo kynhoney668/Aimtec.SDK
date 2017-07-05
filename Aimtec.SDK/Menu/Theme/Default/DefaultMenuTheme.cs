@@ -21,8 +21,7 @@
 
         public override int MenuHeight { get; } = 32;
 
-        public override int BaseMenuWidth { get; set; } = 80;
-
+        public override int BaseMenuWidth { get; set; } = IndicatorWidth + LineWidth + TextSpacing;
 
         public Color TextColor { get; } = Color.FromArgb(207, 195, 149);
 

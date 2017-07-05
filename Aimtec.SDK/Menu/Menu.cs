@@ -299,17 +299,18 @@
             foreach (var child in children)
             {
                 int width = 0;
+
                 if (child is MenuList)
                 {
                     var mList = child as MenuList;
                     var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
                     if (longestItem != null)
                     {
-                        width = (int)MenuManager.Instance.TextWidth(mList.DisplayName + longestItem);
+                        width = (int)MenuManager.Instance.TextWidth(mList.DisplayName + longestItem + 30);
                     }
                 }
 
-                if (child is MenuKeyBind)
+                else if (child is MenuKeyBind)
                 {
                     var kb = child as MenuKeyBind;
                     width = (int)MenuManager.Instance.TextWidth(kb.DisplayName + "PRESS KEY");
