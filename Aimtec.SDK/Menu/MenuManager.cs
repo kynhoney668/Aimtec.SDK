@@ -168,6 +168,10 @@
             }
         }
 
+
+        internal static float LastMouseMoveTime { get; set; }
+        internal static Point LastMousePosition { get; set; }
+
         public override void WndProc(uint message, uint wparam, int lparam)
         {
             // Drag menu
@@ -191,7 +195,7 @@
 
             foreach (var menu in this.Menus)
             {
-                menu.WndProc(message, wparam, lparam);
+                menu.BaseWndProc(message, wparam, lparam);
             }
         }
 

@@ -11,6 +11,8 @@
     using Newtonsoft.Json;
 
     using NLog;
+    using Aimtec.SDK.Util;
+    using Aimtec.SDK.Menu.Theme.Default;
 
     /// <summary>
     ///     Class MenuComponent.
@@ -22,6 +24,20 @@
 
         #region Internal Properties
         internal abstract string Serialized { get; }
+
+        private DefaultMenuTheme _theme { get; set; }
+
+        internal DefaultMenuTheme Theme {
+            get
+            {
+                if (_theme == null)
+                {
+                    this._theme = (DefaultMenuTheme)MenuManager.Instance.Theme;
+                }
+
+                return this._theme;
+            }
+        }
 
         internal virtual bool SavableMenuItem { get; set; } = true;
 
@@ -206,6 +222,8 @@
         /// <value><c>true</c> if this menu is the root menu; otherwise, <c>false</c>.</value>
         public bool Root { get; set; }
 
+        private string ToolTip { get; set; }
+
         /// <summary>
         /// Gets a value indicating whether this instance is a menu.
         /// </summary>
@@ -259,6 +277,44 @@
                 MenuManager.Instance.Theme.MenuHeight);
         }
 
+        /// <summary>
+        ///     Sets the Tool Tip
+        /// </summary>
+        /// <param name="toolTip">The tooltip</param>
+        public MenuComponent SetToolTip(string toolTip)
+        {
+            this.ToolTip = toolTip;
+            return this;
+        }
+
+        /// <summary>
+        ///     Renders the tooltip
+        /// </summary>
+        public void RenderToolTip()
+        {
+            var text = $"[i] { this.ToolTip}";
+            int width = Math.Max(this.Parent.Width, (int)MenuManager.Instance.TextWidth(text));
+
+            DefaultMenuTheme.DrawRectangleOutline(this.Position.X, this.Position.Y, width, this.Theme.MenuHeight, DefaultMenuTheme.LineWidth, this.Theme.LineColor);
+
+            var position = this.Position + DefaultMenuTheme.LineWidth;
+
+            RenderManager.RenderRectangle(
+              position,
+              width - DefaultMenuTheme.LineWidth,
+              this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
+              this.Theme.MenuBoxBackgroundColor);
+
+            var centerPoint = this.Position + new Vector2(width - (DefaultMenuTheme.LineWidth * 2) / 2, this.Theme.MenuHeight - (DefaultMenuTheme.LineWidth * 2) / 2);
+
+            var textPosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
+
+            RenderManager.RenderText(
+                textPosition,
+                Color.LightBlue,
+                text, RenderTextFlags.VerticalCenter);
+        }
+
 
 
         /// <summary>
@@ -275,9 +331,40 @@
         {
             if (this.Visible)
             {
+                if (!string.IsNullOrEmpty(this.ToolTip))
+                {
+                    Console.WriteLine(this.ToolTip);
+                    if (Game.TickCount - MenuManager.LastMouseMoveTime > 500)
+                    {
+                        if (this.GetBounds(this.Position).Contains(MenuManager.LastMousePosition))
+                        {
+                            this.RenderToolTip();  
+                            return;
+                        }
+                    }
+                }
+
                 this.GetRenderManager().Render(pos);
             }
         }
+
+        /// <summary>
+        ///     The WndProc that all Menu Components share
+        /// </summary>
+        public void BaseWndProc(uint message, uint wparam, int lparam)
+        {
+            if (this.Visible && message == (ulong)WindowsMessages.WM_MOUSEMOVE)
+            {
+                var x = lparam & 0xffff;
+                var y = lparam >> 16;
+
+                MenuManager.LastMouseMoveTime = Game.TickCount;
+                MenuManager.LastMousePosition = new Point(x, y);
+            }
+
+            this.WndProc(message, wparam, lparam);
+        }
+
 
         /// <summary>
         ///     An application-defined function that processes messages sent to a window.
@@ -287,6 +374,7 @@
         /// <param name="lparam">Additional message information.</param>
         public virtual void WndProc(uint message, uint wparam, int lparam)
         {
+
         }
 
 

@@ -12,6 +12,7 @@
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
+    using Aimtec.SDK.Menu.Theme.Default;
 
     /// <summary>
     ///     Class Menu.
@@ -286,7 +287,7 @@
             // Pass message to children
             foreach (var child in this.Children.Values)
             {
-                child.WndProc(message, wparam, lparam);
+                child.BaseWndProc(message, wparam, lparam);
             }
         }
 
