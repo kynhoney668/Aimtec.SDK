@@ -239,14 +239,28 @@ namespace Aimtec.SDK.Extensions
         ///     vector.
         /// </summary>
         /// <param name="target">The target.</param>
+        /// <param name="allyIsValidTarget">if set to <c>true</c> allies will be set as valid targets.</param>
         /// <param name="checkRangeFrom">The check range from.</param>
         /// <returns><c>true</c> if the target is a valid target in the auto attack range; otherwise, <c>false</c>.</returns>
-        public static bool IsValidAutoRange(this AttackableUnit target, Vector3 checkRangeFrom = default(Vector3))
+        public static bool IsValidAutoRange(
+            this AttackableUnit target,
+            bool allyIsValidTarget = false,
+            Vector3 checkRangeFrom = default(Vector3))
         {
-            return target != null && target.IsValid && target.IsVisible && !target.IsDead && !target.IsInvulnerable && target.IsTargetable
-                && (target.Team != Player.Team)
-                && Vector3.Distance(target.Position, Player.Position)
-                < Player.GetFullAttackRange((target));
+            if (target == null || !target.IsValid || target.IsDead ||
+                target.IsInvulnerable || !target.IsVisible || !target.IsTargetable)
+            {
+                return false;
+            }
+
+            if (!allyIsValidTarget && target.Team == Player.Team)
+            {
+                return false;
+            }
+
+            return target.Distance(checkRangeFrom != Vector3.Zero
+                ? checkRangeFrom
+                : Player.Position) < Player.GetFullAttackRange(target);
         }
 
         /// <summary>
@@ -265,10 +279,20 @@ namespace Aimtec.SDK.Extensions
             bool allyIsValidTarget = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            return target != null && target.IsValid && !target.IsDead && !target.IsInvulnerable && target.IsVisible && target.IsTargetable
-                && ((allyIsValidTarget || target.Team != Player.Team) && Vector3.Distance(
-                    target.Position,
-                    Player.Position) < range);
+            if (target == null || !target.IsValid || target.IsDead ||
+                target.IsInvulnerable || !target.IsVisible || !target.IsTargetable)
+            {
+                return false;
+            }
+
+            if (!allyIsValidTarget && target.Team == Player.Team)
+            {
+                return false;
+            }
+
+            return target.Distance(checkRangeFrom != Vector3.Zero
+                ? checkRangeFrom
+                : Player.Position) < range;
         }
 
         /// <summary>
