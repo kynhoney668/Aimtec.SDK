@@ -333,7 +333,6 @@
             {
                 if (!string.IsNullOrEmpty(this.ToolTip))
                 {
-                    Console.WriteLine(this.ToolTip);
                     if (Game.TickCount - MenuManager.LastMouseMoveTime > 500)
                     {
                         if (this.GetBounds(this.Position).Contains(MenuManager.LastMousePosition))
