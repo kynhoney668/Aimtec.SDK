@@ -121,6 +121,12 @@
         public bool IsSkillShot { get; set; }
 
         /// <summary>
+        ///     Gets or sets a value indicating whether this instance is a vector skillshot
+        /// </summary>
+        /// <value><c>true</c> if this instance is a vector skill shot; otherwise, <c>false</c>.</value>
+        public bool IsVectorSkillShot { get; set; }
+
+        /// <summary>
         ///     Gets or sets the range.
         /// </summary>
         /// <value>The range.</value>
@@ -214,6 +220,12 @@
                 return Player.SpellBook.CastSpell(this.Slot, target);
             }
 
+            if (this.IsVectorSkillShot)
+            {
+                Logger.Error("Vector skillshot should be cast using two positions");
+                return false;
+            }
+
             var prediction = Prediction.Skillshots.Prediction.Instance.GetPrediction(this.GetPredictionInput(target));
 
             if (prediction.HitChance < this.HitChance)
@@ -249,25 +261,51 @@
         }
 
         /// <summary>
-        ///     Casts the specified position.
+        ///     Casts the spell at the specified position.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool Cast(Vector2 position)
         {
+            if (!this.Ready)
+            {
+                return false;
+            }
+
             return Player.SpellBook.CastSpell(
                 this.Slot,
                 new Vector3(position.X, NavMesh.GetHeightForWorld(position.X, position.Y), position.Y));
         }
 
         /// <summary>
-        ///     Casts the specified position.
+        ///     Casts the spell at the specified position.
         /// </summary>
         /// <param name="position">The position.</param>
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool Cast(Vector3 position)
         {
+            if (!this.Ready)
+            {
+                return false;
+            }
+
             return Player.SpellBook.CastSpell(this.Slot, position);
+        }
+
+        /// <summary>
+        ///     Casts a Vector spell at a specified start position to a specified end position.
+        /// </summary>
+        /// <param name="start">The start position.</param>
+        /// <param name="end">The end position.</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
+        public bool Cast(Vector3 start, Vector3 end)
+        {
+            if (!this.Ready)
+            {
+                return false;
+            }
+
+            return Player.SpellBook.CastSpell(this.Slot, start, end);
         }
 
         /// <summary>
@@ -374,6 +412,7 @@
         /// <param name="speed">The speed.</param>
         /// <param name="collision">if set to <c>true</c> the spell has collision.</param>
         /// <param name="type">The type.</param>
+        /// <param name="vectorSkillshot">if set to <c>true</c> the spell has a start and end position. Ex. Viktor E and Rumble R</param>
         /// <param name="hitchance">The hitchance.</param>
         public void SetSkillshot(
             float delay,
@@ -381,6 +420,7 @@
             float speed,
             bool collision,
             SkillType type,
+            bool vectorSkillshot = false,
             HitChance hitchance = HitChance.Low)
         {
             this.Delay = delay;
@@ -389,6 +429,7 @@
             this.Type = type;
             this.Collision = collision;
             this.IsSkillShot = true;
+            this.IsVectorSkillShot = vectorSkillshot;
             this.HitChance = hitchance;
 
             Logger.Debug(
@@ -402,6 +443,7 @@
                 type,
                 hitchance);
         }
+
 
         #endregion
 
