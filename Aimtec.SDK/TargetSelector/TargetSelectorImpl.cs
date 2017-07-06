@@ -20,7 +20,7 @@
 
         private static Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
 
-        private Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
         private List<Weight> Weights = new List<Weight>();
 
@@ -255,6 +255,18 @@
         public TargetPriority GetPriority(Obj_AI_Hero hero)
         {
             var name = hero.ChampionName;
+            MenuSlider slider = this.Config["TargetsMenu"]["priority" + hero.ChampionName].As<MenuSlider>();
+            if (slider != null)
+            {
+                return (TargetPriority) slider.Value;
+            }
+
+            return GetDefaultPriority(hero);
+        }
+
+        public TargetPriority GetDefaultPriority(Obj_AI_Hero hero)
+        {
+            var name = hero.ChampionName;
 
             if (this.MaxPriority.Contains(name))
             {
@@ -350,7 +362,7 @@
 
         private void CreateMenu()
         {
-            this.Logger.Info("Constructing Menu for default Target Selector");
+            Logger.Info("Constructing Menu for default Target Selector");
 
             this.Config = new Menu("Aimtec.TS", "Target Selector");
 
@@ -362,7 +374,7 @@
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy))
             {
-                targetsMenu.Add(new MenuSlider("priority" + enemy.ChampionName, enemy.ChampionName, (int)this.GetPriority(enemy), 1, 5));
+                targetsMenu.Add(new MenuSlider("priority" + enemy.ChampionName, enemy.ChampionName, (int)this.GetDefaultPriority(enemy), 1, 5));
             }
 
             this.Config.Add(targetsMenu);
@@ -389,6 +401,7 @@
             {
                 if (defaultWeight > 100)
                 {
+                    Logger.Error("Weight cannot be more than 100.");
                     throw new Exception("Weight cannot be more than 100.");
                 }
 
@@ -415,6 +428,7 @@
 
             public float ComputeWeight(Obj_AI_Hero unit)
             {
+
                 if (this.Effect == WeightEffect.LowerIsBetter)
                 {
                     return this.WeightValue * -this.WeightDefinition(unit);

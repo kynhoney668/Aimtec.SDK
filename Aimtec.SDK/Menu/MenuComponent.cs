@@ -357,8 +357,11 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                MenuManager.LastMouseMoveTime = Game.TickCount;
-                MenuManager.LastMousePosition = new Point(x, y);
+                if (this.GetBounds(this.Position).Contains(x, y))
+                {
+                    MenuManager.LastMouseMoveTime = Game.TickCount;
+                    MenuManager.LastMousePosition = new Point(x, y);
+                }
             }
 
             this.WndProc(message, wparam, lparam);

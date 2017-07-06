@@ -36,16 +36,17 @@
             this.DisplayName = displayName;
             this.Shared = shared;
 
+            this.Value = value;
             this.MinValue = minValue;
             this.MaxValue = maxValue;
 
-            if (value > maxValue)
+            if (this.Value > this.MaxValue)
             {
                 Logger.Warn($"The value for slider {this.InternalName} is greater than the maximum value of the slider. Setting to maximum.");
                 this.Value = maxValue;
             }
 
-            else if (value < minValue)
+            else if (this.Value < this.MinValue)
             {
                 Logger.Warn($"The value for slider {this.InternalName} is lower than the minimum value of the slider. Setting to minimum.");
                 this.Value = minValue;

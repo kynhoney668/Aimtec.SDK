@@ -307,7 +307,7 @@
                     var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
                     if (longestItem != null)
                     {
-                        width = (int)MenuManager.Instance.TextWidth(mList.DisplayName + longestItem + 30);
+                        width = (int)MenuManager.Instance.TextWidth(mList.DisplayName + longestItem + 20);
                     }
                 }
 
@@ -315,6 +315,18 @@
                 {
                     var kb = child as MenuKeyBind;
                     width = (int)MenuManager.Instance.TextWidth(kb.DisplayName + "PRESS KEY");
+                }
+
+                else if (child is MenuSlider)
+                {
+                    var slider = child as MenuSlider;
+                    width = (int)MenuManager.Instance.TextWidth(child.DisplayName + slider.MaxValue.ToString());
+                }
+
+                else if (child is MenuSliderBool)
+                {
+                    var slider = child as MenuSliderBool;
+                    width = (int)MenuManager.Instance.TextWidth(child.DisplayName + slider.MaxValue.ToString());
                 }
 
                 else

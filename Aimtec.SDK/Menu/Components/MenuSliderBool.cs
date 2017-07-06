@@ -37,10 +37,29 @@
             this.InternalName = internalName;
             this.DisplayName = displayName;
             this.Enabled = enabled;
+            this.Shared = shared;
+
             this.Value = value;
             this.MinValue = minValue;
             this.MaxValue = maxValue;
-            this.Shared = shared;
+
+            if (this.Value > this.MaxValue)
+            {
+                Logger.Warn($"The value for slider {this.InternalName} is greater than the maximum value of the slider. Setting to maximum.");
+                this.Value = maxValue;
+            }
+
+            else if (this.Value < this.MinValue)
+            {
+                Logger.Warn($"The value for slider {this.InternalName} is lower than the minimum value of the slider. Setting to minimum.");
+                this.Value = minValue;
+            }
+
+            if (this.MinValue > this.MaxValue)
+            {
+                Logger.Error($"The minimum value is greater than the maximum value for slider with name \"{internalName}\"");
+                throw new ArgumentException("The minimum value cannot be greater than the maximum value. Item name: {internalName}");
+            }
         }
 
         [JsonConstructor]
@@ -64,17 +83,15 @@
         ///     Gets or sets the maximum value.
         /// </summary>
         /// <value>The maximum value.</value>
-        [JsonProperty(Order = 4)]
         public int MaxValue { get; set; }
 
         /// <summary>
         ///     Gets or sets the minimum value.
         /// </summary>
         /// <value>The minimum value.</value>
-        [JsonProperty(Order = 5)]
         public int MinValue { get; set; }
 
-        [JsonProperty(Order = 6)]
+        [JsonProperty(Order = 4)]
         public new bool Enabled { get; set; }
 
 
@@ -163,7 +180,8 @@
         private void SetSliderValue(int x)
         {
             var sliderbounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position, this.Parent.Width)[0];
-            this.UpdateValue(Math.Max(this.MinValue, Math.Min(this.MaxValue, (int)((x - this.Position.X) / (sliderbounds.Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue))));
+            var val = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int)((x - this.Position.X) / (sliderbounds.Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue)));
+            this.UpdateValue(val);
         }
 
 
@@ -212,8 +230,6 @@
                 if (sValue?.InternalName != null)
                 {
                     this.Value = sValue.Value;
-                    this.MaxValue = sValue.MaxValue;
-                    this.MinValue = sValue.MinValue;
                     this.Enabled = sValue.Enabled;
                 }
             }
