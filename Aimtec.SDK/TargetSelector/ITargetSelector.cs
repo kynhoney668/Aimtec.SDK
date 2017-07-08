@@ -20,21 +20,17 @@
         /// Gets the target.
         /// </summary>
         /// <param name="range">The range.</param>
+        /// <param name="autoAttackTarget">If true then range is ignored and max auto attack range is used</param>
         /// <returns></returns>
-        Obj_AI_Hero GetTarget(float range);
+        Obj_AI_Hero GetTarget(float range, bool autoAttackTarget);
 
         /// <summary>
         /// Gets the target.
         /// </summary>
         /// <param name="range">The range.</param>
+        /// <param name="autoAttackTarget">If true then range is ignored and max auto attack range is used</param>
         /// <returns></returns>
-        IOrderedEnumerable<Obj_AI_Hero> GetOrderedTargets(float range);
-
-        /// <summary>
-        /// Gets the target for the Orbwalker to attack
-        /// </summary>
-        /// <returns></returns>
-        Obj_AI_Hero GetOrbwalkingTarget();
+        List<Obj_AI_Hero> GetOrderedTargets(float range, bool autoAttackTarget);
 
     }
 }

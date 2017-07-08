@@ -122,6 +122,11 @@ namespace Aimtec.SDK.Orbwalking
 
         protected void Game_OnUpdate()
         {
+            if (Player.IsDead)
+            {
+                return;
+            }
+
             Orbwalk();
         }
 
@@ -321,7 +326,7 @@ namespace Aimtec.SDK.Orbwalking
 
         AttackableUnit GetHeroTarget()
         {
-            return TargetSelector.Implementation.GetOrbwalkingTarget();
+            return TargetSelector.Implementation.GetTarget(0, true);
         }
 
         AttackableUnit GetLastHitTarget()

@@ -5,7 +5,8 @@
 
     using NLog;
     using NLog.Fluent;
-    using System.Linq;
+    using System.Collections.Generic;
+
 
     /// <summary>
     ///     Target Selector Class
@@ -75,27 +76,22 @@
         ///     Gets the target.
         /// </summary>
         /// <param name="range">The range.</param>
+        /// <param name="autoAttackTarget">If true then range is ignored and max auto attack range is used</param>
         /// <returns></returns>
-        public static Obj_AI_Hero GetTarget(float range)
+        public static Obj_AI_Hero GetTarget(float range, bool autoAttackTarget = false)
         {
-            return Implementation.GetTarget(range);
+            return Implementation.GetTarget(range, autoAttackTarget);
         }
 
-        /// <summary>
-        ///     Gets the best target within Auto Attack Range
-        /// </summary>
-        public static Obj_AI_Hero GetOrbwalkingTarget()
-        {
-            return Implementation.GetOrbwalkingTarget();
-        }
 
         /// <summary>
         ///     Gets an ordered enumerable of the available targets within the range based on their priority ranking by the Target Selector
         /// </summary>
-        public IOrderedEnumerable<Obj_AI_Hero> GetOrderedTargets(float range)
+        public IEnumerable<Obj_AI_Hero> GetOrderedTargets(float range, bool autoAttackTarget = false)
         {
-            return Implementation.GetOrderedTargets(range);
+            return Implementation.GetOrderedTargets(range, autoAttackTarget);
         }
+        
             
         /// <summary>
         ///     Disposes the current instance
