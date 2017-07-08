@@ -22,7 +22,7 @@
         /// <param name="range">The range.</param>
         /// <param name="autoAttackTarget">If true then range is ignored and max auto attack range is used</param>
         /// <returns></returns>
-        Obj_AI_Hero GetTarget(float range, bool autoAttackTarget);
+        Obj_AI_Hero GetTarget(float range, bool autoAttackTarget = false);
 
         /// <summary>
         /// Gets the target.
@@ -30,7 +30,7 @@
         /// <param name="range">The range.</param>
         /// <param name="autoAttackTarget">If true then range is ignored and max auto attack range is used</param>
         /// <returns></returns>
-        List<Obj_AI_Hero> GetOrderedTargets(float range, bool autoAttackTarget);
+        List<Obj_AI_Hero> GetOrderedTargets(float range, bool autoAttackTarget = false);
 
     }
 }

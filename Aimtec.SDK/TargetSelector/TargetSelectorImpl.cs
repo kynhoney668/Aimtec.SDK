@@ -15,6 +15,8 @@
 
     internal class TargetSelectorImpl : ITargetSelector
     {
+        public TSCache Cache { get; set; } = new TSCache();
+
         public Menu Config { get; set; }
 
         private static Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
@@ -65,7 +67,9 @@
             this.CreateWeights();
             RenderManager.OnRender += this.RenderManagerOnOnRender;
             Game.OnWndProc += this.GameOnOnWndProc;
+
         }
+
 
         private void GameOnOnWndProc(WndProcEventArgs args)
         {
@@ -150,6 +154,7 @@
         }
 
 
+
         private IOrderedEnumerable<KeyValuePair<Obj_AI_Hero, float>> GetTargetsAndWeightsOrdered(float range, bool autoattack)
         {
             var results = GetTargetsAndWeights(range, autoattack).ToList();
@@ -175,39 +180,50 @@
             return enemies;
         }
 
-        private Dictionary<Obj_AI_Hero, float> CachedTargetWeightRatings;
-        private float LastCacheTargetWeightTime;
 
         private Dictionary<Obj_AI_Hero, float> GetTargetsAndWeights(float range, bool autoattack = false)
         {
-            if (Game.TickCount - LastCacheTargetWeightTime < Config["Misc"]["CacheT"].Value)
-            {
-                return CachedTargetWeightRatings;
-            }
+                var key = "GetTargetsAndWeights" + range + autoattack;
 
-            this.LastCacheTargetWeightTime = Game.TickCount;
+                var cachedValue = this.Cache.GetObject(key);
+            
+                if (cachedValue != null)
+                {
+                    return (Dictionary<Obj_AI_Hero, float>)cachedValue;
+                }
 
-            var enemies = GetValidTargets(range, autoattack);
+                var enemies = GetValidTargets(range, autoattack);
 
-            var enabledWeights = this.Weights.Where(x => x.MenuItem.Enabled);
+                var enabledWeights = this.Weights.Where(x => x.MenuItem.Enabled);
 
-            Dictionary<Obj_AI_Hero, float> CumulativeResults = new Dictionary<Obj_AI_Hero, float>();
+                Dictionary<Obj_AI_Hero, float> CumulativeResults = new Dictionary<Obj_AI_Hero, float>();
 
-            foreach (var hero in enemies)
-            {
-                CumulativeResults[hero] = 0;
-            }
+                foreach (var hero in enemies)
+                {
+                    CumulativeResults[hero] = 0;
+                }
 
-            foreach (var weight in enabledWeights)
-            {
-                weight.ComputeWeight(enemies, ref CumulativeResults);
-            }
+                foreach (var weight in enabledWeights)
+                {
+                    weight.ComputeWeight(enemies, ref CumulativeResults);
+                }
 
-            return CachedTargetWeightRatings = CumulativeResults;
+                this.Cache.AddItem(new TSCache.CacheObject(key, CumulativeResults, this.Config["Misc"]["CacheT"].Value));
+
+                return CumulativeResults;
         }
 
         public List<Obj_AI_Hero> GetOrderedTargets(float range, bool autoattack = false)
         {
+            var key = "GetOrderedTargets" + range + autoattack;
+
+            var cachedValue = this.Cache.GetObject(key);
+
+            if (cachedValue != null)
+            {
+                return (List<Obj_AI_Hero>)cachedValue;
+            }
+
             if (this.Config["UseWeights"].Enabled)
             {
                 var targetWeightDictionary = GetTargetsAndWeights(range, autoattack);
@@ -225,10 +241,12 @@
                     }
                 }
 
+                this.Cache.AddItem(new TSCache.CacheObject(key, ordered, this.Config["Misc"]["CacheT"].Value));
                 return ordered;
             }
 
             var targets = GetOrderedTargetsByMode(range, autoattack).ToList();
+            this.Cache.AddItem(new TSCache.CacheObject(key, targets, this.Config["Misc"]["CacheT"].Value));
             return targets;
         }
 
@@ -250,59 +268,66 @@
             return null;
         }
 
-        private IEnumerable<Obj_AI_Hero> CachedTargetRatingsByMode;
-        private float LastCacheTargetRatingsModeTime;
 
         public IEnumerable<Obj_AI_Hero> GetOrderedTargetsByMode(float range, bool autoattack = false)
         {
-            if (Game.TickCount - LastCacheTargetRatingsModeTime < Config["Misc"]["CacheT"].Value)
+            var key = "GetOrderedTargetsByMode" + range + autoattack;
+
+            var cachedValue = this.Cache.GetObject(key);
+
+            if (cachedValue != null)
             {
-                return CachedTargetRatingsByMode;
+                return (IEnumerable<Obj_AI_Hero>) cachedValue;
             }
 
             var validTargets = GetValidTargets(range, autoattack);
 
+            IEnumerable<Obj_AI_Hero> returnValue = null;
+
             if (this.Mode == TargetSelectorMode.Closest)
             {
-                return CachedTargetRatingsByMode = validTargets.OrderBy(x => x.Distance(Player));
+
+                returnValue = validTargets.OrderBy(x => x.Distance(Player));
             }
 
             else if (this.Mode == TargetSelectorMode.LeastAttacks)
             {
-                return CachedTargetRatingsByMode = validTargets.OrderBy(x => (int)Math.Ceiling(x.Health / Player.GetAutoAttackDamage(x))).ThenByDescending(x => GetPriority(x));
+                returnValue = validTargets.OrderBy(x => (int)Math.Ceiling(x.Health / Player.GetAutoAttackDamage(x))).ThenByDescending(x => GetPriority(x));
             }
 
             else if (this.Mode == TargetSelectorMode.LeastSpells)
             {
-                return CachedTargetRatingsByMode = validTargets.OrderBy(x => (int)(x.Health / Damage.CalculateDamage(Player, x, DamageType.Magical, 100))).ThenByDescending(x => GetPriority(x));
+                returnValue = validTargets.OrderBy(x => (int)(x.Health / Damage.CalculateDamage(Player, x, DamageType.Magical, 100))).ThenByDescending(x => GetPriority(x));
             }
 
             else if (this.Mode == TargetSelectorMode.LowestHealth)
             {
-                return CachedTargetRatingsByMode = validTargets.OrderBy(x => x.Health).ThenByDescending(x => GetPriority(x));
+                returnValue = validTargets.OrderBy(x => x.Health).ThenByDescending(x => GetPriority(x));
             }
 
             else if (this.Mode == TargetSelectorMode.MostAd)
             {
-                return CachedTargetRatingsByMode = validTargets.OrderByDescending(x => x.TotalAttackDamage).ThenByDescending(x => GetPriority(x));
+                returnValue = validTargets.OrderByDescending(x => x.TotalAttackDamage).ThenByDescending(x => GetPriority(x));
             }
 
             else if (this.Mode == TargetSelectorMode.MostAp)
             {
-                return CachedTargetRatingsByMode = validTargets.OrderByDescending(x => x.TotalAbilityDamage).ThenByDescending(x => GetPriority(x));
+                returnValue = validTargets.OrderByDescending(x => x.TotalAbilityDamage).ThenByDescending(x => GetPriority(x));
             }
 
             else if (this.Mode == TargetSelectorMode.NearMouse)
             {
-                return CachedTargetRatingsByMode = validTargets.OrderBy(x => x.Distance(Game.CursorPos)).ThenByDescending(x => GetPriority(x));
+                returnValue = validTargets.OrderBy(x => x.Distance(Game.CursorPos)).ThenByDescending(x => GetPriority(x));
             }
 
             else if (this.Mode == TargetSelectorMode.MostPriority)
             {
-                return CachedTargetRatingsByMode = validTargets.OrderBy(x => GetPriority(x));
+                returnValue = validTargets.OrderBy(x => GetPriority(x));
             }
 
-            return null;
+            this.Cache.AddItem(new TSCache.CacheObject(key, returnValue, this.Config["Misc"]["CacheT"].Value));
+
+            return returnValue;
         }
 
 
@@ -440,7 +465,7 @@
             this.Config.Add(drawings);
 
             var miscMenu = new Menu("Misc", "Misc");
-            miscMenu.Add(new MenuSlider("CacheT", "Cache Refresh Time", 0, 0, 500));
+            miscMenu.Add(new MenuSlider("CacheT", "Cache Refresh Time", 200, 0, 500));
             this.Config.Add(miscMenu);
 
             this.Config.Add(new MenuBool("UseWeights", "Use Weights"));
@@ -535,6 +560,66 @@
         {
             RenderManager.OnRender -= this.RenderManagerOnOnRender;
             Game.OnWndProc -= this.GameOnOnWndProc;
+        }
+    }
+
+    internal class TSCache
+    {
+        private Dictionary<string, CacheObject> CachedObjects = new Dictionary<string, CacheObject>();
+
+        public void AddItem(CacheObject cObject)
+        {
+            this.CachedObjects.Add(cObject.Key, cObject);
+        }
+
+        public void RemoveItem(CacheObject cObject)
+        {
+            this.CachedObjects.Remove(cObject.Key);
+        }
+
+        public Object GetObject(string key)
+        {
+            this.RemoveExpiredItems();
+
+            if (!this.CachedObjects.ContainsKey(key))
+            {
+                return null;
+            }
+
+            return CachedObjects[key].Object;
+        }
+
+        public void RemoveExpiredItems()
+        {
+            foreach (var obj in this.CachedObjects.Values.ToList())
+            {
+                if (Game.TickCount > obj.ExpiryTime)
+                {
+                    CachedObjects.Remove(obj.Key);
+                }
+            }
+        }
+
+        public class CacheObject
+        {
+            public CacheObject(string key, Object obj, int ttl)
+            {
+                this.Key = key;
+                this.Object = obj;
+                this.TTL = ttl;
+                this.CreationTime = Game.TickCount;
+                this.ExpiryTime = Game.TickCount + ttl;
+            }
+
+            public Object Object { get; set; }
+
+            public string Key { get; set; }
+
+            public int CreationTime { get; set; } 
+
+            public int ExpiryTime { get; set; }
+
+            public int TTL { get; set; }
         }
     }
 }
