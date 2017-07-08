@@ -91,7 +91,7 @@ namespace Aimtec.SDK.Extensions
         public static Vector2 ToScreenPosition(this Vector3 worldPos)
         {
             Vector2 screenPosition;
-            RenderManager.WorldToScreen(worldPos, out screenPosition);
+            Render.WorldToScreen(worldPos, out screenPosition);
             return screenPosition;
         }
     }

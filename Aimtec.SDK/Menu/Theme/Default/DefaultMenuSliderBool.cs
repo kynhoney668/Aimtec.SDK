@@ -44,20 +44,20 @@
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
             // Draw light bar before the slider line
-            RenderManager.RenderRectangle(
+            Aimtec.Render.Rectangle(
                 position,
                 beforeSliderWidth,
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(14, 59, 73));
 
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
                 this.Component.DisplayName, RenderTextFlags.VerticalCenter);
 
             var beforeSliderPos = position + new Vector2(beforeSliderWidth, 0);
 
-            RenderManager.RenderLine(
+            Aimtec.Render.Line(
                 beforeSliderPos,
                 beforeSliderPos + new Vector2(0, this.Theme.MenuHeight),
                 DefaultMenuTheme.LineWidth,
@@ -66,14 +66,14 @@
 
             var afterSliderPos = beforeSliderPos + new Vector2(DefaultMenuTheme.LineWidth, 0);
 
-            RenderManager.RenderRectangle(
+            Aimtec.Render.Rectangle(
                 afterSliderPos,
                 afterSliderWidth - DefaultMenuTheme.LineWidth * 2,
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(16, 26, 29));
 
             // draw text
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 pos + DefaultMenuTheme.LineWidth
                 + new Vector2(
                     width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.TextSpacing,
@@ -83,7 +83,7 @@
 
 
             // Render indicator box outline
-            RenderManager.RenderLine(
+            Aimtec.Render.Line(
                 pos.X + width - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth,
                 pos.Y,
                 pos.X + width - DefaultMenuTheme.IndicatorWidth  - DefaultMenuTheme.LineWidth,
@@ -95,7 +95,7 @@
 
             var indBoxPosition = position + new Vector2(width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth, 0);
 
-            RenderManager.RenderRectangle(
+            Aimtec.Render.Rectangle(
                 indBoxPosition,
                 DefaultMenuTheme.IndicatorWidth,
                 this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
@@ -103,7 +103,7 @@
 
             var centerArrowBox = indBoxPosition + new Vector2(DefaultMenuTheme.IndicatorWidth / 2, this.Theme.MenuHeight / 2);
 
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 centerArrowBox,
                 Color.AliceBlue,
                 this.Component.Enabled ? "ON" : "OFF", RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);

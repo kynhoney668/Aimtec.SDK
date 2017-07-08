@@ -35,7 +35,7 @@
                 Directory.CreateDirectory(this.MenuSettingsPath);
             }
 
-            RenderManager.OnPresent += () => this.Render(this.Position);
+            Aimtec.Render.OnPresent += () => this.Render(this.Position);
             Game.OnWndProc += args => this.WndProc(args.Message, args.WParam, args.LParam);
 
             Game.OnEnd += delegate { this.Save(); };

@@ -32,7 +32,7 @@ namespace Aimtec.SDK.Orbwalking
                 Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
                 Game.OnUpdate += this.Game_OnUpdate;
                 SpellBook.OnStopCast += SpellBook_OnStopCast;
-                RenderManager.OnRender += RenderManager_OnRender;
+                Render.OnRender += RenderManager_OnRender;
             }
             else
             {
@@ -227,12 +227,12 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (this.DrawAttackRange)
             {
-                RenderManager.RenderCircle(Player.Position, Player.AttackRange + Player.BoundingRadius, 30, System.Drawing.Color.DeepSkyBlue);
+                Render.Circle(Player.Position, Player.AttackRange + Player.BoundingRadius, 30, System.Drawing.Color.DeepSkyBlue);
             }
 
             if (this.DrawHoldPosition)
             {
-                RenderManager.RenderCircle(Player.Position, this.HoldPositionRadius, 30, System.Drawing.Color.White);
+                Render.Circle(Player.Position, this.HoldPositionRadius, 30, System.Drawing.Color.White);
             }
         }
 
@@ -614,7 +614,7 @@ namespace Aimtec.SDK.Orbwalking
             Obj_AI_Base.OnProcessSpellCast -= Obj_AI_Base_OnProcessSpellCast;
             Game.OnUpdate -= this.Game_OnUpdate;
             SpellBook.OnStopCast -= SpellBook_OnStopCast;
-            RenderManager.OnRender -= RenderManager_OnRender;
+            Render.OnRender -= RenderManager_OnRender;
             this.Attached = false;
         }
 

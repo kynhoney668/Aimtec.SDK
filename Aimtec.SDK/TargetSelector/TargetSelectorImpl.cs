@@ -65,7 +65,7 @@
         {
             this.CreateMenu();
             this.CreateWeights();
-            RenderManager.OnRender += this.RenderManagerOnOnRender;
+            Render.OnRender += this.RenderManagerOnOnRender;
             Game.OnWndProc += this.GameOnOnWndProc;
 
         }
@@ -105,7 +105,7 @@
             {
                 if (this.SelectedHero != null && this.SelectedHero.IsValidTarget())
                 {
-                    RenderManager.RenderCircle(
+                    Render.Circle(
                         this.SelectedHero.Position,
                         this.SelectedHero.BoundingRadius,
                         30,
@@ -119,14 +119,14 @@
                 if (this.Config["UseWeights"].Enabled)
                 {
                     var ordered = this.GetTargetsAndWeightsOrdered(50000, ShowOrderAuto).ToList();
-                    var basepos = new Vector2(RenderManager.Width / 2f, 0.10f * RenderManager.Height);
+                    var basepos = new Vector2(Render.Width / 2f, 0.10f * Render.Height);
                     for (int i = 0; i < ordered.Count(); i++)
                     {
                         var targ = ordered[i];
                         var target = targ.Key;
                         if (target != null)
                         {
-                            RenderManager.RenderText(
+                            Render.Text(
                                 basepos + new Vector2(0, i * 15),
                                 Color.Red,
                                 target.ChampionName + " " + targ.Value);
@@ -137,13 +137,13 @@
                 else
                 {
                     var ordered = this.GetOrderedTargetsByMode(50000, ShowOrderAuto).ToList();
-                    var basepos = new Vector2(RenderManager.Width / 2f, 0.10f * RenderManager.Height);
+                    var basepos = new Vector2(Render.Width / 2f, 0.10f * Render.Height);
                     for (int i = 0; i < ordered.Count(); i++)
                     {
                         var target = ordered[i];
                         if (target != null)
                         {
-                            RenderManager.RenderText(
+                            Render.Text(
                                 basepos + new Vector2(0, i * 15),
                                 Color.Red,
                                 target.ChampionName);
@@ -152,8 +152,6 @@
                 }
             } 
         }
-
-
 
         private IOrderedEnumerable<KeyValuePair<Obj_AI_Hero, float>> GetTargetsAndWeightsOrdered(float range, bool autoattack)
         {
@@ -179,7 +177,6 @@
             var enemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => autoattack ? x.IsValidAutoRange() : x.IsValidTarget(range));
             return enemies;
         }
-
 
         private Dictionary<Obj_AI_Hero, float> GetTargetsAndWeights(float range, bool autoattack = false)
         {
@@ -250,7 +247,6 @@
             return targets;
         }
 
-
         public Obj_AI_Hero GetTarget(float range, bool autoattack = false)
         {
             if (this.SelectedHero != null && this.SelectedHero.IsValidTarget(range))
@@ -267,7 +263,6 @@
 
             return null;
         }
-
 
         public IEnumerable<Obj_AI_Hero> GetOrderedTargetsByMode(float range, bool autoattack = false)
         {
@@ -558,7 +553,7 @@
 
         public void Dispose()
         {
-            RenderManager.OnRender -= this.RenderManagerOnOnRender;
+            Render.OnRender -= this.RenderManagerOnOnRender;
             Game.OnWndProc -= this.GameOnOnWndProc;
         }
     }

@@ -36,14 +36,14 @@
 
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 displayNamePosition,
                 this.Theme.TextColor,
                 this.Component.DisplayName, RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalLeft);
 
 
             // Render arrow outline
-            RenderManager.RenderLine(
+            Aimtec.Render.Line(
                 pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
                 pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
@@ -60,14 +60,14 @@
                 arrowBoxColor = Color.FromArgb(11, 18, 20);
             }
 
-            RenderManager.RenderRectangle(
+            Aimtec.Render.Rectangle(
                 position,
                 DefaultMenuTheme.IndicatorWidth ,
                 this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
                 arrowBoxColor);
 
 
-            RenderManager.RenderText(position + new Vector2((DefaultMenuTheme.IndicatorWidth  / 2), (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 2), Color.FromArgb(207, 195, 149), ">", RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalCenter);
+            Aimtec.Render.Text(position + new Vector2((DefaultMenuTheme.IndicatorWidth  / 2), (this.Theme.MenuHeight - DefaultMenuTheme.LineWidth) / 2), Color.FromArgb(207, 195, 149), ">", RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalCenter);
 
         }
 

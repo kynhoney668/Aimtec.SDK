@@ -188,26 +188,6 @@
             }
 
             this.VisibleSince[sender.NetworkId] = GetTime();
-
-            // update path analysis
-            /*var hero = (Obj_AI_Hero)sender;
-            if (this.PathAnalysis[sender.NetworkId].Count == 2)
-            {
-                var p1 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 2].Position;
-                var p2 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 1].Position;
-                var angle = ((Vector2)sender.Position).AngleBetween((Vector2)p2, (Vector2)p1);
-
-                if (angle > 20)
-                {
-                    this.PathAnalysis[sender.NetworkId]
-                        .Add(new Path() { Time = GetTime(), Position = hero.Path.Last() });
-                }
-                else
-                {
-                    this.PathAnalysis[sender.NetworkId]
-                        .Add(new Path() { Time = GetTime(), Position = hero.Path.Last() });
-                }
-            }*/
         }
  
         private void OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
@@ -488,9 +468,7 @@
 
         private List<Vector3> GetCurrentWaypoints(Obj_AI_Base @object)
         {
-            // todo  .Path might have the current position, didnt check :Roto2:
             var result = new List<Vector3> { @object.Position };
-
             if (@object.HasPath)
             {
                 result.AddRange(@object.Path);
@@ -673,10 +651,8 @@
                         {
                             return new PredictedTargetPosition() { UnitPosition = spot, CastPosition = spot };
                         }
-                        else
-                        {
-                            return this.CalculateTargetPosition(unit, delay, radius, speed, from, type, spot);
-                        }
+
+                        return this.CalculateTargetPosition(unit, delay, radius, speed, @from, type, spot);
                     }
                 }
 

@@ -299,7 +299,7 @@
 
             var position = this.Position + DefaultMenuTheme.LineWidth;
 
-            RenderManager.RenderRectangle(
+            Aimtec.Render.Rectangle(
               position,
               width - DefaultMenuTheme.LineWidth,
               this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
@@ -308,8 +308,7 @@
             var centerPoint = this.Position + new Vector2(width - (DefaultMenuTheme.LineWidth * 2) / 2, this.Theme.MenuHeight - (DefaultMenuTheme.LineWidth * 2) / 2);
 
             var textPosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
-
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 textPosition,
                 Color.LightBlue,
                 text, RenderTextFlags.VerticalCenter);

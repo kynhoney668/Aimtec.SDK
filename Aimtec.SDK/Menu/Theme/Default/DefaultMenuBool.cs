@@ -40,13 +40,13 @@
 
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
 
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
                 this.Component.DisplayName, RenderTextFlags.VerticalCenter);
 
             // Render indicator box outline
-            RenderManager.RenderLine(
+            Aimtec.Render.Line(
                 pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
                 pos.Y,
                 pos.X + width - DefaultMenuTheme.IndicatorWidth - DefaultMenuTheme.LineWidth,
@@ -58,7 +58,7 @@
 
             var boolColor = this.Component.Value ? Color.FromArgb(39, 96, 17) : Color.FromArgb(85, 25, 15);
 
-            RenderManager.RenderRectangle(
+            Aimtec.Render.Rectangle(
                 indBoxPosition,
                 DefaultMenuTheme.IndicatorWidth,
                 this.Theme.MenuHeight - (DefaultMenuTheme.LineWidth),
@@ -66,7 +66,7 @@
 
             var centerArrowBox = indBoxPosition + new Vector2(DefaultMenuTheme.IndicatorWidth / 2, this.Theme.MenuHeight / 2);
 
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 centerArrowBox,
                 Color.AliceBlue,
                 this.Component.Value ? "ON" : "OFF", RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);

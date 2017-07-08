@@ -44,20 +44,20 @@
             var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2f);
 
             // Draw light bar before the slider line
-            RenderManager.RenderRectangle(
+            Aimtec.Render.Rectangle(
                 position,
                 beforeSliderWidth,
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(14, 59, 73));
 
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
                 this.Component.DisplayName, RenderTextFlags.VerticalCenter);
 
             var bfSlider = position + new Vector2(beforeSliderWidth, 0);
 
-            RenderManager.RenderLine(
+            Aimtec.Render.Line(
                 bfSlider,
                 bfSlider + new Vector2(0, this.Theme.MenuHeight),
                 DefaultMenuTheme.LineWidth,
@@ -66,14 +66,14 @@
 
             var afSlider = bfSlider;
 
-            RenderManager.RenderRectangle(
+            Aimtec.Render.Rectangle(
                 afSlider,
                 afterSliderWidth - DefaultMenuTheme.LineWidth,
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(16, 26, 29));
 
             // draw text
-            RenderManager.RenderText(
+            Aimtec.Render.Text(
                 pos + DefaultMenuTheme.LineWidth
                 + new Vector2(
                     width - DefaultMenuTheme.TextSpacing,

@@ -39,16 +39,16 @@
             Color color)
         {
             // Top left to top right
-            RenderManager.RenderLine(x, y, x + width, y, lineWidth, true, color);
+            Render.Line(x, y, x + width, y, lineWidth, true, color);
 
             // Top right to bottom right
-            RenderManager.RenderLine(x + width, y, x + width, y + height, lineWidth, true, color);
+            Render.Line(x + width, y, x + width, y + height, lineWidth, true, color);
 
             // Bottom right to bottom left
-            RenderManager.RenderLine(x + width, y + height, x, y + height, lineWidth, true, color);
+            Render.Line(x + width, y + height, x, y + height, lineWidth, true, color);
 
             // Bottom left to top left
-            RenderManager.RenderLine(x, y + height, x, y, lineWidth, true, color);
+            Render.Line(x, y + height, x, y, lineWidth, true, color);
         }
 
         public override IRenderManager<MenuBool> BuildMenuBoolRenderer(MenuBool component)
@@ -93,7 +93,7 @@
 
         internal void DrawMenuItemBox(Vector2 position, int boxWidth)
         {
-            RenderManager.RenderRectangle(
+            Render.Rectangle(
                 position,
                 (boxWidth) - IndicatorWidth - LineWidth,
                 this.MenuHeight - LineWidth,
@@ -102,7 +102,7 @@
 
         internal void DrawMenuItemBoxFull(Vector2 position, int boxWidth)
         {
-            RenderManager.RenderRectangle(
+            Render.Rectangle(
                 position,
                 (boxWidth) - LineWidth,
                 this.MenuHeight - LineWidth,
@@ -149,8 +149,6 @@
 
             return new Rectangle[] { sliderBounds, boolBounds };
         }
-
-
 
         #endregion
     }
