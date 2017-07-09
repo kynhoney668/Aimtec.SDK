@@ -235,7 +235,7 @@
 
             if (this.IsChargedSpell)
             {
-                return this.IsCharging ? ShootChargedSpell(this.Slot, prediction.CastPosition) : this.StartCharging();
+                return this.IsCharging ? ShootChargedSpell(this.Slot, prediction.CastPosition) : this.StartCharging(prediction.CastPosition);
             }
 
             return Player.SpellBook.CastSpell(this.Slot, prediction.CastPosition);
@@ -451,11 +451,16 @@
 
         private static bool ShootChargedSpell(SpellSlot slot, Vector3 position, bool releaseCast = true)
         {
-            return Player.SpellBook.CastSpell(slot, position)
-                && Player.SpellBook.UpdateChargedSpell(slot, position, releaseCast);
+            var resultUpdate = Player.SpellBook.UpdateChargedSpell(slot, position, releaseCast);
+            if (!releaseCast)
+            {
+                var resultCast = Player.SpellBook.CastSpell(slot, position);
+                return resultUpdate && resultCast;
+            }
+            return resultUpdate;
         }
 
-        private bool StartCharging()
+        private bool StartCharging(Vector3 position)
         {
             if (this.IsCharging || Game.TickCount - this.chargeReqSentT <= 400 + Game.Ping)
             {
@@ -463,7 +468,7 @@
             }
 
             this.chargeReqSentT = Game.TickCount;
-            return Player.SpellBook.CastSpell(this.Slot);
+            return Player.SpellBook.CastSpell(this.Slot, position);
         }
 
         #endregion
