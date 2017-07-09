@@ -37,7 +37,7 @@ namespace Aimtec.SDK.Damage.JSON
         ///     Gets or sets the minimum damage.
         /// </summary>
         /// <value>The minimum damage.</value>
-        public List<int> MinDamage { get; set; }
+        public List<double> MinDamage { get; set; }
 
         /// <summary>
         ///     Gets or sets the scale per100 ad.

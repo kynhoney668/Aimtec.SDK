@@ -63,6 +63,11 @@ namespace Aimtec.SDK.Damage.JSON
         /// <summary>
         ///     The bonus crit damage
         /// </summary>
-        BonusCritDamage
+        BonusCriticalDamage,
+
+        /// <summary>
+        ///     The bonus mana damage
+        /// </summary>
+        BonusMana
     }
 }

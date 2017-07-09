@@ -95,7 +95,7 @@ namespace Aimtec.SDK.Damage
                 case DamageScalingType.MaxMana:
                     origin = sourceScale.MaxMana;
                     break;
-                case DamageScalingType.BonusCritDamage:
+                case DamageScalingType.BonusCriticalDamage:
                     origin = sourceScale.HasItem(ItemId.InfinityEdge) ? 50 : 0; // TODO: Implement sourceScale.BonusCritDamage or sourceScale.CritDamageMod
                     break;
                 default: throw new ArgumentOutOfRangeException();
