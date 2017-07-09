@@ -302,6 +302,11 @@ namespace Aimtec.SDK.Damage
 
             if (totalDamage > 0)
             {
+                if (spellData.ScalePerCritPercent > 0)
+                {
+                    totalDamage *= source.Crit * 100 * spellData.ScalePerCritPercent;
+                }
+
                 if (spellData.ScalePerTargetMissHealth > 0)
                 {
                     totalDamage *= (target.MaxHealth - target.Health) / target.MaxHealth

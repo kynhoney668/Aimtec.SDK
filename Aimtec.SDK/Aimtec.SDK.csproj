@@ -130,7 +130,7 @@
     <Compile Include="Util\WindowsMessages.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Damage\Data\7.12.json" />
+    <EmbeddedResource Include="Damage\Data\7.13.json" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />

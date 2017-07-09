@@ -1,4 +1,4 @@
-﻿namespace Aimtec.SDK.Damage.JSON
+namespace Aimtec.SDK.Damage.JSON
 {
     using System.Collections.Generic;
 
@@ -52,10 +52,28 @@
         public double ScalePer100Ap { get; set; }
 
         /// <summary>
+        ///     Gets or sets the scale per35 bonus ad.
+        /// </summary>
+        /// <value>The scale per35 bonus ad.</value>
+        public double ScalePer35BonusAd { get; set; }
+
+        /// <summary>
         ///     Gets or sets the scale per100 bonus ad.
         /// </summary>
         /// <value>The scale per100 bonus ad.</value>
         public double ScalePer100BonusAd { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the scale per100 bonus ap.
+        /// </summary>
+        /// <value>The scale per100 bonus ap.</value>
+        public double ScalePer100BonusAp { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the scale per crit percent.
+        /// </summary>
+        /// <value>The scale per crit percent.</value>
+        public double ScalePerCritPercent { get; set; }
 
         /// <summary>
         ///     Gets or sets the scaling buff.

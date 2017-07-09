@@ -1,4 +1,4 @@
-﻿namespace Aimtec.SDK.Damage
+namespace Aimtec.SDK.Damage
 {
     using System;
     using System.Collections.Generic;
@@ -62,11 +62,14 @@
 
             switch (spellBonus.ScalingType)
             {
-                case DamageScalingType.BonusAttackPoints:
-                    origin = sourceScale.FlatPhysicalDamageMod;
+                case DamageScalingType.BonusAbilityPoints:
+                    origin = sourceScale.FlatMagicDamageMod;
                     break;
                 case DamageScalingType.AbilityPoints:
                     origin = sourceScale.TotalAbilityDamage;
+                    break;
+                case DamageScalingType.BonusAttackPoints:
+                    origin = sourceScale.FlatPhysicalDamageMod;
                     break;
                 case DamageScalingType.AttackPoints:
                     origin = sourceScale.TotalAttackDamage;
@@ -80,8 +83,11 @@
                 case DamageScalingType.MissingHealth:
                     origin = sourceScale.MaxHealth - sourceScale.Health;
                     break;
-                case DamageScalingType.BonusHealth: // TODO Replace with correct health
-                    origin = ((Obj_AI_Hero) sourceScale).MaxHealth;
+                case DamageScalingType.BonusHealth: // TODO: Implement sourceScale.BaseHealth, since Total-Base = Bonus
+                    origin = ((Obj_AI_Hero)sourceScale).MaxHealth;
+                    break;
+                case DamageScalingType.BonusArmor:
+                    origin = sourceScale.Armor; // TODO: Implement sourceScale.BaseArmor, since Total-Base = Bonus
                     break;
                 case DamageScalingType.Armor:
                     origin = sourceScale.Armor;
@@ -89,17 +95,31 @@
                 case DamageScalingType.MaxMana:
                     origin = sourceScale.MaxMana;
                     break;
+                case DamageScalingType.BonusCritDamage:
+                    origin = sourceScale.HasItem(ItemId.InfinityEdge) ? 50 : 0; // TODO: Implement sourceScale.BonusCritDamage or sourceScale.CritDamageMod
+                    break;
                 default: throw new ArgumentOutOfRangeException();
             }
 
             var dmg = origin * (percent > 0 || percent < 0
                 ? (percent > 0 ? percent : 0)
+                + (spellBonus.ScalePer100BonusAp > 0
+                    ? Math.Abs(source.FlatMagicDamageMod / 100) * spellBonus.ScalePer100BonusAp
+                    : 0)
                 + (spellBonus.ScalePer100Ap > 0
                     ? Math.Abs(source.TotalAbilityDamage / 100) * spellBonus.ScalePer100Ap
-                    : 0) + (spellBonus.ScalePer100BonusAd > 0
+                    : 0)
+                + (spellBonus.ScalePer35BonusAd > 0
+                    ? Math.Abs(source.FlatPhysicalDamageMod / 35) * spellBonus.ScalePer35BonusAd
+                    : 0)
+                + (spellBonus.ScalePer100BonusAd > 0
                     ? Math.Abs(source.FlatPhysicalDamageMod / 100) * spellBonus.ScalePer100BonusAd
-                    : 0) + (spellBonus.ScalePer100Ad > 0
+                    : 0)
+                + (spellBonus.ScalePer100Ad > 0
                     ? Math.Abs(source.TotalAttackDamage / 100) * spellBonus.ScalePer100Ad
+                    : 0)
+                + (spellBonus.ScalePerCritPercent > 0
+                    ? Math.Abs(source.Crit * 100) * spellBonus.ScalePerCritPercent
                     : 0)
                 : 0);
 
@@ -149,7 +169,7 @@
             {
                 // Todo makes this load based on game version
                 using (var stream = Assembly.GetExecutingAssembly()
-                                            .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.12.json"))
+                                            .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.13.json"))
                 {
                     if (stream == null)
                     {
