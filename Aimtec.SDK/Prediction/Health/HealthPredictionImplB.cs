@@ -46,7 +46,7 @@
 
         private void Obj_AI_Base_OnPerformCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
-            if (sender.IsValid && sender.IsMelee)
+            if (sender != null && sender.IsValid && sender.IsMelee)
             {
                 foreach (var value in this.incomingAttacks.Values)
                 {
