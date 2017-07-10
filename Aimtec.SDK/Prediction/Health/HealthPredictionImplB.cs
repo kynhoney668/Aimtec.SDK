@@ -192,7 +192,7 @@
             foreach (var attack in incAttacksUnit)
             {
                 //if this attack will take longer than the specified time to reach the target, then ignore it
-                if (attack.ETA + 120 > time)
+                if (attack.ETA + 250 > time)
                 {
                     continue;
                 }

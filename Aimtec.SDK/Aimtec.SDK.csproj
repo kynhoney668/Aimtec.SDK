@@ -82,7 +82,7 @@
     <Compile Include="Menu\Components\MenuSliderBool.cs" />
     <Compile Include="Menu\IReturns.cs" />
     <Compile Include="Menu\MenuComponent.cs" />
-    <Compile Include="Menu\Config\AimTecMenu.cs" />
+    <Compile Include="Menu\Config\AimtecMenu.cs" />
     <Compile Include="Menu\Config\GlobalKeys.cs" />
     <Compile Include="Menu\Theme\Default\DefaultMenu.cs" />
     <Compile Include="Menu\Theme\Default\DefaultMenuBool.cs" />

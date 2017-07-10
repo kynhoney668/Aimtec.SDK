@@ -263,12 +263,15 @@ namespace Aimtec.SDK.Extensions
                 : Player.Position) < Player.GetFullAttackRange(target);
         }
 
+
+
         /// <summary>
         ///     Determines whether the specified target is a valid target.
         /// </summary>
         /// <param name="target">The target.</param>
         /// <param name="range">The range.</param>
         /// <param name="allyIsValidTarget">if set to <c>true</c> allies will be set as valid targets.</param>
+        /// <param name="includeBoundingRadius"></param>
         /// <param name="checkRangeFrom">The check range from position.</param>
         /// <returns>
         ///     <c>true</c> if the specified target is a valid target; otherwise, <c>false</c>.
@@ -277,6 +280,7 @@ namespace Aimtec.SDK.Extensions
             this AttackableUnit target,
             float range = float.MaxValue,
             bool allyIsValidTarget = false,
+            bool includeBoundingRadius = true,
             Vector3 checkRangeFrom = default(Vector3))
         {
             if (target == null || !target.IsValid || target.IsDead ||
@@ -292,7 +296,7 @@ namespace Aimtec.SDK.Extensions
 
             return target.Distance(checkRangeFrom != Vector3.Zero
                 ? checkRangeFrom
-                : Player.Position) < range;
+                : Player.Position) < range + (includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0);
         }
 
         /// <summary>

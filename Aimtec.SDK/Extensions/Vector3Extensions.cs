@@ -45,7 +45,7 @@ namespace Aimtec.SDK.Extensions
         /// <returns>How many ally heroes are inside a 'float' range from the starting 'vector3' point.</returns>
         public static int CountAllyHeroesInRange(this Vector3 vector3, float range)
         {
-            return GameObjects.AllyHeroes.Count(h => !h.IsMe && h.IsValidTarget(range, false, vector3));
+            return GameObjects.AllyHeroes.Count(h => !h.IsMe && h.IsValidTarget(range, false, false, vector3));
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Aimtec.SDK.Extensions
         /// <returns>How many enemy heroes are inside a 'float' range from the starting 'vector3' point.</returns>
         public static int CountEnemyHeroesInRange(this Vector3 vector3, float range, Obj_AI_Base dontIncludeStartingUnit = null)
         {
-            return GameObjects.EnemyHeroes.Count(h => h.NetworkId != dontIncludeStartingUnit?.NetworkId && h.IsValidTarget(range, true, vector3));
+            return GameObjects.EnemyHeroes.Count(h => h.NetworkId != dontIncludeStartingUnit?.NetworkId && h.IsValidTarget(range, true, false, vector3));
         }
         
         /// <summary>
@@ -93,6 +93,17 @@ namespace Aimtec.SDK.Extensions
             Vector2 screenPosition;
             Render.WorldToScreen(worldPos, out screenPosition);
             return screenPosition;
+        }
+
+        /// <summary>
+        ///     Converts a Vector3 World Position to a Vector2 Minimap Position 
+        /// </summary>
+        /// <param name="vector3">The World Position.</param>
+        public static Vector2 ToMiniMapPosition(this Vector3 worldPos)
+        {
+            Vector2 miniMapPosition;
+            Render.WorldToMinimap(worldPos, out miniMapPosition);
+            return miniMapPosition;
         }
     }
 }

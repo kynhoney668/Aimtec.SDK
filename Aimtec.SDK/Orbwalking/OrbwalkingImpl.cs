@@ -353,7 +353,7 @@ namespace Aimtec.SDK.Orbwalking
 
         AttackableUnit GetLaneClearTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange());
    
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
@@ -457,9 +457,12 @@ namespace Aimtec.SDK.Orbwalking
                     return minion;
                 }
 
-                if (data != null && data.HasMinionAggro && data.IncomingAttacks?.Count >= 3 && predHealth > dmg)
+                if (data != null)
                 {
-                    continue;
+                    if (predHealth > dmg && predHealth < dmg * 3 && data.TimeElapsedSinceLastMinionAttack < 1000)
+                    {
+                        continue;
+                    }
                 }
 
                 return minion;

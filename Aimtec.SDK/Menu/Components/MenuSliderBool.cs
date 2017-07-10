@@ -180,7 +180,7 @@
         private void SetSliderValue(int x)
         {
             var sliderbounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(this.Position, this.Parent.Width)[0];
-            var val = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int)((x - this.Position.X) / (sliderbounds.Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue)));
+            var val = Math.Max(this.MinValue, Math.Min(this.MaxValue, (int)((x - this.Position.X) / (sliderbounds.Width - MenuManager.Instance.Theme.LineWidth * 2) * this.MaxValue)));
             this.UpdateValue(val);
         }
 

@@ -11,6 +11,7 @@
     using Aimtec.SDK.Prediction.Collision;
 
     using NLog;
+    using Aimtec.SDK.Menu.Config;
 
     // todo move dash to seperate class?
     internal class PredictionImpl : IPrediction
@@ -228,7 +229,10 @@
                 {
                     if (e.SpellData.Name.ToLower() == spell.Name)
                     {
-                        Logger.Warn("WHY IS THIS CALLED");
+                        if (AimtecMenu.DebugEnabled)
+                        {
+                            Logger.Warn("WHY IS THIS CALLED");
+                        }
                         this.DontShoot[sender.NetworkId] = GetTime() + spell.Duration;
                         return;
                     }
@@ -593,7 +597,10 @@
             {
                 if (this.PathAnalysis[unit.NetworkId].Count > 4)
                 {
-                    Logger.Warn("Path count > 4");
+                    if (AimtecMenu.DebugEnabled)
+                    {
+                        Logger.Warn("Path count > 4");
+                    }
                     //return new PredictedTargetPosition(){CastPosition = unit.Position, UnitPosition = unit.Position};
                 }
 
@@ -687,7 +694,10 @@
             radius = Math.Abs(radius) < float.Epsilon ? 1 : radius + this.GetHitBox(unit) - 4;
             from = from.IsZero ? Player.Position : from;
 
-            Logger.Info("From: {0} | Player Pos: {1}", from, Player.Position);
+            if (AimtecMenu.DebugEnabled)
+            {
+                Logger.Info("From: {0} | Player Pos: {1}", from, Player.Position);
+            } 
 
             var isFromPlayer = Vector3.DistanceSquared(from, Player.Position) < 50 * 50;
             delay = delay + (0.07f + Game.Ping / 2000f);
@@ -712,7 +722,10 @@
 
                 if (this.DontShoot[unit.NetworkId] > GetTime())
                 {
-                    Logger.Info("{0} > {1}", this.DontShoot[unit.NetworkId], GetTime());
+                    if (AimtecMenu.DebugEnabled)
+                    {
+                        Logger.Info("{0} > {1}", this.DontShoot[unit.NetworkId], GetTime());
+                    }
                     position = unit.Position;
                     castPosition = unit.Position;
                     hitchance = 0;
@@ -720,7 +733,11 @@
                 }
                 else if (dashResult)
                 {
-                    Logger.Info("Target is dashing!");
+                    if (AimtecMenu.DebugEnabled)
+                    {
+                        Logger.Info("Target is dashing!");
+                    }
+
                     if (dashResult.CanHit)
                     {
                         hitchance = 5;
@@ -735,7 +752,10 @@
                 }
                 else if (this.DontShoot2[unit.NetworkId] > GetTime())
                 {
-                    Logger.Info("Dont shoot 2");
+                    if (AimtecMenu.DebugEnabled)
+                    {
+                        Logger.Info("Dont shoot 2");
+                    }
                     position = unit.Position;
                     castPosition = unit.Position;
                     hitchance = 7;
@@ -748,19 +768,25 @@
                 }
                 else
                 {
-                    Logger.Info("Analyze waypoints");
+                    if (AimtecMenu.DebugEnabled)
+                    {
+                        Logger.Info("Analyze waypoints");
+                    }
                     var wpa = this.AnalyzeWaypoints(unit, delay, radius, range, speed, from,type);
                     castPosition = wpa.CastPosition;
                     hitchance = (int) wpa.HitChance;
                     position = wpa.PredictedPosition;
-                    Logger.Info("Waypoints analysis hitchance result: {0}", hitchance);
+                    if (AimtecMenu.DebugEnabled)
+                    {
+                        Logger.Info("Waypoints analysis hitchance result: {0}", hitchance);
+                    }
                 }
             }
             if (isFromPlayer)
             {
                 if (type == SkillType.Line && Vector3.DistanceSquared(from, position) >= range * range)
                 {
-                    Logger.Info("Type == Line OOR. DS: {0} | Range^2: {1}", Vector3.DistanceSquared(from, position), range*range);
+                   // Logger.Info("Type == Line OOR. DS: {0} | Range^2: {1}", Vector3.DistanceSquared(from, position), range*range);
                     hitchance = 0;
                 }
 
@@ -771,7 +797,7 @@
 
                 if (Vector3.DistanceSquared(from, castPosition) > range * range)
                 {
-                    Logger.Info("V3 DS OOR. DS: {0} | Range^2: {1}", Vector3.DistanceSquared(from, castPosition), range * range);
+                    //Logger.Info("V3 DS OOR. DS: {0} | Range^2: {1}", Vector3.DistanceSquared(from, castPosition), range * range);
                     hitchance = 0;
                 }
             }

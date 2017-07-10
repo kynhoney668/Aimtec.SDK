@@ -32,7 +32,7 @@
 
             this.Theme.DrawMenuItemBorder(pos, width);
 
-            var position = pos + DefaultMenuTheme.LineWidth;
+            var position = pos + this.Theme.LineWidth;
 
             this.Theme.DrawMenuItemBoxFull(position, width);
 

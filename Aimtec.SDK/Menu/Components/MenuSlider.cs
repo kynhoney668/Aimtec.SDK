@@ -164,7 +164,7 @@
         /// <param name="x">The x.</param>
         private void SetSliderValue(int x)
         {
-            this.UpdateValue(Math.Max(this.MinValue, Math.Min(this.MaxValue, (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width - DefaultMenuTheme.LineWidth * 2) * this.MaxValue))));
+            this.UpdateValue(Math.Max(this.MinValue, Math.Min(this.MaxValue, (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width - MenuManager.Instance.Theme.LineWidth * 2) * this.MaxValue))));
         }
 
  

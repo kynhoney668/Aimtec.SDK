@@ -14,13 +14,30 @@
         ///     Gets the height of the menu.
         /// </summary>
         /// <value>The height of the menu.</value>
-        public abstract int MenuHeight { get; }
+        public virtual int MenuHeight { get; } = 32;
 
         /// <summary>
         ///     Gets the width of the menu.
         /// </summary>
         /// <value>The base width of a Menu</value>
-        public abstract int BaseMenuWidth { get; set; }
+        public virtual int BaseMenuWidth { get; set; }
+
+        public virtual int TextSpacing { get; set; } = 15;
+
+        public virtual int LineWidth { get; set; } = 1;
+
+        public virtual int IndicatorWidth { get; set; } = 35;
+
+        public virtual Color LineColor { get; set;  } = Color.FromArgb(82, 83, 57);
+
+        public virtual Color MenuBoxBackgroundColor { get; set; } = Color.FromArgb(206, 16, 26, 29);
+
+        public virtual Color TextColor { get; set; } = Color.FromArgb(207, 195, 149);
+
+        public MenuTheme()
+        {
+            this.BaseMenuWidth = this.IndicatorWidth + this.LineWidth + this.TextSpacing;
+        }
 
 
         #endregion
@@ -83,6 +100,7 @@
         public abstract Rectangle[] GetMenuListControlBounds(Vector2 pos, int width);
 
         public abstract Rectangle[] GetMenuSliderBoolControlBounds(Vector2 pos, int width);
+
 
 
         #endregion

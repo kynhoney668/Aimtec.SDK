@@ -9,22 +9,6 @@
     {
         #region Public Properties
 
-        public static int TextSpacing { get; } = 15;
-
-        public static int LineWidth { get; } = 1;
-
-        public static int IndicatorWidth { get; } = 35;
-
-        public Color LineColor { get; } = Color.FromArgb(82, 83, 57);
-
-        public Color MenuBoxBackgroundColor { get; } = Color.FromArgb(206, 16, 26, 29);
-
-        public override int MenuHeight { get; } = 32;
-
-        public override int BaseMenuWidth { get; set; } = IndicatorWidth + LineWidth + TextSpacing;
-
-        public Color TextColor { get; } = Color.FromArgb(207, 195, 149);
-
 
         #endregion
 

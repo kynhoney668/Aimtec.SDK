@@ -307,7 +307,7 @@
                     var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
                     if (longestItem != null)
                     {
-                        width = (int)MenuManager.Instance.TextWidth(mList.DisplayName + longestItem) + DefaultMenuTheme.IndicatorWidth + 15;
+                        width = (int)MenuManager.Instance.TextWidth(mList.DisplayName + longestItem) + MenuManager.Instance.Theme.IndicatorWidth + 15;
                     }
                 }
 

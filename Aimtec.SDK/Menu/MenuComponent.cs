@@ -25,20 +25,6 @@
         #region Internal Properties
         internal abstract string Serialized { get; }
 
-        private DefaultMenuTheme _theme { get; set; }
-
-        internal DefaultMenuTheme Theme {
-            get
-            {
-                if (_theme == null)
-                {
-                    this._theme = (DefaultMenuTheme)MenuManager.Instance.Theme;
-                }
-
-                return this._theme;
-            }
-        }
-
         internal virtual bool SavableMenuItem { get; set; } = true;
 
         internal virtual string ConfigName
@@ -295,19 +281,19 @@
             var text = $"[i] { this.ToolTip}";
             int width = Math.Max(this.Parent.Width, (int)MenuManager.Instance.TextWidth(text));
 
-            DefaultMenuTheme.DrawRectangleOutline(this.Position.X, this.Position.Y, width, this.Theme.MenuHeight, DefaultMenuTheme.LineWidth, this.Theme.LineColor);
+            DefaultMenuTheme.DrawRectangleOutline(this.Position.X, this.Position.Y, width, MenuManager.Instance.Theme.MenuHeight, MenuManager.Instance.Theme.LineWidth, MenuManager.Instance.Theme.LineColor);
 
-            var position = this.Position + DefaultMenuTheme.LineWidth;
+            var position = this.Position + MenuManager.Instance.Theme.LineWidth;
 
             Aimtec.Render.Rectangle(
               position,
-              width - DefaultMenuTheme.LineWidth,
-              this.Theme.MenuHeight - DefaultMenuTheme.LineWidth,
-              this.Theme.MenuBoxBackgroundColor);
+              width - MenuManager.Instance.Theme.LineWidth,
+              MenuManager.Instance.Theme.MenuHeight - MenuManager.Instance.Theme.LineWidth,
+              MenuManager.Instance.Theme.MenuBoxBackgroundColor);
 
-            var centerPoint = this.Position + new Vector2(width - (DefaultMenuTheme.LineWidth * 2) / 2, this.Theme.MenuHeight - (DefaultMenuTheme.LineWidth * 2) / 2);
+            var centerPoint = this.Position + new Vector2(width - (MenuManager.Instance.Theme.LineWidth * 2) / 2, MenuManager.Instance.Theme.MenuHeight - (MenuManager.Instance.Theme.LineWidth * 2) / 2);
 
-            var textPosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2);
+            var textPosition = position + new Vector2(MenuManager.Instance.Theme.TextSpacing, (MenuManager.Instance.Theme.MenuHeight) / 2);
             Aimtec.Render.Text(
                 textPosition,
                 Color.LightBlue,

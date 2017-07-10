@@ -9,6 +9,7 @@
     using Aimtec.SDK.Util;
 
     using NLog;
+    using Aimtec.SDK.Menu.Config;
 
     /// <summary>
     ///     Class Spell.
@@ -35,7 +36,10 @@
         {
             this.Slot = slot;
 
-            Logger.Debug("{0} Spell Created", slot);
+            if (AimtecMenu.DebugEnabled)
+            {
+                Logger.Debug("{0} Spell Created", slot);
+            }
         }
 
         /// <summary>
@@ -222,7 +226,10 @@
 
             if (this.IsVectorSkillShot)
             {
-                Logger.Error("Vector skillshot should be cast using two positions");
+                if (AimtecMenu.DebugEnabled)
+                {
+                    Logger.Error("Vector skillshot should be cast using two positions");
+                }
                 return false;
             }
 
@@ -254,7 +261,10 @@
 
             if (this.IsSkillShot)
             {
-                Logger.Warn("{0} is a skillshot, but casted like a self-activated ability.", this.Slot);
+                if (AimtecMenu.DebugEnabled)
+                {
+                    Logger.Warn("{0} is a skillshot, but casted like a self-activated ability.", this.Slot);
+                }
             }
 
             return Player.SpellBook.CastSpell(this.Slot);
@@ -394,7 +404,9 @@
                 }
             };
 
-            Logger.Debug(
+            if (AimtecMenu.DebugEnabled)
+            {
+                Logger.Debug(
                 "{0} Set as Charged -> Spell Name: {1}, Buff Name: {2}, Min Range: {3}, Max Range: {4}, Charge Duration: {5}s",
                 this.Slot,
                 spellName,
@@ -402,6 +414,7 @@
                 minRange,
                 maxRange,
                 chargeDurationSeconds);
+            }
         }
 
         /// <summary>
@@ -432,7 +445,9 @@
             this.IsVectorSkillShot = vectorSkillshot;
             this.HitChance = hitchance;
 
-            Logger.Debug(
+            if (AimtecMenu.DebugEnabled)
+            {
+                Logger.Debug(
                 "{0} Set as SkillShot -> Range: {1}, Delay: {2},  Width: {3}, Speed: {4}, Collision: {5}, Type: {6}, MinHitChance: {7}",
                 this.Slot,
                 this.Range,
@@ -442,6 +457,7 @@
                 collision,
                 type,
                 hitchance);
+            }
         }
 
 

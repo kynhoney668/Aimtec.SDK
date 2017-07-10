@@ -31,17 +31,17 @@
             var width = this.Component.Parent.Width;
 
             var beforeSliderWidth = (float) (this.Component.Value - this.Component.MinValue)
-                / (this.Component.MaxValue - this.Component.MinValue) * (width - DefaultMenuTheme.LineWidth * 2);
+                / (this.Component.MaxValue - this.Component.MinValue) * (width - this.Theme.LineWidth * 2);
 
-            var afterSliderWidth = width - beforeSliderWidth - DefaultMenuTheme.LineWidth;
+            var afterSliderWidth = width - beforeSliderWidth - this.Theme.LineWidth;
 
             this.Theme.DrawMenuItemBorder(pos, width);
 
-            var position = pos + DefaultMenuTheme.LineWidth;
+            var position = pos + this.Theme.LineWidth;
 
             this.Theme.DrawMenuItemBox(position, width);
 
-            var displayNamePosition = position + new Vector2(DefaultMenuTheme.TextSpacing, (this.Theme.MenuHeight) / 2f);
+            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, (this.Theme.MenuHeight) / 2f);
 
             // Draw light bar before the slider line
             Aimtec.Render.Rectangle(
@@ -60,7 +60,7 @@
             Aimtec.Render.Line(
                 bfSlider,
                 bfSlider + new Vector2(0, this.Theme.MenuHeight),
-                DefaultMenuTheme.LineWidth,
+                this.Theme.LineWidth,
                 false,
                 Color.FromArgb(82, 83, 57));
 
@@ -68,15 +68,15 @@
 
             Aimtec.Render.Rectangle(
                 afSlider,
-                afterSliderWidth - DefaultMenuTheme.LineWidth,
+                afterSliderWidth - this.Theme.LineWidth,
                 this.Theme.MenuHeight * 0.95f,
                 Color.FromArgb(16, 26, 29));
 
             // draw text
             Aimtec.Render.Text(
-                pos + DefaultMenuTheme.LineWidth
+                pos + this.Theme.LineWidth
                 + new Vector2(
-                    width - DefaultMenuTheme.TextSpacing,
+                    width - this.Theme.TextSpacing,
                     (this.Theme.MenuHeight) / 2f),
                 Color.FromArgb(207, 195, 149),
                 this.Component.Value.ToString(), RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);
