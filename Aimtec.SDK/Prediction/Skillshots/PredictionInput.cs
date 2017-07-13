@@ -15,7 +15,7 @@ namespace Aimtec.SDK.Prediction
         /// </summary>
         public PredictionInput()
         {
-            this.From = ObjectManager.GetLocalPlayer().Position;
+            this.From = ObjectManager.GetLocalPlayer().ServerPosition;
             this.RangeCheckFrom = this.From;
         }
 

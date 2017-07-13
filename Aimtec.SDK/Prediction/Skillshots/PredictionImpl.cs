@@ -208,9 +208,9 @@
                 {
                     if (e.SpellData.Name.ToLower() == spell.Name)
                     {
-                        var landingPos = Vector3.Distance(sender.Position, e.End) < spell.Range
+                        var landingPos = Vector3.Distance(sender.ServerPosition, e.End) < spell.Range
                             ? e.End
-                            : sender.Position + spell.Range * Vector3.Normalize(e.End - sender.Position);
+                            : sender.ServerPosition + spell.Range * Vector3.Normalize(e.End - sender.ServerPosition);
 
                         this.TargetsDashing[sender.NetworkId] = new Dash()
                         {
@@ -218,7 +218,7 @@
                             Duration = spell.Delay,
                             EndTime = GetTime() + spell.Delay,
                             EndTime2 = GetTime() + spell.Delay2,
-                            StartPosition = sender.Position,
+                            StartPosition = sender.ServerPosition,
                             EndPosition = landingPos
                         };
                         return;
@@ -258,7 +258,7 @@
         {
             if (this.TargetsImmobile.ContainsKey(unit.NetworkId))
             {
-                var extraDelay = Math.Abs(speed - float.MaxValue) < float.Epsilon ? 0 : Vector3.Distance(from, unit.Position) / speed;
+                var extraDelay = Math.Abs(speed - float.MaxValue) < float.Epsilon ? 0 : Vector3.Distance(from, unit.ServerPosition) / speed;
 
                 if (this.TargetsImmobile[unit.NetworkId] > GetTime() + delay + extraDelay
                     && spellType == SkillType.Circle)
@@ -266,8 +266,8 @@
                     return new ImmobileResult()
                     {
                         Immobile = true,
-                        UnitPosition = unit.Position,
-                        CastPosition = unit.Position + radius / 3f * Vector3.Normalize(from - unit.Position)
+                        UnitPosition = unit.ServerPosition,
+                        CastPosition = unit.ServerPosition + radius / 3f * Vector3.Normalize(from - unit.ServerPosition)
                     };
                 }
 
@@ -277,13 +277,13 @@
                     return new ImmobileResult()
                     {
                         Immobile = true,
-                        UnitPosition = unit.Position,
-                        CastPosition = unit.Position
+                        UnitPosition = unit.ServerPosition,
+                        CastPosition = unit.ServerPosition
                     };
                 }
             }
 
-            return new ImmobileResult(){Immobile = false, UnitPosition = unit.Position, CastPosition = unit.Position};
+            return new ImmobileResult(){Immobile = false, UnitPosition = unit.ServerPosition, CastPosition = unit.ServerPosition};
         }
 
         private DashResult IsDashing(Obj_AI_Base unit, float delay, float radius, float speed, Vector3 from)
@@ -415,7 +415,7 @@
                 {
                     var p1 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 2].Position;
                     var p2 = this.PathAnalysis[sender.NetworkId][this.PathAnalysis[sender.NetworkId].Count - 1].Position;
-                    var angle = ((Vector2) sender.Position).AngleBetween((Vector2) p2, (Vector2) p1);
+                    var angle = ((Vector2) sender.ServerPosition).AngleBetween((Vector2) p2, (Vector2) p1);
 
                     if (angle > 20)
                     {
@@ -439,7 +439,7 @@
                     this.TargetsWaypoints[sender.NetworkId].Add(
                         new WaypointInfo()
                         {
-                            UnitPosition = sender.Position,
+                            UnitPosition = sender.ServerPosition,
                             Waypoint = waypointsToAdd.Last(),
                             Time = GetTime(),
                             N = waypointsToAdd.Count
@@ -472,7 +472,7 @@
 
         private List<Vector3> GetCurrentWaypoints(Obj_AI_Base @object)
         {
-            var result = new List<Vector3> { @object.Position };
+            var result = new List<Vector3> { @object.ServerPosition };
             if (@object.HasPath)
             {
                 result.AddRange(@object.Path);
@@ -490,7 +490,7 @@
             GameObject from,
             bool collision)
         {
-            return this.GetCastPosition(unit, delay, radius, range, speed, from.Position, collision, SkillType.Line);
+            return this.GetCastPosition(unit, delay, radius, range, speed, from.ServerPosition, collision, SkillType.Line);
         }
 
         /// <summary>
@@ -601,7 +601,7 @@
                     {
                         Logger.Warn("Path count > 4");
                     }
-                    //return new PredictedTargetPosition(){CastPosition = unit.Position, UnitPosition = unit.Position};
+                    //return new PredictedTargetPosition(){CastPosition = unit.ServerPosition, UnitPosition = unit.ServerPosition};
                 }
 
                 if (this.PathAnalysis[unit.NetworkId].Count > 3)
@@ -613,17 +613,17 @@
 
             var spot = Vector3.Zero;
 
-            var p90x = second.IsZero ? unit.Position : second;
-            var pathPot = unit.MoveSpeed * (Vector3.Distance(Player.Position, p90x) / speed + delay);
+            var p90x = second.IsZero ? unit.ServerPosition : second;
+            var pathPot = unit.MoveSpeed * (Vector3.Distance(Player.ServerPosition, p90x) / speed + delay);
 
             if (unit.Path.Length < 3)
             {
-                var v = unit.Position + Vector3.Normalize(unit.Path.Last() - unit.Position)
+                var v = unit.ServerPosition + Vector3.Normalize(unit.Path.Last() - unit.ServerPosition)
                     * (pathPot - unit.BoundingRadius + 10);
 
-                if (Vector3.Distance(unit.Position, v) > 1)
+                if (Vector3.Distance(unit.ServerPosition, v) > 1)
                 {
-                    if (Vector3.Distance(unit.Path.Last(), unit.Position) >= Vector3.Distance(unit.Position, v))
+                    if (Vector3.Distance(unit.Path.Last(), unit.ServerPosition) >= Vector3.Distance(unit.ServerPosition, v))
                     {
                         spot = v;
                     }
@@ -663,17 +663,17 @@
                     }
                 }
 
-                if (Vector3.Distance(unit.Position, unit.Path.Last()) > unit.BoundingRadius)
+                if (Vector3.Distance(unit.ServerPosition, unit.Path.Last()) > unit.BoundingRadius)
                 {
                     spot = unit.Path.Last();
                 }
                 else
                 {
-                    spot = unit.Position;
+                    spot = unit.ServerPosition;
                 }
             }
 
-            spot = spot.IsZero ? unit.Position : spot;
+            spot = spot.IsZero ? unit.ServerPosition : spot;
 
             if (!second.IsZero)
             {
@@ -692,14 +692,14 @@
 
             range = Math.Abs(range) < float.Epsilon ? float.MaxValue : range - 15;
             radius = Math.Abs(radius) < float.Epsilon ? 1 : radius + this.GetHitBox(unit) - 4;
-            from = from.IsZero ? Player.Position : from;
+            from = from.IsZero ? Player.ServerPosition : from;
 
             if (AimtecMenu.DebugEnabled)
             {
-                Logger.Info("From: {0} | Player Pos: {1}", from, Player.Position);
+                Logger.Info("From: {0} | Player Pos: {1}", from, Player.ServerPosition);
             } 
 
-            var isFromPlayer = Vector3.DistanceSquared(from, Player.Position) < 50 * 50;
+            var isFromPlayer = Vector3.DistanceSquared(from, Player.ServerPosition) < 50 * 50;
             delay = delay + (0.07f + Game.Ping / 2000f);
 
             Vector3 position;
@@ -726,8 +726,8 @@
                     {
                         Logger.Info("{0} > {1}", this.DontShoot[unit.NetworkId], GetTime());
                     }
-                    position = unit.Position;
-                    castPosition = unit.Position;
+                    position = unit.ServerPosition;
+                    castPosition = unit.ServerPosition;
                     hitchance = 0;
 
                 }
@@ -756,8 +756,8 @@
                     {
                         Logger.Info("Dont shoot 2");
                     }
-                    position = unit.Position;
-                    castPosition = unit.Position;
+                    position = unit.ServerPosition;
+                    castPosition = unit.ServerPosition;
                     hitchance = 7;
                 }
                 else if (immobileResult.Immobile)
@@ -888,7 +888,7 @@
                 hitchance = 3;
             }
 
-            if (((Vector2) from).AngleBetween((Vector2) unit.Position, (Vector2) castPosition) > 60)
+            if (((Vector2) from).AngleBetween((Vector2) unit.ServerPosition, (Vector2) castPosition) > 60)
             {
                 hitchance = 1;
             }
@@ -896,11 +896,11 @@
             if (position.IsZero || castPosition.IsZero)
             {
                 hitchance = 1;
-                castPosition = unit.Position;
+                castPosition = unit.ServerPosition;
                 position = castPosition;
             }
 
-            if (Vector3.Distance(Player.Position, unit.Position) < 250 && unit.NetworkId != Player.NetworkId)
+            if (Vector3.Distance(Player.ServerPosition, unit.ServerPosition) < 250 && unit.NetworkId != Player.NetworkId)
             {
                 hitchance = 2;
                 calculatedTargetPosition = this.CalculateTargetPosition(unit, delay * 0.5f, radius, speed * 2, from, type);
@@ -916,7 +916,7 @@
             if (this.DontShootUntilNewWaypoints[unit.NetworkId])
             {
                 hitchance = 0;
-                castPosition = unit.Position;
+                castPosition = unit.ServerPosition;
                 position = castPosition;
             }
 
@@ -928,7 +928,7 @@
             return this.GetWaypoints(unit.NetworkId, from)
                 .Select(
                     x => Vector2.Zero.AngleBetween(
-                        (Vector2) currentWaypoint - (Vector2) unit.Position,
+                        (Vector2) currentWaypoint - (Vector2) unit.ServerPosition,
                         (Vector2) (x.Waypoint - x.UnitPosition)))
                 .Concat(new[] { 0f }).Max();
         }
