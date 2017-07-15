@@ -84,7 +84,7 @@
             {
                 var buffer = 8;
 
-                if (minion.Type == GameObjectType.AIHeroClient)
+                if (minion.Type == GameObjectType.obj_AI_Hero)
                 {
                     buffer += (int) minion.BoundingRadius; // todo make sure this is ~65
                 }

@@ -41,7 +41,6 @@
             public Vector3 Waypoint { get; set; }
             public float Time { get; set; }
             public int N { get; set; }
-
         }
 
         private struct SpellInfo
@@ -183,7 +182,7 @@
 
         private void OnEnterVisible(AttackableUnit sender, EventArgs eventArgs)
         {
-            if (sender.Type != GameObjectType.AIHeroClient || !sender.IsEnemy)
+            if (sender.Type != GameObjectType.obj_AI_Hero || !sender.IsEnemy)
             {
                 return;
             }
@@ -193,7 +192,7 @@
  
         private void OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
-            if (sender.Type == GameObjectType.AIHeroClient)
+            if (sender.Type == GameObjectType.obj_AI_Hero)
             {
                 foreach (var spell in this.Spells)
                 {
@@ -408,7 +407,7 @@
 
         private void OnNewPath(Obj_AI_Base sender, Obj_AI_BaseNewPathEventArgs e)
         {
-            if (sender.Type == GameObjectType.AIHeroClient && sender.Team != Player.Team
+            if (sender.Type == GameObjectType.obj_AI_Hero && sender.Team != Player.Team
                 || sender.NetworkId == Player.NetworkId)
             {
                 if (this.PathAnalysis[sender.NetworkId].Count == 2)
@@ -428,7 +427,7 @@
                 }
             }
 
-            if (sender.IsValid && sender.Type == GameObjectType.AIHeroClient)
+            if (sender.IsValid && sender.Type == GameObjectType.obj_AI_Hero)
             {
                 this.DontShootUntilNewWaypoints[sender.NetworkId] = false;
 
@@ -449,7 +448,7 @@
 
             if (e.IsDash)
             {
-                if (sender.Type == GameObjectType.AIHeroClient)
+                if (sender.Type == GameObjectType.obj_AI_Hero)
                 {
                     var dash = new Dash()
                     {
@@ -593,7 +592,7 @@
             SkillType type,
             Vector3 second = new Vector3())
         {
-            if (unit.Type == GameObjectType.AIHeroClient && unit.IsEnemy || unit.IsMe)
+            if (unit.Type == GameObjectType.obj_AI_Hero && unit.IsEnemy || unit.IsMe)
             {
                 if (this.PathAnalysis[unit.NetworkId].Count > 4)
                 {
@@ -709,7 +708,7 @@
             var dashResult = this.IsDashing(unit, delay, radius, speed, from);
             var immobileResult = this.IsImmobile(unit, delay, radius, speed, from, type);
 
-            if (unit.Type != GameObjectType.AIHeroClient)
+            if (unit.Type != GameObjectType.obj_AI_Hero)
             {
                 var targetPos = this.CalculateTargetPosition(unit, delay, radius, speed, from, type);
 

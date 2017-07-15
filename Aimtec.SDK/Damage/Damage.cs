@@ -121,7 +121,7 @@ namespace Aimtec.SDK.Damage
                         {
                             switch (target.Type)
                             {
-                                case GameObjectType.AIHeroClient:
+                                case GameObjectType.obj_AI_Hero:
                                     if (hero.Level < 7)
                                     {
                                         dmgMagical += 0.1 * targetHero.MaxHealth;

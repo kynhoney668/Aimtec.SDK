@@ -62,6 +62,5 @@ namespace Aimtec.SDK.Prediction
         /// </summary>
         /// <value>The number of targets hit by the area of effect spell.</value>
         public int AoeTargetsHit { get; set; }
-
     }
 }
