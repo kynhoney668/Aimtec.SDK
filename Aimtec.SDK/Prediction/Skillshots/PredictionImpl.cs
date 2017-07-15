@@ -944,8 +944,7 @@
 
         private float GetHitBox(Obj_AI_Base unit)
         {
-            // todo properhitbox
-            return 65;
+            return unit.BoundingRadius;
         }
 
         public PredictedTargetPosition CalculateTargetPosition(
