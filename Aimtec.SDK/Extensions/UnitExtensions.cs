@@ -137,7 +137,7 @@ namespace Aimtec.SDK.Extensions
         /// </returns>
         public static bool HasBuff(this Obj_AI_Base from, string buffname)
         {
-            return from.BuffManager.HasBuff(buffname);
+            return from.BuffManager.HasBuff(buffname, true);
         }
         
         /// <summary>
