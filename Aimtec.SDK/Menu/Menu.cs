@@ -250,7 +250,6 @@
                 this.GetRenderManager().Render(position);
             }
 
-
             for (var i = 0; i < this.Children.Values.Count; i++)
             {
                 var child = this.Children.Values.ToList()[i];
