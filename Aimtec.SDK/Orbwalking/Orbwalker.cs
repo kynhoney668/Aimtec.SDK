@@ -226,15 +226,21 @@
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public AttackableUnit GetTarget(OrbwalkerMode mode)
+        public AttackableUnit FindTarget(OrbwalkerMode mode)
         {
-            return Implementation.GetTarget(mode);
+            return Implementation.FindTarget(mode);
         }
 
         /// <inheritdoc cref="IOrbwalker" />
-        public AttackableUnit GetTarget()
+        public AttackableUnit FindTarget()
         {
-            return Implementation.GetTarget();
+            return Implementation.FindTarget();
+        }
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public AttackableUnit GetOrbwalkingTarget()
+        {
+            return Implementation.GetOrbwalkingTarget();
         }
 
         /// <inheritdoc cref="IOrbwalker" />

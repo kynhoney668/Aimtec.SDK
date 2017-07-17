@@ -255,13 +255,15 @@
             return this.OrbwalkerModes.FirstOrDefault(x => x.Active);
         }
 
-        /// <inheritdoc cref="IOrbwalker" />
-        public abstract AttackableUnit GetTarget(OrbwalkerMode mode);
+        public abstract AttackableUnit GetOrbwalkingTarget();
 
         /// <inheritdoc cref="IOrbwalker" />
-        public virtual AttackableUnit GetTarget()
+        public abstract AttackableUnit FindTarget(OrbwalkerMode mode);
+
+        /// <inheritdoc cref="IOrbwalker" />
+        public virtual AttackableUnit FindTarget()
         {
-            return this.GetTarget(this.GetActiveMode());
+            return this.FindTarget(this.GetActiveMode());
         }
 
         /// <inheritdoc cref="IOrbwalker" />

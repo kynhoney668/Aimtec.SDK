@@ -231,7 +231,12 @@ namespace Aimtec.SDK.Orbwalking
             this.ForcedTarget = unit;
         }
 
-        public override AttackableUnit GetTarget(OrbwalkerMode mode)
+        public override AttackableUnit GetOrbwalkingTarget()
+        {
+            return LastTarget;
+        }
+
+        public override AttackableUnit FindTarget(OrbwalkerMode mode)
         {
             if (this.ForcedTarget != null && this.ForcedTarget.IsValidAutoRange())
             {
@@ -282,7 +287,7 @@ namespace Aimtec.SDK.Orbwalking
 
             if (this.CanAttack(mode))
             {
-                var target = this.GetTarget(mode);
+                var target = this.LastTarget = this.FindTarget(mode);
                 if (target != null)
                 {
                     this.Attack(target);
