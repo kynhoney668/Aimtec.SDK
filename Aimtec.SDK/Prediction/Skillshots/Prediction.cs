@@ -197,40 +197,6 @@
                     {
                         var p = pos + input.RealRadius * direction;
 
-                        if (input.Type != SkillshotType.Line)
-                        {
-                            return new PredictionOutput
-                            {
-                                Input = input,
-                                CastPosition = (Vector3) pos,
-                                UnitPosition = (Vector3) p,
-                                HitChance = PathTracker.GetCurrentPath(input.Unit).Time < 0.1d
-                                    ? HitChance.VeryHigh
-                                    : HitChance.High
-                            };
-                        }
-
-                        var alpha = ((Vector2) input.From - p).AngleBetween(a - b);
-
-                        if (!(alpha > 30) || !(alpha < 180 - 30))
-                        {
-                            return new PredictionOutput
-                            {
-                                Input = input,
-                                CastPosition = (Vector3) pos,
-                                UnitPosition = (Vector3) p,
-                                HitChance = PathTracker.GetCurrentPath(input.Unit).Time < 0.1d
-                                    ? HitChance.VeryHigh
-                                    : HitChance.High
-                            };
-                        }
-
-                        var beta = (float) Math.Asin(input.RealRadius / p.Distance(input.From));
-                        var cp1 = (Vector2) input.From + (p - (Vector2) input.From).Rotated(beta);
-                        var cp2 = (Vector2) input.From + (p - (Vector2) input.From).Rotated(-beta);
-
-                        pos = cp1.DistanceSquared(pos) < cp2.DistanceSquared(pos) ? cp1 : cp2;
-
                         return new PredictionOutput
                         {
                             Input = input,
