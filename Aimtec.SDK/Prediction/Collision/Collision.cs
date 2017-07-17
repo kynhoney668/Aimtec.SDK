@@ -38,17 +38,44 @@
             {
                 if (input.CollisionObjects.HasFlag(CollisionableObjects.Minions))
                 {
-                    CheckBasicCollision(position, GameObjects.EnemyMinions, ref result, input, 15);
+                    foreach (var minion in GameObjects.EnemyMinions.Where(
+                        minion => minion.IsValidTarget(
+                            Math.Min(input.Range + input.Radius + 100, 2000),
+                            checkRangeFrom: input.RangeCheckFrom)))
+                    {
+                        input.Unit = minion;
+                        var minionPrediction = Prediction.GetPrediction(input, false, false);
+                        if (((Vector2) minionPrediction.UnitPosition).DistanceSquared(
+                            (Vector2) input.From,
+                            (Vector2) position,
+                            true) <= Math.Pow(input.Radius + 15 + minion.BoundingRadius, 2))
+                        {
+                            result.Add(minion);
+                        }
+                    }
                 }
 
                 if (input.CollisionObjects.HasFlag(CollisionableObjects.Heroes))
                 {
-                    CheckBasicCollision(position, GameObjects.EnemyHeroes, ref result, input);
+                    foreach (var hero in GameObjects.EnemyHeroes.Where(
+                        hero => hero.IsValidTarget(
+                            Math.Min(input.Range + input.Radius + 100, 2000),
+                            checkRangeFrom: input.RangeCheckFrom)))
+                    {
+                        input.Unit = hero;
+                        var prediction = Prediction.GetPrediction(input, false, false);
+                        if (((Vector2) prediction.UnitPosition).DistanceSquared(
+                            (Vector2) input.From,
+                            (Vector2) position,
+                            false) <= Math.Pow(input.Radius + 50 + hero.BoundingRadius, 2))
+                        {
+                            result.Add(hero);
+                        }
+                    }
                 }
 
                 if (input.CollisionObjects.HasFlag(CollisionableObjects.Walls))
                 {
-                    // cba
                 }
 
                 if (!input.CollisionObjects.HasFlag(CollisionableObjects.YasuoWall))
@@ -62,7 +89,6 @@
                 }
 
                 GameObject wall = null;
-
                 foreach (var gameObject in GameObjects.AllGameObjects.Where(
                     x => x.IsValid && Regex.IsMatch(
                         x.Name,
@@ -105,31 +131,6 @@
         #endregion
 
         #region Methods
-
-        private static void CheckBasicCollision(
-            Vector3 position,
-            IEnumerable<Obj_AI_Base> targets,
-            ref List<Obj_AI_Base> objectsHit,
-            PredictionInput input,
-            int extraBroScience = 50)
-        {
-            foreach (var target in targets.Where(
-                x => x.IsValidTarget(
-                    Math.Min(input.Range + input.Radius + 100, 2000),
-                    true,
-                    true,
-                    input.RangeCheckFrom)))
-            {
-                input.Unit = target;
-                var prediction = Prediction.GetPrediction(input, false, false);
-
-                if (((Vector2) prediction.UnitPosition).DistanceSquared((Vector2) input.From, (Vector2) position, true)
-                    <= Math.Pow(input.Radius + extraBroScience + target.BoundingRadius, 2))
-                {
-                    objectsHit.Add(target);
-                }
-            }
-        }
 
         private static void Obj_AI_Hero_OnProcessSpellCast(
             Obj_AI_Base sender,

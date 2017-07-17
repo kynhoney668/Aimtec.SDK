@@ -75,6 +75,12 @@
             return vector3 + distance * ((Vector3) toVector2 - vector3).Normalized();
         }
 
+
+        public static float DistanceSquared(this Vector3 v1, Vector3 v2, bool calc3d = false)
+        {
+            return calc3d ? Vector3.DistanceSquared(v1, v2) : Vector2.DistanceSquared((Vector2)v1, (Vector2)v2);
+        }
+
         public static Vector3 FixHeight(this Vector3 v1)
         {
             var v = v1;

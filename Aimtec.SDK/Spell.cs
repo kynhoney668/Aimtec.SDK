@@ -231,7 +231,7 @@
             }
 
             var prediction =
-                Prediction.Skillshots.Prediction.GetPrediction(this.GetPredictionInput(target), true, this.Collision);
+                Prediction.Skillshots.Prediction.GetPrediction(this.GetPredictionInput(target));
 
             if (prediction.HitChance < this.HitChance)
             {
@@ -360,6 +360,7 @@
                 Speed = this.Speed,
                 Range = this.Range,
                 Unit = target,
+                Collision = this.Collision
             };
         }
 

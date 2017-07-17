@@ -102,9 +102,16 @@ namespace Aimtec.SDK.Extensions
         public static List<Vector2> CutPath(this List<Vector2> path, float distance)
         {
             var result = new List<Vector2>();
+            if (distance < 0)
+            {
+                path[0] = path[0] + distance * (path[1] - path[0]).Normalized();
+                return path;
+            }
+
             for (var i = 0; i < path.Count - 1; i++)
             {
                 var dist = path[i].Distance(path[i + 1]);
+
                 if (dist > distance)
                 {
                     result.Add(path[i] + distance * (path[i + 1] - path[i]).Normalized());
