@@ -426,94 +426,80 @@ namespace Aimtec.SDK.Extensions
             return (Vector3) pos;
         }
 
-        public static MovementCollisionInfo VectorMovementCollision(
-            this Vector2 pointStartA,
-            Vector2 pointEndA,
-            float pointVelocityA,
-            Vector2 pointB,
-            float pointVelocityB,
+        public static Tuple<float, Vector2> VectorMovementCollision(
+            Vector2 startPoint1,
+            Vector2 endPoint1,
+            float v1,
+            Vector2 startPoint2,
+            float v2,
             float delay = 0f)
         {
-            return new[] { pointStartA, pointEndA }.VectorMovementCollision(
-                pointVelocityA,
-                pointB,
-                pointVelocityB,
-                delay);
-        }
-
-        public static MovementCollisionInfo VectorMovementCollision(
-            this Vector2[] v1,
-            float v1Velocity,
-            Vector2 v2,
-            float v2Velocity,
-            float delay = 0f)
-        {
-            if (v1.Length < 1)
-            {
-                return default(MovementCollisionInfo);
-            }
-
-            float sP1X = v1[0].X, sP1Y = v1[0].Y, eP1X = v1[1].X, eP1Y = v1[1].Y, sP2X = v2.X, sP2Y = v2.Y;
+            float sP1X = startPoint1.X,
+                  sP1Y = startPoint1.Y,
+                  eP1X = endPoint1.X,
+                  eP1Y = endPoint1.Y,
+                  sP2X = startPoint2.X,
+                  sP2Y = startPoint2.Y;
 
             float d = eP1X - sP1X, e = eP1Y - sP1Y;
             float dist = (float) Math.Sqrt(d * d + e * e), t1 = float.NaN;
-            float s = Math.Abs(dist) > float.Epsilon ? v1Velocity * d / dist : 0,
-                  k = Math.Abs(dist) > float.Epsilon ? v1Velocity * e / dist : 0f;
+            float s = Math.Abs(dist) > float.Epsilon ? v1 * d / dist : 0,
+                  k = (Math.Abs(dist) > float.Epsilon) ? v1 * e / dist : 0f;
 
             float r = sP2X - sP1X, j = sP2Y - sP1Y;
             var c = r * r + j * j;
 
             if (dist > 0f)
             {
-                if (Math.Abs(v1Velocity - float.MaxValue) < float.Epsilon)
+                if (Math.Abs(v1 - float.MaxValue) < float.Epsilon)
                 {
-                    var t = dist / v1Velocity;
-                    t1 = v2Velocity * t >= 0f ? t : float.NaN;
+                    var t = dist / v1;
+                    t1 = v2 * t >= 0f ? t : float.NaN;
                 }
-                else if (Math.Abs(v2Velocity - float.MaxValue) < float.Epsilon)
+                else if (Math.Abs(v2 - float.MaxValue) < float.Epsilon)
                 {
                     t1 = 0f;
                 }
                 else
                 {
-                    float a = s * s + k * k - v2Velocity * v2Velocity, b = -r * s - j * k;
+                    float a = s * s + k * k - v2 * v2, b = -r * s - j * k;
 
                     if (Math.Abs(a) < float.Epsilon)
                     {
                         if (Math.Abs(b) < float.Epsilon)
                         {
-                            t1 = Math.Abs(c) < float.Epsilon ? 0f : float.NaN;
+                            t1 = (Math.Abs(c) < float.Epsilon) ? 0f : float.NaN;
                         }
                         else
                         {
                             var t = -c / (2 * b);
-                            t1 = v2Velocity * t >= 0f ? t : float.NaN;
+                            t1 = (v2 * t >= 0f) ? t : float.NaN;
                         }
                     }
                     else
                     {
                         var sqr = b * b - a * c;
 
-                        if (sqr < 0)
+                        if (!(sqr >= 0))
                         {
-                            return new MovementCollisionInfo(
+                            return new Tuple<float, Vector2>(
                                 t1,
-                                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : default(Vector2));
+                                (!float.IsNaN(t1)) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : new Vector2());
                         }
 
                         var nom = (float) Math.Sqrt(sqr);
                         var t = (-nom - b) / a;
 
-                        t1 = v2Velocity * t >= 0f ? t : float.NaN;
+                        t1 = v2 * t >= 0f ? t : float.NaN;
                         t = (nom - b) / a;
 
-                        var t2 = v2Velocity * t >= 0f ? t : float.NaN;
+                        var t2 = (v2 * t >= 0f) ? t : float.NaN;
 
                         if (float.IsNaN(t2) || float.IsNaN(t1))
                         {
-                            return new MovementCollisionInfo(
+                            return new Tuple<float, Vector2>(
                                 t1,
-                                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : default(Vector2));
+                                (!float.IsNaN(t1)) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : new Vector2());
                         }
 
                         if (t1 >= delay && t2 >= delay)
@@ -532,9 +518,9 @@ namespace Aimtec.SDK.Extensions
                 t1 = 0f;
             }
 
-            return new MovementCollisionInfo(
+            return new Tuple<float, Vector2>(
                 t1,
-                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : default(Vector2));
+                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : new Vector2());
         }
 
         #endregion

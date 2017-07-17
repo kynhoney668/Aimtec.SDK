@@ -198,9 +198,15 @@
                     var tB = a.Distance(b) / speed;
                     var direction = (b - a).Normalized();
                     a = a - speed * tT * direction;
-                    var sol = a.VectorMovementCollision(b, speed, (Vector2) input.From, input.Speed, tT);
-                    var t = (float) sol[0];
-                    var pos = (Vector2) sol[1];
+                    var sol = Vector2Extensions.VectorMovementCollision(
+                        a,
+                        b,
+                        speed,
+                        (Vector2) input.From,
+                        input.Speed,
+                        tT);
+                    var t = sol.Item1;
+                    var pos = sol.Item2;
 
                     if (!pos.IsZero && t >= tT && t <= tT + tB)
                     {

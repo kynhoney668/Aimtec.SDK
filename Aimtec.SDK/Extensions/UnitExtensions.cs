@@ -153,22 +153,32 @@ namespace Aimtec.SDK.Extensions
 
             if (unit.IsVisible)
             {
-                result.Add((Vector2) unit.ServerPosition);
-                result.AddRange(unit.Path.Select(x => (Vector2) x));
-            }
-            else
-            {
-                if (!WaypointTracker.StoredPaths.TryGetValue(unit.NetworkId, out List<Vector2> value))
+                result.Add(unit.ServerPosition.To2D());
+                var path = unit.Path;
+
+                if (path.Length <= 0)
                 {
                     return result;
                 }
 
-                var path = value;
-                var timePassed = (Game.TickCount - WaypointTracker.StoredTick[unit.NetworkId]) / 1000f;
+                var first = path[0].To2D();
+                if (first.DistanceSquared(result[0]) > 40)
+                {
+                    result.Add(first);
+                }
 
+                for (var i = 1; i < path.Length; i++)
+                {
+                    result.Add(path[i].To2D());
+                }
+            }
+            else if (WaypointTracker.StoredPaths.ContainsKey(unit.NetworkId))
+            {
+                var path = WaypointTracker.StoredPaths[unit.NetworkId];
+                var timePassed = (Game.TickCount - WaypointTracker.StoredTick[unit.NetworkId]) / 1000f;
                 if (path.GetPathLength() >= unit.MoveSpeed * timePassed)
                 {
-                    result = path.CutPath((int) (unit.MoveSpeed * timePassed));
+                    result = path.CutPath((unit.MoveSpeed * timePassed));
                 }
             }
 

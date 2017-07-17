@@ -48,7 +48,7 @@
                         if (((Vector2) minionPrediction.UnitPosition).DistanceSquared(
                             (Vector2) input.From,
                             (Vector2) position,
-                            true) <= Math.Pow(input.Radius + 25 + minion.BoundingRadius, 2))
+                            true) <= Math.Pow(input.Radius + 50 + minion.BoundingRadius, 2))
                         {
                             result.Add(minion);
                         }
