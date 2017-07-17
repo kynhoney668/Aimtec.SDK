@@ -308,7 +308,7 @@
 
             if (result == null)
             {
-                result = GetAdvancedPrediction(input);
+                result = GetStandardPrediction(input);
             }
 
             if (Math.Abs(input.Range - float.MaxValue) > float.Epsilon)
@@ -377,9 +377,9 @@
         internal static Vector2 PositionAfter(Obj_AI_Base unit, float t, float speed = float.MaxValue)
         {
             var distance = t * speed;
-            var path = unit.GetWaypoints();
+            var path = unit.Path.Select(x => (Vector2) x).ToArray();
 
-            for (var i = 0; i < path.Count - 1; i++)
+            for (var i = 0; i < path.Length - 1; i++)
             {
                 var a = path[i];
                 var b = path[i + 1];
@@ -395,7 +395,7 @@
                 }
             }
 
-            return path[path.Count - 1];
+            return path[path.Length - 1];
         }
 
         internal static double UnitIsImmobileUntil(Obj_AI_Base unit)

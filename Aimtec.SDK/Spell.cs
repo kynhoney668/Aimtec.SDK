@@ -238,6 +238,11 @@
                 return false;
             }
 
+            if (prediction.CollisionObjects.Count > 0 && this.Collision)
+            {
+                return false;
+            }
+
             if (this.IsChargedSpell)
             {
                 return this.IsCharging
@@ -435,7 +440,7 @@
             bool collision,
             SkillshotType type,
             bool vectorSkillshot = false,
-            HitChance hitchance = HitChance.Low)
+            HitChance hitchance = HitChance.High)
         {
             this.Delay = delay;
             this.Width = width;
