@@ -1,7 +1,6 @@
 ﻿namespace Aimtec.SDK.Menu.Theme.Default
 {
     using System.Drawing;
-    using Aimtec.SDK.Extensions;
 
     using Aimtec.SDK.Menu.Components;
 
@@ -45,6 +44,8 @@
 
         #region Public Methods and Operators
 
+        #region Public Methods and Operators
+
         /// <summary>
         ///     Renders at the specified position.
         /// </summary>
@@ -59,21 +60,21 @@
 
             this.Theme.DrawMenuItemBox(position, width);
 
-            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, (this.Theme.MenuHeight) / 2);
+            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, this.Theme.MenuHeight / 2);
 
             Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName, RenderTextFlags.VerticalCenter);
+                this.Component.DisplayName,
+                RenderTextFlags.VerticalCenter);
 
             // Render arrow outline 1 - left arrow 
             Aimtec.Render.Line(
-                pos.X + width - this.Theme.IndicatorWidth  * 2.1F - this.Theme.LineWidth,
+                pos.X + width - this.Theme.IndicatorWidth * 2.1F - this.Theme.LineWidth,
                 pos.Y,
-                pos.X + width - this.Theme.IndicatorWidth  * 2.1F - this.Theme.LineWidth,
+                pos.X + width - this.Theme.IndicatorWidth * 2.1F - this.Theme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
-
 
             // Render arrow outline 2 - right arrow
             Aimtec.Render.Line(
@@ -83,16 +84,16 @@
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
-
-            var leftBoxPosition = position + new Vector2(width - this.Theme.IndicatorWidth * 2.1f - this.Theme.LineWidth, 0);
-            var rightBoxPosition = position + new Vector2(width - this.Theme.IndicatorWidth  - this.Theme.LineWidth, 0);
+            var leftBoxPosition = position + new Vector2(
+                width - this.Theme.IndicatorWidth * 2.1f - this.Theme.LineWidth,
+                0);
+            var rightBoxPosition = position + new Vector2(width - this.Theme.IndicatorWidth - this.Theme.LineWidth, 0);
 
             Aimtec.Render.Text(
-                leftBoxPosition
-                + new Vector2(-this.Theme.TextSpacing, (this.Theme.MenuHeight) / 2),
+                leftBoxPosition + new Vector2(-this.Theme.TextSpacing, this.Theme.MenuHeight / 2),
                 Color.FromArgb(207, 195, 149),
-                this.Component.Items[this.Component.Value], RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);
-
+                this.Component.Items[this.Component.Value],
+                RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);
 
             // Draw arrow boxes
             Aimtec.Render.Rectangle(
@@ -104,7 +105,8 @@
             Aimtec.Render.Text(
                 leftBoxPosition + new Vector2(this.Theme.IndicatorWidth / 2, this.Theme.MenuHeight / 2),
                 Color.FromArgb(207, 195, 149),
-                "<", RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+                "<",
+                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
 
             Aimtec.Render.Rectangle(
                 rightBoxPosition,
@@ -115,9 +117,12 @@
             Aimtec.Render.Text(
                 rightBoxPosition + new Vector2(this.Theme.IndicatorWidth / 2, this.Theme.MenuHeight / 2),
                 Color.FromArgb(207, 195, 149),
-                ">", RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+                ">",
+                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
 
             #endregion
         }
+
+        #endregion
     }
 }

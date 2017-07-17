@@ -14,13 +14,16 @@
     {
         #region Fields
 
+        internal Font LeagueFont = new Font("Arial", 11);
+
         private bool visible;
 
         #endregion
 
         #region Constructors and Destructors
 
-        private MenuManager() : base("AimtecSDK-RootMenu", string.Empty, true)
+        private MenuManager()
+            : base("AimtecSDK-RootMenu", string.Empty, true)
         {
             //Sets the base menu position
             this.Position = new Vector2(10, 10);
@@ -48,41 +51,13 @@
 
         #endregion
 
-        #region Internal Properties
-
-        internal string AppDataConfigPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Aimtec.SDK");
-
-        internal string MenuSettingsPath => Path.Combine(this.AppDataConfigPath, "MenuSettings");
-
-        internal string SharedSettingsPath => Path.Combine(this.MenuSettingsPath, "SharedConfig");
-
-        internal Font LeagueFont = new Font("Arial", 11);
-
-        public float TextWidth(string text)
-        {
-            float textWidth = 0;
-
-            using (var bmp = new Bitmap(1, 1))
-            {
-                using (Graphics g = Graphics.FromImage(bmp))
-                {
-                    textWidth = g.MeasureString(text, this.LeagueFont).Width;
-                }
-            }
-
-            return textWidth;
-        }
-
-
-        #endregion
-
         #region Public Properties
-
-        public override bool IsMenu { get; } = false;
 
         public static MenuManager Instance { get; } = new MenuManager();
 
         public override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
+
+        public override bool IsMenu { get; } = false;
 
         public MenuTheme Theme { get; set; }
 
@@ -107,7 +82,19 @@
 
         #region Properties
 
+        internal static float LastMouseMoveTime { get; set; }
+
+        internal static Point LastMousePosition { get; set; }
+
+        internal string AppDataConfigPath => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+            "Aimtec.SDK");
+
         internal IReadOnlyList<MenuComponent> Menus => this.Children.Values.Where(x => x.IsMenu).ToList();
+
+        internal string MenuSettingsPath => Path.Combine(this.AppDataConfigPath, "MenuSettings");
+
+        internal string SharedSettingsPath => Path.Combine(this.MenuSettingsPath, "SharedConfig");
 
         #endregion
 
@@ -136,21 +123,14 @@
             return menu;
         }
 
-        public override Rectangle GetBounds(Vector2 pos)
+        public new Menu Attach()
         {
-            return new Rectangle(
-                (int)pos.X,
-                (int)pos.Y,
-                this.Width,
-                this.Theme.MenuHeight * this.Menus.Count);
+            throw new NotImplementedException();
         }
 
-        internal override void Save()
+        public override Rectangle GetBounds(Vector2 pos)
         {
-            foreach (var m in this.Menus)
-            {
-                m.Save();
-            }
+            return new Rectangle((int) pos.X, (int) pos.Y, this.Width, this.Theme.MenuHeight * this.Menus.Count);
         }
 
         public override void Render(Vector2 pos)
@@ -168,27 +148,38 @@
             }
         }
 
+        public float TextWidth(string text)
+        {
+            float textWidth = 0;
 
-        internal static float LastMouseMoveTime { get; set; }
-        internal static Point LastMousePosition { get; set; }
+            using (var bmp = new Bitmap(1, 1))
+            {
+                using (var g = Graphics.FromImage(bmp))
+                {
+                    textWidth = g.MeasureString(text, this.LeagueFont).Width;
+                }
+            }
+
+            return textWidth;
+        }
 
         public override void WndProc(uint message, uint wparam, int lparam)
         {
             // Drag menu
-            if (message == (int)WindowsMessages.WM_KEYDOWN && wparam == (ulong)KeyCode.ShiftKey)
+            if (message == (int) WindowsMessages.WM_KEYDOWN && wparam == (ulong) KeyCode.ShiftKey)
             {
                 //Console.WriteLine("visible?? key = {0}", (Keys) wparam);
                 this.Visible = true;
             }
 
-            if (message == (int)WindowsMessages.WM_KEYUP && wparam == (ulong)KeyCode.ShiftKey)
+            if (message == (int) WindowsMessages.WM_KEYUP && wparam == (ulong) KeyCode.ShiftKey)
             {
                 //Console.WriteLine("not visible?? key = {0}", (Keys) wparam);
                 this.Visible = false;
             }
 
             //Save Menu if F5 is pressed (upon reloading)
-            if (message == (int)WindowsMessages.WM_KEYUP && wparam == (ulong)KeyCode.F5)
+            if (message == (int) WindowsMessages.WM_KEYUP && wparam == (ulong) KeyCode.F5)
             {
                 this.Save();
             }
@@ -199,22 +190,23 @@
             }
         }
 
-        public new Menu Attach()
-        {
-            throw new NotImplementedException();
-        }
+        #endregion
 
+        #region Methods
+
+        internal override void Save()
+        {
+            foreach (var m in this.Menus)
+            {
+                m.Save();
+            }
+        }
 
         internal override void UpdateWidth()
         {
             var maxWidth = this.Children.Values.Max(x => Instance.TextWidth(x.DisplayName));
-            this.Width = (int)(maxWidth + (Instance.Theme.BaseMenuWidth));
+            this.Width = (int) (maxWidth + Instance.Theme.BaseMenuWidth);
         }
-
-
-        #endregion
-
-        #region Explicit Interface Methods
 
         #endregion
     }

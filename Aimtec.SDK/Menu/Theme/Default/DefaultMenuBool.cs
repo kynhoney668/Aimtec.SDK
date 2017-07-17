@@ -36,14 +36,17 @@
 
             this.Theme.DrawMenuItemBox(position, width);
 
-            var centerPoint = pos + new Vector2(width - (this.Theme.LineWidth * 2) / 2, this.Theme.MenuHeight - (this.Theme.LineWidth * 2) / 2);
+            var centerPoint = pos + new Vector2(
+                width - this.Theme.LineWidth * 2 / 2,
+                this.Theme.MenuHeight - this.Theme.LineWidth * 2 / 2);
 
-            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, (this.Theme.MenuHeight) / 2);
+            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, this.Theme.MenuHeight / 2);
 
             Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName, RenderTextFlags.VerticalCenter);
+                this.Component.DisplayName,
+                RenderTextFlags.VerticalCenter);
 
             // Render indicator box outline
             Aimtec.Render.Line(
@@ -61,7 +64,7 @@
             Aimtec.Render.Rectangle(
                 indBoxPosition,
                 this.Theme.IndicatorWidth,
-                this.Theme.MenuHeight - (this.Theme.LineWidth),
+                this.Theme.MenuHeight - this.Theme.LineWidth,
                 boolColor);
 
             var centerArrowBox = indBoxPosition + new Vector2(this.Theme.IndicatorWidth / 2, this.Theme.MenuHeight / 2);
@@ -69,7 +72,8 @@
             Aimtec.Render.Text(
                 centerArrowBox,
                 Color.AliceBlue,
-                this.Component.Value ? "ON" : "OFF", RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+                this.Component.Value ? "ON" : "OFF",
+                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
         }
 
         #endregion

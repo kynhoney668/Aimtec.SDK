@@ -1,8 +1,8 @@
-using System;
-
 namespace Aimtec.SDK.Orbwalking
 {
+    using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
 
     using Aimtec.SDK.Damage;
@@ -13,14 +13,80 @@ namespace Aimtec.SDK.Orbwalking
     using Aimtec.SDK.Prediction.Health;
     using Aimtec.SDK.TargetSelector;
     using Aimtec.SDK.Util;
-    using NLog;
-  
+
     internal class OrbwalkingImpl : AOrbwalker
     {
+        #region Fields
+
+        /// <summary>
+        ///     The time the last attack command was sent (determined locally)
+        /// </summary>
+        protected float LastAttackCommandSentTime;
+
+        #endregion
+
+        #region Constructors and Destructors
+
         internal OrbwalkingImpl()
         {
             this.Initialize();
         }
+
+        #endregion
+
+        #region Public Properties
+
+        public float AnimationTime => Player.AttackCastDelay * 1000;
+
+        public float AttackCoolDownTime => Player.AttackDelay * 1000 - this.AttackDelayReduction;
+
+        public override bool IsWindingUp
+        {
+            get
+            {
+                var detectionTime = Math.Max(this.ServerAttackDetectionTick, this.LastAttackCommandSentTime);
+                return Game.TickCount + Game.Ping / 2 - detectionTime <= this.WindUpTime;
+            }
+        }
+
+        public override float WindUpTime => this.AnimationTime + this.ExtraWindUp;
+
+        #endregion
+
+        #region Properties
+
+        protected bool AttackReady => Game.TickCount + Game.Ping / 2 - this.ServerAttackDetectionTick
+            >= this.AttackCoolDownTime;
+
+        private bool Attached { get; set; }
+
+        private int AttackDelayReduction => this.Config["Advanced"]["attackDelayReduction"].Value;
+
+        private bool DrawAttackRange => this.Config["Drawings"]["drawAttackRange"].Enabled;
+
+        private bool DrawHoldPosition => this.Config["Drawings"]["drawHoldRadius"].Enabled;
+
+        private int ExtraWindUp => this.Config["Misc"]["extraWindup"].Value;
+
+        /// <summary>
+        ///     Gets or sets the Forced Target
+        /// </summary>
+        private AttackableUnit ForcedTarget { get; set; }
+
+        // TODO this completely breaks the modular design, Orbwalker and health prediction shouldnt be tightly coupled!
+        private HealthPredictionImplB HealthPrediction { get; } = new HealthPredictionImplB();
+
+        //Menu Getters
+        private int HoldPositionRadius => this.Config["Misc"]["holdPositionRadius"].Value;
+
+        private AttackableUnit LastTarget { get; set; }
+
+        //Members
+        private float ServerAttackDetectionTick { get; set; }
+
+        #endregion
+
+        #region Public Methods and Operators
 
         public override void Attach(IMenu menu)
         {
@@ -29,105 +95,31 @@ namespace Aimtec.SDK.Orbwalking
                 this.Attached = true;
                 menu.Add(this.Config);
                 Obj_AI_Base.OnProcessAutoAttack += this.ObjAiHeroOnProcessAutoAttack;
-                Obj_AI_Base.OnProcessSpellCast += Obj_AI_Base_OnProcessSpellCast;
+                Obj_AI_Base.OnProcessSpellCast += this.Obj_AI_Base_OnProcessSpellCast;
                 Game.OnUpdate += this.Game_OnUpdate;
-                SpellBook.OnStopCast += SpellBook_OnStopCast;
-                Render.OnRender += RenderManager_OnRender;
+                SpellBook.OnStopCast += this.SpellBook_OnStopCast;
+                Render.OnRender += this.RenderManager_OnRender;
             }
             else
             {
-                Logger.Info("This Orbwalker instance is already attached to a Menu.");
+                this.Logger.Info("This Orbwalker instance is already attached to a Menu.");
             }
         }
 
-        public override float WindUpTime => this.AnimationTime + this.ExtraWindUp;
-
-        // TODO this completely breaks the modular design, Orbwalker and health prediction shouldnt be tightly coupled!
-        private HealthPredictionImplB HealthPrediction { get; } = new HealthPredictionImplB();
-
-        private AttackableUnit LastTarget { get; set; }
-
-        public float AnimationTime => Player.AttackCastDelay * 1000;
-
-        public float AttackCoolDownTime => (Player.AttackDelay * 1000) - this.AttackDelayReduction;
-
-        protected bool AttackReady => (Game.TickCount + Game.Ping / 2) - this.ServerAttackDetectionTick
-                                      >= this.AttackCoolDownTime;
-
-        /// <summary>
-        ///     Gets or sets the Forced Target 
-        /// </summary>
-        private AttackableUnit ForcedTarget { get; set; }
-
-        /// <summary>
-        ///     The time the last attack command was sent (determined locally)
-        /// </summary>
-        protected float LastAttackCommandSentTime;
-
-        public override bool IsWindingUp
+        public override bool Attack(AttackableUnit target)
         {
-            get
+            var preAttackargs = this.FirePreAttack(target);
+
+            if (!preAttackargs.Cancel)
             {
-                var detectionTime = Math.Max(this.ServerAttackDetectionTick, this.LastAttackCommandSentTime);
-                return (Game.TickCount + Game.Ping / 2) - detectionTime <= this.WindUpTime;
-            }
-        }
-
-        //Menu Getters
-        private int HoldPositionRadius => this.Config["Misc"]["holdPositionRadius"].Value;
-
-        private int ExtraWindUp => this.Config["Misc"]["extraWindup"].Value;
-
-        private int AttackDelayReduction => this.Config["Advanced"]["attackDelayReduction"].Value;
-
-        private bool DrawHoldPosition => this.Config["Drawings"]["drawHoldRadius"].Enabled;
-
-        private bool DrawAttackRange => this.Config["Drawings"]["drawAttackRange"].Enabled;
-
-
-        //Members
-        private float ServerAttackDetectionTick { get; set; }
-       
-        private bool Attached { get; set; }
-
-        private void Initialize()
-        {
-            this.Config = new Menu("Orbwalker", "Orbwalker")
-            {
-                new Menu("Advanced", "Advanced")
+                if (Player.IssueOrder(OrderType.AttackUnit, target))
                 {
-                    new MenuSlider("attackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true),
-                },
-
-                new Menu("Drawings", "Drawings")
-                {
-                    new MenuBool("drawAttackRange", "Draw Attack Range", true),
-                    new MenuBool("drawHoldRadius", "Draw Hold Radius", false),
-                },
-
-                new Menu("Misc", "Misc")
-                {
-                    new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
-                    new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
-                    new MenuBool("noBlindAA", "No AA when Blind", true, true),
+                    this.LastAttackCommandSentTime = Game.TickCount;
+                    return true;
                 }
-            };
-
-            this.AddMode(Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, GetHeroTarget, null));
-            this.AddMode(LaneClear = new OrbwalkerMode("Laneclear", GlobalKeys.WaveClearKey, GetLaneClearTarget, null));
-            this.AddMode(LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, GetLastHitTarget, null));
-            this.AddMode(Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, GetMixedModeTarget, null));
-        }
-
-
-        protected void Game_OnUpdate()
-        {
-            if (Player.IsDead)
-            {
-                return;
             }
 
-            Orbwalk();
+            return false;
         }
 
         public bool BlindCheck()
@@ -146,11 +138,6 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             return true;
-        }
-
-        public override bool CanMove()
-        {
-            return this.CanMove(this.GetActiveMode());
         }
 
         public override bool CanAttack()
@@ -189,8 +176,13 @@ namespace Aimtec.SDK.Orbwalking
             {
                 return false;
             }
-            
+
             return this.AttackReady;
+        }
+
+        public override bool CanMove()
+        {
+            return this.CanMove(this.GetActiveMode());
         }
 
         public bool CanMove(OrbwalkerMode mode)
@@ -210,7 +202,7 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
-            if (NoCancelChamps.Contains(Player.ChampionName))
+            if (this.NoCancelChamps.Contains(Player.ChampionName))
             {
                 return true;
             }
@@ -223,65 +215,55 @@ namespace Aimtec.SDK.Orbwalking
             return true;
         }
 
-        private void RenderManager_OnRender()
+        public override void Dispose()
         {
-            if (this.DrawAttackRange)
-            {
-                Render.Circle(Player.Position, Player.AttackRange + Player.BoundingRadius, 30, System.Drawing.Color.DeepSkyBlue);
-            }
-
-            if (this.DrawHoldPosition)
-            {
-                Render.Circle(Player.Position, this.HoldPositionRadius, 30, System.Drawing.Color.White);
-            }
+            this.Config.Dispose();
+            Obj_AI_Base.OnProcessAutoAttack -= this.ObjAiHeroOnProcessAutoAttack;
+            Obj_AI_Base.OnProcessSpellCast -= this.Obj_AI_Base_OnProcessSpellCast;
+            Game.OnUpdate -= this.Game_OnUpdate;
+            SpellBook.OnStopCast -= this.SpellBook_OnStopCast;
+            Render.OnRender -= this.RenderManager_OnRender;
+            this.Attached = false;
         }
 
-        private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
+        public override void ForceTarget(AttackableUnit unit)
         {
-            if (sender.IsMe && (e.DestroyMissile || e.ForceStop || e.StopAnimation))
-            {
-                this.ResetAutoAttackTimer();
-            }
+            this.ForcedTarget = unit;
         }
 
-        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
+        public override AttackableUnit GetTarget(OrbwalkerMode mode)
         {
-            if (sender.IsMe)
+            if (this.ForcedTarget != null && this.ForcedTarget.IsValidAutoRange())
             {
-                /* Detect Caitlyn W Headshot */
-                if (Player.ChampionName == "Caitlyn")
-                {
-                    if (e.SpellData.Name.ToLower().Contains("caitlynheadshotmissile"))
-                    {
-                        this.ServerAttackDetectionTick = Game.TickCount;
-                    }
-                }
-       
-                if (this.IsReset(e.SpellData.Name))
-                {
-                    this.ResetAutoAttackTimer();
-                }
+                return this.ForcedTarget;
             }
+
+            if (mode != null)
+            {
+                return mode.GetTarget();
+            }
+
+            return null;
         }
 
-        protected void ObjAiHeroOnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs args)
+        public override bool Move(Vector3 movePosition)
         {
-            if (sender.IsMe)
+            var preMoveArgs = this.FirePreMove(movePosition);
+
+            if (!preMoveArgs.Cancel)
             {
-                var targ = args.Target as AttackableUnit;
-                if (targ != null)
+                if (Player.IssueOrder(OrderType.MoveTo, preMoveArgs.MovePosition))
                 {
-                    this.ServerAttackDetectionTick = Game.TickCount - Game.Ping / 2;
-                    this.LastTarget = targ;
-                    this.ForcedTarget = null;
-                    DelayAction.Queue((int)WindUpTime, () => FirePostAttack(targ));
+                    return true;
                 }
             }
+
+            return false;
         }
 
         public override void Orbwalk()
         {
-            OrbwalkerMode mode = this.GetActiveMode();
+            var mode = this.GetActiveMode();
 
             if (mode == null)
             {
@@ -300,7 +282,7 @@ namespace Aimtec.SDK.Orbwalking
 
             if (this.CanAttack(mode))
             {
-                var target = GetTarget(mode);
+                var target = this.GetTarget(mode);
                 if (target != null)
                 {
                     this.Attack(target);
@@ -319,9 +301,60 @@ namespace Aimtec.SDK.Orbwalking
             this.LastAttackCommandSentTime = 0;
         }
 
-        public override void ForceTarget(AttackableUnit unit)
+        #endregion
+
+        #region Methods
+
+        protected void Game_OnUpdate()
         {
-            this.ForcedTarget = unit;
+            if (Player.IsDead)
+            {
+                return;
+            }
+
+            this.Orbwalk();
+        }
+
+        protected void ObjAiHeroOnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs args)
+        {
+            if (sender.IsMe)
+            {
+                var targ = args.Target as AttackableUnit;
+                if (targ != null)
+                {
+                    this.ServerAttackDetectionTick = Game.TickCount - Game.Ping / 2;
+                    this.LastTarget = targ;
+                    this.ForcedTarget = null;
+                    DelayAction.Queue((int) this.WindUpTime, () => this.FirePostAttack(targ));
+                }
+            }
+        }
+
+        bool CanKillMinion(Obj_AI_Base minion, int time = 0)
+        {
+            var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
+            var pred = this.GetPredictedHealth(minion, rtime);
+
+            //The minions health will already be 0 by the time our auto attack reaches it, so no point attacking it...
+            if (pred <= 0)
+            {
+                this.FireNonKillableMinion(minion);
+                return false;
+            }
+
+            var dmg = Player.GetAutoAttackDamage(minion);
+
+            var result = dmg - pred >= 0;
+
+            return result;
+        }
+
+        float DamageDealtInTime(Obj_AI_Base sender, Obj_AI_Base minion, int time)
+        {
+            var autos = this.NumberOfAutoAttacksInTime(sender, minion, time);
+            var dmg = autos * sender.GetAutoAttackDamage(minion);
+
+            return (float) (autos * dmg);
         }
 
         AttackableUnit GetHeroTarget()
@@ -329,36 +362,14 @@ namespace Aimtec.SDK.Orbwalking
             return TargetSelector.Implementation.GetTarget(0, true);
         }
 
-        AttackableUnit GetLastHitTarget()
-        {
-            return this.GetLastHitTarget(null);
-        }
-
-        AttackableUnit GetLastHitTarget(IEnumerable<AttackableUnit> attackable)
-        {
-            if (attackable == null)
-            {
-                attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
-            }
-
-            var availableMinionTargets = attackable.Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>()
-                .Where(x => this.CanKillMinion(x));
-
-            var bestMinionTarget = availableMinionTargets.OrderByDescending(x => x.MaxHealth)
-                .ThenBy(x => this.HealthPrediction.GetAggroData(x)?.HasTurretAggro).ThenBy(x => x.Health)
-                .FirstOrDefault();
-
-            return bestMinionTarget;
-        }
-
         AttackableUnit GetLaneClearTarget()
         {
             var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange());
-   
+
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
-            IEnumerable<Obj_AI_Base> minions = attackableUnits.Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>()
-                .OrderByDescending(x => x.MaxHealth);
+            IEnumerable<Obj_AI_Base> minions = attackableUnits
+                .Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>().OrderByDescending(x => x.MaxHealth);
 
             var minionTurretAggro = minions.FirstOrDefault(x => this.HealthPrediction.HasTurretAggro(x));
 
@@ -403,10 +414,8 @@ namespace Aimtec.SDK.Orbwalking
                     return null;
                 }
 
-                var numautos = this.NumberOfAutoAttacksInTime(
-                    Player,
-                    minionTurretAggro,
-                    data.TimeUntilNextTurretAttack);
+                var numautos =
+                    this.NumberOfAutoAttacksInTime(Player, minionTurretAggro, data.TimeUntilNextTurretAttack);
 
                 var tdmg = dmgauto * numautos;
 
@@ -421,9 +430,8 @@ namespace Aimtec.SDK.Orbwalking
                 return null;
             }
 
-
             //Killable
-            AttackableUnit killableMinion = minions.FirstOrDefault(x => CanKillMinion(x));
+            AttackableUnit killableMinion = minions.FirstOrDefault(x => this.CanKillMinion(x));
 
             if (killableMinion != null)
             {
@@ -443,7 +451,8 @@ namespace Aimtec.SDK.Orbwalking
                 return structure;
             }
 
-            foreach (var minion in minions.OrderBy(x => Math.Ceiling(this.GetPredictedHealth(x) / Player.GetAutoAttackDamage(x))))
+            foreach (var minion in minions.OrderBy(
+                x => Math.Ceiling(this.GetPredictedHealth(x) / Player.GetAutoAttackDamage(x))))
             {
                 var predHealth = this.GetPredictedHealth(minion) - 1;
 
@@ -478,6 +487,28 @@ namespace Aimtec.SDK.Orbwalking
             return null;
         }
 
+        AttackableUnit GetLastHitTarget()
+        {
+            return this.GetLastHitTarget(null);
+        }
+
+        AttackableUnit GetLastHitTarget(IEnumerable<AttackableUnit> attackable)
+        {
+            if (attackable == null)
+            {
+                attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
+            }
+
+            var availableMinionTargets = attackable
+                .Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>().Where(x => this.CanKillMinion(x));
+
+            var bestMinionTarget = availableMinionTargets
+                .OrderByDescending(x => x.MaxHealth).ThenBy(x => this.HealthPrediction.GetAggroData(x)?.HasTurretAggro)
+                .ThenBy(x => x.Health).FirstOrDefault();
+
+            return bestMinionTarget;
+        }
+
         //In mixed mode we prioritize killable units, then structures, then heros. If none are found, then we don't attack anything.
         AttackableUnit GetMixedModeTarget()
         {
@@ -510,13 +541,19 @@ namespace Aimtec.SDK.Orbwalking
             return null;
         }
 
+        int GetPredictedHealth(Obj_AI_Base minion, int time = 0)
+        {
+            var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
+            return (int) Math.Ceiling(this.HealthPrediction.GetPrediction(minion, rtime));
+        }
+
         //Gets a structure target based on the following order (Nexus, Turret, Inihibitor)
         AttackableUnit GetStructureTarget(IEnumerable<AttackableUnit> attackable)
         {
             //Nexus
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
-            var nexus = attackableUnits.Where(x => x.Type == GameObjectType.obj_HQ)
-                .OrderBy(x => x.Distance(Player)).FirstOrDefault();
+            var nexus = attackableUnits.Where(x => x.Type == GameObjectType.obj_HQ).OrderBy(x => x.Distance(Player))
+                                       .FirstOrDefault();
             if (nexus != null && nexus.IsValidAutoRange())
             {
                 return nexus;
@@ -524,7 +561,7 @@ namespace Aimtec.SDK.Orbwalking
 
             //Turret
             var turret = attackableUnits.Where(x => x is Obj_AI_Turret).OrderBy(x => x.Distance(Player))
-                .FirstOrDefault();
+                                        .FirstOrDefault();
             if (turret != null && turret.IsValidAutoRange())
             {
                 return turret;
@@ -532,7 +569,7 @@ namespace Aimtec.SDK.Orbwalking
 
             //Inhib
             var inhib = attackableUnits.Where(x => x.Type == GameObjectType.obj_BarracksDampener)
-                .OrderBy(x => x.Distance(Player)).FirstOrDefault();
+                                       .OrderBy(x => x.Distance(Player)).FirstOrDefault();
             if (inhib != null && inhib.IsValidAutoRange())
             {
                 return inhib;
@@ -541,32 +578,37 @@ namespace Aimtec.SDK.Orbwalking
             return null;
         }
 
-        int TimeForAutoToReachTarget(AttackableUnit minion)
+        private void Initialize()
         {
-            var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
-            var ms = Player.IsMelee ? int.MaxValue : Player.BasicAttack.MissileSpeed;
-            var attackTravelTime = (dist / ms) * 1000f;
-            var totalTime = (int) (this.AnimationTime + attackTravelTime + 70 + Game.Ping / 2);
-            return totalTime;
-        }
-
-        bool CanKillMinion(Obj_AI_Base minion, int time = 0)
-        {
-            var rtime = time == 0 ? (this.TimeForAutoToReachTarget(minion)) : (time);
-            var pred = this.GetPredictedHealth(minion, rtime);
-
-            //The minions health will already be 0 by the time our auto attack reaches it, so no point attacking it...
-            if (pred <= 0)
+            this.Config = new Menu("Orbwalker", "Orbwalker")
             {
-                this.FireNonKillableMinion(minion);
-                return false;
-            }
+                new Menu("Advanced", "Advanced")
+                {
+                    new MenuSlider("attackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true),
+                },
+                new Menu("Drawings", "Drawings")
+                {
+                    new MenuBool("drawAttackRange", "Draw Attack Range", true),
+                    new MenuBool("drawHoldRadius", "Draw Hold Radius", false),
+                },
+                new Menu("Misc", "Misc")
+                {
+                    new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
+                    new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
+                    new MenuBool("noBlindAA", "No AA when Blind", true, true),
+                }
+            };
 
-            var dmg = Player.GetAutoAttackDamage(minion);
-
-            var result = (dmg) - pred >= 0;
-
-            return result;
+            this.AddMode(this.Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, this.GetHeroTarget, null));
+            this.AddMode(
+                this.LaneClear = new OrbwalkerMode(
+                    "Laneclear",
+                    GlobalKeys.WaveClearKey,
+                    this.GetLaneClearTarget,
+                    null));
+            this.AddMode(
+                this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
+            this.AddMode(this.Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, this.GetMixedModeTarget, null));
         }
 
         int NumberOfAutoAttacksInTime(Obj_AI_Base sender, AttackableUnit minion, int time)
@@ -583,88 +625,71 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             var fullTimePerAuto = basetimePerAuto + sender.AttackDelay * 1000;
-            var additionalAutos = (int)Math.Ceiling(adjustedTime / fullTimePerAuto);
+            var additionalAutos = (int) Math.Ceiling(adjustedTime / fullTimePerAuto);
 
             numberOfAutos += additionalAutos;
 
             return numberOfAutos;
         }
 
-        float DamageDealtInTime(Obj_AI_Base sender, Obj_AI_Base minion, int time)
+        private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
-            var autos = this.NumberOfAutoAttacksInTime(sender, minion, time);
-            var dmg = autos * sender.GetAutoAttackDamage(minion);
+            if (sender.IsMe)
+            {
+                /* Detect Caitlyn W Headshot */
+                if (Player.ChampionName == "Caitlyn")
+                {
+                    if (e.SpellData.Name.ToLower().Contains("caitlynheadshotmissile"))
+                    {
+                        this.ServerAttackDetectionTick = Game.TickCount;
+                    }
+                }
 
-            return (float) (autos * dmg);
+                if (this.IsReset(e.SpellData.Name))
+                {
+                    this.ResetAutoAttackTimer();
+                }
+            }
         }
 
-        int GetPredictedHealth(Obj_AI_Base minion, int time = 0)
+        private void RenderManager_OnRender()
         {
-            var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
-            return (int) Math.Ceiling(this.HealthPrediction.GetPrediction(minion, rtime));
+            if (this.DrawAttackRange)
+            {
+                Render.Circle(Player.Position, Player.AttackRange + Player.BoundingRadius, 30, Color.DeepSkyBlue);
+            }
+
+            if (this.DrawHoldPosition)
+            {
+                Render.Circle(Player.Position, this.HoldPositionRadius, 30, Color.White);
+            }
         }
 
         bool ShouldWaitMinion(Obj_AI_Base minion)
         {
-            var pred = this.GetPredictedHealth(minion, this.TimeForAutoToReachTarget(minion) + (int)(this.AttackCoolDownTime) + (int)(this.WindUpTime));
+            var pred = this.GetPredictedHealth(
+                minion,
+                this.TimeForAutoToReachTarget(minion) + (int) this.AttackCoolDownTime + (int) this.WindUpTime);
             return Player.GetAutoAttackDamage(minion) - pred >= 0;
         }
 
-        public override void Dispose()
+        private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
         {
-            this.Config.Dispose();
-            Obj_AI_Base.OnProcessAutoAttack -= this.ObjAiHeroOnProcessAutoAttack;
-            Obj_AI_Base.OnProcessSpellCast -= Obj_AI_Base_OnProcessSpellCast;
-            Game.OnUpdate -= this.Game_OnUpdate;
-            SpellBook.OnStopCast -= SpellBook_OnStopCast;
-            Render.OnRender -= RenderManager_OnRender;
-            this.Attached = false;
+            if (sender.IsMe && (e.DestroyMissile || e.ForceStop || e.StopAnimation))
+            {
+                this.ResetAutoAttackTimer();
+            }
         }
 
-        public override AttackableUnit GetTarget(OrbwalkerMode mode)
+        int TimeForAutoToReachTarget(AttackableUnit minion)
         {
-            if (this.ForcedTarget != null && this.ForcedTarget.IsValidAutoRange())
-            {
-                return ForcedTarget;
-            }
-
-            if (mode != null)
-            {
-                return mode.GetTarget();
-            }
-
-            return null;
+            var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
+            var ms = Player.IsMelee ? int.MaxValue : Player.BasicAttack.MissileSpeed;
+            var attackTravelTime = dist / ms * 1000f;
+            var totalTime = (int) (this.AnimationTime + attackTravelTime + 70 + Game.Ping / 2);
+            return totalTime;
         }
 
-        public override bool Move(Vector3 movePosition)
-        {
-            var preMoveArgs = this.FirePreMove(movePosition);
-
-            if (!preMoveArgs.Cancel)
-            {
-                if (Player.IssueOrder(OrderType.MoveTo, preMoveArgs.MovePosition))
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        public override bool Attack(AttackableUnit target)
-        {
-            var preAttackargs = this.FirePreAttack(target);
-
-            if (!preAttackargs.Cancel)
-            {
-                if (Player.IssueOrder(OrderType.AttackUnit, target))
-                {
-                    this.LastAttackCommandSentTime = Game.TickCount;
-                    return true;
-                }
-            }
-
-            return false;
-        }
+        #endregion
     }
 }

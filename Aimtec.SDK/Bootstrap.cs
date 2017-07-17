@@ -6,12 +6,9 @@
 
     using Aimtec.SDK.Damage;
     using Aimtec.SDK.Menu.Config;
-    using Aimtec.SDK.TargetSelector;
 
     using NLog;
-    using NLog.Conditions;
     using NLog.Config;
-    using NLog.Fluent;
     using NLog.Layouts;
     using NLog.Targets;
     using NLog.Targets.Wrappers;
@@ -55,7 +52,7 @@
             SetupLogging();
             LogUnhandledExceptions();
 
-            DamageLibrary.LoadDamages();       
+            DamageLibrary.LoadDamages();
             GlobalKeys.Load();
             TargetSelector.TargetSelector.Load();
 

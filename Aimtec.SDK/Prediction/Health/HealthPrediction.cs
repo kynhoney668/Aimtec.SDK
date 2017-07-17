@@ -1,25 +1,31 @@
 ﻿namespace Aimtec.SDK.Prediction.Health
 {
     /// <summary>
-    /// Class HealthPrediction.
+    ///     Class HealthPrediction.
     /// </summary>
     /// <seealso cref="Aimtec.SDK.Prediction.Health.IHealthPrediction" />
     public class HealthPrediction : IHealthPrediction
     {
-        /// <summary>
-        /// Gets the instance.
-        /// </summary>
-        /// <value>The instance.</value>
-        public static HealthPrediction Instance { get; } = new HealthPrediction();
+        #region Public Properties
 
         /// <summary>
-        /// Gets or sets the implementation.
+        ///     Gets or sets the implementation.
         /// </summary>
         /// <value>The implementation.</value>
         public static IHealthPrediction Implementation { get; set; } = new HealthPredictionImplB();
 
         /// <summary>
-        /// Gets the predicted health of the target.
+        ///     Gets the instance.
+        /// </summary>
+        /// <value>The instance.</value>
+        public static HealthPrediction Instance { get; } = new HealthPrediction();
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        ///     Gets the predicted health of the target.
         /// </summary>
         /// <param name="target">The target.</param>
         /// <param name="time">The time.</param>
@@ -28,5 +34,7 @@
         {
             return Implementation.GetPrediction(target, time);
         }
+
+        #endregion
     }
 }

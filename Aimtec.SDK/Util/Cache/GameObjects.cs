@@ -22,24 +22,24 @@ namespace Aimtec.SDK.Util.Cache
         private static readonly HashSet<Obj_AI_Hero> allyHeroes;
 
         /// <summary>
-        ///     The ally minions
-        /// </summary>
-        private static HashSet<Obj_AI_Minion> allyMinions;
-
-        /// <summary>
         ///     The enemy heroes
         /// </summary>
         private static readonly HashSet<Obj_AI_Hero> enemyHeroes;
 
         /// <summary>
-        ///     The enemy minions
-        /// </summary>
-        private static HashSet<Obj_AI_Minion> enemyMinionsI;
-
-        /// <summary>
         ///     The heroes
         /// </summary>
         private static readonly HashSet<Obj_AI_Hero> HeroesI;
+
+        /// <summary>
+        ///     The ally minions
+        /// </summary>
+        private static HashSet<Obj_AI_Minion> allyMinions;
+
+        /// <summary>
+        ///     The enemy minions
+        /// </summary>
+        private static HashSet<Obj_AI_Minion> enemyMinionsI;
 
         /// <summary>
         ///     The minions
@@ -48,53 +48,10 @@ namespace Aimtec.SDK.Util.Cache
 
         #endregion
 
-
-        /// <summary>
-        /// Gets all game objects.
-        /// </summary>
-        /// <value>All game objects.</value>
-        public static IEnumerable<GameObject> AllGameObjects => allGameObjects;
-
-        /// <summary>
-        /// Gets the ally heroes.
-        /// </summary>
-        /// <value>The ally heroes.</value>
-        public static IEnumerable<Obj_AI_Hero> AllyHeroes => allyHeroes;
-
-        /// <summary>
-        /// Gets the ally minions.
-        /// </summary>
-        /// <value>The ally minions.</value>
-        public static IEnumerable<Obj_AI_Minion> AllyMinions => allyMinions;
-
-        /// <summary>
-        /// Gets the enemy heroes.
-        /// </summary>
-        /// <value>The enemy heroes.</value>
-        public static IEnumerable<Obj_AI_Hero> EnemyHeroes => enemyHeroes;
-
-        /// <summary>
-        /// Gets the enemy minions.
-        /// </summary>
-        /// <value>The enemy minions.</value>
-        public static IEnumerable<Obj_AI_Minion> EnemyMinions => enemyMinionsI;
-
-        /// <summary>
-        /// Gets the heroes.
-        /// </summary>
-        /// <value>The heroes.</value>
-        public static IEnumerable<Obj_AI_Hero> Heroes => HeroesI;
-
-        /// <summary>
-        /// Gets the minions.
-        /// </summary>
-        /// <value>The minions.</value>
-        public static IEnumerable<Obj_AI_Minion> Minions => minionsI;
-
         #region Constructors and Destructors
 
         /// <summary>
-        /// Initializes static members of the <see cref="GameObjects"/> class.
+        ///     Initializes static members of the <see cref="GameObjects" /> class.
         /// </summary>
         static GameObjects()
         {
@@ -111,6 +68,52 @@ namespace Aimtec.SDK.Util.Cache
             allyHeroes = CreateHashSet(HeroesI.Where(x => x.IsAlly));
             enemyHeroes = CreateHashSet(HeroesI.Where(x => x.IsEnemy));
         }
+
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets all game objects.
+        /// </summary>
+        /// <value>All game objects.</value>
+        public static IEnumerable<GameObject> AllGameObjects => allGameObjects;
+
+        /// <summary>
+        ///     Gets the ally heroes.
+        /// </summary>
+        /// <value>The ally heroes.</value>
+        public static IEnumerable<Obj_AI_Hero> AllyHeroes => allyHeroes;
+
+        /// <summary>
+        ///     Gets the ally minions.
+        /// </summary>
+        /// <value>The ally minions.</value>
+        public static IEnumerable<Obj_AI_Minion> AllyMinions => allyMinions;
+
+        /// <summary>
+        ///     Gets the enemy heroes.
+        /// </summary>
+        /// <value>The enemy heroes.</value>
+        public static IEnumerable<Obj_AI_Hero> EnemyHeroes => enemyHeroes;
+
+        /// <summary>
+        ///     Gets the enemy minions.
+        /// </summary>
+        /// <value>The enemy minions.</value>
+        public static IEnumerable<Obj_AI_Minion> EnemyMinions => enemyMinionsI;
+
+        /// <summary>
+        ///     Gets the heroes.
+        /// </summary>
+        /// <value>The heroes.</value>
+        public static IEnumerable<Obj_AI_Hero> Heroes => HeroesI;
+
+        /// <summary>
+        ///     Gets the minions.
+        /// </summary>
+        /// <value>The minions.</value>
+        public static IEnumerable<Obj_AI_Minion> Minions => minionsI;
 
         #endregion
 

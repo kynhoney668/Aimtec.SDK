@@ -1,8 +1,6 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
-    using System;
     using System.IO;
-    using System.Reflection;
 
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
@@ -34,28 +32,28 @@
             this.Shared = shared;
         }
 
-
-
         [JsonConstructor]
         private MenuBool()
         {
-            
         }
 
         #endregion
 
         #region Public Properties
 
-        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
-
- 
         /// <summary>
         ///     Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
         [JsonProperty(Order = 3, PropertyName = "Value")]
         public new bool Value { get; set; }
-        
+
+        #endregion
+
+        #region Properties
+
+        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
+
         #endregion
 
         #region Public Methods and Operators
@@ -82,35 +80,20 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                if (MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position, this.Parent.Width).Contains(x, y))
+                if (MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position, this.Parent.Width)
+                               .Contains(x, y))
                 {
                     this.UpdateValue(!this.Value);
                 }
             }
         }
 
-
-
         #endregion
 
         #region Methods
 
         /// <summary>
-        ///     Updates the value of the bool, saves the new value and fires the value changed event
-        /// </summary>
-        private void UpdateValue(bool newVal)
-        {
-            var oldClone = new MenuBool { InternalName = this.InternalName, DisplayName = this.DisplayName, Value = this.Value };
-
-            this.Value = newVal;
-
-            this.Save();
-
-            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
-        }
-
-        /// <summary>
-        ///    Loads the value from the file for this component
+        ///     Loads the value from the file for this component
         /// </summary>
         internal override void LoadValue()
         {
@@ -125,6 +108,25 @@
                     this.Value = sValue.Value;
                 }
             }
+        }
+
+        /// <summary>
+        ///     Updates the value of the bool, saves the new value and fires the value changed event
+        /// </summary>
+        private void UpdateValue(bool newVal)
+        {
+            var oldClone = new MenuBool
+            {
+                InternalName = this.InternalName,
+                DisplayName = this.DisplayName,
+                Value = this.Value
+            };
+
+            this.Value = newVal;
+
+            this.Save();
+
+            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }
 
         #endregion

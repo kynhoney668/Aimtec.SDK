@@ -3,10 +3,8 @@
     using System;
     using System.Drawing;
     using System.IO;
-    using System.Reflection;
 
     using Aimtec.SDK.Menu.Theme;
-    using Aimtec.SDK.Menu.Theme.Default;
     using Aimtec.SDK.Util;
 
     using Newtonsoft.Json;
@@ -30,7 +28,13 @@
         /// <param name="minValue">The minimum value.</param>
         /// <param name="maxValue">The maximum value.</param>
         /// <param name="shared">Whether this item is shared across instances</param>
-        public MenuSlider(string internalName, string displayName, int value, int minValue = 0, int maxValue = 100, bool shared = false)
+        public MenuSlider(
+            string internalName,
+            string displayName,
+            int value,
+            int minValue = 0,
+            int maxValue = 100,
+            bool shared = false)
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
@@ -42,44 +46,36 @@
 
             if (this.Value > this.MaxValue)
             {
-                Logger.Warn($"The value for slider {this.InternalName} is greater than the maximum value of the slider. Setting to maximum.");
+                Logger.Warn(
+                    $"The value for slider {this.InternalName} is greater than the maximum value of the slider. Setting to maximum.");
                 this.Value = maxValue;
             }
 
             else if (this.Value < this.MinValue)
             {
-                Logger.Warn($"The value for slider {this.InternalName} is lower than the minimum value of the slider. Setting to minimum.");
+                Logger.Warn(
+                    $"The value for slider {this.InternalName} is lower than the minimum value of the slider. Setting to minimum.");
                 this.Value = minValue;
             }
 
             if (this.MinValue > this.MaxValue)
             {
-                Logger.Error($"The minimum value is greater than the maximum value for slider with name \"{internalName}\"");
-                throw new ArgumentException("The minimum value cannot be greater than the maximum value. Item name: {internalName}");
+                Logger.Error(
+                    $"The minimum value is greater than the maximum value for slider with name \"{internalName}\"");
+                throw new ArgumentException(
+                    "The minimum value cannot be greater than the maximum value. Item name: {internalName}");
             }
         }
 
         [JsonConstructor]
         private MenuSlider()
         {
-
         }
 
         #endregion
 
         #region Public Properties
 
-        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
-
-
-
-        /// <summary>
-        ///     Gets or sets the value.
-        /// </summary>
-        /// <value>The value.</value>
-        [JsonProperty(Order = 3)]
-        public new int Value { get; set; }
-    
         /// <summary>
         ///     Gets or sets the maximum value.
         /// </summary>
@@ -92,11 +88,18 @@
         /// <value>The minimum value.</value>
         public int MinValue { get; set; }
 
-
+        /// <summary>
+        ///     Gets or sets the value.
+        /// </summary>
+        /// <value>The value.</value>
+        [JsonProperty(Order = 3)]
+        public new int Value { get; set; }
 
         #endregion
 
         #region Properties
+
+        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
 
         /// <summary>
         ///     Gets or sets a value indicating whether [mouse down].
@@ -108,6 +111,11 @@
 
         #region Public Methods and Operators
 
+        public override Rectangle GetBounds(Vector2 pos)
+        {
+            return MenuManager.Instance.Theme.GetMenuSliderControlBounds(pos, this.Parent.Width);
+        }
+
         /// <summary>
         ///     Gets the render manager.
         /// </summary>
@@ -116,12 +124,6 @@
         {
             return MenuManager.Instance.Theme.BuildMenuSliderRenderer(this);
         }
-
-        public override Rectangle GetBounds(Vector2 pos)
-        {
-            return MenuManager.Instance.Theme.GetMenuSliderControlBounds(pos, this.Parent.Width);
-        }
-
 
         /// <summary>
         ///     An application-defined function that processes messages sent to a window.
@@ -153,36 +155,12 @@
             }
         }
 
-
         #endregion
 
         #region Methods
 
         /// <summary>
-        ///     Sets the slider value.
-        /// </summary>
-        /// <param name="x">The x.</param>
-        private void SetSliderValue(int x)
-        {
-            this.UpdateValue(Math.Max(this.MinValue, Math.Min(this.MaxValue, (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width - MenuManager.Instance.Theme.LineWidth * 2) * this.MaxValue))));
-        }
-
- 
-        private void UpdateValue(int newVal)
-        {
-            var oldClone = new MenuSlider { InternalName = this.InternalName, DisplayName = this.DisplayName, Value = this.Value, MinValue = this.MinValue, MaxValue = this.MaxValue };
-
-            this.Value = newVal;
-
-            this.Save();
-
-            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
-        }
-
-
-
-        /// <summary>
-        ///    Loads the value from the file for this component
+        ///     Loads the value from the file for this component
         /// </summary>
         internal override void LoadValue()
         {
@@ -197,6 +175,39 @@
                     this.Value = sValue.Value;
                 }
             }
+        }
+
+        /// <summary>
+        ///     Sets the slider value.
+        /// </summary>
+        /// <param name="x">The x.</param>
+        private void SetSliderValue(int x)
+        {
+            this.UpdateValue(
+                Math.Max(
+                    this.MinValue,
+                    Math.Min(
+                        this.MaxValue,
+                        (int) ((x - this.Position.X) / (this.GetBounds(this.Position).Width
+                            - MenuManager.Instance.Theme.LineWidth * 2) * this.MaxValue))));
+        }
+
+        private void UpdateValue(int newVal)
+        {
+            var oldClone = new MenuSlider
+            {
+                InternalName = this.InternalName,
+                DisplayName = this.DisplayName,
+                Value = this.Value,
+                MinValue = this.MinValue,
+                MaxValue = this.MaxValue
+            };
+
+            this.Value = newVal;
+
+            this.Save();
+
+            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }
 
         #endregion

@@ -7,22 +7,39 @@
 
     public class GlobalKeys
     {
+        #region Static Fields
+
         internal static Menu KeyConfig;
+
+        #endregion
+
+        #region Public Properties
+
+        public static GlobalKey BurstKey { get; set; }
 
         //Main Keys - To be enabled by default
         public static GlobalKey ComboKey { get; set; }
-        public static GlobalKey MixedKey { get; set; }
-        public static GlobalKey WaveClearKey { get; set; }
-        public static GlobalKey LastHitKey { get; set; }
+
+        public static GlobalKey ComboNoOrbwalkKey { get; set; }
+
+        public static GlobalKey FleeKey { get; set; }
+
+        public static GlobalKey FreezeKey { get; set; }
 
         //Additional Keys that can be enabled by assemblies if they require it
         public static GlobalKey HarassKey { get; set; }
-        public static GlobalKey FreezeKey { get; set; }
-        public static GlobalKey BurstKey { get; set; }
-        public static GlobalKey FleeKey { get; set; }
-        public static GlobalKey ComboNoOrbwalkKey { get; set; }
+
+        public static GlobalKey LastHitKey { get; set; }
+
+        public static GlobalKey MixedKey { get; set; }
+
         public static GlobalKey TowerDiveKey { get; set; }
 
+        public static GlobalKey WaveClearKey { get; set; }
+
+        #endregion
+
+        #region Methods
 
         internal static void Load()
         {
@@ -45,14 +62,23 @@
             FleeKey = new GlobalKey("Flee", "Flee", KeyCode.L, KeybindType.Press, false);
             TowerDiveKey = new GlobalKey("TowerDive", "Tower Dive", KeyCode.T, KeybindType.Press, false);
 
-            ComboNoOrbwalkKey = new GlobalKey("ComboNoOrbwalk", "Combo - No Orbwalk", KeyCode.J, KeybindType.Toggle, false);
+            ComboNoOrbwalkKey = new GlobalKey(
+                "ComboNoOrbwalk",
+                "Combo - No Orbwalk",
+                KeyCode.J,
+                KeybindType.Toggle,
+                false);
 
             AimtecMenu.Instance.Add(KeyConfig);
         }
+
+        #endregion
     }
 
     public class GlobalKey
     {
+        #region Constructors and Destructors
+
         internal GlobalKey(string internalName, string displayName, KeyCode keyCode, KeybindType type, bool enabled)
         {
             this.KeyBindItem = new MenuKeyBind(internalName, displayName, keyCode, type);
@@ -63,7 +89,9 @@
             }
         }
 
-        private bool AddedToMenu { get; set; }
+        #endregion
+
+        #region Public Properties
 
         //Gets whether the keybind is active
         public bool Active
@@ -82,6 +110,15 @@
         //The Menu item associated with this Key
         public MenuKeyBind KeyBindItem { get; }
 
+        #endregion
+
+        #region Properties
+
+        private bool AddedToMenu { get; set; }
+
+        #endregion
+
+        #region Public Methods and Operators
 
         //Enables the key by adding it to the keylist
         public void Activate()
@@ -92,5 +129,7 @@
                 this.AddedToMenu = true;
             }
         }
+
+        #endregion
     }
 }

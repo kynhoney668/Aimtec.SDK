@@ -1,106 +1,60 @@
-﻿using System.Collections.Generic;
-
-namespace Aimtec.SDK.Prediction
+﻿namespace Aimtec.SDK.Prediction.Skillshots
 {
     using Aimtec.SDK.Prediction.Collision;
-    using Aimtec.SDK.Prediction.Skillshots;
 
-    /// <summary>
-    ///     The input parameters to calculate skillshot prediction.
-    /// </summary>
     public class PredictionInput
     {
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="PredictionInput" /> class.
-        /// </summary>
-        public PredictionInput()
-        {
-            this.From = ObjectManager.GetLocalPlayer().ServerPosition;
-            this.RangeCheckFrom = this.From;
-        }
+        #region Fields
 
-        /// <summary>
-        /// Gets or sets the unit.
-        /// </summary>
-        /// <value>The unit.</value>
-        public Obj_AI_Base Unit { get; set; }
-        /// <summary>
-        ///     Gets or sets from.
-        /// </summary>
-        /// <value>
-        ///     From.
-        /// </value>
-        public Vector3 From { get; set; }
+        private Vector3 @from;
 
-        /// <summary>
-        ///     Gets or sets the the position to check the range from.
-        /// </summary>
-        /// <value>
-        ///     The position to check the range from.
-        /// </value>
-        public Vector3 RangeCheckFrom { get; set; }
+        private Vector3 rangeCheckFrom;
 
-        /// <summary>
-        ///     Gets or sets the collision types.
-        /// </summary>
-        /// <value>
-        ///     The collision types.
-        /// </value>
-        public CollisionableObjects CollisionObjects { get; set; }
+        #endregion
 
-        /// <summary>
-        ///     Gets or sets the spell delay.
-        /// </summary>
-        /// <value>
-        ///     The spell delay.
-        /// </value>
-        public float Delay { get; set; }
+        #region Public Properties
 
-        /// <summary>
-        ///     Gets or sets the spell width.
-        /// </summary>
-        /// <value>
-        ///     The width.
-        /// </value>
-        public float Radius { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the spell range.
-        /// </summary>
-        /// <value>
-        ///     The range.
-        /// </value>
-        public float Range { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the spell speed.
-        /// </summary>
-        /// <value>
-        ///     The speed.
-        /// </value>
-        public float Speed { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the cast type of the skill.
-        /// </summary>
-        /// <value>
-        ///     The cast type of the skill.
-        /// </value>
-        public SkillType SkillType { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the target.
-        /// </summary>
-        /// <value>
-        ///     The target.
-        /// </value>
-        public Obj_AI_Base Target { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the spell is an area effect spell.
-        /// </summary>
-        /// <value><c>true</c> if the spell is an area effect spell; otherwise, <c>false</c>.</value>
         public bool AoE { get; set; }
 
+        public bool Collision { get; set; }
+
+        public CollisionableObjects CollisionObjects { get; set; } =
+            CollisionableObjects.Minions | CollisionableObjects.YasuoWall;
+
+        public float Delay { get; set; }
+
+        public Vector3 From
+        {
+            get => this.from.IsZero ? ObjectManager.GetLocalPlayer().Position : this.@from;
+
+            set => this.@from = value;
+        }
+
+        public float Radius { get; set; } = 1f;
+
+        public float Range { get; set; } = float.MaxValue;
+
+        public Vector3 RangeCheckFrom
+        {
+            get => this.rangeCheckFrom.IsZero ? this.From : this.rangeCheckFrom;
+
+            set => this.rangeCheckFrom = value;
+        }
+
+        public float Speed { get; set; } = float.MaxValue;
+
+        public SkillshotType Type { get; set; } = SkillshotType.Line;
+
+        public Obj_AI_Base Unit { get; set; } = ObjectManager.GetLocalPlayer();
+
+        public bool UseBoundingRadius { get; set; } = true;
+
+        #endregion
+
+        #region Properties
+
+        internal float RealRadius => this.UseBoundingRadius ? this.Radius + this.Unit.BoundingRadius : this.Radius;
+
+        #endregion
     }
 }

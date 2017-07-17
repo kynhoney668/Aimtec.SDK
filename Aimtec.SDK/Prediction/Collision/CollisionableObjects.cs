@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Aimtec.SDK.Prediction.Collision
+﻿namespace Aimtec.SDK.Prediction.Collision
 {
+    using System;
+
     /// <summary>
-    /// Enum CollisionableObjects
+    ///     Enum CollisionableObjects
     /// </summary>
+    [Flags]
     public enum CollisionableObjects
     {
         /// <summary>

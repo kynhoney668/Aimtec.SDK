@@ -1,21 +1,21 @@
-﻿using System;
-
-
-namespace Aimtec.SDK.Menu
+﻿namespace Aimtec.SDK.Menu
 {
+    using System;
+
     /// <summary>
-    /// The Arguments for ValueChanged Event
+    ///     The Arguments for ValueChanged Event
     /// </summary>
     public class ValueChangedArgs : EventArgs
     {
-        private MenuComponent previousValue;
+        #region Fields
 
         private MenuComponent newValue;
 
-        /// <summary>
-        /// The internal name of the Menu Component that fired this event
-        /// </summary>
-        public string InternalName { get; }
+        private MenuComponent previousValue;
+
+        #endregion
+
+        #region Constructors and Destructors
 
         /// <summary>
         ///     Creates a new instance of the ValueChangedArgs class
@@ -29,26 +29,41 @@ namespace Aimtec.SDK.Menu
             this.InternalName = newVal.InternalName;
         }
 
+        #endregion
+
+        #region Public Properties
 
         /// <summary>
-        /// Gets the previous instance before the Value Changed
+        ///     The internal name of the Menu Component that fired this event
+        /// </summary>
+        public string InternalName { get; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
+        /// <summary>
+        ///     Gets the new or current instance after the Value Changed
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public T GetPreviousValue<T>() where T : MenuComponent
+        public T GetNewValue<T>()
+            where T : MenuComponent
+        {
+            return (T) this.newValue;
+        }
+
+        /// <summary>
+        ///     Gets the previous instance before the Value Changed
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public T GetPreviousValue<T>()
+            where T : MenuComponent
         {
             return (T) this.previousValue;
         }
 
-        /// <summary>
-        /// Gets the new or current instance after the Value Changed
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns></returns>
-        public T GetNewValue<T>() where T : MenuComponent
-        {
-            return (T)this.newValue;
-        }
+        #endregion
     }
-
 }

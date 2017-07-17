@@ -3,13 +3,10 @@
     using System;
 
     using Aimtec.SDK.Extensions;
-    using Aimtec.SDK.Prediction;
-    using Aimtec.SDK.Prediction.Collision;
+    using Aimtec.SDK.Menu.Config;
     using Aimtec.SDK.Prediction.Skillshots;
-    using Aimtec.SDK.Util;
 
     using NLog;
-    using Aimtec.SDK.Menu.Config;
 
     /// <summary>
     ///     Class Spell.
@@ -179,7 +176,7 @@
         ///     Gets or sets the type.
         /// </summary>
         /// <value>The type.</value>
-        public SkillType Type { get; set; }
+        public SkillshotType Type { get; set; }
 
         /// <summary>
         ///     Gets or sets the width.
@@ -233,7 +230,8 @@
                 return false;
             }
 
-            var prediction = Prediction.Skillshots.Prediction.Instance.GetPrediction(this.GetPredictionInput(target));
+            var prediction =
+                Prediction.Skillshots.Prediction.GetPrediction(this.GetPredictionInput(target), true, this.Collision);
 
             if (prediction.HitChance < this.HitChance)
             {
@@ -242,7 +240,9 @@
 
             if (this.IsChargedSpell)
             {
-                return this.IsCharging ? ShootChargedSpell(this.Slot, prediction.CastPosition) : this.StartCharging(prediction.CastPosition);
+                return this.IsCharging
+                    ? ShootChargedSpell(this.Slot, prediction.CastPosition)
+                    : this.StartCharging(prediction.CastPosition);
             }
 
             return Player.SpellBook.CastSpell(this.Slot, prediction.CastPosition);
@@ -335,7 +335,10 @@
         /// <returns>PredictionOutput.</returns>
         public PredictionOutput GetPrediction(Obj_AI_Base target)
         {
-            return Prediction.Skillshots.Prediction.Implementation.GetPrediction(this.GetPredictionInput(target));
+            return Prediction.Skillshots.Prediction.GetPrediction(
+                this.GetPredictionInput(target),
+                true,
+                this.Collision);
         }
 
         /// <summary>
@@ -347,13 +350,11 @@
         {
             return new PredictionInput()
             {
-                CollisionObjects = this.Collision ? CollisionableObjects.Minions : 0,
                 Delay = this.Delay,
                 Radius = this.Width,
                 Speed = this.Speed,
                 Range = this.Range,
-                Target = target,
-                Unit = Player
+                Unit = target,
             };
         }
 
@@ -407,13 +408,13 @@
             if (AimtecMenu.DebugEnabled)
             {
                 Logger.Debug(
-                "{0} Set as Charged -> Spell Name: {1}, Buff Name: {2}, Min Range: {3}, Max Range: {4}, Charge Duration: {5}s",
-                this.Slot,
-                spellName,
-                buffName,
-                minRange,
-                maxRange,
-                chargeDurationSeconds);
+                    "{0} Set as Charged -> Spell Name: {1}, Buff Name: {2}, Min Range: {3}, Max Range: {4}, Charge Duration: {5}s",
+                    this.Slot,
+                    spellName,
+                    buffName,
+                    minRange,
+                    maxRange,
+                    chargeDurationSeconds);
             }
         }
 
@@ -432,7 +433,7 @@
             float width,
             float speed,
             bool collision,
-            SkillType type,
+            SkillshotType type,
             bool vectorSkillshot = false,
             HitChance hitchance = HitChance.Low)
         {
@@ -448,18 +449,17 @@
             if (AimtecMenu.DebugEnabled)
             {
                 Logger.Debug(
-                "{0} Set as SkillShot -> Range: {1}, Delay: {2},  Width: {3}, Speed: {4}, Collision: {5}, Type: {6}, MinHitChance: {7}",
-                this.Slot,
-                this.Range,
-                delay,
-                width,
-                speed,
-                collision,
-                type,
-                hitchance);
+                    "{0} Set as SkillShot -> Range: {1}, Delay: {2},  Width: {3}, Speed: {4}, Collision: {5}, Type: {6}, MinHitChance: {7}",
+                    this.Slot,
+                    this.Range,
+                    delay,
+                    width,
+                    speed,
+                    collision,
+                    type,
+                    hitchance);
             }
         }
-
 
         #endregion
 
@@ -468,11 +468,13 @@
         private static bool ShootChargedSpell(SpellSlot slot, Vector3 position, bool releaseCast = true)
         {
             var resultUpdate = Player.SpellBook.UpdateChargedSpell(slot, position, releaseCast);
+
             if (!releaseCast)
             {
                 var resultCast = Player.SpellBook.CastSpell(slot, position);
                 return resultUpdate && resultCast;
             }
+
             return resultUpdate;
         }
 

@@ -1,66 +1,84 @@
-﻿using System.Collections.Generic;
-
-namespace Aimtec.SDK.Prediction
+﻿namespace Aimtec.SDK.Prediction.Skillshots
 {
-    using Aimtec.SDK.Prediction.Skillshots;
+    using System;
+    using System.Collections.Generic;
+
+    using Aimtec.SDK.Extensions;
 
     /// <summary>
-    /// Class PredictionOutput.
+    ///     Prediction Output, contains the calculated data from the source prediction input.
     /// </summary>
     public class PredictionOutput
     {
-        /// <summary>
-        ///     Gets or sets the prediction input.
-        /// </summary>
-        /// <value>
-        ///     The prediction input.
-        /// </value>
-        public PredictionInput Input { get; set; }
+        #region Fields
 
         /// <summary>
-        ///     Gets or sets the collisions.
+        ///     Cast Predicted Position data in a 3D-Space given value.
         /// </summary>
-        /// <value>
-        ///     The collisions.
-        /// </value>
-        public IList<GameObject> Collisions { get; set; } = new List<GameObject>();
+        private Vector3 castPosition;
+
+        /// <summary>
+        ///     Unit Predicted Position data ina a 3D-Space given value.
+        /// </summary>
+        private Vector3 unitPosition;
+
+        #endregion
+
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets or sets the data value which is declared for output data after calculation of how many Area-of-Effect
+        ///     targets will get hit by the prediction input source.
+        /// </summary>
+        public int AoeHitCount { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the list of the targets that the spell will hit (only if Area of Effect was enabled).
+        /// </summary>
+        public List<Obj_AI_Hero> AoeTargetsHit { get; set; } = new List<Obj_AI_Hero>();
+
+        /// <summary>
+        ///     Gets the number of targets the skill-shot will hit (only if Area of Effect was enabled).
+        /// </summary>
+        public int AoeTargetsHitCount => Math.Max(this.AoeHitCount, this.AoeTargetsHit.Count);
+
+        /// <summary>
+        ///     Gets or sets the position where the skill-shot should be casted to increase the accuracy.
+        /// </summary>
+        public Vector3 CastPosition
+        {
+            get => this.castPosition.IsZero ? this.Input.Unit.ServerPosition : this.castPosition.FixHeight();
+            set => this.castPosition = value;
+        }
+
+        /// <summary>
+        ///     Gets or sets the collision objects list which the input source would collide with.
+        /// </summary>
+        public List<Obj_AI_Base> CollisionObjects { get; set; } = new List<Obj_AI_Base>();
 
         /// <summary>
         ///     Gets or sets the hit chance.
         /// </summary>
-        /// <value>
-        ///     The hit chance.
-        /// </value>
-        public HitChance HitChance { get; set; }
+        public HitChance HitChance { get; set; } = HitChance.Impossible;
 
         /// <summary>
-        ///     Gets or sets the cast position.
+        ///     Gets or sets where the unit is going to be when the skill-shot reaches his position.
         /// </summary>
-        /// <value>
-        ///     The cast position.
-        /// </value>
-        public Vector3 CastPosition { get; set; }
+        public Vector3 UnitPosition
+        {
+            get => this.unitPosition.IsZero ? this.Input.Unit.ServerPosition : this.unitPosition.FixHeight();
+            set => this.unitPosition = value;
+        }
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
-        ///     Gets or sets the target's predicted position.
+        ///     Gets or sets the input.
         /// </summary>
-        /// <value>
-        ///     The target's predicted position.
-        /// </value>
-        public Vector3 PredictedPosition { get; set; }
+        internal PredictionInput Input { get; set; }
 
-        /// <summary>
-        ///     Gets a value indicating whether the <see cref="CastPosition" /> will collide with another GameObject.
-        /// </summary>
-        /// <value>
-        ///     <c>true</c> if the <see cref="CastPosition" /> will collide with another GameObject; otherwise, <c>false</c>.
-        /// </value>
-        public bool Collision => this.Collisions.Count > 0 || this.HitChance == HitChance.Collision;
-
-        /// <summary>
-        /// Gets or sets the number of targets hit by the area of effect spell.
-        /// </summary>
-        /// <value>The number of targets hit by the area of effect spell.</value>
-        public int AoeTargetsHit { get; set; }
+        #endregion
     }
 }

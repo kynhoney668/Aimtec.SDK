@@ -1,6 +1,6 @@
 namespace Aimtec.SDK.Extensions
 {
-    using System;
+    using System.Collections.Generic;
     using System.Linq;
 
     /// <summary>
@@ -17,6 +17,32 @@ namespace Aimtec.SDK.Extensions
         #region Public Methods and Operators
 
         /// <summary>
+        ///     Counts the ally heroes in range.
+        /// </summary>
+        /// <param name="unit">the unit.</param>
+        /// <param name="range">The range.</param>
+        /// <returns>How many ally heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
+        public static int CountAllyHeroesInRange(this GameObject unit, float range)
+        {
+            return unit.Position.CountAllyHeroesInRange(range);
+        }
+
+        /// <summary>
+        ///     Counts the enemy heroes in range.
+        /// </summary>
+        /// <param name="unit">the unit.</param>
+        /// <param name="range">The range.</param>
+        /// <param name="dontIncludeStartingUnit">The original unit.</param>
+        /// <returns>How many enemy heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
+        public static int CountEnemyHeroesInRange(
+            this GameObject unit,
+            float range,
+            Obj_AI_Base dontIncludeStartingUnit = null)
+        {
+            return unit.Position.CountEnemyHeroesInRange(range, dontIncludeStartingUnit);
+        }
+
+        /// <summary>
         ///     Returns the 3D distance between two vectors.
         /// </summary>
         /// <param name="v1">The start vector.</param>
@@ -27,23 +53,18 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
-        ///     Returns the 2D distance between two vectors.
-        /// </summary>
-        /// <param name="v1">The start vector.</param>
-        /// <param name="v2">The end vector.</param>
-        public static float Distance(this Vector2 v1, Vector2 v2)
-        {
-            return Vector2.Distance(v1, v2);
-        }
-
-        /// <summary>
         ///     Returns the 3D distance between a gameobject and a vector.
         /// </summary>
         /// <param name="gameObject">The GameObject.</param>
         /// <param name="v1">The vector.</param>
         public static float Distance(this GameObject gameObject, Vector3 v1)
         {
-            return Vector3.Distance(gameObject.Position, v1);
+            return Vector3.Distance(gameObject.ServerPosition, v1);
+        }
+
+        public static float Distance(this GameObject gameObject, Vector2 v1)
+        {
+            return Vector2.Distance((Vector2) gameObject.ServerPosition, v1);
         }
 
         /// <summary>
@@ -53,7 +74,7 @@ namespace Aimtec.SDK.Extensions
         /// <param name="gameObj1">The target GameObject.</param>
         public static float Distance(this GameObject gameObj, GameObject gameObj1)
         {
-            return Vector3.Distance(gameObj.Position, gameObj1.Position);
+            return Vector3.Distance(gameObj.ServerPosition, gameObj1.Position);
         }
 
         /// <summary>
@@ -63,7 +84,27 @@ namespace Aimtec.SDK.Extensions
         /// <param name="gameObj1">The target GameObject.</param>
         public static float DistanceSqr(this GameObject gameObj, GameObject gameObj1)
         {
-            return Vector3.DistanceSquared(gameObj.Position, gameObj1.Position);
+            return Vector3.DistanceSquared(gameObj.ServerPosition, gameObj1.Position);
+        }
+
+        /// <summary>
+        ///     Returns the 3D distance squared between two gameobjects.
+        /// </summary>
+        /// <param name="gameObj">The start GameObject.</param>
+        /// <param name="gameObj1">The target position.</param>
+        public static float DistanceSqr(this GameObject gameObj, Vector3 pos)
+        {
+            return Vector3.DistanceSquared(gameObj.ServerPosition, pos);
+        }
+
+        /// <summary>
+        ///     Returns a determined buff a determined unit has.
+        /// </summary>
+        /// <param name="unit">The unit.</param>
+        /// <param name="buffName">The buff's stringname</param>
+        public static Buff GetBuff(this Obj_AI_Base unit, string buffName)
+        {
+            return unit.BuffManager.GetBuff(buffName);
         }
 
         /// <summary>
@@ -91,40 +132,47 @@ namespace Aimtec.SDK.Extensions
                 return baseRange;
             }
 
-            if (Player.ChampionName.Equals("Caitlyn"))
+            if (!Player.ChampionName.Equals("Caitlyn"))
             {
-                var unit = target as Obj_AI_Base;
+                return baseRange + target.BoundingRadius;
+            }
 
-                if (unit != null && unit.HasBuff("caitlynyordletrapinternal"))
-                {
-                    baseRange = 1300 + Player.BoundingRadius;
-                }
+            var unit = target as Obj_AI_Base;
+
+            if (unit != null && unit.HasBuff("caitlynyordletrapinternal"))
+            {
+                baseRange = 1300 + Player.BoundingRadius;
             }
 
             return baseRange + target.BoundingRadius;
         }
-        
-        /// <summary>
-        ///     Counts the ally heroes in range.
-        /// </summary>
-        /// <param name="unit">the unit.</param>
-        /// <param name="range">The range.</param>
-        /// <returns>How many ally heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
-        public static int CountAllyHeroesInRange(this GameObject unit, float range)
-        {
-            return unit.Position.CountAllyHeroesInRange(range);
-        }
 
-        /// <summary>
-        ///     Counts the enemy heroes in range.
-        /// </summary>
-        /// <param name="unit">the unit.</param>
-        /// <param name="range">The range.</param>
-        /// <param name="dontIncludeStartingUnit">The original unit.</param>
-        /// <returns>How many enemy heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
-        public static int CountEnemyHeroesInRange(this GameObject unit, float range, Obj_AI_Base dontIncludeStartingUnit = null)
+        public static List<Vector2> GetWaypoints(this Obj_AI_Base unit)
         {
-            return unit.Position.CountEnemyHeroesInRange(range, dontIncludeStartingUnit);
+            var result = new List<Vector2>();
+
+            if (unit.IsVisible)
+            {
+                result.Add((Vector2) unit.ServerPosition);
+                result.AddRange(unit.Path.Select(x => (Vector2) x));
+            }
+            else
+            {
+                if (!WaypointTracker.StoredPaths.TryGetValue(unit.NetworkId, out List<Vector2> value))
+                {
+                    return result;
+                }
+
+                var path = value;
+                var timePassed = (Game.TickCount - WaypointTracker.StoredTick[unit.NetworkId]) / 1000f;
+
+                if (path.GetPathLength() >= unit.MoveSpeed * timePassed)
+                {
+                    result = path.CutPath((int) (unit.MoveSpeed * timePassed));
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -139,7 +187,7 @@ namespace Aimtec.SDK.Extensions
         {
             return from.BuffManager.HasBuff(buffname, true);
         }
-        
+
         /// <summary>
         ///     Determines whether the specified unit is affected by a determined bufftype.
         /// </summary>
@@ -187,34 +235,6 @@ namespace Aimtec.SDK.Extensions
         {
             return unit.Health / unit.MaxHealth * 100;
         }
-        
-        /// <summary>
-        ///     Returns the current mana a determined unit has, in percentual.
-        /// </summary>
-        /// <param name="unit">The unit.</param>
-        public static float ManaPercent(this Obj_AI_Base unit)
-        {
-            return unit.Mana / unit.MaxMana * 100;
-        }
-
-        /// <summary>
-        ///     Gets the buffs of the unit which are valid and active
-        /// </summary>
-        /// <param name="buff">The unit.</param>
-        public static Buff[] ValidActiveBuffs(this Obj_AI_Base unit)
-        {
-            return unit.Buffs.Where(buff => buff.IsValid && buff.IsActive).ToArray();
-        }
-
-        /// <summary>
-        ///     Returns a determined buff a determined unit has.
-        /// </summary>
-        /// <param name="unit">The unit.</param>
-        /// <param name="buffName">The buff's stringname</param>
-        public static Buff GetBuff(this Obj_AI_Base unit, string buffName)
-        {
-            return unit.BuffManager.GetBuff(buffName);
-        }
 
         /// <summary>
         ///     Determines whether the specified target is inside a determined range.
@@ -235,6 +255,19 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
+        ///     Determines whether or not the specified unit is recalling.
+        /// </summary>
+        /// <param name="unit">The unit</param>
+        /// <returns>
+        ///     <c>true</c> if the specified unit is recalling; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool IsRecalling(this Obj_AI_Hero unit)
+        {
+            return unit.ValidActiveBuffs().Any(
+                buff => buff.Name.ToLower().Contains("recall") && buff.Type == BuffType.Aura);
+        }
+
+        /// <summary>
         ///     Determines whether the target is a valid target in the auto attack range from the specified check range from
         ///     vector.
         /// </summary>
@@ -247,8 +280,8 @@ namespace Aimtec.SDK.Extensions
             bool allyIsValidTarget = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            if (target == null || !target.IsValid || target.IsDead ||
-                target.IsInvulnerable || !target.IsVisible || !target.IsTargetable)
+            if (target == null || !target.IsValid || target.IsDead || target.IsInvulnerable || !target.IsVisible
+                || !target.IsTargetable)
             {
                 return false;
             }
@@ -258,12 +291,9 @@ namespace Aimtec.SDK.Extensions
                 return false;
             }
 
-            return target.Distance(checkRangeFrom != Vector3.Zero
-                ? checkRangeFrom
-                : Player.Position) < Player.GetFullAttackRange(target);
+            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.Position)
+                < Player.GetFullAttackRange(target);
         }
-
-
 
         /// <summary>
         ///     Determines whether the specified target is a valid target.
@@ -283,8 +313,8 @@ namespace Aimtec.SDK.Extensions
             bool includeBoundingRadius = true,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            if (target == null || !target.IsValid || target.IsDead ||
-                target.IsInvulnerable || !target.IsVisible || !target.IsTargetable)
+            if (target == null || !target.IsValid || target.IsDead || target.IsInvulnerable || !target.IsVisible
+                || !target.IsTargetable)
             {
                 return false;
             }
@@ -294,23 +324,48 @@ namespace Aimtec.SDK.Extensions
                 return false;
             }
 
-            return target.Distance(checkRangeFrom != Vector3.Zero
-                ? checkRangeFrom
-                : Player.Position) < range + (includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0);
+            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.Position) < range
+                + (includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0);
         }
 
         /// <summary>
-        ///     Determines whether or not the specified unit is recalling.
+        ///     Returns the current mana a determined unit has, in percentual.
         /// </summary>
-        /// <param name="unit">The unit</param>
-        /// <returns>
-        ///     <c>true</c> if the specified unit is recalling; otherwise, <c>false</c>.
-        /// </returns>
-        public static bool IsRecalling(this Obj_AI_Hero unit)
+        /// <param name="unit">The unit.</param>
+        public static float ManaPercent(this Obj_AI_Base unit)
         {
-            return unit.ValidActiveBuffs().Any(buff => buff.Name.ToLower().Contains("recall") && buff.Type == BuffType.Aura);
+            return unit.Mana / unit.MaxMana * 100;
+        }
+
+        /// <summary>
+        ///     Gets the buffs of the unit which are valid and active
+        /// </summary>
+        /// <param name="buff">The unit.</param>
+        public static Buff[] ValidActiveBuffs(this Obj_AI_Base unit)
+        {
+            return unit.Buffs.Where(buff => buff.IsValid && buff.IsActive).ToArray();
         }
 
         #endregion
+
+        /// <summary>
+        ///     Waypoint Tracker data container.
+        /// </summary>
+        internal static class WaypointTracker
+        {
+            #region Static Fields
+
+            /// <summary>
+            ///     Stored Paths.
+            /// </summary>
+            public static readonly Dictionary<int, List<Vector2>> StoredPaths = new Dictionary<int, List<Vector2>>();
+
+            /// <summary>
+            ///     Stored Ticks.
+            /// </summary>
+            public static readonly Dictionary<int, int> StoredTick = new Dictionary<int, int>();
+
+            #endregion
+        }
     }
 }

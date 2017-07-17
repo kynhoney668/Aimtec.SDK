@@ -29,7 +29,7 @@
         ///     The second form damage stage.
         /// </summary>
         SecondForm,
-        
+
         /// <summary>
         ///     The third form damage stage.
         /// </summary>
@@ -39,12 +39,12 @@
         ///     The second cast damage stage.
         /// </summary>
         SecondCast,
-        
+
         /// <summary>
         ///     The third cast damage stage.
         /// </summary>
         ThirdCast,
-        
+
         /// <summary>
         ///     The against minions damage stage.
         /// </summary>
@@ -69,7 +69,7 @@
         ///     The AoE damage stage.
         /// </summary>
         AreaOfEffect,
-        
+
         /// <summary>
         ///     The collision damage stage.
         /// </summary>
@@ -79,12 +79,12 @@
         ///     The empowered damage stage.
         /// </summary>
         Empowered,
-        
+
         /// <summary>
         ///     The effect damage stage.
         /// </summary>
         Effect,
-        
+
         /// <summary>
         ///     The reduced damage stage.
         /// </summary>

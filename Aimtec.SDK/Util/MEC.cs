@@ -1,262 +1,543 @@
 ﻿// ReSharper disable RedundantAssignment
+
 namespace Aimtec.SDK.Util
 {
     using System;
     using System.Collections.Generic;
+    using System.Drawing;
     using System.Linq;
 
     /// <summary>
     ///     Class MEC.
     /// </summary>
-    /// <remarks>
-    ///     Best Case  O(1) - 3 points or less
-    ///     Worst Case O(n) - Greater than 3 points
-    /// </remarks>
     public class Mec
     {
+        #region Public Properties
+
+        /// <summary>
+        ///     Gets or sets the min max box.
+        /// </summary>
+        public static RectangleF MinMaxBox { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the min max corners.
+        /// </summary>
+        public static Vector2[] MinMaxCorners { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the non culled points.
+        /// </summary>
+        public static Vector2[] NonCulledPoints { get; set; }
+
+        #endregion
+
         #region Public Methods and Operators
 
         /// <summary>
-        ///     Finds the minimum enclosing circle.
+        ///     Find a minimal bounding circle.
         /// </summary>
-        /// <param name="points">The points.</param>
-        /// <returns>MinimumEnclosingCircleResult.</returns>
-        /// <exception cref="ArgumentNullException">points</exception>
-        /// <exception cref="ArgumentException">Cannot find the MEC of an empty array.</exception>
-        public static MinimumEnclosingCircleResult FindMinimumEnclosingCircle(Vector2[] points)
+        /// <param name="points">The Points</param>
+        /// <param name="center">The center</param>
+        /// <param name="radius">The radius</param>
+        public static void FindMinimalBoundingCircle(List<Vector2> points, out Vector2 center, out float radius)
         {
-            if (points == null)
+            // Find the convex hull.
+            var hull = MakeConvexHull(points);
+
+            // The best solution so far.
+            var bestCenter = points[0];
+            var bestRadius2 = float.MaxValue;
+
+            // Look at pairs of hull points.
+            for (var i = 0; i < hull.Count - 1; i++)
             {
-                throw new ArgumentNullException(nameof(points));
+                for (var j = i + 1; j < hull.Count; j++)
+                {
+                    // Find the circle through these two points.
+                    var testCenter = new Vector2((hull[i].X + hull[j].X) / 2f, (hull[i].Y + hull[j].Y) / 2f);
+                    var dx = testCenter.X - hull[i].X;
+                    var dy = testCenter.Y - hull[i].Y;
+                    var testRadius2 = dx * dx + dy * dy;
+
+                    // See if this circle would be an improvement.
+                    if (!(testRadius2 < bestRadius2))
+                    {
+                        continue;
+                    }
+
+                    // See if this circle encloses all of the points.
+                    if (!CircleEnclosesPoints(testCenter, testRadius2, points, i, j, -1))
+                    {
+                        continue;
+                    }
+
+                    // Save this solution.
+                    bestCenter = testCenter;
+                    bestRadius2 = testRadius2;
+                }
+
+                // for i
             }
 
-            if (points.Length <= 0)
+            // for j
+
+            // Look at triples of hull points.
+            for (var i = 0; i < hull.Count - 2; i++)
             {
-                throw new ArgumentException("Cannot find the MEC of an empty array.");
+                for (var j = i + 1; j < hull.Count - 1; j++)
+                {
+                    for (var k = j + 1; k < hull.Count; k++)
+                    {
+                        // Find the circle through these three points.
+                        FindCircle(hull[i], hull[j], hull[k], out Vector2 testCenter, out float testRadius2);
+
+                        // See if this circle would be an improvement.
+                        if (!(testRadius2 < bestRadius2))
+                        {
+                            continue;
+                        }
+
+                        // See if this circle encloses all of the points.
+                        if (!CircleEnclosesPoints(testCenter, testRadius2, points, i, j, k))
+                        {
+                            continue;
+                        }
+
+                        // Save this solution.
+                        bestCenter = testCenter;
+                        bestRadius2 = testRadius2;
+                    }
+
+                    // for k
+                }
+
+                // for i
             }
 
-            return points.Length >= 3
-                ? FindEnclosingCircleWithThreePointsOrLess(points)
-                : InternalGetMinimumEnclosingCircle(points);
+            // for j
+            center = bestCenter;
+            if (bestRadius2.Equals(float.MaxValue))
+            {
+                radius = 0;
+            }
+            else
+            {
+                radius = (float) Math.Sqrt(bestRadius2);
+            }
         }
 
         /// <summary>
-        ///     Finds the minimum enclosing circle.
+        ///     Returns the minimum enclosing circle from a list of points.
         /// </summary>
-        /// <param name="points">The points.</param>
-        /// <returns>MinimumEnclosingCircleResult.</returns>
-        public static MinimumEnclosingCircleResult FindMinimumEnclosingCircle(IEnumerable<Vector2> points)
+        /// <param name="points">List of points</param>
+        /// <returns>
+        ///     <see cref="MecCircle" />
+        /// </returns>
+        public static MecCircle GetMec(List<Vector2> points)
         {
-            return FindMinimumEnclosingCircle(points.ToArray());
+            var convexHull = MakeConvexHull(points);
+            FindMinimalBoundingCircle(convexHull, out Vector2 center, out float radius);
+
+            return new MecCircle(center, radius);
+        }
+
+        /// <summary>
+        ///     Return the points that make up a polygon's convex hull. This method leaves the points list unchanged.
+        /// </summary>
+        /// <param name="points">The Points</param>
+        /// <returns>List of <see cref="Vector2" /></returns>
+        public static List<Vector2> MakeConvexHull(List<Vector2> points)
+        {
+            // Cull.
+            points = HullCull(points);
+
+            // Find the remaining point with the smallest Y value.
+            // if (there's a tie, take the one with the smaller X value.
+            Vector2[] bestPt = { points[0] };
+            foreach (var pt in points.Where(
+                pt => pt.Y < bestPt[0].Y || Math.Abs(pt.Y - bestPt[0].Y) < float.Epsilon && pt.X < bestPt[0].X))
+            {
+                bestPt[0] = pt;
+            }
+
+            // Move this point to the convex hull.
+            var hull = new List<Vector2> { bestPt[0] };
+            points.Remove(bestPt[0]);
+
+            // Start wrapping up the other points.
+            float sweepAngle = 0;
+            for (;;)
+            {
+                // If all of the points are on the hull, we're done.
+                if (points.Count == 0)
+                {
+                    break;
+                }
+
+                // Find the point with smallest AngleValue
+                // from the last point.
+                var x = hull[hull.Count - 1].X;
+                var y = hull[hull.Count - 1].Y;
+                bestPt[0] = points[0];
+                float bestAngle = 3600;
+
+                // Search the rest of the points.
+                foreach (var pt in points)
+                {
+                    var testAngle = AngleValue(x, y, pt.X, pt.Y);
+
+                    if (!(testAngle >= sweepAngle) || !(bestAngle > testAngle))
+                    {
+                        continue;
+                    }
+
+                    bestAngle = testAngle;
+                    bestPt[0] = pt;
+                }
+
+                // See if the first point is better.
+                // If so, we are done.
+                var firstAngle = AngleValue(x, y, hull[0].X, hull[0].Y);
+                if (firstAngle >= sweepAngle && bestAngle >= firstAngle)
+                {
+                    // The first point is better. We're done.
+                    break;
+                }
+
+                // Add the best point to the convex hull.
+                hull.Add(bestPt[0]);
+                points.Remove(bestPt[0]);
+
+                sweepAngle = bestAngle;
+            }
+
+            return hull;
         }
 
         #endregion
 
         #region Methods
 
-        private static float CalculateL2Norm(Vector2 v)
+        /// <summary>
+        ///     Return a number that gives the ordering of angles
+        ///     WRST horizontal from the point (x1, y1) to (x2, y2).
+        ///     In other words, AngleValue(x1, y1, x2, y2) is not
+        ///     the angle, but if:
+        ///     Angle(x1, y1, x2, y2) > Angle(x1, y1, x2, y2)
+        ///     then
+        ///     AngleValue(x1, y1, x2, y2) > AngleValue(x1, y1, x2, y2)
+        ///     this angle is greater than the angle for another set
+        ///     of points,) this number for
+        ///     This function is <c>dy</c> / (<c>dy</c> + dx).
+        /// </summary>
+        /// <param name="x1">First X</param>
+        /// <param name="y1">First Y</param>
+        /// <param name="x2">Second X</param>
+        /// <param name="y2">Second Y</param>
+        /// <returns>The <see cref="float" /></returns>
+        private static float AngleValue(float x1, float y1, float x2, float y2)
         {
-            return (float) Math.Sqrt(Math.Pow(v.X, 2) + Math.Pow(v.Y, 2));
-        }
+            float t;
 
-        private static MinimumEnclosingCircleResult FindCircle3Pts(IList<Vector2> pts)
-        {
-            var center = new Vector2();
-            var radius = 0f;
-
-            var v1 = pts[1] - pts[0];
-            var v2 = pts[2] - pts[0];
-
-            if (Math.Abs(Vector2.Dot(v1, v2)) < float.Epsilon)
+            var dx = x2 - x1;
+            var ax = Math.Abs(dx);
+            var dy = y2 - y1;
+            var ay = Math.Abs(dy);
+            if ((ax + ay).Equals(0))
             {
-                var d1 = CalculateL2Norm(pts[0] - pts[1]);
-                var d2 = CalculateL2Norm(pts[0] - pts[2]);
-                var d3 = CalculateL2Norm(pts[1] - pts[2]);
-
-                if (d1 >= d2 && d1 >= d3)
-                {
-                    center = (pts[0] + pts[1]) / 2f;
-                    radius = d1 / 2f;
-                }
-                else if (d2 >= d1 && d2 >= d3)
-                {
-                    center = (pts[0] + pts[2]) / 2f;
-                    radius = d2 / 2f;
-                }
-                else if (d3 >= d1 && d3 >= d2)
-                {
-                    center = (pts[1] + pts[2]) / 2f;
-                    radius = d3 / 2f;
-                }
+                // if (the two points are the same, return 360.
+                t = 360f / 9f;
             }
             else
             {
-                var midPoint1 = (pts[0] + pts[1]) / 2f;
-                var c1 = midPoint1.X * v1.X + midPoint1.Y * v1.Y;
-
-                var midPoint2 = (pts[0] + pts[2]) / 2f;
-                var c2 = midPoint2.X * v2.X + midPoint2.Y * v2.Y;
-
-                var det = v1.X * v2.Y - v1.Y * v2.X;
-                var cx = (c1 * v2.Y - c2 * v1.Y) / det;
-                var cy = (v1.X * c2 - v2.X * c1) / det;
-
-                center.X = cx;
-                center.Y = cy;
-
-                cx -= pts[0].X;
-                cy -= pts[0].Y;
-
-                radius = (float) Math.Sqrt(cx * cx + cy * cy);
+                t = dy / (ax + ay);
             }
 
-            return new MinimumEnclosingCircleResult(center, radius);
-        }
-
-        private static MinimumEnclosingCircleResult FindEnclosingCircleWithThreePointsOrLess(IList<Vector2> points)
-        {
-            var center = new Vector2();
-            var radius = 0f;
-
-            switch (points.Count)
+            if (dx < 0)
             {
-                case 1:
-                    center = points[0];
-                    radius = 0f;
-                    break;
-                case 2:
-                    center.X = (points[0].X + points[1].X) / 2f;
-                    center.Y = (points[0].Y + points[1].Y) / 2f;
-                    radius = Vector2.Distance(points[0], points[1]) / 2f;
-                    break;
-                case 3: return FindCircle3Pts(points);
+                t = 2 - t;
+            }
+            else if (dy < 0)
+            {
+                t = 4 + t;
             }
 
-            return new MinimumEnclosingCircleResult(center, radius);
+            return t * 90;
         }
 
-        private static void FindSecondPoint(IList<Vector2> pts, int i, ref Vector2 center, ref float radius)
+        /// <summary>
+        ///     Returns whether the indicated circle encloses all of the points.
+        /// </summary>
+        /// <param name="center">Center of the Circle</param>
+        /// <param name="radius2">Circle Radius</param>
+        /// <param name="points">Points List</param>
+        /// <param name="skip1">Skip certain point 1</param>
+        /// <param name="skip2">Skip certain point 2</param>
+        /// <param name="skip3">Skip certain point 3</param>
+        /// <returns>The <see cref="bool" /></returns>
+        private static bool CircleEnclosesPoints(
+            Vector2 center,
+            float radius2,
+            IEnumerable<Vector2> points,
+            int skip1,
+            int skip2,
+            int skip3)
         {
-            center.X = (pts[0].X + pts[i].X) / 2f;
-            center.Y = (pts[0].Y + pts[i].Y) / 2f;
+            return (from point in points.Where((t, i) => i != skip1 && i != skip2 && i != skip3)
+                    let dx = center.X - point.X
+                    let dy = center.Y - point.Y
+                    select dx * dx + dy * dy).All(testRadius2 => !(testRadius2 > radius2));
+        }
 
-            var dx = pts[0].X - pts[i].X;
-            var dy = pts[0].Y - pts[i].Y;
+        /// <summary>
+        ///     Find a circle through three Vector2 points
+        /// </summary>
+        /// <param name="a">Vector2 point A</param>
+        /// <param name="b">Vector2 point B</param>
+        /// <param name="c">Vector2 point C</param>
+        /// <param name="center">Returned Vector2 Center</param>
+        /// <param name="radius2">Retuned Circle Radius</param>
+        private static void FindCircle(Vector2 a, Vector2 b, Vector2 c, out Vector2 center, out float radius2)
+        {
+            // Get the perpendicular bisector of (x1, y1) and (x2, y2).
+            var x1 = (b.X + a.X) / 2;
+            var y1 = (b.Y + a.Y) / 2;
+            var dy1 = b.X - a.X;
+            var dx1 = -(b.Y - a.Y);
 
-            radius = CalculateL2Norm(new Vector2(dx, dy)) / 2f;
+            // Get the perpendicular bisector of (x2, y2) and (x3, y3).
+            var x2 = (c.X + b.X) / 2;
+            var y2 = (c.Y + b.Y) / 2;
+            var dy2 = c.X - b.X;
+            var dx2 = -(c.Y - b.Y);
 
-            for (var j = 1; j < i; ++j)
+            // See where the lines intersect.
+            var cx = (y1 * dx1 * dx2 + x2 * dx1 * dy2 - x1 * dy1 * dx2 - y2 * dx1 * dx2) / (dx1 * dy2 - dy1 * dx2);
+            var cy = (cx - x1) * dy1 / dx1 + y1;
+            center = new Vector2(cx, cy);
+
+            var dx = cx - a.X;
+            var dy = cy - a.Y;
+            radius2 = dx * dx + dy * dy;
+        }
+
+        /// <summary>
+        ///     Find a box that fits inside the MinMax quadrilateral.
+        /// </summary>
+        /// <param name="points">The Points</param>
+        /// <returns>
+        ///     <see cref="RectangleF" />
+        /// </returns>
+        private static RectangleF GetMinMaxBox(IEnumerable<Vector2> points)
+        {
+            // Find the MinMax quadrilateral.
+            Vector2 ul = new Vector2(0, 0), ur = ul, ll = ul, lr = ul;
+            var minMaxCornersInfo = GetMinMaxCorners(points, ul, ur, ll, lr);
+            ul = minMaxCornersInfo.UpperLeft;
+            ur = minMaxCornersInfo.UpperRight;
+            ll = minMaxCornersInfo.LowerLeft;
+            lr = minMaxCornersInfo.LowerRight;
+
+            // Get the coordinates of a box that lies inside this quadrilateral.
+            var xmin = ul.X;
+            var ymin = ul.Y;
+
+            var xmax = ur.X;
+            if (ymin < ur.Y)
             {
-                dx = center.X - pts[j].X;
-                dy = center.Y - pts[j].Y;
+                ymin = ur.Y;
+            }
 
-                if (CalculateL2Norm(new Vector2(dx, dy)) < radius)
+            if (xmax > lr.X)
+            {
+                xmax = lr.X;
+            }
+
+            var ymax = lr.Y;
+
+            if (xmin < ll.X)
+            {
+                xmin = ll.X;
+            }
+
+            if (ymax > ll.Y)
+            {
+                ymax = ll.Y;
+            }
+
+            var result = new RectangleF(xmin, ymin, xmax - xmin, ymax - ymin);
+            MinMaxBox = result;
+            return result;
+        }
+
+        /// <summary>
+        ///     Find the points nearest the upper left, upper right, lower left, and lower right corners.
+        /// </summary>
+        /// <param name="points">
+        ///     The Points
+        /// </param>
+        /// <param name="upperLeft">
+        ///     Upper left <see cref="Vector2" />
+        /// </param>
+        /// <param name="upperRight">
+        ///     Upper right <see cref="Vector2" />
+        /// </param>
+        /// <param name="lowerLeft">
+        ///     Lower left <see cref="Vector2" />
+        /// </param>
+        /// <param name="lowerRight">
+        ///     Lower right <see cref="Vector2" />
+        /// </param>
+        /// <returns>
+        ///     The <see cref="Vector2" /> list.
+        /// </returns>
+        private static MinMaxCornersInfo GetMinMaxCorners(
+            IEnumerable<Vector2> points,
+            Vector2 upperLeft,
+            Vector2 upperRight,
+            Vector2 lowerLeft,
+            Vector2 lowerRight)
+        {
+            // Search the other points.
+            foreach (var pt in points)
+            {
+                if (-pt.X - pt.Y > -upperLeft.X - upperLeft.Y)
                 {
-                    continue;
+                    upperLeft = pt;
                 }
 
-                FindThirdPoint(pts, i, j, ref center, ref radius);
-            }
-        }
-
-        private static void FindThirdPoint(IList<Vector2> pts, int i, int j, ref Vector2 center, ref float radius)
-        {
-            center.X = (pts[j].X + pts[i].X) / 2f;
-            center.Y = (pts[j].Y + pts[i].Y) / 2f;
-
-            var dx = pts[j].X - pts[i].X;
-            var dy = pts[j].Y - pts[i].Y;
-
-            radius = CalculateL2Norm(new Vector2(dx, dy)) / 2f;
-
-            for (var k = 0; k < j; ++k)
-            {
-                dx = center.X - pts[k].X;
-                dy = center.Y - pts[k].Y;
-
-                if (CalculateL2Norm(new Vector2(dx, dy)) < radius)
+                if (pt.X - pt.Y > upperRight.X - upperRight.Y)
                 {
-                    continue;
+                    upperRight = pt;
                 }
 
-                var ptsf = new Vector2[3];
-                ptsf[0] = pts[i];
-                ptsf[1] = pts[j];
-                ptsf[2] = pts[k];
-
-                var result = FindCircle3Pts(ptsf);
-                center = result.Center;
-                radius = result.Radius;
-            }
-        }
-
-        private static MinimumEnclosingCircleResult InternalGetMinimumEnclosingCircle(IList<Vector2> pts)
-        {
-            Vector2 center;
-
-            center.X = (pts[0].X + pts[1].X) / 2f;
-            center.Y = (pts[0].Y + pts[1].Y) / 2f;
-
-            var dx = pts[0].X - pts[1].X;
-            var dy = pts[0].Y - pts[1].Y;
-
-            var radius = CalculateL2Norm(new Vector2(dx, dy)) / 2f;
-
-            for (var i = 2; i < pts.Count; ++i)
-            {
-                dx = pts[i].X - center.X;
-                dy = pts[i].Y - center.Y;
-
-                var d = CalculateL2Norm(new Vector2(dx, dy));
-
-                if (d < radius)
+                if (-pt.X + pt.Y > -lowerLeft.X + lowerLeft.Y)
                 {
-                    continue;
+                    lowerLeft = pt;
                 }
 
-                FindSecondPoint(pts, i, ref center, ref radius);
+                if (pt.X + pt.Y > lowerRight.X + lowerRight.Y)
+                {
+                    lowerRight = pt;
+                }
             }
 
-            return new MinimumEnclosingCircleResult(center, radius);
+            MinMaxCorners = new[] { upperLeft, upperRight, lowerRight, lowerLeft };
+            return new MinMaxCornersInfo(upperLeft, upperRight, lowerLeft, lowerRight);
+        }
+
+        /// <summary>
+        ///     Cull points out of the convex hull that lie inside the trapezoid defined by the vertices with smallest and largest
+        ///     X and Y coordinates. Return the points that are not culled.
+        /// </summary>
+        /// <param name="points">The Points</param>
+        /// <returns>List of <see cref="Vector2" /></returns>
+        private static List<Vector2> HullCull(IReadOnlyList<Vector2> points)
+        {
+            // Find a culling box.
+            var cullingBox = GetMinMaxBox(points);
+
+            return points.Where(
+                pt => pt.X <= cullingBox.Left || pt.X >= cullingBox.Right || pt.Y <= cullingBox.Top
+                    || pt.Y >= cullingBox.Bottom).ToList();
         }
 
         #endregion
-    }
-
-    /// <summary>
-    ///     Struct MinimumEnclosingCircleResult
-    /// </summary>
-    public struct MinimumEnclosingCircleResult
-    {
-        #region Constructors and Destructors
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="MinimumEnclosingCircleResult" /> struct.
+        ///     Contains Center and Radius
         /// </summary>
-        /// <param name="center">The center.</param>
-        /// <param name="radius">The radius.</param>
-        internal MinimumEnclosingCircleResult(Vector2 center, float radius)
+        public struct MecCircle
         {
-            this.Center = center;
-            this.Radius = radius;
+            #region Fields
+
+            /// <summary>
+            ///     The center
+            /// </summary>
+            public Vector2 Center;
+
+            /// <summary>
+            ///     The Radius
+            /// </summary>
+            public float Radius;
+
+            #endregion
+
+            #region Constructors and Destructors
+
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="MecCircle" /> struct.
+            /// </summary>
+            /// <param name="center">
+            ///     The center
+            /// </param>
+            /// <param name="radius">
+            ///     The radius
+            /// </param>
+            internal MecCircle(Vector2 center, float radius)
+            {
+                this.Center = center;
+                this.Radius = radius;
+            }
+
+            #endregion
         }
 
-        #endregion
-
-        #region Public Properties
-
         /// <summary>
-        ///     Gets or sets the center.
+        ///     Information container for the <see cref="GetMinMaxCorners" /> method.
         /// </summary>
-        /// <value>The center.</value>
-        public Vector2 Center { get; set; }
+        public struct MinMaxCornersInfo
+        {
+            #region Fields
 
-        /// <summary>
-        ///     Gets or sets the radius.
-        /// </summary>
-        /// <value>The radius.</value>
-        public float Radius { get; set; }
+            /// <summary>
+            ///     The lower left component.
+            /// </summary>
+            public Vector2 LowerLeft;
 
-        #endregion
+            /// <summary>
+            ///     The lower right component.
+            /// </summary>
+            public Vector2 LowerRight;
+
+            /// <summary>
+            ///     The upper left component.
+            /// </summary>
+            public Vector2 UpperLeft;
+
+            /// <summary>
+            ///     The upper right component.
+            /// </summary>
+            public Vector2 UpperRight;
+
+            #endregion
+
+            #region Constructors and Destructors
+
+            /// <summary>
+            ///     Initializes a new instance of the <see cref="MinMaxCornersInfo" /> struct.
+            /// </summary>
+            /// <param name="upperLeft">
+            ///     The upper left component
+            /// </param>
+            /// <param name="upperRight">
+            ///     The upper right component
+            /// </param>
+            /// <param name="lowerLeft">
+            ///     The lower left component
+            /// </param>
+            /// <param name="lowerRight">
+            ///     The lower right component
+            /// </param>
+            public MinMaxCornersInfo(Vector2 upperLeft, Vector2 upperRight, Vector2 lowerLeft, Vector2 lowerRight)
+            {
+                this.UpperLeft = upperLeft;
+                this.UpperRight = upperRight;
+                this.LowerLeft = lowerLeft;
+                this.LowerRight = lowerRight;
+            }
+
+            #endregion
+        }
     }
 }

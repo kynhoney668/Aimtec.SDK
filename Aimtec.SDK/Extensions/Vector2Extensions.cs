@@ -1,11 +1,12 @@
 namespace Aimtec.SDK.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Drawing;
     using System.Linq;
 
     /// <summary>
-    /// Class Vector2Extensions.
+    ///     Class Vector2Extensions.
     /// </summary>
     public static class Vector2Extensions
     {
@@ -39,7 +40,7 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
-        /// Get the angles between the two points.
+        ///     Get the angles between the two points.
         /// </summary>
         /// <param name="self">The self.</param>
         /// <param name="v1">The v1.</param>
@@ -68,17 +69,68 @@ namespace Aimtec.SDK.Extensions
         /// <returns>Point.</returns>
         public static Point AsPoint(this Vector2 pos)
         {
-            return new Point((int)pos.X, (int)pos.Y);
+            return new Point((int) pos.X, (int) pos.Y);
         }
 
-        /// <summary>
-        ///    Converts the Vector2 To a Vector3
-        /// </summary>
-        /// <param name="pos">The position.</param>
-        /// <returns>Point.</returns>
-        public static Vector3 To3D(this Vector2 pos)
+        public static Vector2[] CircleCircleIntersection(
+            this Vector2 center1,
+            Vector2 center2,
+            float radius1,
+            float radius2)
         {
-            return (Vector3)pos;
+            var d = center1.Distance(center2);
+
+            if (d > radius1 + radius2 || d <= Math.Abs(radius1 - radius2))
+            {
+                return new Vector2[] { };
+            }
+
+            var a = (radius1 * radius1 - radius2 * radius2 + d * d) / (2 * d);
+            var h = (float) Math.Sqrt(radius1 * radius1 - a * a);
+            var direction = (center2 - center1).Normalized();
+            var pa = center1 + a * direction;
+            var s1 = pa + h * direction.Perpendicular();
+            var s2 = pa - h * direction.Perpendicular();
+            return new[] { s1, s2 };
+        }
+
+        public static float CrossProduct(this Vector2 v1, Vector2 v2)
+        {
+            return v2.Y * v1.X - v2.X * v1.Y;
+        }
+
+        public static List<Vector2> CutPath(this List<Vector2> path, float distance)
+        {
+            var result = new List<Vector2>();
+            for (var i = 0; i < path.Count - 1; i++)
+            {
+                var dist = path[i].Distance(path[i + 1]);
+                if (dist > distance)
+                {
+                    result.Add(path[i] + distance * (path[i + 1] - path[i]).Normalized());
+
+                    for (var j = i + 1; j < path.Count; j++)
+                    {
+                        result.Add(path[j]);
+                    }
+
+                    break;
+                }
+
+                distance -= dist;
+            }
+
+            return result.Count > 0 ? result : new List<Vector2> { path.Last() };
+        }
+
+        public static float Distance(this Vector2 v1, Vector2 v2)
+        {
+            return Vector2.Distance(v1, v2);
+        }
+
+        public static float Distance(this Vector2 v1, Vector3 v2)
+        {
+            return Vector2.Distance(v1, (Vector2) v2);
         }
 
         /// <summary>
@@ -98,8 +150,53 @@ namespace Aimtec.SDK.Extensions
             var objects = point.ProjectOn(segmentStart, segmentEnd);
 
             return objects.IsOnSegment || onlyIfOnSegment == false
-                       ? Vector2.DistanceSquared(objects.SegmentPoint, point)
-                       : float.MaxValue;
+                ? Vector2.DistanceSquared(objects.SegmentPoint, point)
+                : float.MaxValue;
+        }
+
+        public static float DistanceSquared(this Vector2 v1, Vector2 v2)
+        {
+            return Vector2.DistanceSquared(v1, v2);
+        }
+
+        public static float DistanceSquared(this Vector2 v1, Vector3 v2)
+        {
+            return Vector2.DistanceSquared(v1, (Vector2) v2);
+        }
+
+        /// <summary>
+        ///     Extends a Vector2 to another Vector2.
+        /// </summary>
+        /// <param name="vector2">Extended Vector2 (From)</param>
+        /// <param name="toVector2">SharpDX Vector2 (To)</param>
+        /// <param name="distance">Distance (float units)</param>
+        /// <returns>Extended Vector2</returns>
+        public static Vector2 Extend(this Vector2 vector2, Vector2 toVector2, float distance)
+        {
+            return vector2 + distance * (toVector2 - vector2).Normalized();
+        }
+
+        /// <summary>
+        ///     Extends a Vector2 to a Vector3.
+        /// </summary>
+        /// <param name="vector2">Extended Vector2 (From)</param>
+        /// <param name="toVector3">SharpDX Vector3 (To)</param>
+        /// <param name="distance">Distance (float units)</param>
+        /// <returns>Extended Vector2</returns>
+        public static Vector2 Extend(this Vector2 vector2, Vector3 toVector3, float distance)
+        {
+            return vector2 + distance * ((Vector2) toVector3 - vector2).Normalized();
+        }
+
+        public static float GetPathLength(this List<Vector2> path)
+        {
+            var distance = 0f;
+            for (var i = 0; i < path.Count - 1; i++)
+            {
+                distance += path[i].Distance(path[i + 1]);
+            }
+
+            return distance;
         }
 
         /// <summary>
@@ -164,8 +261,29 @@ namespace Aimtec.SDK.Extensions
             return new IntersectionResult(
                 true,
                 new Vector2(
-                    (float)(lineSegment1Start.X + r * deltaBAx),
-                    (float)(lineSegment1Start.Y + r * deltaBAy)));
+                    (float) (lineSegment1Start.X + r * deltaBAx),
+                    (float) (lineSegment1Start.Y + r * deltaBAy)));
+        }
+
+        public static bool IsUnderAllyTurret(this GameObject obj)
+        {
+            return obj.Position.PointUnderAllyTurret();
+        }
+
+        public static bool IsUnderEnemyTurret(this GameObject obj)
+        {
+            return obj.Position.PointUnderEnemyTurret();
+        }
+
+        /// <summary>
+        ///     Normalizes a Vector2.
+        /// </summary>
+        /// <param name="vector2">SharpDX Vector2</param>
+        /// <returns>Normalized Vector2</returns>
+        public static Vector2 Normalized(this Vector2 vector2)
+        {
+            vector2.Normalize();
+            return vector2;
         }
 
         /// <summary>
@@ -177,6 +295,24 @@ namespace Aimtec.SDK.Extensions
         public static Vector2 Perpendicular(this Vector2 vector2, int offset = 0)
         {
             return offset == 0 ? new Vector2(-vector2.Y, vector2.X) : new Vector2(vector2.Y, -vector2.X);
+        }
+
+        public static bool PointUnderAllyTurret(this Vector2 point)
+        {
+            var allyTurrets = ObjectManager
+                .Get<Obj_AI_Turret>().Any(
+                    t => t.IsAlly && point.Distance(t.Position.To2D())
+                        < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            return allyTurrets;
+        }
+
+        public static bool PointUnderEnemyTurret(this Vector2 point)
+        {
+            var enemyTurrets = ObjectManager
+                .Get<Obj_AI_Turret>().Any(
+                    t => t.IsEnemy && point.Distance(t.Position.To2D())
+                        < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
+            return enemyTurrets;
         }
 
         /// <summary>
@@ -207,7 +343,7 @@ namespace Aimtec.SDK.Extensions
                 theta += 360;
             }
 
-            return (float)theta;
+            return (float) theta;
         }
 
         /// <summary>
@@ -218,28 +354,6 @@ namespace Aimtec.SDK.Extensions
         public static double Pow(this float x)
         {
             return Math.Pow(x, 2);
-        }
-
-        public static bool PointUnderEnemyTurret(this Vector2 point)
-        {
-            var enemyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsEnemy && point.Distance(t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
-            return enemyTurrets;
-        }
-
-        public static bool PointUnderAllyTurret(this Vector2 point)
-        {
-            var allyTurrets = ObjectManager.Get<Obj_AI_Turret>().Any(t => t.IsAlly && point.Distance(t.Position.To2D()) < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
-            return allyTurrets;
-        }
-
-        public static bool IsUnderEnemyTurret(this GameObject obj)
-        {
-            return obj.Position.PointUnderEnemyTurret();
-        }
-
-        public static bool IsUnderAllyTurret(this GameObject obj)
-        {
-            return obj.Position.PointUnderAllyTurret();
         }
 
         /// <summary>
@@ -258,7 +372,7 @@ namespace Aimtec.SDK.Extensions
             var bx = segmentEnd.X;
             var by = segmentEnd.Y;
             var rL = ((cx - ax) * (bx - ax) + (cy - ay) * (by - ay))
-                     / ((float)Math.Pow(bx - ax, 2) + (float)Math.Pow(by - ay, 2));
+                / ((float) Math.Pow(bx - ax, 2) + (float) Math.Pow(by - ay, 2));
             var pointLine = new Vector2(ax + rL * (bx - ax), ay + rL * (by - ay));
             float rS;
             if (rL < 0)
@@ -291,43 +405,129 @@ namespace Aimtec.SDK.Extensions
             var sin = Math.Sin(angle);
 
             return new Vector2(
-                (float)(vector2.X * cos - vector2.Y * sin),
-                (float)(vector2.Y * cos + vector2.X * sin));
+                (float) (vector2.X * cos - vector2.Y * sin),
+                (float) (vector2.Y * cos + vector2.X * sin));
         }
 
         /// <summary>
-        ///     Extends a Vector2 to another Vector2.
+        ///     Converts the Vector2 To a Vector3
         /// </summary>
-        /// <param name="vector2">Extended Vector2 (From)</param>
-        /// <param name="toVector2">SharpDX Vector2 (To)</param>
-        /// <param name="distance">Distance (float units)</param>
-        /// <returns>Extended Vector2</returns>
-        public static Vector2 Extend(this Vector2 vector2, Vector2 toVector2, float distance)
+        /// <param name="pos">The position.</param>
+        /// <returns>Point.</returns>
+        public static Vector3 To3D(this Vector2 pos)
         {
-            return vector2 + distance * (toVector2 - vector2).Normalized();
+            return (Vector3) pos;
         }
 
-        /// <summary>
-        ///     Extends a Vector2 to a Vector3.
-        /// </summary>
-        /// <param name="vector2">Extended Vector2 (From)</param>
-        /// <param name="toVector3">SharpDX Vector3 (To)</param>
-        /// <param name="distance">Distance (float units)</param>
-        /// <returns>Extended Vector2</returns>
-        public static Vector2 Extend(this Vector2 vector2, Vector3 toVector3, float distance)
+        public static MovementCollisionInfo VectorMovementCollision(
+            this Vector2 pointStartA,
+            Vector2 pointEndA,
+            float pointVelocityA,
+            Vector2 pointB,
+            float pointVelocityB,
+            float delay = 0f)
         {
-            return vector2 + distance * ((Vector2)toVector3 - vector2).Normalized();
+            return new[] { pointStartA, pointEndA }.VectorMovementCollision(
+                pointVelocityA,
+                pointB,
+                pointVelocityB,
+                delay);
         }
 
-        /// <summary>
-        ///     Normalizes a Vector2.
-        /// </summary>
-        /// <param name="vector2">SharpDX Vector2</param>
-        /// <returns>Normalized Vector2</returns>
-        public static Vector2 Normalized(this Vector2 vector2)
+        public static MovementCollisionInfo VectorMovementCollision(
+            this Vector2[] v1,
+            float v1Velocity,
+            Vector2 v2,
+            float v2Velocity,
+            float delay = 0f)
         {
-            vector2.Normalize();
-            return vector2;
+            if (v1.Length < 1)
+            {
+                return default(MovementCollisionInfo);
+            }
+
+            float sP1X = v1[0].X, sP1Y = v1[0].Y, eP1X = v1[1].X, eP1Y = v1[1].Y, sP2X = v2.X, sP2Y = v2.Y;
+
+            float d = eP1X - sP1X, e = eP1Y - sP1Y;
+            float dist = (float) Math.Sqrt(d * d + e * e), t1 = float.NaN;
+            float s = Math.Abs(dist) > float.Epsilon ? v1Velocity * d / dist : 0,
+                  k = Math.Abs(dist) > float.Epsilon ? v1Velocity * e / dist : 0f;
+
+            float r = sP2X - sP1X, j = sP2Y - sP1Y;
+            var c = r * r + j * j;
+
+            if (dist > 0f)
+            {
+                if (Math.Abs(v1Velocity - float.MaxValue) < float.Epsilon)
+                {
+                    var t = dist / v1Velocity;
+                    t1 = v2Velocity * t >= 0f ? t : float.NaN;
+                }
+                else if (Math.Abs(v2Velocity - float.MaxValue) < float.Epsilon)
+                {
+                    t1 = 0f;
+                }
+                else
+                {
+                    float a = s * s + k * k - v2Velocity * v2Velocity, b = -r * s - j * k;
+
+                    if (Math.Abs(a) < float.Epsilon)
+                    {
+                        if (Math.Abs(b) < float.Epsilon)
+                        {
+                            t1 = Math.Abs(c) < float.Epsilon ? 0f : float.NaN;
+                        }
+                        else
+                        {
+                            var t = -c / (2 * b);
+                            t1 = v2Velocity * t >= 0f ? t : float.NaN;
+                        }
+                    }
+                    else
+                    {
+                        var sqr = b * b - a * c;
+
+                        if (sqr < 0)
+                        {
+                            return new MovementCollisionInfo(
+                                t1,
+                                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : default(Vector2));
+                        }
+
+                        var nom = (float) Math.Sqrt(sqr);
+                        var t = (-nom - b) / a;
+
+                        t1 = v2Velocity * t >= 0f ? t : float.NaN;
+                        t = (nom - b) / a;
+
+                        var t2 = v2Velocity * t >= 0f ? t : float.NaN;
+
+                        if (float.IsNaN(t2) || float.IsNaN(t1))
+                        {
+                            return new MovementCollisionInfo(
+                                t1,
+                                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : default(Vector2));
+                        }
+
+                        if (t1 >= delay && t2 >= delay)
+                        {
+                            t1 = Math.Min(t1, t2);
+                        }
+                        else if (t2 >= delay)
+                        {
+                            t1 = t2;
+                        }
+                    }
+                }
+            }
+            else if (Math.Abs(dist) < float.Epsilon)
+            {
+                t1 = 0f;
+            }
+
+            return new MovementCollisionInfo(
+                t1,
+                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : default(Vector2));
         }
 
         #endregion
@@ -368,6 +568,33 @@ namespace Aimtec.SDK.Extensions
                 this.Intersects = intersects;
                 this.Point = point;
             }
+
+            #endregion
+        }
+
+        public struct MovementCollisionInfo
+        {
+            #region Fields
+
+            public Vector2 CollisionPosition;
+
+            public float CollisionTime;
+
+            #endregion
+
+            #region Constructors and Destructors
+
+            internal MovementCollisionInfo(float collisionTime, Vector2 collisionPosition)
+            {
+                this.CollisionTime = collisionTime;
+                this.CollisionPosition = collisionPosition;
+            }
+
+            #endregion
+
+            #region Public Indexers
+
+            public object this[int i] => i == 0 ? this.CollisionTime : (object) this.CollisionPosition;
 
             #endregion
         }

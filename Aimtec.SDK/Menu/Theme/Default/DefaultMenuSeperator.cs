@@ -39,7 +39,8 @@
             Aimtec.Render.Text(
                 position + new Vector2(width / 2f, this.Theme.MenuHeight / 2f),
                 Color.FromArgb(207, 195, 149),
-                this.Component.Value, RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+                this.Component.Value,
+                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
         }
 
         #endregion

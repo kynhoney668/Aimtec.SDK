@@ -31,9 +31,9 @@
     <DocumentationFile>bin\Release\Aimtec.SDK.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Aimtec, Version=1.0.6319.29380, Culture=neutral, processorArchitecture=x86">
+    <Reference Include="Aimtec, Version=1.0.6382.1399, Culture=neutral, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\Desktop\Aimtec\System\Aimtec.dll</HintPath>
+      <HintPath>$(LOCALAPPDATA)\AimtecLoader\Data\System\Aimtec.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=10.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.10.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -54,9 +54,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
+    <Compile Include="Events\Dash.cs" />
     <Compile Include="Orbwalking\AOrbwalker.cs" />
     <Compile Include="Orbwalking\IOrbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkerMode.cs" />
+    <Compile Include="Prediction\Skillshots\AoE\AoEPrediction.cs" />
+    <Compile Include="Prediction\Skillshots\AoE\Circle.cs" />
+    <Compile Include="Prediction\Skillshots\AoE\Cone.cs" />
+    <Compile Include="Prediction\Skillshots\AoE\Line.cs" />
+    <Compile Include="Prediction\Skillshots\AoE\PossibleTarget.cs" />
+    <Compile Include="Prediction\Skillshots\HitChance.cs" />
+    <Compile Include="Prediction\Skillshots\PathTracker.cs" />
+    <Compile Include="Prediction\Skillshots\Prediction.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionInput.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionOutput.cs" />
+    <Compile Include="Prediction\Skillshots\SkillshotType.cs" />
+    <Compile Include="Prediction\Skillshots\StoredPath.cs" />
     <Compile Include="Util\Cache\GameObjectEqualityComparer.cs" />
     <Compile Include="Util\Cache\GameObjects.cs" />
     <Compile Include="Damage\Damage.cs" />
@@ -108,13 +121,6 @@
     <Compile Include="Prediction\Health\HealthPredictionImpl.cs" />
     <Compile Include="Prediction\Health\HealthPredictionImplB.cs" />
     <Compile Include="Prediction\Health\IHealthPrediction.cs" />
-    <Compile Include="Prediction\Skillshots\HitChance.cs" />
-    <Compile Include="Prediction\Skillshots\PredictionInput.cs" />
-    <Compile Include="Prediction\Skillshots\PredictionOutput.cs" />
-    <Compile Include="Prediction\Skillshots\IPrediction.cs" />
-    <Compile Include="Prediction\Skillshots\Prediction.cs" />
-    <Compile Include="Prediction\Skillshots\PredictionImpl.cs" />
-    <Compile Include="Prediction\Skillshots\SkillType.cs" />
     <Compile Include="Spell.cs" />
     <Compile Include="TargetSelector\ITargetSelector.cs" />
     <Compile Include="TargetSelector\TargetSelector.cs" />

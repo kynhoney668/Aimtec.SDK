@@ -1,35 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Aimtec.SDK.Util
+﻿namespace Aimtec.SDK.Util
 {
+    using System;
+
     /// <summary>
-    /// Class Geometry.
+    ///     Class Geometry.
     /// </summary>
     public class Geometry
     {
-        /// <summary>
-        /// Struct VectorMovementCollisionResult
-        /// </summary>
-        public struct VectorMovementCollisionResult
-        {
-            /// <summary>
-            /// Gets or sets the time.
-            /// </summary>
-            /// <value>The time.</value>
-            public float Time { get; set; }
-            /// <summary>
-            /// Gets or sets the position.
-            /// </summary>
-            /// <value>The position.</value>
-            public Vector2 Position { get; set; }
-        }
+        #region Public Methods and Operators
 
         /// <summary>
-        /// Calculates the collision point between two vectors with different velocities after a fixed delay.
+        ///     Calculates the collision point between two vectors with different velocities after a fixed delay.
         /// </summary>
         /// <param name="startPoint1">The start point.</param>
         /// <param name="endPoint1">The ending point</param>
@@ -54,9 +35,9 @@ namespace Aimtec.SDK.Util
                   sP2y = startPoint2.Y;
 
             float d = eP1x - sP1x, e = eP1y - sP1y;
-            float dist = (float)Math.Sqrt(d * d + e * e), t1 = float.NaN;
+            float dist = (float) Math.Sqrt(d * d + e * e), t1 = float.NaN;
             float S = Math.Abs(dist) > float.Epsilon ? v1 * d / dist : 0,
-                  K = (Math.Abs(dist) > float.Epsilon) ? v1 * e / dist : 0f;
+                  K = Math.Abs(dist) > float.Epsilon ? v1 * e / dist : 0f;
 
             float r = sP2x - sP1x, j = sP2y - sP1y;
             var c = r * r + j * j;
@@ -80,12 +61,12 @@ namespace Aimtec.SDK.Util
                     {
                         if (Math.Abs(b) < float.Epsilon)
                         {
-                            t1 = (Math.Abs(c) < float.Epsilon) ? 0f : float.NaN;
+                            t1 = Math.Abs(c) < float.Epsilon ? 0f : float.NaN;
                         }
                         else
                         {
                             var t = -c / (2 * b);
-                            t1 = (v2 * t >= 0f) ? t : float.NaN;
+                            t1 = v2 * t >= 0f ? t : float.NaN;
                         }
                     }
                     else
@@ -93,11 +74,11 @@ namespace Aimtec.SDK.Util
                         var sqr = b * b - a * c;
                         if (sqr >= 0)
                         {
-                            var nom = (float)Math.Sqrt(sqr);
+                            var nom = (float) Math.Sqrt(sqr);
                             var t = (-nom - b) / a;
                             t1 = v2 * t >= 0f ? t : float.NaN;
                             t = (nom - b) / a;
-                            var t2 = (v2 * t >= 0f) ? t : float.NaN;
+                            var t2 = v2 * t >= 0f ? t : float.NaN;
 
                             if (!float.IsNaN(t2) && !float.IsNaN(t1))
                             {
@@ -119,7 +100,35 @@ namespace Aimtec.SDK.Util
                 t1 = 0f;
             }
 
-            return new VectorMovementCollisionResult() { Time = t1, Position = (!float.IsNaN(t1)) ? new Vector2(sP1x + S * t1, sP1y + K * t1) : new Vector2() };
+            return new VectorMovementCollisionResult()
+            {
+                Time = t1,
+                Position = !float.IsNaN(t1) ? new Vector2(sP1x + S * t1, sP1y + K * t1) : new Vector2()
+            };
+        }
+
+        #endregion
+
+        /// <summary>
+        ///     Struct VectorMovementCollisionResult
+        /// </summary>
+        public struct VectorMovementCollisionResult
+        {
+            #region Public Properties
+
+            /// <summary>
+            ///     Gets or sets the position.
+            /// </summary>
+            /// <value>The position.</value>
+            public Vector2 Position { get; set; }
+
+            /// <summary>
+            ///     Gets or sets the time.
+            /// </summary>
+            /// <value>The time.</value>
+            public float Time { get; set; }
+
+            #endregion
         }
     }
 }

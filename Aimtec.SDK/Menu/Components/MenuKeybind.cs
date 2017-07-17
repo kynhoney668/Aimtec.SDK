@@ -1,12 +1,11 @@
 ﻿namespace Aimtec.SDK.Menu.Components
 {
-    using System;
+    using System.IO;
 
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
+
     using Newtonsoft.Json;
-    using System.IO;
-    using System.Reflection;
 
     /// <summary>
     ///     Class MenuKeybind. This class cannot be inherited.
@@ -27,7 +26,13 @@
         /// <param name="keybindType">Type of the keybind.</param>
         /// <param name="active">Whether this item should be active by default</param>
         /// <param name="shared">Whether this item is shared across instances</param>
-        public MenuKeyBind(string internalName, string displayName, KeyCode key, KeybindType keybindType, bool active = false, bool shared = false)
+        public MenuKeyBind(
+            string internalName,
+            string displayName,
+            KeyCode key,
+            KeybindType keybindType,
+            bool active = false,
+            bool shared = false)
         {
             this.InternalName = internalName;
             this.DisplayName = displayName;
@@ -47,16 +52,11 @@
 
         #region Public Properties
 
-        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
-
-
         /// <summary>
-        ///     Gets or sets the value.
+        ///     Gets if this keybind is currently active
         /// </summary>
         /// <value>The value.</value>
-        [JsonProperty(Order = 3)]
-        public new bool Value { get; set; }
-
+        public new bool Enabled => this.Value;
 
         /// <summary>
         ///     Gets or sets the key.
@@ -72,21 +72,28 @@
         public KeybindType KeybindType { get; set; }
 
         /// <summary>
-        ///     Gets if this keybind is currently active 
+        ///     Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
-        public new bool Enabled => Value;
+        [JsonProperty(Order = 3)]
+        public new bool Value { get; set; }
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
-        /// Gets or sets a value indicating whether the key is being set.
+        ///     Gets whether this keybind is currently listening for key presses
+        /// </summary>
+        internal bool Inactive { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the key is being set.
         /// </summary>
         /// <value><c>true</c> if the key is being set; otherwise, <c>false</c>.</value>
         internal bool KeyIsBeingSet { get; set; }
 
-        /// <summary>
-        /// Gets whether this keybind is currently listening for key presses
-        /// </summary>
-        internal bool Inactive { get; set; }
+        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
 
         #endregion
 
@@ -120,11 +127,12 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
+                if (message == (ulong) WindowsMessages.WM_LBUTTONDOWN)
                 {
                     if (!this.KeyIsBeingSet && this.GetBounds(this.Position).Contains(x, y))
                     {
-                        if (!MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position, this.Parent.Width).Contains(x, y))
+                        if (!MenuManager.Instance.Theme.GetMenuBoolControlBounds(this.Position, this.Parent.Width)
+                                        .Contains(x, y))
                         {
                             this.KeyIsBeingSet = true;
                         }
@@ -136,80 +144,43 @@
                     }
                 }
 
-                if (this.KeyIsBeingSet && message == (ulong)WindowsMessages.WM_KEYUP)
+                if (this.KeyIsBeingSet && message == (ulong) WindowsMessages.WM_KEYUP)
                 {
-                    this.UpdateKey((KeyCode)wparam);
+                    this.UpdateKey((KeyCode) wparam);
                     this.KeyIsBeingSet = false;
                 }
             }
 
-            if (this.Inactive || wparam != (ulong)this.Key || this.KeyIsBeingSet || MenuGUI.IsShopOpen() || MenuGUI.IsChatOpen())
+            if (this.Inactive || wparam != (ulong) this.Key || this.KeyIsBeingSet || MenuGUI.IsShopOpen()
+                || MenuGUI.IsChatOpen())
             {
                 return;
             }
 
             if (this.KeybindType == KeybindType.Press)
             {
-                if (message == (ulong)WindowsMessages.WM_KEYDOWN)
+                if (message == (ulong) WindowsMessages.WM_KEYDOWN)
                 {
                     this.UpdateValue(true);
                 }
-                else if (message == (ulong)WindowsMessages.WM_KEYUP)
+                else if (message == (ulong) WindowsMessages.WM_KEYUP)
                 {
                     this.UpdateValue(false);
                 }
             }
 
-            else if (message == (ulong)WindowsMessages.WM_KEYUP)
+            else if (message == (ulong) WindowsMessages.WM_KEYUP)
             {
                 this.UpdateValue(!this.Value);
             }
         }
-
-
 
         #endregion
 
         #region Methods
 
         /// <summary>
-        ///     Updates the value of the KeyBind, saves the new value and fires the value changed event
-        /// </summary>
-        private void UpdateValue(bool newVal)
-        {
-            var oldClone = new MenuKeyBind { Value = this.Value, InternalName = this.InternalName, DisplayName = this.DisplayName, Key = this.Key, KeybindType = this.KeybindType };
-
-            this.Value = newVal;
-
-            if (this.KeybindType == KeybindType.Toggle)
-            {
-                this.Save();
-            }
-
-            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
-        }
-
-        private void UpdateKey(KeyCode key)
-        {
-            //Unregister the keybind if escape is pressed
-            if (key == KeyCode.Escape)
-            {
-                this.Inactive = true;
-                this.Value = false;
-                return;
-            }
-
-            var oldClone = new MenuKeyBind { Value = this.Value, InternalName = this.InternalName, DisplayName = this.DisplayName, Key = this.Key, KeybindType = this.KeybindType };
-
-            this.Key = key;
-
-            this.Save();
-
-            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
-        }
-
-        /// <summary>
-        ///    Loads the value from the file for this component
+        ///     Loads the value from the file for this component
         /// </summary>
         internal override void LoadValue()
         {
@@ -225,6 +196,56 @@
                     this.Key = sValue.Key;
                 }
             }
+        }
+
+        private void UpdateKey(KeyCode key)
+        {
+            //Unregister the keybind if escape is pressed
+            if (key == KeyCode.Escape)
+            {
+                this.Inactive = true;
+                this.Value = false;
+                return;
+            }
+
+            var oldClone = new MenuKeyBind
+            {
+                Value = this.Value,
+                InternalName = this.InternalName,
+                DisplayName = this.DisplayName,
+                Key = this.Key,
+                KeybindType = this.KeybindType
+            };
+
+            this.Key = key;
+
+            this.Save();
+
+            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
+        }
+
+        /// <summary>
+        ///     Updates the value of the KeyBind, saves the new value and fires the value changed event
+        /// </summary>
+        private void UpdateValue(bool newVal)
+        {
+            var oldClone = new MenuKeyBind
+            {
+                Value = this.Value,
+                InternalName = this.InternalName,
+                DisplayName = this.DisplayName,
+                Key = this.Key,
+                KeybindType = this.KeybindType
+            };
+
+            this.Value = newVal;
+
+            if (this.KeybindType == KeybindType.Toggle)
+            {
+                this.Save();
+            }
+
+            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }
 
         #endregion

@@ -1,37 +1,25 @@
 ﻿namespace Aimtec.SDK.TargetSelector
 {
+    using System.Collections.Generic;
+
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Config;
 
     using NLog;
     using NLog.Fluent;
-    using System.Collections.Generic;
-
 
     /// <summary>
     ///     Target Selector Class
     /// </summary>
     public class TargetSelector
     {
-        private static Menu TargetSelectorMenu { get; set; }
+        #region Static Fields
 
-        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
+        private static ITargetSelector impl;
 
-        internal static void Load()
-        {
-            Log.Info().Message("Loading Default Target Selector").Write();
-            Implementation = new TargetSelectorImpl();
-        }
+        #endregion
 
-        internal static void LoadMenu()
-        {
-            Logger.Info("Loading the Target Selector Menu");
-   
-            TargetSelectorMenu = impl.Config;
-
-            AimtecMenu.Instance.Add(TargetSelectorMenu);
-        }
-
+        #region Constructors and Destructors
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="TargetSelector" /> class.
@@ -41,6 +29,10 @@
         {
             Implementation = impl;
         }
+
+        #endregion
+
+        #region Public Properties
 
         /// <summary>
         ///     Gets or sets the implementation of the target selector.
@@ -70,29 +62,18 @@
             }
         }
 
-        private static ITargetSelector impl;
+        #endregion
 
-        /// <summary>
-        ///     Gets the target.
-        /// </summary>
-        /// <param name="range">The range.</param>
-        /// <param name="autoAttackTarget">If true then range is ignored and max auto attack range is used</param>
-        /// <returns></returns>
-        public static Obj_AI_Hero GetTarget(float range, bool autoAttackTarget = false)
-        {
-            return Implementation.GetTarget(range, autoAttackTarget);
-        }
+        #region Properties
 
+        private static Logger Logger { get; } = LogManager.GetCurrentClassLogger();
 
-        /// <summary>
-        ///     Gets an ordered enumerable of the available targets within the range based on their priority ranking by the Target Selector
-        /// </summary>
-        public IEnumerable<Obj_AI_Hero> GetOrderedTargets(float range, bool autoAttackTarget = false)
-        {
-            return Implementation.GetOrderedTargets(range, autoAttackTarget);
-        }
-        
-            
+        private static Menu TargetSelectorMenu { get; set; }
+
+        #endregion
+
+        #region Public Methods and Operators
+
         /// <summary>
         ///     Disposes the current instance
         /// </summary>
@@ -110,5 +91,46 @@
                 Implementation.Dispose();
             }
         }
+
+        /// <summary>
+        ///     Gets the target.
+        /// </summary>
+        /// <param name="range">The range.</param>
+        /// <param name="autoAttackTarget">If true then range is ignored and max auto attack range is used</param>
+        /// <returns></returns>
+        public static Obj_AI_Hero GetTarget(float range, bool autoAttackTarget = false)
+        {
+            return Implementation.GetTarget(range, autoAttackTarget);
+        }
+
+        /// <summary>
+        ///     Gets an ordered enumerable of the available targets within the range based on their priority ranking by the Target
+        ///     Selector
+        /// </summary>
+        public IEnumerable<Obj_AI_Hero> GetOrderedTargets(float range, bool autoAttackTarget = false)
+        {
+            return Implementation.GetOrderedTargets(range, autoAttackTarget);
+        }
+
+        #endregion
+
+        #region Methods
+
+        internal static void Load()
+        {
+            Log.Info().Message("Loading Default Target Selector").Write();
+            Implementation = new TargetSelectorImpl();
+        }
+
+        internal static void LoadMenu()
+        {
+            Logger.Info("Loading the Target Selector Menu");
+
+            TargetSelectorMenu = impl.Config;
+
+            AimtecMenu.Instance.Add(TargetSelectorMenu);
+        }
+
+        #endregion
     }
 }

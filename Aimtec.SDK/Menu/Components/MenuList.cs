@@ -2,13 +2,11 @@
 {
     using System;
     using System.IO;
-    using System.Reflection;
 
     using Aimtec.SDK.Menu.Theme;
+    using Aimtec.SDK.Util;
 
     using Newtonsoft.Json;
-
-    using Util;
 
     /// <summary>
     ///     Class MenuList.
@@ -45,23 +43,11 @@
         [JsonConstructor]
         private MenuList()
         {
-            
         }
 
         #endregion
 
         #region Public Properties
-
-        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
-
-
-        /// <summary>
-        ///     Gets or sets the value, which is the index of the string list.
-        /// </summary>
-        /// <value>The value.</value>
-        [JsonProperty(Order = 3)]
-        public new int Value { get; set; }
-
 
         /// <summary>
         ///     Gets or sets the items.
@@ -70,14 +56,25 @@
         [JsonProperty(Order = 4)]
         public string[] Items { get; set; }
 
-
         /// <summary>
         ///     Gets the selected item.
         /// </summary>
         /// <value>The selected item.</value>
         public string SelectedItem => this.Items[this.Value];
 
-    
+        /// <summary>
+        ///     Gets or sets the value, which is the index of the string list.
+        /// </summary>
+        /// <value>The value.</value>
+        [JsonProperty(Order = 3)]
+        public new int Value { get; set; }
+
+        #endregion
+
+        #region Properties
+
+        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
+
         #endregion
 
         #region Public Methods and Operators
@@ -100,7 +97,7 @@
         /// <param name="lparam">Additional message information.</param>
         public override void WndProc(uint message, uint wparam, int lparam)
         {
-            if (message == (ulong)WindowsMessages.WM_LBUTTONUP && this.Visible)
+            if (message == (ulong) WindowsMessages.WM_LBUTTONUP && this.Visible)
             {
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
@@ -137,27 +134,12 @@
             }
         }
 
-
         #endregion
 
         #region Methods
 
         /// <summary>
-        ///     Updates the value of the MenuList, saves the new value and fires the value changed event
-        /// </summary>
-        private void UpdateValue(int newVal)
-        {
-            var oldClone = new MenuList { InternalName = this.InternalName, DisplayName = this.DisplayName, Items = this.Items, Value = this.Value };
-
-            this.Value = newVal;
-
-            this.Save();
-
-            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
-        }
-
-        /// <summary>
-        ///    Loads the value from the file for this component
+        ///     Loads the value from the file for this component
         /// </summary>
         internal override void LoadValue()
         {
@@ -172,6 +154,26 @@
                     this.Value = sValue.Value;
                 }
             }
+        }
+
+        /// <summary>
+        ///     Updates the value of the MenuList, saves the new value and fires the value changed event
+        /// </summary>
+        private void UpdateValue(int newVal)
+        {
+            var oldClone = new MenuList
+            {
+                InternalName = this.InternalName,
+                DisplayName = this.DisplayName,
+                Items = this.Items,
+                Value = this.Value
+            };
+
+            this.Value = newVal;
+
+            this.Save();
+
+            this.FireOnValueChanged(this, new ValueChangedArgs(oldClone, this));
         }
 
         #endregion

@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Aimtec.SDK.Events
+﻿namespace Aimtec.SDK.Events
 {
+    using System;
+
     /// <summary>
-    /// Class GameEvents.
+    ///     Class GameEvents.
     /// </summary>
     public static class GameEvents
     {
+        #region Constructors and Destructors
+
         /// <summary>
-        /// Initializes static members of the <see cref="GameEvents"/> class.
+        ///     Initializes static members of the <see cref="GameEvents" /> class.
         /// </summary>
         static GameEvents()
         {
@@ -20,18 +18,30 @@ namespace Aimtec.SDK.Events
             Game.OnUpdate += GameStartHandler;
         }
 
+        #endregion
+
+        #region Delegates
+
         /// <summary>
-        /// The GameStart Delegate
+        ///     The GameStart Delegate
         /// </summary>
         public delegate void GameStartDelegate();
 
+        #endregion
+
+        #region Public Events
+
         /// <summary>
-        /// Occurs when the game is started.
+        ///     Occurs when the game is started.
         /// </summary>
         public static event GameStartDelegate GameStart;
 
+        #endregion
+
+        #region Methods
+
         /// <summary>
-        /// Handles the <see cref="GameStart"/> event.
+        ///     Handles the <see cref="GameStart" /> event.
         /// </summary>
         private static void GameStartHandler()
         {
@@ -52,7 +62,7 @@ namespace Aimtec.SDK.Events
             {
                 return;
             }
-            
+
             foreach (var del in invocationList)
             {
                 try
@@ -65,5 +75,7 @@ namespace Aimtec.SDK.Events
                 }
             }
         }
+
+        #endregion
     }
 }

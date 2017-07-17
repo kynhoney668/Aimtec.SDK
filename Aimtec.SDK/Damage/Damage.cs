@@ -112,7 +112,8 @@ namespace Aimtec.SDK.Damage
                     case "Galio":
                         if (hero.HasBuff("galiopassivebuff"))
                         {
-                            dmgMagical += 8 + 4 * hero.Level + hero.TotalAttackDamage + 0.6 * hero.TotalAbilityDamage + 0.6 * hero.BonusSpellBlock;
+                            dmgMagical += 8 + 4 * hero.Level + hero.TotalAttackDamage + 0.6 * hero.TotalAbilityDamage
+                                + 0.6 * hero.BonusSpellBlock;
                         }
                         break;
                     // TODO getting the actual buffname
@@ -264,7 +265,7 @@ namespace Aimtec.SDK.Damage
                 if (spellData.IsModifiedDamage && spellData.DamageType == DamageType.Physical && targetHero != null
                     && targetHero.ChampionName == "Fizz")
                 {
-                    dmgBase -= 4 + (2 * Math.Floor((targetHero.Level - 1) / 3d));
+                    dmgBase -= 4 + 2 * Math.Floor((targetHero.Level - 1) / 3d);
                     alreadyAdd2 = true;
                 }
             }
@@ -293,7 +294,7 @@ namespace Aimtec.SDK.Damage
                         continue;
                     }
 
-                    dmgBonus -= 4 + (2 * Math.Floor((targetHero.Level - 1) / 3d));
+                    dmgBonus -= 4 + 2 * Math.Floor((targetHero.Level - 1) / 3d);
                     alreadyAdd2 = true;
                 }
             }
@@ -518,8 +519,9 @@ namespace Aimtec.SDK.Damage
                 // Galio W TODO
                 if (targetHero.HasBuff("galioSOMEONEPLSHELPMEWITHBUFFNAMESTY"))
                 {
-                    amount *= 1 - new[] { 0.2, 0.25, 0.3, 0.35, 0.4 }[targetHero
-                        .SpellBook.GetSpell(SpellSlot.W).Level - 1] + 0.08 * (int)(targetHero.BonusSpellBlock/100);
+                    amount *= 1
+                        - new[] { 0.2, 0.25, 0.3, 0.35, 0.4 }[targetHero.SpellBook.GetSpell(SpellSlot.W).Level - 1]
+                        + 0.08 * (int) (targetHero.BonusSpellBlock / 100);
                 }
 
                 // Garen W
@@ -576,8 +578,7 @@ namespace Aimtec.SDK.Damage
             {
                 var minion = target as Obj_AI_Minion;
 
-                if (minion != null &&
-                    minion.Name.Contains("Siege"))
+                if (minion != null && minion.Name.Contains("Siege"))
                 {
                     amount *= 0.7;
                 }

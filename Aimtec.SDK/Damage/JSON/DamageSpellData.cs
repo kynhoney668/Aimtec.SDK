@@ -55,16 +55,16 @@ namespace Aimtec.SDK.Damage.JSON
         public List<int> MaxDamageOnMinion { get; set; }
 
         /// <summary>
-        ///     Gets or sets the scale per target missing health.
-        /// </summary>
-        /// <value>The scale per target missing health.</value>
-        public double ScalePerTargetMissHealth { get; set; }
-
-        /// <summary>
         ///     Gets or sets the scale per crit percent.
         /// </summary>
         /// <value>The scale per crit percent.</value>
         public double ScalePerCritPercent { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the scale per target missing health.
+        /// </summary>
+        /// <value>The scale per target missing health.</value>
+        public double ScalePerTargetMissHealth { get; set; }
 
         /// <summary>
         ///     Gets the Scaling Slot.

@@ -20,11 +20,15 @@
 
         #region Public Properties
 
-        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
+        public new string Value { get; set; }
+
+        #endregion
+
+        #region Properties
 
         internal override bool SavableMenuItem { get; set; } = false;
 
-        public new string Value { get; set; }
+        internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
 
         #endregion
 
@@ -34,6 +38,10 @@
         {
             return MenuManager.Instance.Theme.BuildMenuSeperatorRenderer(this);
         }
+
+        #endregion
+
+        #region Methods
 
         internal override void LoadValue()
         {

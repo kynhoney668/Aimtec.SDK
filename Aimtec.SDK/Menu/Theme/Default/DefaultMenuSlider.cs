@@ -41,7 +41,7 @@
 
             this.Theme.DrawMenuItemBox(position, width);
 
-            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, (this.Theme.MenuHeight) / 2f);
+            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, this.Theme.MenuHeight / 2f);
 
             // Draw light bar before the slider line
             Aimtec.Render.Rectangle(
@@ -53,7 +53,8 @@
             Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName, RenderTextFlags.VerticalCenter);
+                this.Component.DisplayName,
+                RenderTextFlags.VerticalCenter);
 
             var bfSlider = position + new Vector2(beforeSliderWidth, 0);
 
@@ -74,12 +75,12 @@
 
             // draw text
             Aimtec.Render.Text(
-                pos + this.Theme.LineWidth
-                + new Vector2(
+                pos + this.Theme.LineWidth + new Vector2(
                     width - this.Theme.TextSpacing,
-                    (this.Theme.MenuHeight) / 2f),
+                    this.Theme.MenuHeight / 2f),
                 Color.FromArgb(207, 195, 149),
-                this.Component.Value.ToString(), RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);
+                this.Component.Value.ToString(),
+                RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);
         }
 
         #endregion

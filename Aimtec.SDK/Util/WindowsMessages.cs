@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Aimtec.SDK.Util
+﻿namespace Aimtec.SDK.Util
 {
+    using System;
+
     /// <summary>
     ///     Windows Messages
     ///     Defined in <![CDATA[winuser.h]]> from Windows SDK v6.1

@@ -1,6 +1,5 @@
 ﻿namespace Aimtec.SDK.Menu
 {
-    using System.Collections.Generic;
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Theme;
@@ -13,31 +12,10 @@
         #region Public Properties
 
         /// <summary>
-        ///     Converts the <see cref="IMenuComponent" /> to the specified <typeparamref name="T" />.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns>T.</returns>
-        T As<T>() where T : MenuComponent;
-
-
-        /// <summary>
         ///     Gets or sets the display name.
         /// </summary>
         /// <value>The display name.</value>
         string DisplayName { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the name of the internal.
-        /// </summary>
-        /// <value>The name of the internal.</value>
-        string InternalName { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the position.
-        /// </summary>
-        /// <value>The position.</value>
-        Vector2 Position { get; set; }
-
 
         /// <summary>
         ///     Gets a value indicating whether this <see cref="MenuComponent" /> is enabled.
@@ -50,28 +28,10 @@
         bool Enabled { get; }
 
         /// <summary>
-        ///     Gets a value associated with this <see cref="MenuComponent" />
+        ///     Gets or sets the name of the internal.
         /// </summary>
-        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        int Value { get; }
-
-        /// <summary>
-        ///     Gets or sets whether this <see cref="MenuComponent" /> is a a root menu.
-        /// </summary>
-        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        bool Root { get; set; }
-
-        /// <summary>
-        ///     Gets the parent of this <see cref="MenuComponent" /> if it has one.
-        /// </summary>
-        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        Menu Parent { get; set; }
-
-        /// <summary>
-        ///     Gets whether this cref="MenuComponent" /> is shared.
-        /// </summary>
-        /// <value><c>true</c> if shared; otherwise, <c>false</c>.</value>
-        bool Shared { get; set; }
+        /// <value>The name of the internal.</value>
+        string InternalName { get; set; }
 
         /// <summary>
         ///     Gets or sets whether this <see cref="MenuComponent" /> is a Menu.
@@ -80,10 +40,40 @@
         bool IsMenu { get; }
 
         /// <summary>
+        ///     Gets the parent of this <see cref="MenuComponent" /> if it has one.
+        /// </summary>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
+        Menu Parent { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the position.
+        /// </summary>
+        /// <value>The position.</value>
+        Vector2 Position { get; set; }
+
+        /// <summary>
+        ///     Gets or sets whether this <see cref="MenuComponent" /> is a a root menu.
+        /// </summary>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
+        bool Root { get; set; }
+
+        /// <summary>
+        ///     Gets whether this cref="MenuComponent" /> is shared.
+        /// </summary>
+        /// <value><c>true</c> if shared; otherwise, <c>false</c>.</value>
+        bool Shared { get; set; }
+
+        /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
         /// </summary>
         /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
         bool Toggled { get; set; }
+
+        /// <summary>
+        ///     Gets a value associated with this <see cref="MenuComponent" />
+        /// </summary>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
+        int Value { get; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
@@ -94,6 +84,14 @@
         #endregion
 
         #region Public Methods and Operators
+
+        /// <summary>
+        ///     Converts the <see cref="IMenuComponent" /> to the specified <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns>T.</returns>
+        T As<T>()
+            where T : MenuComponent;
 
         /// <summary>
         ///     Gets the bounds.

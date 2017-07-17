@@ -84,7 +84,7 @@ namespace Aimtec.SDK.Damage
                     origin = sourceScale.MaxHealth - sourceScale.Health;
                     break;
                 case DamageScalingType.BonusHealth: // TODO: Implement sourceScale.BaseHealth, since Total-Base = Bonus
-                    origin = ((Obj_AI_Hero)sourceScale).MaxHealth;
+                    origin = ((Obj_AI_Hero) sourceScale).MaxHealth;
                     break;
                 case DamageScalingType.BonusArmor:
                     origin = sourceScale.Armor; // TODO: Implement sourceScale.BaseArmor, since Total-Base = Bonus
@@ -96,7 +96,9 @@ namespace Aimtec.SDK.Damage
                     origin = sourceScale.MaxMana;
                     break;
                 case DamageScalingType.BonusCriticalDamage:
-                    origin = sourceScale.HasItem(ItemId.InfinityEdge) ? 50 : 0; // TODO: Implement sourceScale.BonusCritDamage or sourceScale.CritDamageMod
+                    origin = sourceScale.HasItem(ItemId.InfinityEdge)
+                        ? 50
+                        : 0; // TODO: Implement sourceScale.BonusCritDamage or sourceScale.CritDamageMod
                     break;
                 default: throw new ArgumentOutOfRangeException();
             }
@@ -108,17 +110,13 @@ namespace Aimtec.SDK.Damage
                     : 0)
                 + (spellBonus.ScalePer100Ap > 0
                     ? Math.Abs(source.TotalAbilityDamage / 100) * spellBonus.ScalePer100Ap
-                    : 0)
-                + (spellBonus.ScalePer35BonusAd > 0
+                    : 0) + (spellBonus.ScalePer35BonusAd > 0
                     ? Math.Abs(source.FlatPhysicalDamageMod / 35) * spellBonus.ScalePer35BonusAd
-                    : 0)
-                + (spellBonus.ScalePer100BonusAd > 0
+                    : 0) + (spellBonus.ScalePer100BonusAd > 0
                     ? Math.Abs(source.FlatPhysicalDamageMod / 100) * spellBonus.ScalePer100BonusAd
-                    : 0)
-                + (spellBonus.ScalePer100Ad > 0
+                    : 0) + (spellBonus.ScalePer100Ad > 0
                     ? Math.Abs(source.TotalAttackDamage / 100) * spellBonus.ScalePer100Ad
-                    : 0)
-                + (spellBonus.ScalePerCritPercent > 0
+                    : 0) + (spellBonus.ScalePerCritPercent > 0
                     ? Math.Abs(source.Crit * 100) * spellBonus.ScalePerCritPercent
                     : 0)
                 : 0);

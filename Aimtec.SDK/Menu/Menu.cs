@@ -3,7 +3,6 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Drawing;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -12,7 +11,6 @@
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
-    using Aimtec.SDK.Menu.Theme.Default;
 
     /// <summary>
     ///     Class Menu.
@@ -33,7 +31,6 @@
         /// </summary>
         private bool visible;
 
-
         #endregion
 
         #region Constructors and Destructors
@@ -47,7 +44,7 @@
         public Menu(string internalName, string displayName, bool isRoot = false)
         {
             var callingAssembly = Assembly.GetCallingAssembly();
-            GuidAttribute GUID = (GuidAttribute)Attribute.GetCustomAttribute(callingAssembly, typeof(GuidAttribute));
+            var GUID = (GuidAttribute) Attribute.GetCustomAttribute(callingAssembly, typeof(GuidAttribute));
             var assemblyGuidShort = GUID.Value.Substring(0, 5);
             var assemblyName = Assembly.GetCallingAssembly().GetName().Name;
 
@@ -67,20 +64,6 @@
 
         #endregion
 
-        #region Internal Properties
-
-        internal override string Serialized { get; }
-
-        internal int Width { get; set; }
-
-        /// <summary>
-        ///     The internal name of this Menu - adjusted with GUID so it is unique per assembly.
-        ///     This is to allow using the same internal name for root menus across different assemblies.
-        /// </summary>
-        internal string RootMenuKey { get; set; }
-
-        #endregion
-
         #region Public Properties
 
         /// <summary>
@@ -88,6 +71,12 @@
         /// </summary>
         /// <value>The children.</value>
         public override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
+
+        /// <summary>
+        ///     Gets a value indicating whether this instance is a menu.
+        /// </summary>
+        /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
+        public override bool IsMenu => true;
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
@@ -128,19 +117,25 @@
             }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this instance is a menu.
-        /// </summary>
-        /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
-        public override bool IsMenu => true;
+        #endregion
 
+        #region Properties
+
+        /// <summary>
+        ///     The internal name of this Menu - adjusted with GUID so it is unique per assembly.
+        ///     This is to allow using the same internal name for root menus across different assemblies.
+        /// </summary>
+        internal string RootMenuKey { get; set; }
+
+        internal override string Serialized { get; }
+
+        internal int Width { get; set; }
 
         #endregion
 
         #region Public Indexers
 
         public override MenuComponent this[string name] => this.GetItem(name);
-
 
         #endregion
 
@@ -163,7 +158,8 @@
                 //Don't try to add this item if we already have an existing item with the same name
                 if (this.Children.ContainsKey(menuComponent.InternalName))
                 {
-                    Console.WriteLine($"The Menu {this.InternalName} already contains a child with the name {menuComponent.InternalName}");
+                    Console.WriteLine(
+                        $"The Menu {this.InternalName} already contains a child with the name {menuComponent.InternalName}");
                     return this;
                 }
 
@@ -179,7 +175,6 @@
                 }
 
                 this.UpdateWidth();
-
             }
 
             return this;
@@ -203,23 +198,6 @@
 
             return this;
         }
-
-
-        /// <summary>
-        /// Sets this menu instance to true will make it shared resulting in all its children becoming shared.
-        /// </summary>
-        public Menu SetShared(bool value)
-        {
-            this.Shared = value;
-
-            foreach (var item in this.Children.Values)
-            {
-                item.Shared = true;
-            }
-
-            return this;
-        }
-
 
         /// <summary>
         ///     Returns an enumerator that iterates through a collection.
@@ -253,10 +231,24 @@
             for (var i = 0; i < this.Children.Values.Count; i++)
             {
                 var child = this.Children.Values.ToList()[i];
-                child.Position = position
-                                 + new Vector2(this.Parent.Width, i * MenuManager.Instance.Theme.MenuHeight);
+                child.Position = position + new Vector2(this.Parent.Width, i * MenuManager.Instance.Theme.MenuHeight);
                 child.Render(child.Position);
             }
+        }
+
+        /// <summary>
+        ///     Sets this menu instance to true will make it shared resulting in all its children becoming shared.
+        /// </summary>
+        public Menu SetShared(bool value)
+        {
+            this.Shared = value;
+
+            foreach (var item in this.Children.Values)
+            {
+                item.Shared = true;
+            }
+
+            return this;
         }
 
         /// <summary>
@@ -267,7 +259,7 @@
         /// <param name="lparam">Additional message information.</param>
         public override void WndProc(uint message, uint wparam, int lparam)
         {
-            if (this.Visible && message == (ulong)WindowsMessages.WM_LBUTTONUP)
+            if (this.Visible && message == (ulong) WindowsMessages.WM_LBUTTONUP)
             {
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
@@ -276,7 +268,8 @@
                 {
                     this.Toggled = !this.Toggled;
 
-                    foreach (var m in this.Parent.Children.Values.Where(z => z.IsMenu && z.InternalName != this.InternalName))
+                    foreach (var m in this.Parent.Children.Values.Where(
+                        z => z.IsMenu && z.InternalName != this.InternalName))
                     {
                         m.Toggled = false;
                     }
@@ -290,58 +283,9 @@
             }
         }
 
-        internal virtual void UpdateWidth()
-        {
-            var children = this.Children.Values;
+        #endregion
 
-            int maxWidth = 0;
-
-            foreach (var child in children)
-            {
-                int width = 0;
-
-                if (child is MenuList)
-                {
-                    var mList = child as MenuList;
-                    var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
-                    if (longestItem != null)
-                    {
-                        width = (int)MenuManager.Instance.TextWidth(mList.DisplayName + longestItem) + MenuManager.Instance.Theme.IndicatorWidth + 15;
-                    }
-                }
-
-                else if (child is MenuKeyBind)
-                {
-                    var kb = child as MenuKeyBind;
-                    width = (int)MenuManager.Instance.TextWidth(kb.DisplayName + "PRESS KEY");
-                }
-
-                else if (child is MenuSlider)
-                {
-                    var slider = child as MenuSlider;
-                    width = (int)MenuManager.Instance.TextWidth(child.DisplayName + slider.MaxValue.ToString());
-                }
-
-                else if (child is MenuSliderBool)
-                {
-                    var slider = child as MenuSliderBool;
-                    width = (int)MenuManager.Instance.TextWidth(child.DisplayName + slider.MaxValue.ToString());
-                }
-
-                else
-                {
-                    width = (int)MenuManager.Instance.TextWidth(child.DisplayName);
-                }
-
-                if (width > maxWidth)
-                {
-                    maxWidth = width;
-                }
-            }
-
-            this.Width = (int)(maxWidth + (MenuManager.Instance.Theme.BaseMenuWidth));
-        }
-
+        #region Methods
 
         internal override void LoadValue()
         {
@@ -351,8 +295,6 @@
                 item.LoadValue();
             }
         }
-
-        #endregion
 
         internal override void Save()
         {
@@ -366,5 +308,60 @@
                 item.Save();
             }
         }
+
+        internal virtual void UpdateWidth()
+        {
+            var children = this.Children.Values;
+
+            var maxWidth = 0;
+
+            foreach (var child in children)
+            {
+                var width = 0;
+
+                if (child is MenuList)
+                {
+                    var mList = child as MenuList;
+                    var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
+                    if (longestItem != null)
+                    {
+                        width = (int) MenuManager.Instance.TextWidth(mList.DisplayName + longestItem)
+                            + MenuManager.Instance.Theme.IndicatorWidth + 15;
+                    }
+                }
+
+                else if (child is MenuKeyBind)
+                {
+                    var kb = child as MenuKeyBind;
+                    width = (int) MenuManager.Instance.TextWidth(kb.DisplayName + "PRESS KEY");
+                }
+
+                else if (child is MenuSlider)
+                {
+                    var slider = child as MenuSlider;
+                    width = (int) MenuManager.Instance.TextWidth(child.DisplayName + slider.MaxValue.ToString());
+                }
+
+                else if (child is MenuSliderBool)
+                {
+                    var slider = child as MenuSliderBool;
+                    width = (int) MenuManager.Instance.TextWidth(child.DisplayName + slider.MaxValue.ToString());
+                }
+
+                else
+                {
+                    width = (int) MenuManager.Instance.TextWidth(child.DisplayName);
+                }
+
+                if (width > maxWidth)
+                {
+                    maxWidth = width;
+                }
+            }
+
+            this.Width = (int) (maxWidth + MenuManager.Instance.Theme.BaseMenuWidth);
+        }
+
+        #endregion
     }
 }

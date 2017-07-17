@@ -1,10 +1,8 @@
 ﻿namespace Aimtec.SDK.Menu.Theme.Default
 {
-    using System;
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Components;
-    using Util;
 
     internal class DefaultMenuKeyBind : IRenderManager<MenuKeyBind, DefaultMenuTheme>
     {
@@ -38,18 +36,19 @@
 
             this.Theme.DrawMenuItemBox(position, width);
 
-            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, (this.Theme.MenuHeight) / 2);
+            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, this.Theme.MenuHeight / 2);
 
             Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName, RenderTextFlags.VerticalCenter);
+                this.Component.DisplayName,
+                RenderTextFlags.VerticalCenter);
 
             // Render indicator box outline
             Aimtec.Render.Line(
                 pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth,
                 pos.Y,
-                pos.X + width - this.Theme.IndicatorWidth  - this.Theme.LineWidth,
+                pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth,
                 pos.Y + this.Theme.MenuHeight,
                 Color.FromArgb(82, 83, 57));
 
@@ -60,7 +59,7 @@
 
             Aimtec.Render.Rectangle(
                 indBoxPosition,
-                this.Theme.IndicatorWidth ,
+                this.Theme.IndicatorWidth,
                 this.Theme.MenuHeight - this.Theme.LineWidth,
                 boolColor);
 
@@ -69,17 +68,25 @@
             Aimtec.Render.Text(
                 centerArrowBox,
                 Color.AliceBlue,
-                this.Component.Value ? "ON" : "OFF", RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+                this.Component.Value ? "ON" : "OFF",
+                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
 
             //Draw Key indicator
-            var keyIndicatorPos = pos + new Vector2(width - this.Theme.IndicatorWidth - this.Theme.LineWidth - this.Theme.TextSpacing, this.Theme.MenuHeight / 2);
+            var keyIndicatorPos = pos + new Vector2(
+                width - this.Theme.IndicatorWidth - this.Theme.LineWidth - this.Theme.TextSpacing,
+                this.Theme.MenuHeight / 2);
 
-            var text = this.Component.KeyIsBeingSet ? "PRESS KEY" : this.Component.Inactive ? "None" : $"[{this.Component.Key}]";
+            var text = this.Component.KeyIsBeingSet
+                ? "PRESS KEY"
+                : this.Component.Inactive
+                    ? "None"
+                    : $"[{this.Component.Key}]";
 
             Aimtec.Render.Text(
-              keyIndicatorPos,
-               Color.FromArgb(207, 195, 149),
-               text, RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
+                keyIndicatorPos,
+                Color.FromArgb(207, 195, 149),
+                text,
+                RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
         }
 
         #endregion

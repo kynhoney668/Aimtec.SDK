@@ -1,7 +1,7 @@
-﻿using System;
-
-namespace Aimtec.SDK.Util
+﻿namespace Aimtec.SDK.Util
 {
+    using System;
+
     /// <summary>
     ///     Specifies key codes and modifiers.
     /// </summary>
