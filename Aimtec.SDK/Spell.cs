@@ -440,7 +440,7 @@
             bool collision,
             SkillshotType type,
             bool vectorSkillshot = false,
-            HitChance hitchance = HitChance.Low)
+            HitChance hitchance = HitChance.High)
         {
             this.Delay = delay;
             this.Width = width;
