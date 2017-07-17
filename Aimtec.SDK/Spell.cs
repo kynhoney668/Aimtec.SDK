@@ -238,6 +238,11 @@
                 return false;
             }
 
+            if (prediction.CollisionObjects.Count > 0 && this.Collision)
+            {
+                return false;
+            }
+
             if (this.IsChargedSpell)
             {
                 return this.IsCharging
