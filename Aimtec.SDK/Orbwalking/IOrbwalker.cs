@@ -169,13 +169,18 @@
         /// <summary>
         ///     Gets the target for this orbwalker mode
         /// </summary>
-        AttackableUnit GetTarget(OrbwalkerMode mode);
+        AttackableUnit FindTarget(OrbwalkerMode mode);
 
         /// <summary>
         ///     Gets the target.
         /// </summary>
         /// <returns></returns>
-        AttackableUnit GetTarget();
+        AttackableUnit FindTarget();
+
+        /// <summary>
+        ///     Gets the current Orbwalker target
+        /// </summary>
+        AttackableUnit GetOrbwalkingTarget();
 
         /// <summary>
         ///     Returns whether this the missile name is an auto attack reset
