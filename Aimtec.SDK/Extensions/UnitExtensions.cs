@@ -114,7 +114,7 @@ namespace Aimtec.SDK.Extensions
         /// <param name="buffname">The buffname.</param>
         public static int GetBuffCount(this Obj_AI_Base from, string buffname)
         {
-            return from.BuffManager.GetBuffCount(buffname);
+            return from.BuffManager.GetBuffCount(buffname, true);
         }
 
         /// <summary>
