@@ -140,6 +140,11 @@ namespace Aimtec.SDK.Orbwalking
             return true;
         }
 
+        public bool PlantsCheck(AttackableUnit minion)
+        {
+            return !(minion is Obj_AI_Minion) || !minion.Name.Contains("SRU_Plant_") || this.Config["Misc"]["attackPlants"].Enabled;
+        }
+
         public override bool CanAttack()
         {
             return this.CanAttack(this.GetActiveMode());
@@ -153,6 +158,11 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             if (!this.AttackingEnabled || !mode.AttackingEnabled)
+            {
+                return false;
+            }
+
+            if (Player.HasBuffOfType(BuffType.Polymorph))
             {
                 return false;
             }
@@ -233,7 +243,7 @@ namespace Aimtec.SDK.Orbwalking
 
         public override AttackableUnit GetOrbwalkingTarget()
         {
-            return LastTarget;
+            return this.LastTarget;
         }
 
         public override AttackableUnit FindTarget(OrbwalkerMode mode)
@@ -243,12 +253,7 @@ namespace Aimtec.SDK.Orbwalking
                 return this.ForcedTarget;
             }
 
-            if (mode != null)
-            {
-                return mode.GetTarget();
-            }
-
-            return null;
+            return mode?.GetTarget();
         }
 
         public override bool Move(Vector3 movePosition)
@@ -369,7 +374,7 @@ namespace Aimtec.SDK.Orbwalking
 
         AttackableUnit GetLaneClearTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange());
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && this.PlantsCheck(x));
 
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
@@ -501,7 +506,7 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (attackable == null)
             {
-                attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
+                attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero && this.PlantsCheck(x));
             }
 
             var availableMinionTargets = attackable
@@ -601,18 +606,13 @@ namespace Aimtec.SDK.Orbwalking
                     new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
                     new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
                     new MenuBool("noBlindAA", "No AA when Blind", true, true),
+                    new MenuBool("attackPlants", "Attack Plants", false, true)
                 }
             };
 
             this.AddMode(this.Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, this.GetHeroTarget, null));
-            this.AddMode(
-                this.LaneClear = new OrbwalkerMode(
-                    "Laneclear",
-                    GlobalKeys.WaveClearKey,
-                    this.GetLaneClearTarget,
-                    null));
-            this.AddMode(
-                this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
+            this.AddMode(this.LaneClear = new OrbwalkerMode("Laneclear", GlobalKeys.WaveClearKey, this.GetLaneClearTarget, null));
+            this.AddMode(this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
             this.AddMode(this.Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, this.GetMixedModeTarget, null));
         }
 
