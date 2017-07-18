@@ -129,7 +129,7 @@
         {
             speed = Math.Abs(speed) < float.Epsilon ? input.Unit.MoveSpeed : speed;
 
-            if (path.Count <= 1)
+            if (path.Count <= 1 || (input.Unit.SpellBook.IsAutoAttacking && !input.Unit.IsDashing()))
             {
                 return new PredictionOutput
                 {
@@ -210,6 +210,11 @@
 
                     if (!pos.IsZero && t >= tT && t <= tT + tB)
                     {
+                        if (pos.DistanceSquared(b) < 20)
+                        {
+                            break;
+                        }
+
                         var p = pos + input.RealRadius * direction;
 
                         return new PredictionOutput
