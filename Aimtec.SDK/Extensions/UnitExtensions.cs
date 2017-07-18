@@ -151,35 +151,22 @@ namespace Aimtec.SDK.Extensions
         {
             var result = new List<Vector2>();
 
-            if (unit.IsVisible)
+            if (!unit.IsVisible)
             {
-                result.Add(unit.ServerPosition.To2D());
-                var path = unit.Path;
-
-                if (path.Length <= 0)
-                {
-                    return result;
-                }
-
-                var first = path[0].To2D();
-                if (first.DistanceSquared(result[0]) > 40)
-                {
-                    result.Add(first);
-                }
-
-                for (var i = 1; i < path.Length; i++)
-                {
-                    result.Add(path[i].To2D());
-                }
+                return result;
             }
-            else if (WaypointTracker.StoredPaths.ContainsKey(unit.NetworkId))
+
+            result.Add(unit.ServerPosition.To2D());
+            var path = unit.Path;
+
+            if (path.Length <= 0)
             {
-                var path = WaypointTracker.StoredPaths[unit.NetworkId];
-                var timePassed = (Game.TickCount - WaypointTracker.StoredTick[unit.NetworkId]) / 1000f;
-                if (path.GetPathLength() >= unit.MoveSpeed * timePassed)
-                {
-                    result = path.CutPath((unit.MoveSpeed * timePassed));
-                }
+                return result;
+            }
+
+            for (var i = 1; i < path.Length; i++)
+            {
+                result.Add(path[i].To2D());
             }
 
             return result;
