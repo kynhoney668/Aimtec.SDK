@@ -1,6 +1,8 @@
 ﻿namespace Aimtec.SDK
 {
     using System;
+    using System.Drawing;
+    using System.Linq;
 
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Menu.Config;
@@ -36,6 +38,29 @@
             if (AimtecMenu.DebugEnabled)
             {
                 Logger.Debug("{0} Spell Created", slot);
+            }
+
+            Render.OnRender += this.OnRender;
+        }
+
+        private void OnRender()
+        {
+            if (!AimtecMenu.DebugEnabled)
+            {
+                return;
+            }
+
+            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsVisible && x.IsEnemy))
+            {
+                var prediction = this.GetPrediction(enemy);
+
+                Render.WorldToScreen(prediction.CastPosition, out Vector2 predictionSp);
+
+                Render.Circle(prediction.CastPosition, 100, 20, Color.Aqua);
+                Render.Text(
+                    predictionSp + new Vector2(0, 60),
+                    Color.White,
+                    $"{this.Slot} - {prediction.HitChance}");
             }
         }
 
