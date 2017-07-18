@@ -510,7 +510,7 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             var availableMinionTargets = attackable
-                .Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>().Where(x => this.CanKillMinion(x));
+                .OfType<Obj_AI_Base>().Where(x => this.CanKillMinion(x));
 
             var bestMinionTarget = availableMinionTargets
                 .OrderByDescending(x => x.MaxHealth).ThenBy(x => this.HealthPrediction.GetAggroData(x)?.HasTurretAggro)
@@ -562,16 +562,14 @@ namespace Aimtec.SDK.Orbwalking
         {
             //Nexus
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
-            var nexus = attackableUnits.Where(x => x.Type == GameObjectType.obj_HQ).OrderBy(x => x.Distance(Player))
-                                       .FirstOrDefault();
+            var nexus = attackableUnits.Where(x => x.Type == GameObjectType.obj_HQ).MinBy(x => x.Distance(Player));
             if (nexus != null && nexus.IsValidAutoRange())
             {
                 return nexus;
             }
 
             //Turret
-            var turret = attackableUnits.Where(x => x is Obj_AI_Turret).OrderBy(x => x.Distance(Player))
-                                        .FirstOrDefault();
+            var turret = attackableUnits.Where(x => x is Obj_AI_Turret).MinBy(x => x.Distance(Player));
             if (turret != null && turret.IsValidAutoRange())
             {
                 return turret;
@@ -579,7 +577,7 @@ namespace Aimtec.SDK.Orbwalking
 
             //Inhib
             var inhib = attackableUnits.Where(x => x.Type == GameObjectType.obj_BarracksDampener)
-                                       .OrderBy(x => x.Distance(Player)).FirstOrDefault();
+                                       .MinBy(x => x.Distance(Player));
             if (inhib != null && inhib.IsValidAutoRange())
             {
                 return inhib;

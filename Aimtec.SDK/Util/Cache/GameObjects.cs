@@ -125,7 +125,7 @@ namespace Aimtec.SDK.Util.Cache
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns>IEnumerable{T}</returns>
-        public static IEnumerable<T> Get<T>()
+        public static IEnumerable<T> Get<T>() where T: GameObject
         {
             return allGameObjects.OfType<T>();
         }

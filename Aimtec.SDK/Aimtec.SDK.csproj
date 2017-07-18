@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
     <Compile Include="Events\Dash.cs" />
+    <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Orbwalking\AOrbwalker.cs" />
     <Compile Include="Orbwalking\IOrbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkerMode.cs" />

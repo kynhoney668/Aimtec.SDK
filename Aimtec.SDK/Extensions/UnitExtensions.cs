@@ -260,8 +260,7 @@ namespace Aimtec.SDK.Extensions
         /// </returns>
         public static bool IsRecalling(this Obj_AI_Hero unit)
         {
-            return unit.ValidActiveBuffs().Any(
-                buff => buff.Name.ToLower().Contains("recall") && buff.Type == BuffType.Aura);
+            return unit.HasBuff("recall");
         }
 
         /// <summary>
