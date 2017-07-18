@@ -233,6 +233,7 @@
         ///     Casts the specified target.
         /// </summary>
         /// <param name="target">The target.</param>
+        /// <param name="target">The minimum hitchance. </param>
         /// <returns><c>true</c> if the spell was casted, <c>false</c> otherwise.</returns>
         public bool Cast(Obj_AI_Base target)
         {
@@ -271,12 +272,13 @@
             if (this.IsChargedSpell)
             {
                 return this.IsCharging
-                    ? ShootChargedSpell(this.Slot, prediction.CastPosition)
+                    ? this.ShootChargedSpell(prediction.CastPosition)
                     : this.StartCharging(prediction.CastPosition);
             }
 
             return Player.SpellBook.CastSpell(this.Slot, prediction.CastPosition);
         }
+
 
         /// <summary>
         ///     Casts this instance.
@@ -312,9 +314,16 @@
                 return false;
             }
 
-            return Player.SpellBook.CastSpell(
-                this.Slot,
-                new Vector3(position.X, NavMesh.GetHeightForWorld(position.X, position.Y), position.Y));
+            var castPosition = new Vector3(position.X, NavMesh.GetHeightForWorld(position.X, position.Y), position.Y);
+
+            if (this.IsChargedSpell)
+            {
+                return this.IsCharging
+                    ? this.ShootChargedSpell(castPosition)
+                    : this.StartCharging(castPosition);
+            }
+
+            return Player.SpellBook.CastSpell(this.Slot, castPosition);
         }
 
         /// <summary>
@@ -327,6 +336,13 @@
             if (!this.Ready)
             {
                 return false;
+            }
+
+            if (this.IsChargedSpell)
+            {
+                return this.IsCharging
+                    ? this.ShootChargedSpell(position)
+                    : this.StartCharging(position);
             }
 
             return Player.SpellBook.CastSpell(this.Slot, position);
@@ -492,24 +508,20 @@
             }
         }
 
-        #endregion
-
-        #region Methods
-
-        private static bool ShootChargedSpell(SpellSlot slot, Vector3 position, bool releaseCast = true)
+        public bool ShootChargedSpell(Vector3 position, bool releaseCast = true)
         {
-            var resultUpdate = Player.SpellBook.UpdateChargedSpell(slot, position, releaseCast);
+            var resultUpdate = Player.SpellBook.UpdateChargedSpell(this.Slot, position, releaseCast);
 
             if (!releaseCast)
             {
-                var resultCast = Player.SpellBook.CastSpell(slot, position);
+                var resultCast = Player.SpellBook.CastSpell(this.Slot, position);
                 return resultUpdate && resultCast;
             }
 
             return resultUpdate;
         }
 
-        private bool StartCharging(Vector3 position)
+        public bool StartCharging(Vector3 position)
         {
             if (this.IsCharging || Game.TickCount - this.chargeReqSentT <= 400 + Game.Ping)
             {
@@ -519,6 +531,10 @@
             this.chargeReqSentT = Game.TickCount;
             return Player.SpellBook.CastSpell(this.Slot, position);
         }
+
+        #endregion
+
+        #region Methods
 
         #endregion
     }
