@@ -65,7 +65,7 @@
             {
                 if (!sourceIterator.MoveNext())
                 {
-                    throw new InvalidOperationException("Sequence contains no elements");
+                    return default(TSource);
                 }
 
                 var min = sourceIterator.Current;
