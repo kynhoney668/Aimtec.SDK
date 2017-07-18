@@ -118,22 +118,22 @@ namespace Aimtec.SDK.Damage
                         break;
                     // TODO getting the actual buffname
                     case "Sejuani":
-                        if (target.HasBuff("sejuanistun") && targetHero != null)
+                        if (target.HasBuff("sejuanistun"))
                         {
                             switch (target.Type)
                             {
                                 case GameObjectType.obj_AI_Hero:
                                     if (hero.Level < 7)
                                     {
-                                        dmgMagical += 0.1 * targetHero.MaxHealth;
+                                        dmgMagical += 0.1 * target.MaxHealth;
                                     }
                                     else if (hero.Level < 14)
                                     {
-                                        dmgMagical += 0.15 * targetHero.MaxHealth;
+                                        dmgMagical += 0.15 * target.MaxHealth;
                                     }
                                     else
                                     {
-                                        dmgMagical += 0.2 * targetHero.MaxHealth;
+                                        dmgMagical += 0.2 * target.MaxHealth;
                                     }
                                     break;
                                 case GameObjectType.obj_AI_Minion:
@@ -161,19 +161,21 @@ namespace Aimtec.SDK.Damage
                 }
             }
 
-            // Ninja Tabi
-            if (targetHero != null && !(source is Obj_AI_Turret) && targetHero.HasItem(3047))
+            // Fizz P
+            if (targetHero != null && targetHero.ChampionName == "Fizz")
             {
-                dmgReduce *= 0.9;
+                dmgPhysical -= 4 + 2 * Math.Floor((targetHero.Level - 1) / 3d);
             }
 
             dmgPhysical = source.CalculatePhysicalDamage(target, dmgPhysical);
             dmgMagical = source.CalculateMagicDamage(target, dmgMagical);
 
-            // Fizz P
-            if (targetHero != null && targetHero.ChampionName == "Fizz")
+            // Ninja Tabi
+            if (targetHero != null &&
+                !(source is Obj_AI_Turret) &&
+                targetHero.HasItem(ItemId.NinjaTabi))
             {
-                dmgPhysical -= 4 + 2 * Math.Floor((targetHero.Level - 1) / 3d);
+                dmgReduce *= 0.9;
             }
 
             return Math.Max(Math.Floor((dmgPhysical + dmgMagical) * dmgReduce + source.GetPassiveFlatMod(target)), 0);
@@ -574,13 +576,33 @@ namespace Aimtec.SDK.Damage
             double amount,
             DamageType damageType)
         {
+            var minion = target as Obj_AI_Minion;
             if (source is Obj_AI_Turret)
             {
-                var minion = target as Obj_AI_Minion;
-
-                if (minion != null && minion.Name.Contains("Siege"))
+                if (minion != null &&
+                    minion.Name.Contains("Siege") || minion.Name.Contains("Super"))
                 {
                     amount *= 0.7;
+                }
+            }
+            else if (source is Obj_AI_Hero)
+            {
+                if (minion != null)
+                {
+                    if (source.HasBuff("barontarget") &&
+                        minion.UnitSkinName.Contains("SRU_Baron"))
+                    {
+                        amount *= 0.5;
+                    }
+                    else if (source.HasBuff("dragonbuff_tooltipmanager") &&
+                        target.HasBuff("s5_dragonvengeance") &&
+                        target.UnitSkinName.Contains("SRU_Dragon"))
+                    {
+                        /* TODO: More like broscience, not 100% consistent, the effect is "7% reduced damage for each dragon killed by your team."
+                         * while this doesn't do anything else than reducing by 7% your damage for each dragon TYPE you've killed.
+                           Buffs can't tell you how many dragons you've killed, nor can the enemy buff, so there's no way to tell in-game, needs some kind of property. */
+                        amount *= 1 - 0.07 * (source.ValidActiveBuffs().Count(b => b.Name.Contains("dragonbuff")) - 1);
+                    }
                 }
             }
 
