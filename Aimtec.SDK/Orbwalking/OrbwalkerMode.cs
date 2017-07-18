@@ -169,20 +169,12 @@
         /// </summary>
         public void Execute()
         {
-            if (this.ModeBehaviour != null)
-            {
-                this.ModeBehaviour();
-            }
+            this.ModeBehaviour?.Invoke();
         }
 
         public AttackableUnit GetTarget()
         {
-            if (this.GetTargetImplementation != null)
-            {
-                return this.GetTargetImplementation();
-            }
-
-            return null;
+            return this.GetTargetImplementation?.Invoke();
         }
 
         #endregion
