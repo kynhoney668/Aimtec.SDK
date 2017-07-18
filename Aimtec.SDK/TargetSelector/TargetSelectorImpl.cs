@@ -322,42 +322,42 @@
             else if (this.Mode == TargetSelectorMode.LeastAttacks)
             {
                 returnValue = validTargets.OrderBy(x => (int) Math.Ceiling(x.Health / Player.GetAutoAttackDamage(x)))
-                                          .ThenByDescending(x => this.GetPriority(x));
+                                          .ThenByDescending(this.GetPriority);
             }
 
             else if (this.Mode == TargetSelectorMode.LeastSpells)
             {
                 returnValue = validTargets
-                    .OrderBy(x => (int) (x.Health / Damage.CalculateDamage(Player, x, DamageType.Magical, 100)))
-                    .ThenByDescending(x => this.GetPriority(x));
+                    .OrderBy(x => (int) (x.Health / Player.CalculateDamage(x, DamageType.Magical, 100)))
+                    .ThenByDescending(this.GetPriority);
             }
 
             else if (this.Mode == TargetSelectorMode.LowestHealth)
             {
-                returnValue = validTargets.OrderBy(x => x.Health).ThenByDescending(x => this.GetPriority(x));
+                returnValue = validTargets.OrderBy(x => x.Health).ThenByDescending(this.GetPriority);
             }
 
             else if (this.Mode == TargetSelectorMode.MostAd)
             {
                 returnValue = validTargets.OrderByDescending(x => x.TotalAttackDamage)
-                                          .ThenByDescending(x => this.GetPriority(x));
+                                          .ThenByDescending(this.GetPriority);
             }
 
             else if (this.Mode == TargetSelectorMode.MostAp)
             {
                 returnValue = validTargets.OrderByDescending(x => x.TotalAbilityDamage)
-                                          .ThenByDescending(x => this.GetPriority(x));
+                                          .ThenByDescending(this.GetPriority);
             }
 
             else if (this.Mode == TargetSelectorMode.NearMouse)
             {
                 returnValue = validTargets.OrderBy(x => x.Distance(Game.CursorPos))
-                                          .ThenByDescending(x => this.GetPriority(x));
+                                          .ThenByDescending(this.GetPriority);
             }
 
             else if (this.Mode == TargetSelectorMode.MostPriority)
             {
-                returnValue = validTargets.OrderBy(x => this.GetPriority(x));
+                returnValue = validTargets.OrderBy(this.GetPriority);
             }
 
             this.Cache.AddItem(new TSCache.CacheObject(key, returnValue, this.Config["Misc"]["CacheT"].Value));
@@ -367,7 +367,6 @@
 
         public TargetPriority GetPriority(Obj_AI_Hero hero)
         {
-            var name = hero.ChampionName;
             var slider = this.Config["TargetsMenu"]["priority" + hero.ChampionName].As<MenuSlider>();
             if (slider != null)
             {
@@ -419,29 +418,26 @@
 
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy))
             {
-                targetsMenu.Add(
-                    new MenuSlider(
-                        "priority" + enemy.ChampionName,
-                        enemy.ChampionName,
-                        (int) this.GetDefaultPriority(enemy),
-                        1,
-                        5));
+                targetsMenu.Add(new MenuSlider("priority" + enemy.ChampionName, enemy.ChampionName, (int)this.GetDefaultPriority(enemy), 1, 5));
             }
 
             this.Config.Add(targetsMenu);
 
-            var drawings = new Menu("Drawings", "Drawings");
-            drawings.Add(new MenuBool("IndicateSelected", "Indicate Selected Target"));
-            drawings.Add(new MenuBool("ShowOrder", "Show Target Order"));
-            drawings.Add(new MenuBool("ShowOrderAuto", "Auto range only"));
+            var drawings = new Menu("Drawings", "Drawings")
+            {
+                new MenuBool("IndicateSelected", "Indicate Selected Target"),
+                new MenuBool("ShowOrder", "Show Target Order"),
+                new MenuBool("ShowOrderAuto", "Auto range only")
+            };
             this.Config.Add(drawings);
 
-            var miscMenu = new Menu("Misc", "Misc");
-            miscMenu.Add(new MenuSlider("CacheT", "Cache Refresh Time", 200, 0, 500));
+            var miscMenu = new Menu("Misc", "Misc")
+            {
+                new MenuSlider("CacheT", "Cache Refresh Time", 200, 0, 500)
+            };
             this.Config.Add(miscMenu);
 
             this.Config.Add(new MenuBool("UseWeights", "Use Weights"));
-
             this.Config.Add(new MenuList("TsMode", "Mode", Enum.GetNames(typeof(TargetSelectorMode)), 0));
         }
 
@@ -532,7 +528,6 @@
         private void GameOnOnWndProc(WndProcEventArgs args)
         {
             var message = args.Message;
-
             if (message == (ulong) WindowsMessages.WM_LBUTTONDOWN)
             {
                 var clickPosition = Game.CursorPos;
