@@ -129,7 +129,7 @@ namespace Aimtec.SDK.Damage
 
             foreach (var reduction in Reductions)
             {
-                if (source != null || !source.HasBuff(reduction.BuffName))
+                if (source == null || !source.HasBuff(reduction.BuffName))
                 {
                     continue;
                 }
