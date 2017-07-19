@@ -42,7 +42,7 @@ namespace Aimtec.SDK.Damage
                                    Type = Reduction.ReductionDamageType.Percent,
                                    ReductionPercentDamage = (source, attacker) =>
                                        {
-                                           return new[] { 0.3, 0.4, 0.5 }[source.SpellBook.GetSpell(SpellSlot.R).Level - 1];
+                                           return new[] { 30, 40, 50 }[source.SpellBook.GetSpell(SpellSlot.R).Level - 1];
                                        }
                                });
 
@@ -68,7 +68,7 @@ namespace Aimtec.SDK.Damage
                                    Type = Reduction.ReductionDamageType.Percent,
                                    ReductionPercentDamage = (source, attacker) =>
                                        {
-                                           return new[] { 30 , 32.5, 35, 37.5, 40 }[source.SpellBook.GetSpell(SpellSlot.E).Level - 1];
+                                           return new[] { 30, 32.5, 35, 37.5, 40 }[source.SpellBook.GetSpell(SpellSlot.E).Level - 1];
                                        }
                                });
 
@@ -90,7 +90,7 @@ namespace Aimtec.SDK.Damage
                                        {
 										   if (ObjectManager.Get<GameObject>()
 											       .Where(o => o.Type == GameObjectType.obj_GeneralParticleEmitter)
-											       .Any(p => p.Name == "Garen_Base_W_Shoulder_L.troy"))
+											       .Any(p => p.Name == "Garen_Base_W_Shoulder_L.troy" && p.IsAlly))
                                            {
                                                 return 60;
                                            }
@@ -115,7 +115,7 @@ namespace Aimtec.SDK.Damage
                                    Type = Reduction.ReductionDamageType.Percent,
                                    ReductionPercentDamage = (source, attacker) =>
                                        {
-                                           return new[] { 5, 55, 6, 65, 7 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] / (attacker is Obj_AI_Turret ? 2f : 1f);
+                                           return new[] { 50, 55, 60, 65, 70 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] / (attacker is Obj_AI_Turret ? 2 : 1f);
                                        }
                                });
 
@@ -134,14 +134,15 @@ namespace Aimtec.SDK.Damage
                     continue;
                 }
 
-                if (reduction.Type.HasFlag(Reduction.ReductionDamageType.Flat))
+                switch (reduction.Type)
                 {
-                    flatDamageReduction += reduction.GetFlatDamage(source, attacker);
-                }
+                    case Reduction.ReductionDamageType.Flat:
+                        flatDamageReduction += reduction.GetFlatDamage(source, attacker);
+                        break;
 
-                if (reduction.Type.HasFlag(Reduction.ReductionDamageType.Percent))
-                {
-                    percentDamageReduction *= 1 - reduction.GetPercentDamage(source, attacker) / 100;
+                    case Reduction.ReductionDamageType.Percent:
+                        percentDamageReduction *= 1 - reduction.GetPercentDamage(source, attacker) / 100;
+                        break;
                 }
             }
 
@@ -193,11 +194,10 @@ namespace Aimtec.SDK.Damage
 
             public ReductionDamageType Type { get; set; }
 
-            [Flags]
             public enum ReductionDamageType
             {
-                Flat = 0x1,
-                Percent = 0x2
+                Flat,
+                Percent
             }
         }
     }

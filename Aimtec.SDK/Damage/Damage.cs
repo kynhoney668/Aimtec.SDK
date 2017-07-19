@@ -43,7 +43,7 @@ namespace Aimtec.SDK.Damage
                     damage = source.CalculateMixedDamage(target, damage / 2d, damage / 2d);
                     break;
                 case DamageType.True:
-                    damage = Math.Floor(source.GetPassivePercentMod(target, Math.Max(amount, 0), DamageType.True));
+                    damage = Math.Max(Math.Floor(amount), 0);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(damageType), damageType, null);
@@ -87,128 +87,23 @@ namespace Aimtec.SDK.Damage
 
             if (hero != null)
             {
-                // TODO: Finish Passive Damages.
-                switch (hero.ChampionName)
+                var passiveDamage = DamagePassive.ComputePassiveDamages(hero, target);
+                dmgPhysical += passiveDamage.PhysicalDamage;
+                dmgMagical += passiveDamage.MagicalDamage;
+
+                dmgPhysical *= passiveDamage.PhysicalDamagePercent;
+                dmgMagical *= passiveDamage.MagicalDamagePercent;
+
+                var ardentCenserBuff = hero.GetBuff("ARDENTCENSER"); // TODO: Add real buffname.
+                var ardentCenserBuffCaster = (Obj_AI_Hero)ardentCenserBuff?.Caster;
+                if (ardentCenserBuffCaster != null)
                 {
-                    case "Aatrox":
-                        if (hero.HasBuff("AatroxWPower") &&
-						    hero.HasBuff("aatroxwonhpowerbuff"))
-                        {
-                            dmgMagical += hero.GetSpellDamage(target, SpellSlot.W);
-                        }
-                        break;
+                    dmgMagical += 19.12 + 0.88 * ardentCenserBuffCaster.Level;
+                }
 
-                    case "Akali":
-                        if (target.HasBuff("AkaliMota"))
-                        {
-                            dmgMagical += hero.GetSpellDamage(target, SpellSlot.Q, DamageStage.Detonation);
-                        }
-
-                        if (hero.HasBuff("akalishadowstate"))
-                        {
-                            dmgMagical += new[] { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 40, 50, 60, 70, 80, 90, 100 }[hero.Level-1];
-                        }
-                        break;
-
-                    case "Ashe":
-                        if (target.HasBuff("ashepassiveslow"))
-                        {
-                            dmgPhysical += 1 * (0.1 + hero.Crit*100 * (1 + (hero.HasItem(ItemId.InfinityEdge) ? 50 : 0))); // TODO: Implement sourceScale.BonusCritDamage or sourceScale.CritDamageMod)));
-                        }
-                        break;
-
-                    case "Bard":
-                        dmgMagical += 30 + 15 * (hero.GetBuffCount("bardpdisplaychimecount") / 5) + 0.3 * hero.TotalAbilityDamage;
-                        break;
-
-                    case "Blitzcrank":
-                        if (hero.HasBuff("PowerFist"))
-                        {
-                            dmgPhysical += hero.GetSpellDamage(target, SpellSlot.E);
-                        }
-                        break;
-
-                    case "Braum":
-                        if (target.HasBuff("braummarkstunreduction"))
-                        {
-                            dmgMagical += 3.2 + 2 * hero.Level;
-                        }
-                        break;
-
-                    case "Caitlyn":
-                        if (hero.HasBuff("caitlynheadshot") ||
-						    hero.HasBuff("caitlynheadshotrangecheck") && target.HasBuff("caitlynyordletrapinternal"))
-                        {
-                            var totCritDamageModifier = 2 + (hero.HasItem(ItemId.InfinityEdge) ? 0.5 : 0);
-                            switch (target.Type)
-                            {
-                                case GameObjectType.obj_AI_Minion:
-                                    dmgPhysical *= 2.5;
-                                    break;
-
-                                case GameObjectType.obj_AI_Hero:
-                                    dmgPhysical *= 1.5 + 0.5 * totCritDamageModifier * (hero.Crit*100);
-                                    break;
-                            }
-                        }
-                        break;
-
-                    case "ChoGath":
-                        if (hero.HasBuff("VorpalSpikes"))
-                        {
-                            dmgMagical += hero.GetSpellDamage(target, SpellSlot.E);
-                        }
-                        break;
-
-                    case "Corki":
-                        dmgMagical = dmgPhysical * 0.80;
-                        dmgPhysical *= 0.20;
-                        break;
-
-                    case "Galio":
-                        if (hero.HasBuff("galiopassivebuff"))
-                        {
-                            dmgMagical += 8 + 4 * hero.Level + hero.TotalAttackDamage + 0.6 * hero.TotalAbilityDamage + 0.6 * hero.BonusSpellBlock;
-                        }
-                        break;
-
-                    case "Kalista":
-                        dmgPhysical *= 0.9;
-                        break;
-
-                    case "Quinn":
-                        if (target.HasBuff("quinnw"))
-                        {
-                            dmgPhysical += 10 + 5 * hero.Level + (0.14 + 0.02 * hero.Level) * hero.TotalAttackDamage;
-                        }
-                        break;
-
-                    case "Sejuani":
-                        if (target.HasBuff("sejuanistun"))
-                        {
-                            switch (target.Type)
-                            {
-                                case GameObjectType.obj_AI_Hero:
-                                    if (hero.Level < 7)
-                                    {
-                                        dmgMagical += 0.1 * target.MaxHealth;
-                                    }
-                                    else if (hero.Level < 14)
-                                    {
-                                        dmgMagical += 0.15 * target.MaxHealth;
-                                    }
-                                    else
-                                    {
-                                        dmgMagical += 0.2 * target.MaxHealth;
-                                    }
-                                    break;
-
-                                case GameObjectType.obj_AI_Minion:
-                                    dmgMagical += 400;
-                                    break;
-                            }
-                        }
-                        break;
+                if (target.GetBuffCount("braummarkcounter") == 3)
+                {
+                    dmgMagical += 16 + 10 * source.Level;
                 }
 
                 if (target is Obj_AI_Minion)
@@ -216,7 +111,12 @@ namespace Aimtec.SDK.Damage
                     var mastery = hero.GetCunningPage(MasteryId.Cunning.Savagery);
                     if (mastery != null && hero.IsUsingMastery(mastery))
                     {
-                        dmgPhysical += new [] { 1, 2, 3, 4, 5 }[mastery.Points-1];
+                        dmgPhysical += new[] { 1, 2, 3, 4, 5 }[mastery.Points-1];
+                    }
+
+                    if (hero.HasItem(ItemId.DoransShield))
+                    {
+                        dmgPhysical += 5;
                     }
 
                     if (!hero.IsMelee &&
@@ -225,18 +125,6 @@ namespace Aimtec.SDK.Damage
                     {
                         dmgReduce *= 0.65;
                     }
-
-                    if (hero.HasItem(ItemId.DoransShield))
-                    {
-                        dmgPhysical += 5;
-                    }
-                }
-
-                var ardentCenserBuff = hero.GetBuff("ARDENTCENSER"); // TODO: Add real buffname.
-                var ardentCenserBuffCaster = (Obj_AI_Hero)ardentCenserBuff?.Caster;
-                if (ardentCenserBuffCaster != null)
-                {
-                    dmgMagical += 19.12 + 0.88 * ardentCenserBuffCaster.Level;
                 }
             }
 
@@ -280,7 +168,7 @@ namespace Aimtec.SDK.Damage
                     break;
             }
 
-            return Math.Max(Math.Floor((dmgPhysical + dmgMagical) * dmgReduce + source.GetPassiveFlatMod(target)), 0);
+            return Math.Max(Math.Floor(dmgPhysical + dmgMagical) * dmgReduce + source.GetPassiveFlatMod(target), 0);
         }
 
         /// <summary>
@@ -434,8 +322,33 @@ namespace Aimtec.SDK.Damage
                 dmgPassive += source.GetPassiveFlatMod(target);
             }
 
-            const int Broscience = 5;
-            return Math.Max(Math.Floor(totalDamage * dmgReduce  + dmgPassive - Broscience), 0);
+            if (source.ChampionName == "Sejuani" &&
+                target.HasBuff("sejuanistun"))
+            {
+                switch (target.Type)
+                {
+                    case GameObjectType.obj_AI_Hero:
+                        if (source.Level < 7)
+                        {
+                            dmgPassive += 0.1 * target.MaxHealth;
+                        }
+                        else if (source.Level < 14)
+                        {
+                            dmgPassive += 0.15 * target.MaxHealth;
+                        }
+                        else
+                        {
+                            dmgPassive += 0.2 * target.MaxHealth;
+                        }
+                        break;
+
+                    case GameObjectType.obj_AI_Minion:
+                        dmgPassive += 400;
+                        break;
+                }
+            }
+
+            return Math.Max(Math.Floor(totalDamage * dmgReduce  + dmgPassive), 0);
         }
 
         #endregion
@@ -487,15 +400,11 @@ namespace Aimtec.SDK.Damage
             var damageReductions = DamageReduction.ComputeReductionDamages(hero, target, DamageType.Magical);
             var masteryDamage = DamageMastery.ComputeMasteryDamages(hero, target);
 
-            const int Broscience = 5;
             return Math.Max(
-                    Math.Floor(
-                        source.GetPassivePercentMod(target, value, DamageType.Magical)
-                        * damageReductions.PercentDamageReduction
-                        * amount
+                        Math.Floor(source.GetPassivePercentMod(target, value, DamageType.Magical) * amount * damageReductions.PercentDamageReduction)
                         + masteryDamage.MagicalDamage
-                        - damageReductions.FlatDamageReduction
-                        - Broscience), 0);
+                        - damageReductions.FlatDamageReduction,
+                   0);
         }
 
         /// <summary>
@@ -516,18 +425,22 @@ namespace Aimtec.SDK.Damage
             double armorPenetrationFlat = source.FlatArmorPenetration;
             double bonusArmorPenetrationMod = source.PercentBonusArmorPenetration;
 
-            // Minions return wrong percent values.
-            if (source is Obj_AI_Minion)
+            switch (source.Type)
             {
-                armorPenetrationFlat = 0;
-                armorPenetrationPercent = 1;
-                bonusArmorPenetrationMod = 1;
-            }
+                // Minions return wrong percent values.
+                case GameObjectType.obj_AI_Minion:
+                    armorPenetrationFlat = 0;
+                    armorPenetrationPercent = 1;
+                    bonusArmorPenetrationMod = 1;
+                    break;
 
-            // Turrets passive.
-            if (source.Type == GameObjectType.obj_AI_Turret)
-            {
-                // todo turret passive damage
+                // Turrets' Passive damage.
+                case GameObjectType.obj_AI_Turret:
+                    armorPenetrationFlat = 0;
+                    bonusArmorPenetrationMod = 1;
+
+                    //TODO:
+                    break;
             }
 
             // Penetration can't reduce armor below 0.
@@ -551,20 +464,14 @@ namespace Aimtec.SDK.Damage
             }
 
             var hero = source as Obj_AI_Hero;
-            var targetHero = target as Obj_AI_Hero;
-
             var damageReductions = DamageReduction.ComputeReductionDamages(hero, target, DamageType.Physical);
             var masteryDamage = DamageMastery.ComputeMasteryDamages(hero, target);
 
-            const int Broscience = 5;
             return Math.Max(
-                    Math.Floor(
-                        source.GetPassivePercentMod(target, value, DamageType.Physical)
-                        * damageReductions.PercentDamageReduction
-                        * amount
+                        Math.Floor(source.GetPassivePercentMod(target, value, DamageType.Physical) * amount * damageReductions.PercentDamageReduction)
                         + masteryDamage.PhysicalDamage
-                        - damageReductions.FlatDamageReduction
-                        - Broscience), 0);
+                        - damageReductions.FlatDamageReduction,
+                   0);
         }
 
         /// <summary>
@@ -604,6 +511,7 @@ namespace Aimtec.SDK.Damage
             this Obj_AI_Base source,
             AttackableUnit target,
             double amount,
+            // ReSharper disable once UnusedParameter.Local
             DamageType damageType)
         {
             var minion = target as Obj_AI_Minion;
@@ -645,18 +553,44 @@ namespace Aimtec.SDK.Damage
 				var targetHero = target as Obj_AI_Hero;
 				if (targetHero != null)
 				{
-					if (targetHero.ValidActiveBuffs().Any(b => b.Caster != hero && b.Name == "ExposeWeaknessDebuff"))
+				    var buff = hero.GetBuff("sonapassivedebuff");
+                    if (buff != null)
+                    {
+                        var caster = buff.Caster as Obj_AI_Hero;
+                        if (caster != null)
+                        {
+                            amount *= 1 - (0.25 + 0.04 * caster.TotalAbilityDamage / 100);
+                        }
+				    }
+
+                    if (targetHero.ValidActiveBuffs().Any(b =>
+                            b.Caster != hero &&
+                            hero.Team == b.Caster.Team &&
+                            b.Name == "ExposeWeaknessDebuff"))
 					{
 						amount *= 1 + 3 / 100; // 3% Increase.
 					}
 
-				    var doubleEdgedSword = targetHero.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
-                    if (doubleEdgedSword != null &&
-                        targetHero.IsUsingMastery(doubleEdgedSword))
-					{
-						amount *= 1 + 1.5 / 100; // 1.5% Increase.
-					}
+                    if (hero.MaxHealth < targetHero.MaxHealth && damageType == DamageType.Physical)
+                    {
+                        var healthDiff = Math.Min(targetHero.MaxHealth - hero.MaxHealth, 1000);
+                        if (hero.HasItem(ItemId.LordDominiksRegards))
+				        {
+				            amount *= 1 + healthDiff / 5000;
+				        }
+                        else if (hero.HasItem(ItemId.GiantSlayer))
+				        {
+				            amount *= 1 + healthDiff / 10000;
+                        }
+                    }
 				}
+
+                var doubleEdgedSword = targetHero?.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
+                if (doubleEdgedSword != null &&
+                    targetHero.IsUsingMastery(doubleEdgedSword))
+                {
+                    amount *= 1 + 1.5 / 100; // 1.5% Increase.
+                }
             }
 
             return amount;

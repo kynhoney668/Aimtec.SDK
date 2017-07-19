@@ -8,7 +8,6 @@ namespace Aimtec.SDK.Damage
 
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     internal class DamageItem
     {
@@ -245,20 +244,19 @@ namespace Aimtec.SDK.Damage
                     continue;
                 }
 
-                if (item.DamageType.HasFlag(Item.ItemDamageType.Physical))
+                switch (item.DamageType)
                 {
-                    totalPhysicalDamage += item.GetPhysicalDamage(source, target);
-                }
+                    case Item.ItemDamageType.Physical:
+                        totalPhysicalDamage += item.GetPhysicalDamage(source, target);
+                        break;
 
+                    case Item.ItemDamageType.Magical:
+                        totalMagicalDamage += item.GetMagicalDamage(source, target);
+                        break;
 
-                if (item.DamageType.HasFlag(Item.ItemDamageType.Magical))
-                {
-                    totalMagicalDamage += item.GetMagicalDamage(source, target);
-                }
-
-                if (item.DamageType.HasFlag(Item.ItemDamageType.True))
-                {
-                    totalTrueDamage += item.GetTrueDamage(source, target);
+                    case Item.ItemDamageType.True:
+                        totalTrueDamage += item.GetTrueDamage(source, target);
+                        break;
                 }
             }
 
@@ -271,9 +269,9 @@ namespace Aimtec.SDK.Damage
         {
             public ItemDamageResult(double physicalDamage, double magicalDamage, double trueDamage)
             {
-                this.PhysicalDamage = physicalDamage;
-                this.MagicalDamage = magicalDamage;
-                this.TrueDamage = trueDamage;
+                this.PhysicalDamage = Math.Floor(physicalDamage);
+                this.MagicalDamage = Math.Floor(magicalDamage);
+                this.TrueDamage = Math.Floor(trueDamage);
             }
 
             public double PhysicalDamage { get; set; }
@@ -323,12 +321,11 @@ namespace Aimtec.SDK.Damage
 
             public ItemDamageType DamageType { get; set; }
 
-            [Flags]
             public enum ItemDamageType
             {
-                Physical = 0x1,
-                Magical = 0x2,
-                True = 0x4
+                Physical,
+                Magical,
+                True
             }
         }
     }

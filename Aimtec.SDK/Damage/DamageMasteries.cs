@@ -8,7 +8,6 @@ namespace Aimtec.SDK.Damage
 
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     internal class DamageMastery
     {
@@ -34,7 +33,13 @@ namespace Aimtec.SDK.Damage
                                   DamageType = Mastery.MasteryDamageType.Percent,
                                   MasteryPercentDamage = (mastery, source, target) =>
                                       {
-                                          return 1.03;
+                                          var targetHero = target as Obj_AI_Hero;
+                                          if (targetHero != null)
+                                          {
+                                              return 1.03;
+                                          }
+
+                                          return 1;
                                       }
                               });
 
@@ -82,7 +87,7 @@ namespace Aimtec.SDK.Damage
                                           var targetHero = target as Obj_AI_Hero;
                                           if (targetHero?.HealthPercent() < 40)
                                           {
-                                              return 1 - new[] { 0.6, 1.2, 1.8, 2.4, 3 }[mastery.Points - 1] / 100;
+                                              return 1 + new[] { 0.6, 1.2, 1.8, 2.4, 3 }[mastery.Points - 1] / 100;
                                           }
 
                                           return 1;
@@ -105,19 +110,20 @@ namespace Aimtec.SDK.Damage
                     continue;
                 }
 
-                if (mastery.DamageType.HasFlag(Mastery.MasteryDamageType.Physical))
+                var getMastery = source.GetMastery(mastery.Page, mastery.Id);
+                switch (mastery.DamageType)
                 {
-                    totalPhysicalDamage += mastery.GetPhysicalDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
-                }
+                    case Mastery.MasteryDamageType.Physical:
+                        totalPhysicalDamage += mastery.GetPhysicalDamage(getMastery, source, target);
+                        break;
 
-                if (mastery.DamageType.HasFlag(Mastery.MasteryDamageType.Magical))
-                {
-                    totalMagicalDamage += mastery.GetMagicalDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
-                }
+                    case Mastery.MasteryDamageType.Magical:
+                        totalMagicalDamage += mastery.GetMagicalDamage(getMastery, source, target);
+                        break;
 
-                if (mastery.DamageType.HasFlag(Mastery.MasteryDamageType.Percent))
-                {
-                    totalPercentDamage *= mastery.GetPercentDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
+                    case Mastery.MasteryDamageType.Percent:
+                        totalPercentDamage *= mastery.GetPercentDamage(getMastery, source, target);
+                        break;
                 }
             }
 
@@ -130,8 +136,8 @@ namespace Aimtec.SDK.Damage
         {
             public MasteryDamageResult(double physicalDamage, double magicalDamage, double percentDamage)
             {
-                this.PhysicalDamage = physicalDamage;
-                this.MagicalDamage = magicalDamage;
+                this.PhysicalDamage = Math.Floor(physicalDamage);
+                this.MagicalDamage = Math.Floor(magicalDamage);
                 this.PercentDamage = percentDamage;
             }
 
@@ -184,12 +190,11 @@ namespace Aimtec.SDK.Damage
 
             public MasteryDamageType DamageType { get; set; }
 
-            [Flags]
             public enum MasteryDamageType
             {
-                Physical = 0x1,
-                Magical = 0x2,
-                Percent = 0x4
+                Physical,
+                Magical,
+                Percent
             }
         }
     }

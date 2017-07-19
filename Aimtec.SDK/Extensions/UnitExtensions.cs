@@ -1,7 +1,10 @@
 namespace Aimtec.SDK.Extensions
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+
+    using Aimtec.SDK.Damage;
 
     /// <summary>
     ///     Class UnitExtensions.
@@ -91,7 +94,7 @@ namespace Aimtec.SDK.Extensions
         ///     Returns the 3D distance squared between two gameobjects.
         /// </summary>
         /// <param name="gameObj">The start GameObject.</param>
-        /// <param name="gameObj1">The target position.</param>
+        /// <param name="pos">The target position.</param>
         public static float DistanceSqr(this GameObject gameObj, Vector3 pos)
         {
             return Vector3.DistanceSquared(gameObj.ServerPosition, pos);
@@ -336,10 +339,25 @@ namespace Aimtec.SDK.Extensions
         /// <summary>
         ///     Gets the buffs of the unit which are valid and active
         /// </summary>
-        /// <param name="buff">The unit.</param>
+        /// <param name="unit">The unit.</param>
         public static Buff[] ValidActiveBuffs(this Obj_AI_Base unit)
         {
             return unit.Buffs.Where(buff => buff.IsValid && buff.IsActive).ToArray();
+        }
+
+        /// <summary>
+        ///     Gets the crit multiplier
+        /// </summary>
+        /// <param name="hero">The hero.</param>
+        /// <param name="checkCrit">The crit check.</param>
+        public static float GetCritMultiplier(this Obj_AI_Hero hero, bool checkCrit = false)
+        {
+            var crit = hero.HasItem(ItemId.InfinityEdge) ? 1.5f : 1;
+            return !checkCrit
+                ? crit
+                : (Math.Abs(hero.Crit - 1) < float.Epsilon
+                    ? 1 + crit
+                    : 1);
         }
 
         #endregion

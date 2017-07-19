@@ -440,10 +440,9 @@
 			"SpellData": {
 				"SpellEffectType": "None",
 				"DamageType": "Physical",
-				"Damages": [20.0, 35.0, 50.0, 65.0, 80.0],
 				"BonusDamages": [{
 					"DamageType": "Physical",
-					"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
+					"DamagePercentages": [0.21, 0.22, 0.23, 0.24, 0.25],
 					"ScalingTarget": "Source",
 					"ScalingType": "AttackPoints"
 				}]
@@ -1964,7 +1963,7 @@
 				"Damages": [30.0, 55.0, 80.0, 105.0, 130.0],
 				"BonusDamages": [{
 					"DamageType": "Physical",
-					"DamagePercentages": [1.4, 1.4, 1.4, 1.4, 1.4],
+					"DamagePercentages": [0.4, 0.4, 0.4, 0.4, 0.4],
 					"ScalingTarget": "Source",
 					"ScalingType": "AttackPoints"
 				}]
@@ -2038,6 +2037,7 @@
 					"DamageType": "Magical",
 					"Damages": [10.0, 20.0, 30.0, 40.0, 50.0],
 					"BonusDamages": [{
+							"MaxDamageOnMinion": [100, 150, 200, 250, 300],
 							"DamageType": "Magical",
 							"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
 							"ScalingTarget": "Source",

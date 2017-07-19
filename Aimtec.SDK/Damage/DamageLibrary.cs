@@ -87,7 +87,7 @@ namespace Aimtec.SDK.Damage
                     origin = ((Obj_AI_Hero)sourceScale).MaxHealth;
                     break;
                 case DamageScalingType.BonusArmor:
-                    origin = sourceScale.Armor; // TODO: Implement sourceScale.BaseArmor, since Total-Base = Bonus
+                    origin = sourceScale.BonusArmor;
                     break;
                 case DamageScalingType.Armor:
                     origin = sourceScale.Armor;
