@@ -84,7 +84,7 @@ namespace Aimtec.SDK.Damage
                     origin = sourceScale.MaxHealth - sourceScale.Health;
                     break;
                 case DamageScalingType.BonusHealth: // TODO: Implement sourceScale.BaseHealth, since Total-Base = Bonus
-                    origin = ((Obj_AI_Hero) sourceScale).MaxHealth;
+                    origin = ((Obj_AI_Hero)sourceScale).MaxHealth;
                     break;
                 case DamageScalingType.BonusArmor:
                     origin = sourceScale.Armor; // TODO: Implement sourceScale.BaseArmor, since Total-Base = Bonus
@@ -96,9 +96,7 @@ namespace Aimtec.SDK.Damage
                     origin = sourceScale.MaxMana;
                     break;
                 case DamageScalingType.BonusCriticalDamage:
-                    origin = sourceScale.HasItem(ItemId.InfinityEdge)
-                        ? 50
-                        : 0; // TODO: Implement sourceScale.BonusCritDamage or sourceScale.CritDamageMod
+                    origin = sourceScale.HasItem(ItemId.InfinityEdge) ? 50 : 0; // TODO: Implement sourceScale.BonusCritDamage or sourceScale.CritDamageMod
                     break;
                 default: throw new ArgumentOutOfRangeException();
             }
@@ -110,13 +108,17 @@ namespace Aimtec.SDK.Damage
                     : 0)
                 + (spellBonus.ScalePer100Ap > 0
                     ? Math.Abs(source.TotalAbilityDamage / 100) * spellBonus.ScalePer100Ap
-                    : 0) + (spellBonus.ScalePer35BonusAd > 0
+                    : 0)
+                + (spellBonus.ScalePer35BonusAd > 0
                     ? Math.Abs(source.FlatPhysicalDamageMod / 35) * spellBonus.ScalePer35BonusAd
-                    : 0) + (spellBonus.ScalePer100BonusAd > 0
+                    : 0)
+                + (spellBonus.ScalePer100BonusAd > 0
                     ? Math.Abs(source.FlatPhysicalDamageMod / 100) * spellBonus.ScalePer100BonusAd
-                    : 0) + (spellBonus.ScalePer100Ad > 0
+                    : 0)
+                + (spellBonus.ScalePer100Ad > 0
                     ? Math.Abs(source.TotalAttackDamage / 100) * spellBonus.ScalePer100Ad
-                    : 0) + (spellBonus.ScalePerCritPercent > 0
+                    : 0)
+                + (spellBonus.ScalePerCritPercent > 0
                     ? Math.Abs(source.Crit * 100) * spellBonus.ScalePerCritPercent
                     : 0)
                 : 0);
@@ -158,16 +160,12 @@ namespace Aimtec.SDK.Damage
         /// </summary>
         internal static void LoadDamages()
         {
-            Logger.Debug(
-                "Embedded Resources: " + string.Join(
-                    " | ",
-                    Assembly.GetExecutingAssembly().GetManifestResourceNames()));
+            Logger.Debug("Embedded Resources: " + string.Join(" | ", Assembly.GetExecutingAssembly().GetManifestResourceNames()));
 
             try
             {
-                // Todo makes this load based on game version
-                using (var stream = Assembly.GetExecutingAssembly()
-                                            .GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.14.json"))
+                // TODO: make this load dynamically based on current running game version.
+                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.14.json"))
                 {
                     if (stream == null)
                     {
@@ -188,7 +186,7 @@ namespace Aimtec.SDK.Damage
             {
                 Logger.Fatal(e, "Could not load damages. Subsequent Damage API calls will return 0.");
 
-                // Create empty damages to supress errors
+                // Create empty damages to suppress errors
                 Damages = new Dictionary<string, ChampionDamage>();
             }
         }

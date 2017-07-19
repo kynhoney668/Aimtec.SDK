@@ -142,7 +142,17 @@ namespace Aimtec.SDK.Orbwalking
 
         public bool PlantsCheck(AttackableUnit minion)
         {
-            return !(minion is Obj_AI_Minion) || !minion.Name.Contains("SRU_Plant_") || this.Config["Misc"]["attackPlants"].Enabled;
+            return !(minion is Obj_AI_Minion) || !((Obj_AI_Minion)minion).UnitSkinName.Contains("SRU_Plant_") || this.Config["Misc"]["attackPlants"].Enabled;
+        }
+
+        public bool WardsCheck(AttackableUnit minion)
+        {
+            return !(minion is Obj_AI_Minion) || !((Obj_AI_Minion)minion).UnitSkinName.Contains("ward") || this.Config["Misc"]["attackWards"].Enabled;
+        }
+
+        public bool IsValidAttackableUnit(AttackableUnit unit)
+        {
+            return this.PlantsCheck(unit) && this.WardsCheck(unit) && !unit.Name.Contains("Beacon");
         }
 
         public override bool CanAttack()
@@ -374,7 +384,7 @@ namespace Aimtec.SDK.Orbwalking
 
         AttackableUnit GetLaneClearTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && this.PlantsCheck(x));
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && this.IsValidAttackableUnit(x));
 
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
@@ -506,7 +516,7 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (attackable == null)
             {
-                attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero && this.PlantsCheck(x));
+                attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero && this.IsValidAttackableUnit(x));
             }
 
             var availableMinionTargets = attackable
@@ -604,7 +614,8 @@ namespace Aimtec.SDK.Orbwalking
                     new MenuSlider("holdPositionRadius", "Hold Radius", 50, 0, 400, true),
                     new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
                     new MenuBool("noBlindAA", "No AA when Blind", true, true),
-                    new MenuBool("attackPlants", "Attack Plants", false, true)
+                    new MenuBool("attackPlants", "Attack Plants", false, true),
+                    new MenuBool("attackWards", "Attack Wards", true, true)
                 }
             };
 

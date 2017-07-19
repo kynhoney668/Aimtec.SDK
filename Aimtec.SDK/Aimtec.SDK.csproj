@@ -54,6 +54,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
+    <Compile Include="Damage\DamageItem.cs" />
+    <Compile Include="Damage\DamageMasteries.cs" />
+    <Compile Include="Damage\DamageReduction.cs" />
+    <Compile Include="Damage\MasteryId.cs" />
     <Compile Include="Events\Dash.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Orbwalking\AOrbwalker.cs" />
