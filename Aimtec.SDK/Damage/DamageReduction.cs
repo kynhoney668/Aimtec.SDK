@@ -129,22 +129,19 @@ namespace Aimtec.SDK.Damage
 
             foreach (var reduction in Reductions)
             {
-                if (source != null || source.HasBuff(reduction.BuffName))
+                if (source != null || !source.HasBuff(reduction.BuffName))
                 {
                     continue;
                 }
 
-                if (source != null && source.HasBuff(reduction.BuffName))
+                if (reduction.Type.HasFlag(Reduction.ReductionDamageType.Flat))
                 {
-                    if (reduction.Type.HasFlag(Reduction.ReductionDamageType.Flat))
-                    {
-                        flatDamageReduction += reduction.GetFlatDamage(source, attacker);
-                    }
+                    flatDamageReduction += reduction.GetFlatDamage(source, attacker);
+                }
 
-                    if (reduction.Type.HasFlag(Reduction.ReductionDamageType.Percent))
-                    {
-                        percentDamageReduction *= 1 - reduction.GetPercentDamage(source, attacker) / 100;
-                    }
+                if (reduction.Type.HasFlag(Reduction.ReductionDamageType.Percent))
+                {
+                    percentDamageReduction *= 1 - reduction.GetPercentDamage(source, attacker) / 100;
                 }
             }
 

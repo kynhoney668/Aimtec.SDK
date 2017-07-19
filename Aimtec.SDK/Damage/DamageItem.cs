@@ -251,12 +251,12 @@ namespace Aimtec.SDK.Damage
                 }
 
 
-                if (item.DamageType.HasFlag(Item.ItemDamageType.Physical))
+                if (item.DamageType.HasFlag(Item.ItemDamageType.Magical))
                 {
                     totalMagicalDamage += item.GetMagicalDamage(source, target);
                 }
 
-                if (item.DamageType.HasFlag(Item.ItemDamageType.Physical))
+                if (item.DamageType.HasFlag(Item.ItemDamageType.True))
                 {
                     totalTrueDamage += item.GetTrueDamage(source, target);
                 }
