@@ -63,7 +63,7 @@
             foreach (var attack in incAttacksUnit)
             {
                 //if this attack will take longer than the specified time to reach the target, then ignore it
-                if (attack.ETA + 250 > time)
+                if (attack.ETA + 100 > time)
                 {
                     continue;
                 }
@@ -389,7 +389,7 @@
                 - this.Target.BoundingRadius;
 
             //Gets the time left until this auto reaches target by subtracting the time elapsed from total travel time
-            public float ETA => this.TravelTime - this.TimeElapsed + 100;
+            public float ETA => this.TravelTime - this.TimeElapsed;
 
             public virtual float MeleeTravelTime { get; set; }
 
