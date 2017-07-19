@@ -8,16 +8,6 @@
     /// <seealso cref="Aimtec.SDK.Menu.IMenuComponent" />
     public interface IMenu
     {
-        #region Public Properties
-
-        /// <summary>
-        ///     Gets the children.
-        /// </summary>
-        /// <value>The children.</value>
-        Dictionary<string, MenuComponent> Children { get; }
-
-        #endregion
-
         #region Public Methods and Operators
 
         /// <summary>

@@ -97,13 +97,13 @@
 
         #endregion
 
-        #region Public Methods and Operators
+        #region Methods
 
         /// <summary>
         ///     Gets the render manager.
         /// </summary>
         /// <returns>Aimtec.SDK.Menu.Theme.IRenderManager.</returns>
-        public override IRenderManager GetRenderManager()
+        internal override IRenderManager GetRenderManager()
         {
             return MenuManager.Instance.Theme.BuildMenuKeyBindRenderer(this);
         }
@@ -114,7 +114,7 @@
         /// <param name="message">The message.</param>
         /// <param name="wparam">Additional message information.</param>
         /// <param name="lparam">Additional message information.</param>
-        public override void WndProc(uint message, uint wparam, int lparam)
+        internal override void WndProc(uint message, uint wparam, int lparam)
         {
             //No need to process if the item does not belong to a menu yet
             if (this.Parent == null)
@@ -127,7 +127,7 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                if (message == (ulong) WindowsMessages.WM_LBUTTONDOWN)
+                if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
                 {
                     if (!this.KeyIsBeingSet && this.GetBounds(this.Position).Contains(x, y))
                     {
@@ -144,14 +144,14 @@
                     }
                 }
 
-                if (this.KeyIsBeingSet && message == (ulong) WindowsMessages.WM_KEYUP)
+                if (this.KeyIsBeingSet && message == (ulong)WindowsMessages.WM_KEYUP)
                 {
-                    this.UpdateKey((KeyCode) wparam);
+                    this.UpdateKey((KeyCode)wparam);
                     this.KeyIsBeingSet = false;
                 }
             }
 
-            if (this.Inactive || wparam != (ulong) this.Key || this.KeyIsBeingSet || MenuGUI.IsShopOpen()
+            if (this.Inactive || wparam != (ulong)this.Key || this.KeyIsBeingSet || MenuGUI.IsShopOpen()
                 || MenuGUI.IsChatOpen())
             {
                 return;
@@ -159,25 +159,21 @@
 
             if (this.KeybindType == KeybindType.Press)
             {
-                if (message == (ulong) WindowsMessages.WM_KEYDOWN)
+                if (message == (ulong)WindowsMessages.WM_KEYDOWN)
                 {
                     this.UpdateValue(true);
                 }
-                else if (message == (ulong) WindowsMessages.WM_KEYUP)
+                else if (message == (ulong)WindowsMessages.WM_KEYUP)
                 {
                     this.UpdateValue(false);
                 }
             }
 
-            else if (message == (ulong) WindowsMessages.WM_KEYUP)
+            else if (message == (ulong)WindowsMessages.WM_KEYUP)
             {
                 this.UpdateValue(!this.Value);
             }
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         ///     Loads the value from the file for this component

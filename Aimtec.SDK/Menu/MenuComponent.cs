@@ -28,78 +28,38 @@
 
         #region Delegates
 
+        /// <summary>
+        /// The Value Changed Event Handler
+        /// </summary>
+        /// <param name="sender">The sender.</param>
+        /// <param name="args">The arguments.</param>
         public delegate void ValueChangedHandler(MenuComponent sender, ValueChangedArgs args);
+
+        #endregion
+
+        #region Public Indexers
+
+        /// <inheritdoc />
+        public virtual IMenuComponent this[string name] => null;
 
         #endregion
 
         #region Public Events
 
-        public virtual event ValueChangedHandler ValueChanged;
+        /// <inheritdoc />
+        public virtual event ValueChangedHandler OnValueChanged;
 
         #endregion
 
         #region Public Properties
 
-        /// <summary>
-        ///     Gets the children.
-        /// </summary>
-        /// <value>The children.</value>
-        public virtual Dictionary<string, MenuComponent> Children { get; }
-
-        /// <summary>
-        ///     Gets or sets the display name.
-        /// </summary>
-        /// <value>The display name.</value>
+        /// <inheritdoc />
         [JsonProperty(Order = 1)]
         public string DisplayName { get; set; }
 
-        /// <summary>
-        ///     Gets a value indicating whether this <see cref="MenuComponent" /> is enabled.
-        /// </summary>
-        /// <remarks>
-        ///     This property will only succeed for MenuBool, MenuKeybind and MenuSliderBool.
-        /// </remarks>
-        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        public bool Enabled => ((IReturns<bool>) this).Value;
-
-        /// <summary>
-        ///     Gets or sets the name of the internal.
-        /// </summary>
-        /// <value>The name of the internal.</value>
+        /// <inheritdoc />
         [JsonProperty(Order = 2)]
         public string InternalName { get; set; }
-
-        /// <summary>
-        ///     Gets a value indicating whether this instance is a menu.
-        /// </summary>
-        /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
-        public virtual bool IsMenu => false;
-
-        /// <summary>
-        ///     Gets or sets the parent.
-        /// </summary>
-        /// <value>The parent.</value>
-        public Menu Parent { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the position.
-        /// </summary>
-        /// <value>The position.</value>
-        public Vector2 Position { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="MenuComponent" /> is the root menu.
-        /// </summary>
-        /// <value><c>true</c> if this menu is the root menu; otherwise, <c>false</c>.</value>
-        public bool Root { get; set; }
-
-        public bool Shared { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
-        /// </summary>
-        /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
-        public virtual bool Toggled { get; set; }
 
         /// <summary>
         ///     Gets a numeric value associated with MenuComponent <see cref="MenuComponent" />.
@@ -107,17 +67,59 @@
         /// <remarks>
         ///     This property will only succeed for MenuSlider, MenuSliderBool and MenuList.
         /// </remarks>
-        public int Value => ((IReturns<int>) this).Value;
+        public int Value => ((IReturns<int>)this).Value;
+
+        /// <inheritdoc />
+        public bool Enabled => ((IReturns<bool>) this).Value;
+
+        /// <inheritdoc />
+        public Menu Parent { get; set; }
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        ///     The children of this menu
+        /// </summary>
+        /// <value>The children.</value>
+        internal virtual Dictionary<string, MenuComponent> Children { get; }
+
+        /// <summary>
+        ///     Gets or sets the position.
+        /// </summary>
+        /// <value>The position.</value>
+        internal Vector2 Position { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether this <see cref="MenuComponent" /> is the root menu.
+        /// </summary>
+        /// <value><c>true</c> if this menu is the root menu; otherwise, <c>false</c>.</value>
+        internal bool Root { get; set; }
+
+        /// <summary>
+        ///     Gets whether this cref="MenuComponent" /> is shared.
+        /// </summary>
+        /// <value><c>true</c> if shared; otherwise, <c>false</c>.</value>
+        internal bool Shared { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        public virtual bool Visible { get; set; }
+        internal virtual bool Visible { get; set; }
 
-        #endregion
+        /// <summary>
+        ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
+        /// </summary>
+        /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
+        internal virtual bool Toggled { get; set; }
 
-        #region Properties
+        /// <summary>
+        ///     Gets or sets whether this <see cref="MenuComponent" /> is a Menu.
+        /// </summary>
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
+        internal virtual bool IsMenu => false;
 
         internal string AssemblyConfigDirectoryName
         {
@@ -193,41 +195,67 @@
             }
         }
 
+
         internal virtual bool SavableMenuItem { get; set; } = true;
 
         internal abstract string Serialized { get; }
 
-        protected static Logger Logger => LogManager.GetCurrentClassLogger();
+        internal Logger Logger => LogManager.GetCurrentClassLogger();
 
         private string ToolTip { get; set; }
 
         #endregion
 
-        #region Public Indexers
+        #region Public Methods and Operators
 
-        public virtual MenuComponent this[string name] => null;
+        /// <inheritdoc />
+        public T As<T>()
+            where T : IMenuComponent
+        {
+            return (T) (IMenuComponent) this;
+        }
+
+        /// <summary>
+        ///     Removes this component from its parent menu
+        /// </summary>
+        public void Dispose()
+        {
+            if (this.Parent != null)
+            {
+                this.Parent.Children.Remove(this.InternalName);
+            }
+        }
+
+        /// <summary>
+        ///     Sets the Tool Tip
+        /// </summary>
+        /// <param name="toolTip">The tooltip</param>
+        public MenuComponent SetToolTip(string toolTip)
+        {
+            this.ToolTip = toolTip;
+            return this;
+        }
 
         #endregion
 
-        #region Public Methods and Operators
+        #region Methods
 
         /// <summary>
-        ///     Converts the <see cref="MenuComponent" /> to the specified <typeparamref name="T" />.
+        ///     Gets the bounds.
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <returns>T.</returns>
-        public T As<T>()
-            where T : MenuComponent
+        /// <param name="pos">The position.</param>
+        /// <returns>System.Drawing.Rectangle.</returns>
+        internal virtual Rectangle GetBounds(Vector2 pos)
         {
-            return (T) this;
+            return new Rectangle((int)pos.X, (int)pos.Y, this.Parent.Width, MenuManager.Instance.Theme.MenuHeight);
         }
 
         /// <summary>
         ///     The WndProc that all Menu Components share
         /// </summary>
-        public void BaseWndProc(uint message, uint wparam, int lparam)
+        internal void BaseWndProc(uint message, uint wparam, int lparam)
         {
-            if (this.Visible && message == (ulong) WindowsMessages.WM_MOUSEMOVE)
+            if (this.Visible && message == (ulong)WindowsMessages.WM_MOUSEMOVE)
             {
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
@@ -243,80 +271,28 @@
         }
 
         /// <summary>
-        ///     Removes this component from its parent menu
+        ///     An application-defined function that processes messages sent to a window.
         /// </summary>
-        public void Dispose()
+        /// <param name="message">The message.</param>
+        /// <param name="wparam">Additional message information.</param>
+        /// <param name="lparam">Additional message information.</param>
+        internal virtual void WndProc(uint message, uint wparam, int lparam)
         {
-            if (this.Parent != null)
-            {
-                this.Parent.Children.Remove(this.InternalName);
-            }
-        }
-
-        /// <summary>
-        ///     Gets the bounds.
-        /// </summary>
-        /// <param name="pos">The position.</param>
-        /// <returns>System.Drawing.Rectangle.</returns>
-        public virtual Rectangle GetBounds(Vector2 pos)
-        {
-            return new Rectangle((int) pos.X, (int) pos.Y, this.Parent.Width, MenuManager.Instance.Theme.MenuHeight);
-        }
-
-        /// <summary>
-        ///     Gets the item.
-        /// </summary>
-        /// <param name="name">The name.</param>
-        /// <returns>MenuComponent.</returns>
-        public MenuComponent GetItem(string name)
-        {
-            if (this.Children.Keys.Contains(name))
-            {
-                return this.Children[name];
-            }
-
-            Logger.Warn("[Menu] Item: {0} was not found in the menu: {1}", name, this.InternalName);
-
-            return null;
         }
 
         /// <summary>
         ///     Gets the render manager.
         /// </summary>
         /// <returns>Aimtec.SDK.Menu.Theme.IRenderManager.</returns>
-        public abstract IRenderManager GetRenderManager();
-
-        /// <summary>
-        ///     Renders at the specified position.
-        /// </summary>
-        /// <param name="pos">The position.</param>
-        public virtual void Render(Vector2 pos)
-        {
-            if (this.Visible)
-            {
-                if (!string.IsNullOrEmpty(this.ToolTip))
-                {
-                    if (Game.TickCount - MenuManager.LastMouseMoveTime > 500)
-                    {
-                        if (this.GetBounds(this.Position).Contains(MenuManager.LastMousePosition))
-                        {
-                            this.RenderToolTip();
-                            return;
-                        }
-                    }
-                }
-
-                this.GetRenderManager().Render(pos);
-            }
-        }
+        internal abstract IRenderManager GetRenderManager();
 
         /// <summary>
         ///     Renders the tooltip
         /// </summary>
-        public void RenderToolTip()
+        private void RenderToolTip()
         {
             var text = $"[i] {this.ToolTip}";
-            var width = Math.Max(this.Parent.Width, (int) MenuManager.Instance.TextWidth(text));
+            var width = Math.Max(this.Parent.Width, (int)MiscUtils.MeasureTextWidth(text));
 
             DefaultMenuTheme.DrawRectangleOutline(
                 this.Position.X,
@@ -345,34 +321,31 @@
         }
 
         /// <summary>
-        ///     Sets the Tool Tip
+        ///     Renders at the specified position.
         /// </summary>
-        /// <param name="toolTip">The tooltip</param>
-        public MenuComponent SetToolTip(string toolTip)
+        /// <param name="pos">The position.</param>
+        internal virtual void Render(Vector2 pos)
         {
-            this.ToolTip = toolTip;
-            return this;
+            if (this.Visible)
+            {
+                if (!string.IsNullOrEmpty(this.ToolTip))
+                {
+                    if (Game.TickCount - MenuManager.LastMouseMoveTime > 500)
+                    {
+                        if (this.GetBounds(this.Position).Contains(MenuManager.LastMousePosition))
+                        {
+                            this.RenderToolTip();
+                            return;
+                        }
+                    }
+                }
+
+                this.GetRenderManager().Render(pos);
+            }
         }
-
-        /// <summary>
-        ///     An application-defined function that processes messages sent to a window.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="wparam">Additional message information.</param>
-        /// <param name="lparam">Additional message information.</param>
-        public virtual void WndProc(uint message, uint wparam, int lparam)
-        {
-        }
-
-        #endregion
-
-        #region Methods
-
-        internal abstract void LoadValue();
 
         internal virtual void Save()
         {
-            //no point to save things like seperators
             if (!this.SavableMenuItem)
             {
                 return;
@@ -397,12 +370,20 @@
             File.WriteAllText(this.ConfigPath, this.Serialized);
         }
 
+        /// <summary>
+        ///     Loads the saved value for this item
+        /// </summary>
+        internal abstract void LoadValue();
+
+        /// <summary>
+        ///     Fires the OnValueChanged event for this item
+        /// </summary>
         protected virtual void FireOnValueChanged(MenuComponent sender, ValueChangedArgs args)
         {
-            if (this.ValueChanged != null)
+            if (this.OnValueChanged != null)
             {
                 //Fire the value changed of this menucomponent instance
-                this.ValueChanged(sender, args);
+                this.OnValueChanged(sender, args);
             }
 
             //Fire the value changed on the parent menu 

@@ -87,7 +87,7 @@ namespace Aimtec.SDK.Damage
 
             if (hero != null)
             {
-                var passiveDamage = DamagePassive.ComputePassiveDamages(hero, target);
+                var passiveDamage = DamagePassives.ComputePassiveDamages(hero, target);
                 dmgPhysical += passiveDamage.PhysicalDamage;
                 dmgMagical += passiveDamage.MagicalDamage;
 
@@ -151,7 +151,7 @@ namespace Aimtec.SDK.Damage
                 }
             }
 
-            var itemDamage = DamageItem.ComputeItemDamages(source, target);
+            var itemDamage = DamageItems.ComputeItemDamages(source, target);
             dmgPhysical += itemDamage.PhysicalDamage;
             dmgMagical += itemDamage.MagicalDamage;
 
@@ -297,7 +297,7 @@ namespace Aimtec.SDK.Damage
 
                 if (spellData.IsApplyOnHit || spellData.IsModifiedDamage)
                 {
-                    var itemDamage = DamageItem.ComputeItemDamages(source, target);
+                    var itemDamage = DamageItems.ComputeItemDamages(source, target);
                     dmgPassive += itemDamage.PhysicalDamage + itemDamage.MagicalDamage;
                 }
 
@@ -397,8 +397,8 @@ namespace Aimtec.SDK.Damage
             }
 
             var hero = source as Obj_AI_Hero;
-            var damageReductions = DamageReduction.ComputeReductionDamages(hero, target, DamageType.Magical);
-            var masteryDamage = DamageMastery.ComputeMasteryDamages(hero, target);
+            var damageReductions = DamageReductions.ComputeReductions(hero, target, DamageType.Magical);
+            var masteryDamage = DamageMasteries.ComputeMasteryDamages(hero, target);
 
             return Math.Max(
                         Math.Floor(source.GetPassivePercentMod(target, value, DamageType.Magical) * amount * damageReductions.PercentDamageReduction)
@@ -464,8 +464,8 @@ namespace Aimtec.SDK.Damage
             }
 
             var hero = source as Obj_AI_Hero;
-            var damageReductions = DamageReduction.ComputeReductionDamages(hero, target, DamageType.Physical);
-            var masteryDamage = DamageMastery.ComputeMasteryDamages(hero, target);
+            var damageReductions = DamageReductions.ComputeReductions(hero, target, DamageType.Physical);
+            var masteryDamage = DamageMasteries.ComputeMasteryDamages(hero, target);
 
             return Math.Max(
                         Math.Floor(source.GetPassivePercentMod(target, value, DamageType.Physical) * amount * damageReductions.PercentDamageReduction)
@@ -547,7 +547,7 @@ namespace Aimtec.SDK.Damage
 			var hero = source as Obj_AI_Hero;
 			if (hero != null)
             {
-                var masteryDamage = DamageMastery.ComputeMasteryDamages(hero, target);
+                var masteryDamage = DamageMasteries.ComputeMasteryDamages(hero, target);
                 amount *= masteryDamage.PercentDamage;
 				
 				var targetHero = target as Obj_AI_Hero;

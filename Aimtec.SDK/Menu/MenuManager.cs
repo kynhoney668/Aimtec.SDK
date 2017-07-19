@@ -14,8 +14,6 @@
     {
         #region Fields
 
-        internal Font LeagueFont = new Font("Arial", 11);
-
         private bool visible;
 
         #endregion
@@ -55,13 +53,17 @@
 
         public static MenuManager Instance { get; } = new MenuManager();
 
-        public override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
-
-        public override bool IsMenu { get; } = false;
-
         public MenuTheme Theme { get; set; }
 
-        public override bool Visible
+        #endregion
+
+        #region Properties
+
+        internal override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
+
+        internal override bool IsMenu { get; } = false;
+
+        internal override bool Visible
         {
             get
             {
@@ -77,10 +79,6 @@
                 this.visible = value;
             }
         }
-
-        #endregion
-
-        #region Properties
 
         internal static float LastMouseMoveTime { get; set; }
 
@@ -128,12 +126,16 @@
             throw new NotImplementedException();
         }
 
-        public override Rectangle GetBounds(Vector2 pos)
+        #endregion
+
+        #region Methods
+
+        internal override Rectangle GetBounds(Vector2 pos)
         {
-            return new Rectangle((int) pos.X, (int) pos.Y, this.Width, this.Theme.MenuHeight * this.Menus.Count);
+            return new Rectangle((int)pos.X, (int)pos.Y, this.Width, this.Theme.MenuHeight * this.Menus.Count);
         }
 
-        public override void Render(Vector2 pos)
+        internal override void Render(Vector2 pos)
         {
             if (!this.Visible)
             {
@@ -148,38 +150,23 @@
             }
         }
 
-        public float TextWidth(string text)
-        {
-            float textWidth = 0;
-
-            using (var bmp = new Bitmap(1, 1))
-            {
-                using (var g = Graphics.FromImage(bmp))
-                {
-                    textWidth = g.MeasureString(text, this.LeagueFont).Width;
-                }
-            }
-
-            return textWidth;
-        }
-
-        public override void WndProc(uint message, uint wparam, int lparam)
+        internal override void WndProc(uint message, uint wparam, int lparam)
         {
             // Drag menu
-            if (message == (int) WindowsMessages.WM_KEYDOWN && wparam == (ulong) KeyCode.ShiftKey)
+            if (message == (int)WindowsMessages.WM_KEYDOWN && wparam == (ulong)KeyCode.ShiftKey)
             {
                 //Console.WriteLine("visible?? key = {0}", (Keys) wparam);
                 this.Visible = true;
             }
 
-            if (message == (int) WindowsMessages.WM_KEYUP && wparam == (ulong) KeyCode.ShiftKey)
+            if (message == (int)WindowsMessages.WM_KEYUP && wparam == (ulong)KeyCode.ShiftKey)
             {
                 //Console.WriteLine("not visible?? key = {0}", (Keys) wparam);
                 this.Visible = false;
             }
 
             //Save Menu if F5 is pressed (upon reloading)
-            if (message == (int) WindowsMessages.WM_KEYUP && wparam == (ulong) KeyCode.F5)
+            if (message == (int)WindowsMessages.WM_KEYUP && wparam == (ulong)KeyCode.F5)
             {
                 this.Save();
             }
@@ -190,9 +177,6 @@
             }
         }
 
-        #endregion
-
-        #region Methods
 
         internal override void Save()
         {
@@ -204,7 +188,7 @@
 
         internal override void UpdateWidth()
         {
-            var maxWidth = this.Children.Values.Max(x => Instance.TextWidth(x.DisplayName));
+            var maxWidth = this.Children.Values.Max(x => MiscUtils.MeasureTextWidth(x.DisplayName));
             this.Width = (int) (maxWidth + Instance.Theme.BaseMenuWidth);
         }
 

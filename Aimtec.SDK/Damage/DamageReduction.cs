@@ -10,47 +10,47 @@ namespace Aimtec.SDK.Damage
     using System.Collections.Generic;
     using System.Linq;
 
-    internal class DamageReduction
+    internal class DamageReductions
     {
-        static DamageReduction()
+        static DamageReductions()
         {
             #region Reductions
 
-            Reductions.Add(new Reduction
-                              {
+            Reductions.Add(new DamageReduction
+            {
                                   BuffName = "Exhaust",
-                                  Type = Reduction.ReductionDamageType.Percent,
-                                  ReductionPercentDamage = (source, attacker) =>
+                                  Type = DamageReduction.ReductionDamageType.Percent,
+                                  ReductionDamage = (source, attacker) =>
                                       {
                                            return 40;
                                       }
                               });
 
-            Reductions.Add(new Reduction
-                               {
+            Reductions.Add(new DamageReduction
+            {
                                    BuffName = "urgotentropypassive",
-                                   Type = Reduction.ReductionDamageType.Percent,
-                                   ReductionPercentDamage = (source, attacker) =>
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
                                        {
                                            return 15;
                                        }
                                });
 
-            Reductions.Add(new Reduction
-                               {
+            Reductions.Add(new DamageReduction
+            {
                                    BuffName = "urgotswapdef",
-                                   Type = Reduction.ReductionDamageType.Percent,
-                                   ReductionPercentDamage = (source, attacker) =>
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
                                        {
                                            return new[] { 30, 40, 50 }[source.SpellBook.GetSpell(SpellSlot.R).Level - 1];
                                        }
                                });
 
-            Reductions.Add(new Reduction
-                               {
+            Reductions.Add(new DamageReduction
+            {
                                    BuffName = "itemphantomdancerdebuff",
-                                   Type = Reduction.ReductionDamageType.Percent,
-                                   ReductionPercentDamage = (source, attacker) =>
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
                                        {
                                            var phantomdancerBuff = source.BuffManager.GetBuff("itemphantomdancerdebuff");
                                            if (phantomdancerBuff?.Caster.NetworkId == attacker?.NetworkId)
@@ -62,31 +62,31 @@ namespace Aimtec.SDK.Damage
                                        }
                                });
 
-            Reductions.Add(new Reduction
-                               {
+            Reductions.Add(new DamageReduction
+            {
                                    BuffName = "BraumShieldRaise",
-                                   Type = Reduction.ReductionDamageType.Percent,
-                                   ReductionPercentDamage = (source, attacker) =>
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
                                        {
                                            return new[] { 30, 32.5, 35, 37.5, 40 }[source.SpellBook.GetSpell(SpellSlot.E).Level - 1];
                                        }
                                });
 
-            Reductions.Add(new Reduction
-                               {
+            Reductions.Add(new DamageReduction
+            {
                                    BuffName = "GalioW",
-                                   Type = Reduction.ReductionDamageType.Percent,
-                                   ReductionPercentDamage = (source, attacker) =>
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
                                        {
                                            return new[] { 20, 25, 30, 35, 40 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] + 8 * (source.BonusSpellBlock / 100);
                                        }
                                });
 
-            Reductions.Add(new Reduction
-                               {
+            Reductions.Add(new DamageReduction
+            {
                                    BuffName = "GarenW",
-                                   Type = Reduction.ReductionDamageType.Percent,
-                                   ReductionPercentDamage = (source, attacker) =>
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
                                        {
 										   if (ObjectManager.Get<GameObject>()
 											       .Where(o => o.Type == GameObjectType.obj_GeneralParticleEmitter)
@@ -99,21 +99,21 @@ namespace Aimtec.SDK.Damage
                                        }
                                });
 
-            Reductions.Add(new Reduction
-                               {
+            Reductions.Add(new DamageReduction
+            {
                                    BuffName = "GragasWSelf",
-                                   Type = Reduction.ReductionDamageType.Percent,
-                                   ReductionPercentDamage = (source, attacker) =>
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
                                        {
                                            return new[] { 10, 12, 14, 16, 18 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1];
                                        }
                                });
 
-            Reductions.Add(new Reduction
+            Reductions.Add(new DamageReduction
                                {
                                    BuffName = "Meditate",
-                                   Type = Reduction.ReductionDamageType.Percent,
-                                   ReductionPercentDamage = (source, attacker) =>
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
                                        {
                                            return new[] { 50, 55, 60, 65, 70 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] / (attacker is Obj_AI_Turret ? 2 : 1f);
                                        }
@@ -122,7 +122,7 @@ namespace Aimtec.SDK.Damage
             #endregion
         }
 
-        public static ReductionDamageResult ComputeReductionDamages(Obj_AI_Hero source, Obj_AI_Base attacker, DamageType damageType)
+        public static ReductionDamageResult ComputeReductions(Obj_AI_Hero source, Obj_AI_Base attacker, DamageType damageType)
         {
             double flatDamageReduction = 0;
             double percentDamageReduction = 1;
@@ -136,12 +136,12 @@ namespace Aimtec.SDK.Damage
 
                 switch (reduction.Type)
                 {
-                    case Reduction.ReductionDamageType.Flat:
-                        flatDamageReduction += reduction.GetFlatDamage(source, attacker);
+                    case DamageReduction.ReductionDamageType.Flat:
+                        flatDamageReduction += reduction.GetDamageReduction(source, attacker);
                         break;
 
-                    case Reduction.ReductionDamageType.Percent:
-                        percentDamageReduction *= 1 - reduction.GetPercentDamage(source, attacker) / 100;
+                    case DamageReduction.ReductionDamageType.Percent:
+                        percentDamageReduction *= 1 - reduction.GetDamageReduction(source, attacker) / 100;
                         break;
                 }
             }
@@ -149,7 +149,7 @@ namespace Aimtec.SDK.Damage
             return new ReductionDamageResult(flatDamageReduction, percentDamageReduction);
         }
 
-        public static List<Reduction> Reductions { get; set; } = new List<Reduction>();
+        public static List<DamageReduction> Reductions { get; set; } = new List<DamageReduction>();
 
         public class ReductionDamageResult
         {
@@ -163,30 +163,19 @@ namespace Aimtec.SDK.Damage
             public double PercentDamageReduction { get; set; }
         }
 
-        public class Reduction
+        public class DamageReduction
         {
             public string BuffName { get; set; }
 
             public delegate double ReductionDamageDelegateHandler(Obj_AI_Hero source, Obj_AI_Base attacker);
 
-            public ReductionDamageDelegateHandler ReductionFlatDamage { get; set; }
-            public ReductionDamageDelegateHandler ReductionPercentDamage { get; set; }
+            public ReductionDamageDelegateHandler ReductionDamage { get; set; }
 
-            public double GetFlatDamage(Obj_AI_Hero source, Obj_AI_Base attacker)
+            public double GetDamageReduction(Obj_AI_Hero source, Obj_AI_Base attacker)
             {
-                if (this.ReductionFlatDamage != null)
+                if (this.ReductionDamage != null)
                 {
-                    return this.ReductionFlatDamage(source, attacker);
-                }
-
-                return 0;
-            }
-
-            public double GetPercentDamage(Obj_AI_Hero source, Obj_AI_Base attacker)
-            {
-                if (this.ReductionPercentDamage != null)
-                {
-                    return this.ReductionPercentDamage(source, attacker);
+                    return this.ReductionDamage(source, attacker);
                 }
 
                 return 0;

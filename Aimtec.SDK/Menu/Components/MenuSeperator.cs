@@ -32,16 +32,12 @@
 
         #endregion
 
-        #region Public Methods and Operators
+        #region Methods
 
-        public override IRenderManager GetRenderManager()
+        internal override IRenderManager GetRenderManager()
         {
             return MenuManager.Instance.Theme.BuildMenuSeperatorRenderer(this);
         }
-
-        #endregion
-
-        #region Methods
 
         internal override void LoadValue()
         {

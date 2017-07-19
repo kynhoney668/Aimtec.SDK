@@ -70,19 +70,19 @@
         ///     Gets the children.
         /// </summary>
         /// <value>The children.</value>
-        public override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
+        internal override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
 
         /// <summary>
         ///     Gets a value indicating whether this instance is a menu.
         /// </summary>
         /// <value><c>true</c> if this instance is a menu; otherwise, <c>false</c>.</value>
-        public override bool IsMenu => true;
+        internal override bool IsMenu => true;
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
         /// </summary>
         /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
-        public override bool Toggled
+        internal override bool Toggled
         {
             get => this.toggled;
             set
@@ -100,7 +100,7 @@
         ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
         /// </summary>
         /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        public override bool Visible
+        internal override bool Visible
         {
             get => this.visible;
             set
@@ -135,7 +135,8 @@
 
         #region Public Indexers
 
-        public override MenuComponent this[string name] => this.GetItem(name);
+        /// <inheritdoc />
+        public override IMenuComponent this[string name] => this.GetItem(name);
 
         #endregion
 
@@ -212,7 +213,7 @@
         ///     Gets the render manager.
         /// </summary>
         /// <returns>IRenderManager.</returns>
-        public override IRenderManager GetRenderManager()
+        internal override IRenderManager GetRenderManager()
         {
             return MenuManager.Instance.Theme.BuildMenuRenderer(this);
         }
@@ -221,7 +222,7 @@
         ///     Renders the specified position.
         /// </summary>
         /// <param name="position">The position.</param>
-        public override void Render(Vector2 position)
+        internal override void Render(Vector2 position)
         {
             if (this.Visible)
             {
@@ -257,7 +258,7 @@
         /// <param name="message">The message.</param>
         /// <param name="wparam">Additional message information.</param>
         /// <param name="lparam">Additional message information.</param>
-        public override void WndProc(uint message, uint wparam, int lparam)
+        internal override void WndProc(uint message, uint wparam, int lparam)
         {
             if (this.Visible && message == (ulong) WindowsMessages.WM_LBUTTONUP)
             {
@@ -286,6 +287,21 @@
         #endregion
 
         #region Methods
+
+        /// <inheritdoc />
+        internal IMenuComponent GetItem(string name)
+        {
+            MenuComponent item = null;
+
+            this.Children.TryGetValue(name, out item);
+
+            if (item == null)
+            {
+                Logger.Warn("[Menu] Item: {0} was not found in the menu: {1}", name, this.InternalName);
+            }
+
+            return item;
+        }
 
         internal override void LoadValue()
         {
@@ -325,7 +341,7 @@
                     var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
                     if (longestItem != null)
                     {
-                        width = (int) MenuManager.Instance.TextWidth(mList.DisplayName + longestItem)
+                        width = (int)MiscUtils.MeasureTextWidth(mList.DisplayName + longestItem)
                             + MenuManager.Instance.Theme.IndicatorWidth + 15;
                     }
                 }
@@ -333,24 +349,24 @@
                 else if (child is MenuKeyBind)
                 {
                     var kb = child as MenuKeyBind;
-                    width = (int) MenuManager.Instance.TextWidth(kb.DisplayName + "PRESS KEY");
+                    width = (int) MiscUtils.MeasureTextWidth(kb.DisplayName + "PRESS KEY");
                 }
 
                 else if (child is MenuSlider)
                 {
                     var slider = child as MenuSlider;
-                    width = (int) MenuManager.Instance.TextWidth(child.DisplayName + slider.MaxValue.ToString());
+                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue.ToString());
                 }
 
                 else if (child is MenuSliderBool)
                 {
                     var slider = child as MenuSliderBool;
-                    width = (int) MenuManager.Instance.TextWidth(child.DisplayName + slider.MaxValue.ToString());
+                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue.ToString());
                 }
 
                 else
                 {
-                    width = (int) MenuManager.Instance.TextWidth(child.DisplayName);
+                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName);
                 }
 
                 if (width > maxWidth)

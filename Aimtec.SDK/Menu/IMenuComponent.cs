@@ -3,11 +3,14 @@
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Theme;
+    using Aimtec.SDK.Menu.Components;
+    using static Aimtec.SDK.Menu.MenuComponent;
+    using System;
 
     /// <summary>
     ///     Interface IMenuComponent
     /// </summary>
-    public interface IMenuComponent
+    public interface IMenuComponent : IDisposable
     {
         #region Public Properties
 
@@ -18,68 +21,32 @@
         string DisplayName { get; set; }
 
         /// <summary>
-        ///     Gets a value indicating whether this <see cref="MenuComponent" /> is enabled.
+        ///     Gets or sets the internal name
+        /// </summary>
+        /// <value>The internal name.</value>
+        string InternalName { get; set; }
+
+        /// <summary>
+        ///     Gets a value indicating whether this <see cref="IMenuComponent" /> is enabled.
         /// </summary>
         /// <remarks>
         ///     This property will only succeed if the MenuComponent implements <see cref="IReturns{bool}" />.
-        ///     This property will only succeed for MenuBool, MenuKeyBind and MenuSliderBool" />.
+        ///     This property will only succeed for <see cref="MenuBool"/>, <see cref="MenuKeyBind"/>, <see cref="MenuSliderBool"/>.
         /// </remarks>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         bool Enabled { get; }
 
         /// <summary>
-        ///     Gets or sets the name of the internal.
-        /// </summary>
-        /// <value>The name of the internal.</value>
-        string InternalName { get; set; }
-
-        /// <summary>
-        ///     Gets or sets whether this <see cref="MenuComponent" /> is a Menu.
-        /// </summary>
-        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        bool IsMenu { get; }
-
-        /// <summary>
-        ///     Gets the parent of this <see cref="MenuComponent" /> if it has one.
-        /// </summary>
-        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        Menu Parent { get; set; }
-
-        /// <summary>
-        ///     Gets or sets the position.
-        /// </summary>
-        /// <value>The position.</value>
-        Vector2 Position { get; set; }
-
-        /// <summary>
-        ///     Gets or sets whether this <see cref="MenuComponent" /> is a a root menu.
-        /// </summary>
-        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
-        bool Root { get; set; }
-
-        /// <summary>
-        ///     Gets whether this cref="MenuComponent" /> is shared.
-        /// </summary>
-        /// <value><c>true</c> if shared; otherwise, <c>false</c>.</value>
-        bool Shared { get; set; }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is toggled.
-        /// </summary>
-        /// <value><c>true</c> if toggled; otherwise, <c>false</c>.</value>
-        bool Toggled { get; set; }
-
-        /// <summary>
-        ///     Gets a value associated with this <see cref="MenuComponent" />
+        ///     Gets a value associated with this <see cref="IMenuComponent" />
         /// </summary>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         int Value { get; }
 
         /// <summary>
-        ///     Gets or sets a value indicating whether this <see cref="IMenuComponent" /> is visible.
+        ///     Gets the parent of this <see cref="IMenuComponent" /> if it has one.
         /// </summary>
-        /// <value><c>true</c> if visible; otherwise, <c>false</c>.</value>
-        bool Visible { get; set; }
+        /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
+        Menu Parent { get; set; }
 
         #endregion
 
@@ -91,35 +58,30 @@
         /// <typeparam name="T"></typeparam>
         /// <returns>T.</returns>
         T As<T>()
-            where T : MenuComponent;
-
-        /// <summary>
-        ///     Gets the bounds.
-        /// </summary>
-        /// <param name="pos">The position.</param>
-        /// <returns>Rectangle.</returns>
-        Rectangle GetBounds(Vector2 pos);
-
-        /// <summary>
-        ///     Gets the render manager.
-        /// </summary>
-        /// <returns>IRenderManager.</returns>
-        IRenderManager GetRenderManager();
-
-        /// <summary>
-        ///     Renders at the specified position.
-        /// </summary>
-        /// <param name="pos">The position.</param>
-        void Render(Vector2 pos);
-
-        /// <summary>
-        ///     An application-defined function that processes messages sent to a window.
-        /// </summary>
-        /// <param name="message">The message.</param>
-        /// <param name="wparam">Additional message information.</param>
-        /// <param name="lparam">Additional message information.</param>
-        void WndProc(uint message, uint wparam, int lparam);
+            where T : IMenuComponent;
 
         #endregion
+
+        #region Public Indexers
+
+        /// <summary>
+        ///      The indexer to get items contained in this menu
+        /// </summary>
+        /// <remarks>
+        ///     This property will only succeed if this class is type <see cref="Menu"/>".
+        /// </remarks>
+        IMenuComponent this[string name] { get; }
+
+        #endregion
+
+        #region Public Events
+
+        /// <summary>
+        ///    The event fired when the a change occurs in this see cref="IMenuComponent" />
+        /// </summary>
+        event ValueChangedHandler OnValueChanged;
+
+        #endregion
+
     }
 }

@@ -138,6 +138,7 @@
     <Compile Include="Util\Keys.cs" />
     <Compile Include="Util\Geometry.cs" />
     <Compile Include="Util\MEC.cs" />
+    <Compile Include="Util\MiscUtils.cs" />
     <Compile Include="Util\ThirdParty\Clipper.cs" />
     <Compile Include="Util\WindowsMessages.cs" />
   </ItemGroup>

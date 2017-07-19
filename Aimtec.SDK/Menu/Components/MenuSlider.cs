@@ -109,9 +109,9 @@
 
         #endregion
 
-        #region Public Methods and Operators
+        #region Methods
 
-        public override Rectangle GetBounds(Vector2 pos)
+        internal override Rectangle GetBounds(Vector2 pos)
         {
             return MenuManager.Instance.Theme.GetMenuSliderControlBounds(pos, this.Parent.Width);
         }
@@ -120,7 +120,7 @@
         ///     Gets the render manager.
         /// </summary>
         /// <returns>Aimtec.SDK.Menu.Theme.IRenderManager.</returns>
-        public override IRenderManager GetRenderManager()
+        internal override IRenderManager GetRenderManager()
         {
             return MenuManager.Instance.Theme.BuildMenuSliderRenderer(this);
         }
@@ -131,10 +131,10 @@
         /// <param name="message">The message.</param>
         /// <param name="wparam">Additional message information.</param>
         /// <param name="lparam">Additional message information.</param>
-        public override void WndProc(uint message, uint wparam, int lparam)
+        internal override void WndProc(uint message, uint wparam, int lparam)
         {
-            if ((message == (ulong) WindowsMessages.WM_LBUTTONDOWN
-                || message == (ulong) WindowsMessages.WM_MOUSEMOVE && this.MouseDown) && this.Visible)
+            if ((message == (ulong)WindowsMessages.WM_LBUTTONDOWN
+                || message == (ulong)WindowsMessages.WM_MOUSEMOVE && this.MouseDown) && this.Visible)
             {
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
@@ -149,15 +149,11 @@
                 this.MouseDown = true;
             }
 
-            if (message == (ulong) WindowsMessages.WM_LBUTTONUP)
+            if (message == (ulong)WindowsMessages.WM_LBUTTONUP)
             {
                 this.MouseDown = false;
             }
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         ///     Loads the value from the file for this component

@@ -233,7 +233,6 @@
         ///     Casts the specified target.
         /// </summary>
         /// <param name="target">The target.</param>
-        /// <param name="target">The minimum hitchance. </param>
         /// <returns><c>true</c> if the spell was casted, <c>false</c> otherwise.</returns>
         public bool Cast(Obj_AI_Base target)
         {
@@ -286,7 +285,7 @@
         /// <returns><c>true</c> if the spell was casted, <c>false</c> otherwise.</returns>
         public bool Cast()
         {
-            if (!this.Ready)
+            if (!this.Ready || MenuGUI.IsChatOpen() || MenuGUI.IsShopOpen())
             {
                 return false;
             }
@@ -309,7 +308,7 @@
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool Cast(Vector2 position)
         {
-            if (!this.Ready)
+            if (!this.Ready || MenuGUI.IsChatOpen() || MenuGUI.IsShopOpen())
             {
                 return false;
             }
@@ -333,7 +332,7 @@
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool Cast(Vector3 position)
         {
-            if (!this.Ready)
+            if (!this.Ready || MenuGUI.IsChatOpen() || MenuGUI.IsShopOpen())
             {
                 return false;
             }
@@ -356,7 +355,7 @@
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool Cast(Vector3 start, Vector3 end)
         {
-            if (!this.Ready)
+            if (!this.Ready || MenuGUI.IsChatOpen() || MenuGUI.IsShopOpen())
             {
                 return false;
             }
@@ -371,6 +370,11 @@
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool CastOnUnit(GameObject obj)
         {
+            if (!this.Ready || MenuGUI.IsChatOpen() || MenuGUI.IsShopOpen())
+            {
+                return false;
+            }
+
             return Player.SpellBook.CastSpell(this.Slot, obj);
         }
 

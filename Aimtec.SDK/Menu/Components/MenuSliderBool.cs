@@ -124,15 +124,15 @@
 
         #endregion
 
-        #region Public Methods and Operators
+        #region Methods
 
-        public override Rectangle GetBounds(Vector2 pos)
+        internal override Rectangle GetBounds(Vector2 pos)
         {
             var bounds = MenuManager.Instance.Theme.GetMenuSliderBoolControlBounds(pos, this.Parent.Width);
             return Rectangle.Union(bounds[0], bounds[1]);
         }
 
-        public override IRenderManager GetRenderManager()
+        internal override IRenderManager GetRenderManager()
         {
             return MenuManager.Instance.Theme.BuildMenuSliderBoolRenderer(this);
         }
@@ -143,10 +143,10 @@
         /// <param name="message">The message.</param>
         /// <param name="wparam">Additional message information.</param>
         /// <param name="lparam">Additional message information.</param>
-        public override void WndProc(uint message, uint wparam, int lparam)
+        internal override void WndProc(uint message, uint wparam, int lparam)
         {
-            if ((message == (ulong) WindowsMessages.WM_LBUTTONDOWN
-                || message == (ulong) WindowsMessages.WM_MOUSEMOVE && this.MouseDown) && this.Visible)
+            if ((message == (ulong)WindowsMessages.WM_LBUTTONDOWN
+                || message == (ulong)WindowsMessages.WM_MOUSEMOVE && this.MouseDown) && this.Visible)
             {
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
@@ -162,7 +162,7 @@
                 }
             }
 
-            else if (message == (ulong) WindowsMessages.WM_LBUTTONUP)
+            else if (message == (ulong)WindowsMessages.WM_LBUTTONUP)
             {
                 if (this.Visible && !this.MouseDown)
                 {
@@ -179,10 +179,6 @@
                 this.MouseDown = false;
             }
         }
-
-        #endregion
-
-        #region Methods
 
         /// <summary>
         ///     Loads the value from the file for this component

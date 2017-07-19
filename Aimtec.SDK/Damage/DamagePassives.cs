@@ -11,17 +11,17 @@ namespace Aimtec.SDK.Damage
 
     using Aimtec.SDK.Damage.JSON;
 
-    internal class DamagePassive
+    internal class DamagePassives
     {
-        static DamagePassive()
+        static DamagePassives()
         {
             #region Physical Damage Passives
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                           {
                               Name = "Aatrox",
-                              DamageType = Passive.PassiveDamageType.FlatPhysical,
-                              PassivePhysicalDamage = (source, target) =>
+                              DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                              PassiveDamage = (source, target) =>
                                   {
                                       if (source.HasBuff("aatroxwpower") &&
                                           source.HasBuff("aatroxwonhpowerbuff"))
@@ -33,11 +33,11 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Akali",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("AkaliMota"))
                                          {
@@ -53,11 +53,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Alistar",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("alistartrample"))
                                          {
@@ -68,11 +68,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Ashe",
-                                 DamageType = Passive.PassiveDamageType.PercentPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.PercentPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.HasBuff("asheqbuff"))
                                          {
@@ -83,11 +83,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Ashe",
-                                 DamageType = Passive.PassiveDamageType.FlatPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("ashepassiveslow"))
                                          {
@@ -98,11 +98,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Bard",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.GetBuffCount("bardpspiritammocount") > 0)
                                          {
@@ -113,11 +113,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Blitzcrank",
-                                 DamageType = Passive.PassiveDamageType.FlatPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.HasBuff("powerfist"))
                                          {
@@ -128,11 +128,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Braum",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("braummarkstunreduction"))
                                          {
@@ -143,11 +143,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Caitlyn",
-                                 DamageType = Passive.PassiveDamageType.FlatPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.HasBuff("caitlynheadshot") ||
                                              source.HasBuff("caitlynheadshotrangecheck") && target.HasBuff("caitlynyordletrapinternal"))
@@ -177,11 +177,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Camille",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.HasBuff("camiller"))
                                          {
@@ -193,11 +193,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "ChoGath",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.HasBuff("VorpalSpikes"))
                                          {
@@ -208,31 +208,31 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Corki",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          return 0.8 * source.TotalAttackDamage;
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Corki",
-                                 DamageType = Passive.PassiveDamageType.PercentPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.PercentPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          return 0.2;
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Darius",
-                                 DamageType = Passive.PassiveDamageType.PercentPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.PercentPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.HasBuff("dariusnoxiantacticsonh"))
                                          {
@@ -243,11 +243,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Diana",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.GetBuffCount("dianapassivemarker") == 2)
                                          {
@@ -258,11 +258,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Draven",
-                                 DamageType = Passive.PassiveDamageType.FlatPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.HasBuff("dravenspinningattack"))
                                          {
@@ -273,11 +273,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Ekko",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.GetBuffCount("ekkostacks") == 2)
                                          {
@@ -288,11 +288,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Galio",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (source.HasBuff("galiopassivebuff"))
                                          {
@@ -303,11 +303,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Garen",
-                                 DamageType = Passive.PassiveDamageType.FlatPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("garenq"))
                                          {
@@ -318,11 +318,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Gnar",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.GetBuffCount("gnarwproc") == 2)
                                          {
@@ -333,11 +333,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Gragas",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("gragaswattackbuff"))
                                          {
@@ -348,11 +348,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Hecarim",
-                                 DamageType = Passive.PassiveDamageType.FlatPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("hecarimrampspeed"))
                                          {
@@ -363,21 +363,21 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Kalista",
-                                 DamageType = Passive.PassiveDamageType.PercentPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.PercentPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          return 0.9;
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Quinn",
-                                 DamageType = Passive.PassiveDamageType.FlatPhysical,
-                                 PassivePhysicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("quinnw"))
                                          {
@@ -388,11 +388,11 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new Passive
+            Passives.Add(new DamagePassive
                              {
                                  Name = "Sejuani",
-                                 DamageType = Passive.PassiveDamageType.FlatMagical,
-                                 PassiveMagicalDamage = (source, target) =>
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
                                      {
                                          if (target.HasBuff("sejuanistun"))
                                          {
@@ -441,33 +441,32 @@ namespace Aimtec.SDK.Damage
                     continue;
                 }
 
-                var physicalDamage = passive.GetPhysicalDamage(source, target);
-                var magicalDamage = passive.GetMagicalDamage(source, target);
-                var trueDamage = passive.GetTrueDamage(source, target);
+                var passiveDamage = passive.GetDamage(source, target);
+
                 switch (passive.DamageType)
                 {
-                    case Passive.PassiveDamageType.FlatPhysical:
-                        totalPhysicalDamage += physicalDamage;
+                    case DamagePassive.PassiveDamageType.FlatPhysical:
+                        totalPhysicalDamage += passiveDamage;
                         break;
 
-                    case Passive.PassiveDamageType.FlatMagical:
-                        totalMagicalDamage += magicalDamage;
+                    case DamagePassive.PassiveDamageType.FlatMagical:
+                        totalMagicalDamage += passiveDamage;
                         break;
 
-                    case Passive.PassiveDamageType.FlatTrue:
-                        totalTrueDamage += trueDamage;
+                    case DamagePassive.PassiveDamageType.FlatTrue:
+                        totalTrueDamage += passiveDamage;
                         break;
 
-                    case Passive.PassiveDamageType.PercentPhysical:
-                        totalPhysicalDamageMod *= physicalDamage;
+                    case DamagePassive.PassiveDamageType.PercentPhysical:
+                        totalPhysicalDamageMod *= passiveDamage;
                         break;
 
-                    case Passive.PassiveDamageType.PercentMagical:
-                        totalMagicalDamageMod *= magicalDamage;
+                    case DamagePassive.PassiveDamageType.PercentMagical:
+                        totalMagicalDamageMod *= passiveDamage;
                         break;
 
-                    case Passive.PassiveDamageType.PercentTrue:
-                        totalTrueDamageMod *= trueDamage;
+                    case DamagePassive.PassiveDamageType.PercentTrue:
+                        totalTrueDamageMod *= passiveDamage;
                         break;
                 }
             }
@@ -475,7 +474,7 @@ namespace Aimtec.SDK.Damage
             return new PassiveDamageResult(totalPhysicalDamage, totalMagicalDamage, totalTrueDamage, totalPhysicalDamageMod, totalMagicalDamageMod, totalTrueDamageMod);
         }
 
-        public static List<Passive> Passives { get; set; } = new List<Passive>();
+        public static List<DamagePassive> Passives { get; set; } = new List<DamagePassive>();
 
         public class PassiveDamageResult
         {
@@ -498,41 +497,19 @@ namespace Aimtec.SDK.Damage
             public double TrueDamagePercent { get; set; }
         }
 
-        public class Passive
+        public class DamagePassive
         {
             public string Name { get; set; }
 
             public delegate double PassiveDamageDelegateHandler(Obj_AI_Hero source, Obj_AI_Base target);
 
-            public PassiveDamageDelegateHandler PassivePhysicalDamage { get; set; }
-            public PassiveDamageDelegateHandler PassiveMagicalDamage { get; set; }
-            public PassiveDamageDelegateHandler PassiveTrueDamage { get; set; }
+            public PassiveDamageDelegateHandler PassiveDamage { get; set; }
 
-            public double GetPhysicalDamage(Obj_AI_Hero source, Obj_AI_Base target)
+            public double GetDamage(Obj_AI_Hero source, Obj_AI_Base target)
             {
-                if (this.PassivePhysicalDamage != null)
+                if (this.PassiveDamage != null)
                 {
-                    return this.PassivePhysicalDamage(source, target);
-                }
-
-                return 0;
-            }
-
-            public double GetMagicalDamage(Obj_AI_Hero source, Obj_AI_Base target)
-            {
-                if (this.PassiveMagicalDamage != null)
-                {
-                    return this.PassiveMagicalDamage(source, target);
-                }
-
-                return 0;
-            }
-
-            public double GetTrueDamage(Obj_AI_Hero source, Obj_AI_Base target)
-            {
-                if (this.PassiveTrueDamage != null)
-                {
-                    return this.PassiveTrueDamage(source, target);
+                    return this.PassiveDamage(source, target);
                 }
 
                 return 0;

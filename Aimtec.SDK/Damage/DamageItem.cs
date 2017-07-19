@@ -9,17 +9,17 @@ namespace Aimtec.SDK.Damage
     using System;
     using System.Collections.Generic;
 
-    internal class DamageItem
+    internal class DamageItems
     {
-        static DamageItem()
+        static DamageItems()
         {
             #region Physical Damage Items
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.BladeoftheRuinedKing,
-                              DamageType = Item.ItemDamageType.Physical,
-                              ItemPhysicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Physical,
+                              ItemDamage = (source, target) =>
                                   {
                                       switch (target.Type)
                                       {
@@ -34,11 +34,11 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.EnchantmentBloodrazor,
-                              DamageType = Item.ItemDamageType.Physical,
-                              ItemPhysicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Physical,
+                              ItemDamage = (source, target) =>
                                   {
                                       switch (target.Type)
                                       {
@@ -53,22 +53,22 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.RecurveBow,
-                              DamageType = Item.ItemDamageType.Physical,
-                              ItemPhysicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Physical,
+                              ItemDamage = (source, target) =>
                                   {
                                       return 15;
                                   }
                           });
 
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.TitanicHydra,
-                              DamageType = Item.ItemDamageType.Physical,
-                              ItemPhysicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Physical,
+                              ItemDamage = (source, target) =>
                                   {
                                       if (source.HasBuff("itemtitanichydracleavebuff"))
                                       {
@@ -79,11 +79,11 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.TrinityForce,
-                              DamageType = Item.ItemDamageType.Physical,
-                              ItemPhysicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Physical,
+                              ItemDamage = (source, target) =>
                                   {
                                       if (source.HasBuff("sheen"))
                                       {
@@ -94,11 +94,11 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.IcebornGauntlet,
-                              DamageType = Item.ItemDamageType.Physical,
-                              ItemPhysicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Physical,
+                              ItemDamage = (source, target) =>
                                   {
                                       if (source.HasBuff("sheen"))
                                       {
@@ -109,11 +109,11 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.Sheen,
-                              DamageType = Item.ItemDamageType.Physical,
-                              ItemPhysicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Physical,
+                              ItemDamage = (source, target) =>
                                   {
                                       if (source.HasBuff("sheen"))
                                       {
@@ -124,11 +124,11 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.Muramana,
-                              DamageType = Item.ItemDamageType.Physical,
-                              ItemPhysicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Physical,
+                              ItemDamage = (source, target) =>
                                   {
                                       if (source.ManaPercent() > 20)
                                       {
@@ -143,51 +143,51 @@ namespace Aimtec.SDK.Damage
 
             #region Magical Damage Items
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.GuinsoosRageblade,
-                              DamageType = Item.ItemDamageType.Magical,
-                              ItemMagicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Magical,
+                              ItemDamage = (source, target) =>
                                   {
                                       return 15;
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.NashorsTooth,
-                              DamageType = Item.ItemDamageType.Magical,
-                              ItemMagicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Magical,
+                              ItemDamage = (source, target) =>
                                   {
                                       return 15 + 0.15 * source.TotalAbilityDamage;
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.WitsEnd,
-                              DamageType = Item.ItemDamageType.Magical,
-                              ItemMagicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Magical,
+                              ItemDamage = (source, target) =>
                                   {
                                       return 40;
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.LichBane,
-                              DamageType = Item.ItemDamageType.Magical,
-                              ItemMagicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Magical,
+                              ItemDamage = (source, target) =>
                                   {
                                       return source.BaseAttackDamage + 0.50 * source.TotalAbilityDamage;
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.KircheisShard,
-                              DamageType = Item.ItemDamageType.Magical,
-                              ItemMagicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Magical,
+                              ItemDamage = (source, target) =>
                                   {
                                       if (source.GetBuffCount("ItemStatikShankCharge") == 100)
                                       {
@@ -198,11 +198,11 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.RapidFirecannon,
-                              DamageType = Item.ItemDamageType.Magical,
-                              ItemMagicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Magical,
+                              ItemDamage = (source, target) =>
                                   {
                                       if (source.GetBuffCount("ItemStatikShankCharge") == 100)
                                       {
@@ -213,11 +213,11 @@ namespace Aimtec.SDK.Damage
                                   }
                           });
 
-            Items.Add(new Item
+            Items.Add(new DamageItem
                           {
                               Id = ItemId.StatikkShiv,
-                              DamageType = Item.ItemDamageType.Magical,
-                              ItemMagicalDamage = (source, target) =>
+                              DamageType = DamageItem.ItemDamageType.Magical,
+                              ItemDamage = (source, target) =>
                                   {
                                       if (source.GetBuffCount("ItemStatikShankCharge") == 100)
                                       {
@@ -246,16 +246,16 @@ namespace Aimtec.SDK.Damage
 
                 switch (item.DamageType)
                 {
-                    case Item.ItemDamageType.Physical:
-                        totalPhysicalDamage += item.GetPhysicalDamage(source, target);
+                    case DamageItem.ItemDamageType.Physical:
+                        totalPhysicalDamage += item.GetDamage(source, target);
                         break;
 
-                    case Item.ItemDamageType.Magical:
-                        totalMagicalDamage += item.GetMagicalDamage(source, target);
+                    case DamageItem.ItemDamageType.Magical:
+                        totalMagicalDamage += item.GetDamage(source, target);
                         break;
 
-                    case Item.ItemDamageType.True:
-                        totalTrueDamage += item.GetTrueDamage(source, target);
+                    case DamageItem.ItemDamageType.True:
+                        totalTrueDamage += item.GetDamage(source, target);
                         break;
                 }
             }
@@ -263,7 +263,7 @@ namespace Aimtec.SDK.Damage
             return new ItemDamageResult(totalPhysicalDamage, totalMagicalDamage, totalTrueDamage);
         }
 
-        public static List<Item> Items { get; set; } = new List<Item>();
+        public static List<DamageItem> Items { get; set; } = new List<DamageItem>();
 
         public class ItemDamageResult
         {
@@ -279,41 +279,19 @@ namespace Aimtec.SDK.Damage
             public double TrueDamage { get; set; }
         }
 
-        public class Item
+        public class DamageItem
         {
             public uint Id { get; set; }
 
             public delegate double ItemDamageDelegateHandler(Obj_AI_Base source, Obj_AI_Base target);
 
-            public ItemDamageDelegateHandler ItemPhysicalDamage { get; set; }
-            public ItemDamageDelegateHandler ItemMagicalDamage { get; set; }
-            public ItemDamageDelegateHandler ItemTrueDamage { get; set; }
+            public ItemDamageDelegateHandler ItemDamage { get; set; }
 
-            public double GetPhysicalDamage(Obj_AI_Base source, Obj_AI_Base target)
+            public double GetDamage(Obj_AI_Base source, Obj_AI_Base target)
             {
-                if (this.ItemPhysicalDamage != null)
+                if (this.ItemDamage != null)
                 {
-                    return this.ItemPhysicalDamage(source, target);
-                }
-
-                return 0;
-            }
-
-            public double GetMagicalDamage(Obj_AI_Base source, Obj_AI_Base target)
-            {
-                if (this.ItemMagicalDamage != null)
-                {
-                    return this.ItemMagicalDamage(source, target);
-                }
-
-                return 0;
-            }
-
-            public double GetTrueDamage(Obj_AI_Base source, Obj_AI_Base target)
-            {
-                if (this.ItemTrueDamage != null)
-                {
-                    return this.ItemTrueDamage(source, target);
+                    return this.ItemDamage(source, target);
                 }
 
                 return 0;

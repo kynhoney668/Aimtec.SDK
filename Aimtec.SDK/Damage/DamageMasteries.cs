@@ -9,29 +9,29 @@ namespace Aimtec.SDK.Damage
     using System;
     using System.Collections.Generic;
 
-    internal class DamageMastery
+    internal class DamageMasteries
     {
-        static DamageMastery()
+        static DamageMasteries()
         {
             #region Masteries
 
-            Masteries.Add(new Mastery
+            Masteries.Add(new DamageMastery
                               {
                                   Page = MasteryPage.Ferocity,
                                   Id = (uint)MasteryId.Ferocity.DoubleEdgedSword,
-                                  DamageType = Mastery.MasteryDamageType.Percent,
-                                  MasteryPercentDamage = (mastery, source, target) =>
+                                  DamageType = DamageMastery.MasteryDamageType.Percent,
+                                  MasteryDamage = (mastery, source, target) =>
                                       {
                                           return 1.03;
                                       }
                               });
 
-            Masteries.Add(new Mastery
+            Masteries.Add(new DamageMastery
                               {
                                   Page = MasteryPage.Ferocity,
                                   Id = (uint)MasteryId.Ferocity.BattleTrance,
-                                  DamageType = Mastery.MasteryDamageType.Percent,
-                                  MasteryPercentDamage = (mastery, source, target) =>
+                                  DamageType = DamageMastery.MasteryDamageType.Percent,
+                                  MasteryDamage = (mastery, source, target) =>
                                       {
                                           var targetHero = target as Obj_AI_Hero;
                                           if (targetHero != null)
@@ -43,12 +43,12 @@ namespace Aimtec.SDK.Damage
                                       }
                               });
 
-            Masteries.Add(new Mastery
+            Masteries.Add(new DamageMastery
                               {
                                   Page = MasteryPage.Cunning,
                                   Id = (uint)MasteryId.Cunning.Assassin,
-                                  DamageType = Mastery.MasteryDamageType.Percent,
-                                  MasteryPercentDamage = (mastery, source, target) =>
+                                  DamageType = DamageMastery.MasteryDamageType.Percent,
+                                  MasteryDamage = (mastery, source, target) =>
                                       {
                                           var targetHero = target as Obj_AI_Hero;
                                           if (targetHero != null &&
@@ -61,12 +61,12 @@ namespace Aimtec.SDK.Damage
                                       }
                               });
 
-            Masteries.Add(new Mastery
+            Masteries.Add(new DamageMastery
                               {
                                   Page = MasteryPage.Cunning,
                                   Id = (uint)MasteryId.Cunning.GreenFathersGift,
-                                  DamageType = Mastery.MasteryDamageType.Magical,
-                                  MasteryMagicalDamage = (mastery, source, target) =>
+                                  DamageType = DamageMastery.MasteryDamageType.Magical,
+                                  MasteryDamage = (mastery, source, target) =>
                                       {
                                           if (target != null)
                                           {
@@ -77,12 +77,12 @@ namespace Aimtec.SDK.Damage
                                       }
                               });
 
-            Masteries.Add(new Mastery
+            Masteries.Add(new DamageMastery
                               {
                                   Page = MasteryPage.Cunning,
                                   Id = (uint)MasteryId.Cunning.Merciless,
-                                  DamageType = Mastery.MasteryDamageType.Percent,
-                                  MasteryPercentDamage = (mastery, source, target) =>
+                                  DamageType = DamageMastery.MasteryDamageType.Percent,
+                                  MasteryDamage = (mastery, source, target) =>
                                       {
                                           var targetHero = target as Obj_AI_Hero;
                                           if (targetHero?.HealthPercent() < 40)
@@ -103,26 +103,27 @@ namespace Aimtec.SDK.Damage
             double totalMagicalDamage = 0;
             double totalPercentDamage = 1;
 
-            foreach (var mastery in Masteries)
+            foreach (var damageMastery in Masteries)
             {
-                if (!source.IsUsingMastery(mastery.Page, mastery.Id))
+                var mastery = source.GetMastery(damageMastery.Page, damageMastery.Id);
+
+                if (mastery == null)
                 {
                     continue;
                 }
 
-                var getMastery = source.GetMastery(mastery.Page, mastery.Id);
-                switch (mastery.DamageType)
+                switch (damageMastery.DamageType)
                 {
-                    case Mastery.MasteryDamageType.Physical:
-                        totalPhysicalDamage += mastery.GetPhysicalDamage(getMastery, source, target);
+                    case DamageMastery.MasteryDamageType.Physical:
+                        totalPhysicalDamage += damageMastery.GetMasteryDamage(mastery, source, target);
                         break;
 
-                    case Mastery.MasteryDamageType.Magical:
-                        totalMagicalDamage += mastery.GetMagicalDamage(getMastery, source, target);
+                    case DamageMastery.MasteryDamageType.Magical:
+                        totalMagicalDamage += damageMastery.GetMasteryDamage(mastery, source, target);
                         break;
 
-                    case Mastery.MasteryDamageType.Percent:
-                        totalPercentDamage *= mastery.GetPercentDamage(getMastery, source, target);
+                    case DamageMastery.MasteryDamageType.Percent:
+                        totalPercentDamage *= damageMastery.GetMasteryDamage(mastery, source, target);
                         break;
                 }
             }
@@ -130,7 +131,7 @@ namespace Aimtec.SDK.Damage
             return new MasteryDamageResult(totalPhysicalDamage, totalMagicalDamage, totalPercentDamage);
         }
 
-        public static List<Mastery> Masteries { get; set; } = new List<Mastery>();
+        public static List<DamageMastery> Masteries { get; set; } = new List<DamageMastery>();
 
         public class MasteryDamageResult
         {
@@ -146,48 +147,26 @@ namespace Aimtec.SDK.Damage
             public double PercentDamage { get; set; }
         }
 
-        public class Mastery
+        public class DamageMastery
         {
             public uint Id { get; set; }
 
             public MasteryPage Page { get; set; }
 
-            public delegate double MasteryDamageDelegateHandler(Aimtec.Mastery mastery, Obj_AI_Hero source, AttackableUnit target);
+            public delegate double MasteryDamageDelegateHandler(Mastery mastery, Obj_AI_Hero source, AttackableUnit target);
 
-            public MasteryDamageDelegateHandler MasteryPhysicalDamage { get; set; }
-            public MasteryDamageDelegateHandler MasteryMagicalDamage { get; set; }
-            public MasteryDamageDelegateHandler MasteryPercentDamage { get; set; }
+            public MasteryDamageDelegateHandler MasteryDamage { get; set; }
 
-            public double GetPhysicalDamage(Aimtec.Mastery mastery, Obj_AI_Hero source, AttackableUnit target)
+            public double GetMasteryDamage(Mastery mastery, Obj_AI_Hero source, AttackableUnit target)
             {
-                if (this.MasteryPhysicalDamage != null)
+                if (this.MasteryDamage != null)
                 {
-                    return this.MasteryPhysicalDamage(mastery, source, target);
+                    return this.MasteryDamage(mastery, source, target);
                 }
 
                 return 0;
             }
-
-            public double GetMagicalDamage(Aimtec.Mastery mastery, Obj_AI_Hero source, AttackableUnit target)
-            {
-                if (this.MasteryMagicalDamage != null)
-                {
-                    return this.MasteryMagicalDamage(mastery, source, target);
-                }
-
-                return 0;
-            }
-
-            public double GetPercentDamage(Aimtec.Mastery mastery, Obj_AI_Hero source, AttackableUnit target)
-            {
-                if (this.MasteryPercentDamage != null)
-                {
-                    return this.MasteryPercentDamage(mastery, source, target);
-                }
-
-                return 0;
-            }
-
+ 
             public MasteryDamageType DamageType { get; set; }
 
             public enum MasteryDamageType
