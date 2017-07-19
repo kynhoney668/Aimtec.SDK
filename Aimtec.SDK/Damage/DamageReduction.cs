@@ -127,20 +127,25 @@ namespace Aimtec.SDK.Damage
             double flatDamageReduction = 0;
             double percentDamageReduction = 1;
 
-            var allReductions = Reductions.Where(r => source != null && source.HasBuff(r.BuffName));
-            var enumerable = allReductions as IList<Reduction> ?? allReductions.ToList();
-
-            var flatDamageReductions = enumerable.Where(x => x.Type == Reduction.ReductionDamageType.Flat);
-            var percentDamageReductions = enumerable.Where(x => x.Type == Reduction.ReductionDamageType.Percent);
-
-            foreach (var reduction in flatDamageReductions)
+            foreach (var reduction in Reductions)
             {
-                flatDamageReduction += reduction.GetFlatDamage(source, attacker);
-            }
+                if (source != null || source.HasBuff(reduction.BuffName))
+                {
+                    continue;
+                }
 
-            foreach (var reduction in percentDamageReductions)
-            {
-                percentDamageReduction *= 1 - reduction.GetPercentDamage(source, attacker) / 100;
+                if (source != null && source.HasBuff(reduction.BuffName))
+                {
+                    if (reduction.Type.HasFlag(Reduction.ReductionDamageType.Flat))
+                    {
+                        flatDamageReduction += reduction.GetFlatDamage(source, attacker);
+                    }
+
+                    if (reduction.Type.HasFlag(Reduction.ReductionDamageType.Percent))
+                    {
+                        percentDamageReduction *= 1 - reduction.GetPercentDamage(source, attacker) / 100;
+                    }
+                }
             }
 
             return new ReductionDamageResult(flatDamageReduction, percentDamageReduction);

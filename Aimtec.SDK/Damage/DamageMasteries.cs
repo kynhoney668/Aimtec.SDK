@@ -98,26 +98,27 @@ namespace Aimtec.SDK.Damage
             double totalMagicalDamage = 0;
             double totalPercentDamage = 1;
 
-            var allMasteries = Masteries.Where(x => source.IsUsingMastery(x.Page, x.Id));
-            var enumerable = allMasteries as IList<Mastery> ?? allMasteries.ToList();
-
-            var physicalDamageMasteries = enumerable.Where(x => x.DamageType == Mastery.MasteryDamageType.Physical);
-            var magicalDamageMasteries = enumerable.Where(x => x.DamageType == Mastery.MasteryDamageType.Magical);
-            var percentDamageMasteries = enumerable.Where(x => x.DamageType == Mastery.MasteryDamageType.Percent);
-
-            foreach (var mastery in physicalDamageMasteries)
+            foreach (var mastery in Masteries)
             {
-                totalPhysicalDamage += mastery.GetPhysicalDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
-            }
+                if (!source.IsUsingMastery(mastery.Page, mastery.Id))
+                {
+                    continue;
+                }
 
-            foreach (var mastery in magicalDamageMasteries)
-            {
-                totalMagicalDamage += mastery.GetMagicalDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
-            }
+                if (mastery.DamageType.HasFlag(Mastery.MasteryDamageType.Physical))
+                {
+                    totalPhysicalDamage += mastery.GetPhysicalDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
+                }
 
-            foreach (var mastery in percentDamageMasteries)
-            {
-                totalPercentDamage *= mastery.GetPercentDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
+                if (mastery.DamageType.HasFlag(Mastery.MasteryDamageType.Magical))
+                {
+                    totalMagicalDamage += mastery.GetMagicalDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
+                }
+
+                if (mastery.DamageType.HasFlag(Mastery.MasteryDamageType.Percent))
+                {
+                    totalPercentDamage *= mastery.GetPercentDamage(source.GetMastery(mastery.Page, mastery.Id), source, target);
+                }
             }
 
             return new MasteryDamageResult(totalPhysicalDamage, totalMagicalDamage, totalPercentDamage);

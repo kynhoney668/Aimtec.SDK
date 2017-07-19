@@ -237,27 +237,29 @@ namespace Aimtec.SDK.Damage
             double totalPhysicalDamage = 0;
             double totalMagicalDamage = 0;
             double totalTrueDamage = 0;
-
-            var allItems = Items.Where(x => source.HasItem(x.Id));
-            var enumerable = allItems as IList<Item> ?? allItems.ToList();
-
-            var physicalDamageItems = enumerable.Where(x => x.DamageType.HasFlag(Item.ItemDamageType.Physical));
-            var magicalDamageItems = enumerable.Where(x => x.DamageType.HasFlag(Item.ItemDamageType.Magical));
-            var trueDamageItems = enumerable.Where(x => x.DamageType.HasFlag(Item.ItemDamageType.True));
-
-            foreach (var item in physicalDamageItems)
+            
+            foreach (var item in Items)
             {
-                totalPhysicalDamage += item.GetPhysicalDamage(source, target);
-            }
+                if (!source.HasItem(item.Id))
+                {
+                    continue;
+                }
 
-            foreach (var item in magicalDamageItems)
-            {
-                totalMagicalDamage += item.GetMagicalDamage(source, target);
-            }
+                if (item.DamageType.HasFlag(Item.ItemDamageType.Physical))
+                {
+                    totalPhysicalDamage += item.GetPhysicalDamage(source, target);
+                }
 
-            foreach (var item in trueDamageItems)
-            {
-                totalTrueDamage += item.GetTrueDamage(source, target);
+
+                if (item.DamageType.HasFlag(Item.ItemDamageType.Physical))
+                {
+                    totalMagicalDamage += item.GetMagicalDamage(source, target);
+                }
+
+                if (item.DamageType.HasFlag(Item.ItemDamageType.Physical))
+                {
+                    totalTrueDamage += item.GetTrueDamage(source, target);
+                }
             }
 
             return new ItemDamageResult(totalPhysicalDamage, totalMagicalDamage, totalTrueDamage);
