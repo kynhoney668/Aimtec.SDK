@@ -107,9 +107,17 @@
         ///     Gets an ordered enumerable of the available targets within the range based on their priority ranking by the Target
         ///     Selector
         /// </summary>
-        public IEnumerable<Obj_AI_Hero> GetOrderedTargets(float range, bool autoAttackTarget = false)
+        public static IEnumerable<Obj_AI_Hero> GetOrderedTargets(float range, bool autoAttackTarget = false)
         {
             return Implementation.GetOrderedTargets(range, autoAttackTarget);
+        }
+
+        /// <summary>
+        ///     Gets the selected target
+        /// </summary>
+        public static Obj_AI_Hero GetSelectedTarget()
+        {
+            return Implementation.GetSelectedTarget();
         }
 
         #endregion

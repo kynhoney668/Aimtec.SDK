@@ -209,7 +209,7 @@
 
         public TargetSelectorMode Mode => (TargetSelectorMode) this.Config["TsMode"].As<MenuList>().Value;
 
-        public Obj_AI_Hero SelectedHero { get; set; }
+        public Obj_AI_Hero SelectedTarget { get; set; }
 
         #endregion
 
@@ -222,6 +222,21 @@
         #endregion
 
         #region Public Methods and Operators
+
+        public Obj_AI_Hero GetSelectedTarget()
+        {
+            return this.GetSelectedTarget(20000);
+        }
+
+        public Obj_AI_Hero GetSelectedTarget(float range)
+        {
+            if (this.SelectedTarget.IsValidTarget(range))
+            {
+                return this.SelectedTarget;
+            }
+
+            return null;
+        }
 
         public void AddWeight(Weight weight)
         {
@@ -279,14 +294,16 @@
 
                 var ordered = targetWeightDictionary.Keys.OrderByDescending(k => targetWeightDictionary[k]).ToList();
 
-                if (this.SelectedHero != null)
+                var selected = GetSelectedTarget(range);
+
+                if (selected != null)
                 {
-                    var containsSelected = ordered.Any(x => x.NetworkId == this.SelectedHero.NetworkId);
+                    var containsSelected = ordered.Any(x => x.NetworkId == selected.NetworkId);
 
                     if (containsSelected)
                     {
-                        ordered.RemoveAll(x => x.NetworkId == this.SelectedHero.NetworkId);
-                        ordered.Insert(0, this.SelectedHero);
+                        ordered.RemoveAll(x => x.NetworkId == selected.NetworkId);
+                        ordered.Insert(0, selected);
                     }
                 }
 
@@ -378,9 +395,11 @@
 
         public Obj_AI_Hero GetTarget(float range, bool autoattack = false)
         {
-            if (this.SelectedHero != null && this.SelectedHero.IsValidTarget(range))
+            var selected = GetSelectedTarget(range);
+
+            if (selected != null)
             {
-                return this.SelectedHero;
+                return selected;
             }
 
             var target = this.GetOrderedTargets(range, autoattack).FirstOrDefault();
@@ -539,12 +558,12 @@
 
                 if (closestHero != null && Game.CursorPos.Distance(closestHero.Position) <= 300)
                 {
-                    this.SelectedHero = closestHero;
+                    this.SelectedTarget = closestHero;
                 }
 
                 else
                 {
-                    this.SelectedHero = null;
+                    this.SelectedTarget = null;
                 }
             }
         }
@@ -587,9 +606,11 @@
         {
             var results = this.GetTargetsAndWeights(range, autoattack).ToList();
 
-            if (this.SelectedHero != null && this.SelectedHero.IsValidTarget(range))
+            var selected = GetSelectedTarget(range);
+
+            if (selected != null)
             {
-                return results.OrderByDescending(x => x.Key.NetworkId == this.SelectedHero.NetworkId)
+                return results.OrderByDescending(x => x.Key.NetworkId == selected.NetworkId)
                               .ThenByDescending(x => x.Value);
             }
 
@@ -604,9 +625,11 @@
 
             if (indicateSelected)
             {
-                if (this.SelectedHero != null && this.SelectedHero.IsValidTarget())
+                var selected = GetSelectedTarget();
+
+                if (selected != null)
                 {
-                    Render.Circle(this.SelectedHero.Position, this.SelectedHero.BoundingRadius, 30, Color.Red);
+                    Render.Circle(this.SelectedTarget.Position, this.SelectedTarget.BoundingRadius, 30, Color.Red);
                 }
             }
 

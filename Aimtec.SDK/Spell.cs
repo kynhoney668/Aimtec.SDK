@@ -180,6 +180,27 @@
         }
 
         /// <summary>
+        ///     Gets the percentage the spell is charged up
+        /// </summary>
+        public float ChargePercent
+        {
+            get
+            {
+                if (!this.IsChargedSpell)
+                {
+                    return 100;
+                }
+
+                if (this.IsCharging)
+                {
+                    return this.Range / this.ChargedMaxRange;
+                }
+
+                return 0;
+            }
+        }
+
+        /// <summary>
         ///     Gets a value indicating whether this <see cref="Spell" /> is ready.
         /// </summary>
         /// <value><c>true</c> if ready; otherwise, <c>false</c>.</value>
@@ -512,6 +533,9 @@
             }
         }
 
+        /// <summary>
+        ///     Shoots the charged spell
+        /// </summary>
         public bool ShootChargedSpell(Vector3 position, bool releaseCast = true)
         {
             var resultUpdate = Player.SpellBook.UpdateChargedSpell(this.Slot, position, releaseCast);
@@ -525,6 +549,9 @@
             return resultUpdate;
         }
 
+        /// <summary>
+        ///     Starts charging the spell
+        /// </summary>
         public bool StartCharging(Vector3 position)
         {
             if (this.IsCharging || Game.TickCount - this.chargeReqSentT <= 400 + Game.Ping)
