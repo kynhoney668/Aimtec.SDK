@@ -68,20 +68,22 @@ namespace Aimtec.SDK.Damage
                                      }
                              });
 
-            Passives.Add(new DamagePassive
+            /*
+             Passives.Add(new DamagePassive
                              {
                                  Name = "Ashe",
                                  DamageType = DamagePassive.PassiveDamageType.PercentPhysical,
                                  PassiveDamage = (source, target) =>
                                      {
-                                         if (source.HasBuff("asheqbuff"))
+                                         if (source.HasBuff("asheqattack"))
                                          {
-                                             return source.GetSpellDamage(target, SpellSlot.Q);
+                                             return new[] { 0.20, 0.21, 0.22, 0.23, 0.24, 0.25 }[source.SpellBook.GetSpell(SpellSlot.Q).Level - 1] * source.TotalAttackDamage;
                                          }
 
-                                         return 0;
+                                         return 1;
                                      }
                              });
+            */
 
             Passives.Add(new DamagePassive
                              {
@@ -91,7 +93,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (target.HasBuff("ashepassiveslow"))
                                          {
-                                             return (10 + source.Crit*100 * (1 + (source.HasItem(ItemId.InfinityEdge) ? 0.5 : 0))) * source.TotalAttackDamage;
+                                             return (0.1 + source.Crit / 100 * (1 + (source.HasItem(ItemId.InfinityEdge) ? 0.5 : 0))) * source.TotalAttackDamage;
                                          }
 
                                          return 0;
@@ -236,10 +238,10 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("dariusnoxiantacticsonh"))
                                          {
-                                             return source.GetSpellDamage(target, SpellSlot.W);
+                                             return source.GetSpellDamage(target, SpellSlot.W) * source.TotalAttackDamage;
                                          }
 
-                                         return 0;
+                                         return 1;
                                      }
                              });
 
@@ -267,6 +269,21 @@ namespace Aimtec.SDK.Damage
                                          if (source.HasBuff("dravenspinningattack"))
                                          {
                                              return source.GetSpellDamage(target, SpellSlot.Q);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "DrMundo",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("masochism"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.E);
                                          }
 
                                          return 0;
@@ -350,13 +367,35 @@ namespace Aimtec.SDK.Damage
 
             Passives.Add(new DamagePassive
                              {
-                                 Name = "Hecarim",
+                                 Name = "Jhin",
                                  DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
                                  PassiveDamage = (source, target) =>
                                      {
-                                         if (target.HasBuff("hecarimrampspeed"))
+                                         if (Math.Abs(source.Crit - 1) < float.Epsilon)
                                          {
-                                             return source.GetSpellDamage(target, SpellSlot.E);
+                                             return (source.HasItem(ItemId.InfinityEdge) ? 0.875 : 0.5) * (source.TotalAttackDamage
+                                                       + Math.Round((new[] { 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40 }[source.Level - 1]
+                                                            + Math.Round(source.Crit * 100 / 10 * 4)
+                                                            + Math.Round((source.AttackSpeedMod - 1) * 100 / 10) * 2.5) / 100 * source.TotalAttackDamage));
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Jhin",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("JhinPassiveAttackBuff"))
+                                         {
+                                             return (source.HasItem(ItemId.InfinityEdge) ? 1.875 : 1.5) * ((source.Level < 6
+                                                        ? 0.15
+                                                        : (source.Level < 11
+                                                            ? 0.2
+                                                            : 0.25)) * (target.MaxHealth - target.Health));
                                          }
 
                                          return 0;

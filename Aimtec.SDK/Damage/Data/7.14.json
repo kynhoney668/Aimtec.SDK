@@ -1749,8 +1749,6 @@
 					"SpellEffectType": "None",
 					"DamageType": "Magical",
 					"Damages": [60.0, 90.0, 120.0, 150.0, 180.0],
-
-
 					"BonusDamages": [{
 						"DamageType": "Magical",
 						"DamagePercentages": [1.2, 1.2, 1.2, 1.2, 1.2],
@@ -1822,7 +1820,6 @@
 					"SpellEffectType": "Attack",
 					"DamageType": "Magical",
 					"Damages": [300.0, 400.0, 500.0],
-
 					"BonusDamages": [{
 						"DamageType": "Magical",
 						"DamagePercentages": [0.6, 0.6, 0.6],
