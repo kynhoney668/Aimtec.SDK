@@ -384,7 +384,7 @@
 
         public TargetPriority GetPriority(Obj_AI_Hero hero)
         {
-            var slider = this.Config["TargetsMenu"]["priority" + hero.ChampionName].As<MenuSlider>();
+            var slider = this.Config["TargetsMenu"]["priority" + hero.ChampionName];
             if (slider != null)
             {
                 return (TargetPriority) slider.Value;
