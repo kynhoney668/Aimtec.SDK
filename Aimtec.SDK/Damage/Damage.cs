@@ -544,7 +544,7 @@ namespace Aimtec.SDK.Damage
                 }
             }
 
-			var hero = source as Obj_AI_Hero;
+            var hero = source as Obj_AI_Hero;
             if (hero != null)
             {
                 var masteryDamage = DamageMasteries.ComputeMasteryDamages(hero, target);
@@ -563,10 +563,10 @@ namespace Aimtec.SDK.Damage
                         }
                     }
 
-                    if (targetHero.ValidActiveBuffs().Any(b => b.Caster != null &&
-                            b.Caster.NetworkId != hero.NetworkId &&
-                            hero.Team == b.Caster.Team &&
-                            b.Name == "ExposeWeaknessDebuff"))
+                    var masterybuff = targetHero.GetBuff("ExposeWeaknessDebuff");
+                    if (masterybuff != null &&
+                        hero.Team == masterybuff.Caster?.Team &&
+                        masterybuff.Caster?.NetworkId != hero.NetworkId)
                     {
                         amount *= 1 + 3 / 100; // 3% Increase.
                     }
@@ -583,13 +583,13 @@ namespace Aimtec.SDK.Damage
                             amount *= 1 + healthDiff / 10000;
                         }
                     }
-                }
 
-                var doubleEdgedSword = targetHero?.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
-                if (doubleEdgedSword != null &&
-                    targetHero.IsUsingMastery(doubleEdgedSword))
-                {
-                    amount *= 1 + 1.5 / 100; // 1.5% Increase.
+                    var doubleEdgedSword = targetHero.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
+                    if (doubleEdgedSword != null &&
+                        targetHero.IsUsingMastery(doubleEdgedSword))
+                    {
+                        amount *= 1 + 1.5 / 100; // 1.5% Increase.
+                    }
                 }
             }
 
