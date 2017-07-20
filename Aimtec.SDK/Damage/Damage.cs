@@ -545,15 +545,15 @@ namespace Aimtec.SDK.Damage
             }
 
 			var hero = source as Obj_AI_Hero;
-			if (hero != null)
+            if (hero != null)
             {
                 var masteryDamage = DamageMasteries.ComputeMasteryDamages(hero, target);
                 amount *= masteryDamage.PercentDamage;
-				
-				var targetHero = target as Obj_AI_Hero;
-				if (targetHero != null)
-				{
-				    var buff = hero.GetBuff("sonapassivedebuff");
+
+                var targetHero = target as Obj_AI_Hero;
+                if (targetHero != null)
+                {
+                    var buff = hero.GetBuff("sonapassivedebuff");
                     if (buff != null)
                     {
                         var caster = buff.Caster as Obj_AI_Hero;
@@ -561,29 +561,29 @@ namespace Aimtec.SDK.Damage
                         {
                             amount *= 1 - (0.25 + 0.04 * caster.TotalAbilityDamage / 100);
                         }
-				    }
+                    }
 
-                    if (targetHero.ValidActiveBuffs().Any(b =>
-                            b.Caster != hero &&
+                    if (targetHero.ValidActiveBuffs().Any(b => b.Caster != null &&
+                            b.Caster.NetworkId != hero.NetworkId &&
                             hero.Team == b.Caster.Team &&
                             b.Name == "ExposeWeaknessDebuff"))
-					{
-						amount *= 1 + 3 / 100; // 3% Increase.
-					}
+                    {
+                        amount *= 1 + 3 / 100; // 3% Increase.
+                    }
 
                     if (hero.MaxHealth < targetHero.MaxHealth && damageType == DamageType.Physical)
                     {
                         var healthDiff = Math.Min(targetHero.MaxHealth - hero.MaxHealth, 1000);
                         if (hero.HasItem(ItemId.LordDominiksRegards))
-				        {
-				            amount *= 1 + healthDiff / 5000;
-				        }
+                        {
+                            amount *= 1 + healthDiff / 5000;
+                        }
                         else if (hero.HasItem(ItemId.GiantSlayer))
-				        {
-				            amount *= 1 + healthDiff / 10000;
+                        {
+                            amount *= 1 + healthDiff / 10000;
                         }
                     }
-				}
+                }
 
                 var doubleEdgedSword = targetHero?.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
                 if (doubleEdgedSword != null &&
