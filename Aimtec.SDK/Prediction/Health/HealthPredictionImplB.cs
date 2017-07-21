@@ -6,6 +6,8 @@
 
     using Aimtec.SDK.Damage;
     using Aimtec.SDK.Extensions;
+    using Aimtec.SDK.Menu.Components;
+    using Aimtec.SDK.Menu.Config;
 
     class HealthPredictionImplB : IHealthPrediction
     {
@@ -14,6 +16,8 @@
         internal readonly Dictionary<int, List<Attack>> incomingAttacks = new Dictionary<int, List<Attack>>();
 
         internal readonly Dictionary<int, AggroData> MinionAggroData = new Dictionary<int, AggroData>();
+
+        internal Menu.Menu Config { get; set; }
 
         #endregion
 
@@ -26,6 +30,13 @@
             GameObject.OnDestroy += this.GameObjectOnOnDestroy;
             Obj_AI_Base.OnPerformCast += this.Obj_AI_Base_OnPerformCast;
             SpellBook.OnStopCast += this.SpellBook_OnStopCast;
+
+            Config = new Menu.Menu("HealthPred", "HealthPrediction");
+
+            Config.Add(new MenuSeperator("seperator", "Default value should be 180"));
+            Config.Add(new MenuSlider("ExtraDelay", "Extra Delay", 180, 0, 250));
+
+            AimtecMenu.Instance.Add(this.Config);
         }
 
         #endregion
@@ -63,7 +74,7 @@
             foreach (var attack in incAttacksUnit)
             {
                 //if this attack will take longer than the specified time to reach the target, then ignore it
-                if (attack.ETA + 180 > time)
+                if (attack.ETA + this.Config["ExtraDelay"].Value > time)
                 {
                     continue;
                 }
@@ -131,7 +142,7 @@
                                 && x.Target.NetworkId == targ.NetworkId);
                     }
 
-                    if (targ is Obj_AI_Turret)
+                    if (source is Obj_AI_Turret)
                     {
                         if (this.MinionAggroData.ContainsKey(targ.NetworkId))
                         {
@@ -385,8 +396,7 @@
 
             public bool Destroyed { get; set; }
 
-            public float Distance => this.StartPosition.Distance(this.Target.Position) - this.Sender.BoundingRadius
-                - this.Target.BoundingRadius;
+            public float Distance => this.StartPosition.Distance(this.Target.Position) - this.Sender.BoundingRadius - this.Target.BoundingRadius;
 
             //Gets the time left until this auto reaches target by subtracting the time elapsed from total travel time
             public float ETA => this.TravelTime - this.TimeElapsed;

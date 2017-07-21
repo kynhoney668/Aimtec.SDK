@@ -594,7 +594,7 @@
 
                 if (selected != null)
                 {
-                    Render.Circle(this.SelectedTarget.Position, this.SelectedTarget.BoundingRadius, 30, Color.Red);
+                    Render.Circle(this.SelectedTarget.Position, this.SelectedTarget.BoundingRadius * 2, 30, Color.Red);
                 }
             }
 

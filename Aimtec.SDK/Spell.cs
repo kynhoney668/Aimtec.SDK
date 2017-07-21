@@ -34,12 +34,6 @@
         public Spell(SpellSlot slot)
         {
             this.Slot = slot;
-
-            if (AimtecMenu.DebugEnabled)
-            {
-                Logger.Debug("{0} Spell Created", slot);
-            }
-
             Render.OnRender += this.OnRender;
         }
 
@@ -53,14 +47,16 @@
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsVisible && x.IsEnemy))
             {
                 var prediction = this.GetPrediction(enemy);
+                if (prediction != null)
+                {
+                    Render.WorldToScreen(prediction.CastPosition, out Vector2 predictionSp);
 
-                Render.WorldToScreen(prediction.CastPosition, out Vector2 predictionSp);
-
-                Render.Circle(prediction.CastPosition, 100, 20, Color.Aqua);
-                Render.Text(
-                    predictionSp + new Vector2(0, 60),
-                    Color.White,
-                    $"{this.Slot} - {prediction.HitChance}");
+                    Render.Circle(prediction.CastPosition, 100, 20, Color.Aqua);
+                    Render.Text(
+                        predictionSp + new Vector2(0, 60),
+                        Color.White,
+                        $"{this.Slot} - {prediction.HitChance}");
+                }
             }
         }
 
@@ -184,6 +180,7 @@
         /// </summary>
         public float ChargePercent
         {
+            
             get
             {
                 if (!this.IsChargedSpell)
@@ -193,7 +190,9 @@
 
                 if (this.IsCharging)
                 {
-                    return this.Range / this.ChargedMaxRange;
+                    var maxgain = this.ChargedMaxRange - this.ChargedMinRange;
+                    var gain = this.Range - this.ChargedMinRange;
+                    return (gain / maxgain);
                 }
 
                 return 0;
@@ -273,6 +272,7 @@
                 {
                     Logger.Error("Vector skillshot should be cast using two positions");
                 }
+
                 return false;
             }
 

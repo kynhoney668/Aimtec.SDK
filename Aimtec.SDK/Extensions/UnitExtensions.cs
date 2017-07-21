@@ -309,7 +309,7 @@ namespace Aimtec.SDK.Extensions
             this AttackableUnit target,
             float range = float.MaxValue,
             bool allyIsValidTarget = false,
-            bool includeBoundingRadius = true,
+            bool includeBoundingRadius = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
             if (target == null || !target.IsValid || target.IsDead || target.IsInvulnerable || !target.IsVisible
@@ -325,6 +325,29 @@ namespace Aimtec.SDK.Extensions
 
             return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.Position) < range
                 + (includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0);
+        }
+
+        /// <summary>
+        ///     Returns true if this unit is able to be targetted by spells
+        /// </summary>
+        /// <param name="unit">The unit.</param>
+        public static bool IsValidSpellTarget(this AttackableUnit unit)
+        {
+            var mUnit = unit as Obj_AI_Minion;
+
+            if (mUnit == null)
+            {
+                return false;
+            }
+
+            var name = mUnit.UnitSkinName.ToLower();
+
+            if (name.Contains("barrel") || name.Contains("ward") || name.Contains("sru_plant_"))
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
