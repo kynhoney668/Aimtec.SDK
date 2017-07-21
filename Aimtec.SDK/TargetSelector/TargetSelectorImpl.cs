@@ -442,7 +442,7 @@
                 new Weight(
                     "ClosestToPlayerWeight",
                     "Closest to Player",
-                    true,
+                    false,
                     100,
                     target => target.Distance(Player),
                     WeightEffect.LowerIsBetter));
@@ -478,7 +478,7 @@
                 new Weight(
                     "MaxAttackDamageWeight",
                     "Most AD",
-                    true,
+                    false,
                     100,
                     target => target.TotalAttackDamage,
                     WeightEffect.HigherIsBetter));
@@ -487,7 +487,7 @@
                 new Weight(
                     "MaxAbilityPowerWeight",
                     "Most AP",
-                    true,
+                    false,
                     100,
                     target => target.TotalAbilityDamage,
                     WeightEffect.HigherIsBetter));
@@ -496,7 +496,7 @@
                 new Weight(
                     "MinArmorWeight",
                     "Min Armor",
-                    true,
+                    false,
                     100,
                     target => target.Armor + target.BonusArmor,
                     WeightEffect.LowerIsBetter));
@@ -505,7 +505,7 @@
                 new Weight(
                     "MinMRWeight",
                     "Min MR",
-                    true,
+                    false,
                     100,
                     target => target.SpellBlock,
                     WeightEffect.LowerIsBetter));
