@@ -13,7 +13,7 @@ namespace Aimtec.SDK.Extensions
     {
         #region Static Fields
 
-        private static readonly Obj_AI_Hero Player = ObjectManager.GetLocalPlayer();
+        private static Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
 
         #endregion
 
