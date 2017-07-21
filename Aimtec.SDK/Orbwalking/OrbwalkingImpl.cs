@@ -519,7 +519,7 @@ namespace Aimtec.SDK.Orbwalking
             foreach (var minion in minions.OrderBy(
                 x => Math.Ceiling(this.GetPredictedHealth(x) / Player.GetAutoAttackDamage(x))))
             {
-                var predHealth = this.GetPredictedHealth(minion) - 1;
+                var predHealth = this.GetPredictedHealth(minion);
 
                 var dmg = Player.GetAutoAttackDamage(minion);
 
@@ -533,9 +533,10 @@ namespace Aimtec.SDK.Orbwalking
 
                 if (data != null)
                 {
-                    if (predHealth > dmg && predHealth < dmg * 3 && data.TimeElapsedSinceLastMinionAttack < 1000)
+                    if (predHealth > dmg && predHealth < dmg * 3 && data.TimeElapsedSinceLastMinionAttack < 1500)
                     {
-                        continue;
+                        Player.IssueOrder(OrderType.Stop, Player.Position);
+                        return null;
                     }
                 }
 
