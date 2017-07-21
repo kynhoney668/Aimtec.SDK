@@ -203,8 +203,6 @@
 
         #region Public Properties
 
-        public TSCache Cache { get; set; } = new TSCache();
-
         public Menu Config { get; set; }
 
         public TargetSelectorMode Mode => (TargetSelectorMode) this.Config["TsMode"].As<MenuList>().Value;
@@ -279,15 +277,6 @@
 
         public List<Obj_AI_Hero> GetOrderedTargets(float range, bool autoattack = false)
         {
-            var key = "GetOrderedTargets" + range + autoattack;
-
-            var cachedValue = this.Cache.GetObject(key);
-
-            if (cachedValue != null)
-            {
-                return (List<Obj_AI_Hero>) cachedValue;
-            }
-
             if (this.Config["UseWeights"].Enabled)
             {
                 var targetWeightDictionary = this.GetTargetsAndWeights(range, autoattack);
@@ -307,26 +296,15 @@
                     }
                 }
 
-                this.Cache.AddItem(new TSCache.CacheObject(key, ordered, this.Config["Misc"]["CacheT"].Value));
                 return ordered;
             }
 
             var targets = this.GetOrderedTargetsByMode(range, autoattack).ToList();
-            this.Cache.AddItem(new TSCache.CacheObject(key, targets, this.Config["Misc"]["CacheT"].Value));
             return targets;
         }
 
         public IEnumerable<Obj_AI_Hero> GetOrderedTargetsByMode(float range, bool autoattack = false)
         {
-            var key = "GetOrderedTargetsByMode" + range + autoattack;
-
-            var cachedValue = this.Cache.GetObject(key);
-
-            if (cachedValue != null)
-            {
-                return (IEnumerable<Obj_AI_Hero>) cachedValue;
-            }
-
             var validTargets = this.GetValidTargets(range, autoattack);
 
             IEnumerable<Obj_AI_Hero> returnValue = null;
@@ -376,8 +354,6 @@
             {
                 returnValue = validTargets.OrderBy(this.GetPriority);
             }
-
-            this.Cache.AddItem(new TSCache.CacheObject(key, returnValue, this.Config["Misc"]["CacheT"].Value));
 
             return returnValue;
         }
@@ -452,9 +428,9 @@
 
             var miscMenu = new Menu("Misc", "Misc")
             {
-                new MenuSlider("CacheT", "Cache Refresh Time", 200, 0, 500)
             };
-            this.Config.Add(miscMenu);
+
+            //this.Config.Add(miscMenu);
 
             this.Config.Add(new MenuBool("UseWeights", "Use Weights"));
             this.Config.Add(new MenuList("TsMode", "Mode", Enum.GetNames(typeof(TargetSelectorMode)), 0));
@@ -570,15 +546,6 @@
 
         private Dictionary<Obj_AI_Hero, float> GetTargetsAndWeights(float range, bool autoattack = false)
         {
-            var key = "GetTargetsAndWeights" + range + autoattack;
-
-            var cachedValue = this.Cache.GetObject(key);
-
-            if (cachedValue != null)
-            {
-                return (Dictionary<Obj_AI_Hero, float>) cachedValue;
-            }
-
             var enemies = this.GetValidTargets(range, autoattack);
 
             var enabledWeights = this.Weights.Where(x => x.MenuItem.Enabled);
@@ -594,8 +561,6 @@
             {
                 weight.ComputeWeight(enemies, ref CumulativeResults);
             }
-
-            this.Cache.AddItem(new TSCache.CacheObject(key, CumulativeResults, this.Config["Misc"]["CacheT"].Value));
 
             return CumulativeResults;
         }
@@ -756,82 +721,6 @@
                     weightedTotals[item.Key] += result;
                 }
             }
-
-            #endregion
-        }
-    }
-
-    internal class TSCache
-    {
-        #region Fields
-
-        private Dictionary<string, CacheObject> CachedObjects = new Dictionary<string, CacheObject>();
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        public void AddItem(CacheObject cObject)
-        {
-            this.CachedObjects.Add(cObject.Key, cObject);
-        }
-
-        public Object GetObject(string key)
-        {
-            this.RemoveExpiredItems();
-
-            if (!this.CachedObjects.ContainsKey(key))
-            {
-                return null;
-            }
-
-            return this.CachedObjects[key].Object;
-        }
-
-        public void RemoveExpiredItems()
-        {
-            foreach (var obj in this.CachedObjects.Values.ToList())
-            {
-                if (Game.TickCount > obj.ExpiryTime)
-                {
-                    this.CachedObjects.Remove(obj.Key);
-                }
-            }
-        }
-
-        public void RemoveItem(CacheObject cObject)
-        {
-            this.CachedObjects.Remove(cObject.Key);
-        }
-
-        #endregion
-
-        public class CacheObject
-        {
-            #region Constructors and Destructors
-
-            public CacheObject(string key, Object obj, int ttl)
-            {
-                this.Key = key;
-                this.Object = obj;
-                this.TTL = ttl;
-                this.CreationTime = Game.TickCount;
-                this.ExpiryTime = Game.TickCount + ttl;
-            }
-
-            #endregion
-
-            #region Public Properties
-
-            public int CreationTime { get; set; }
-
-            public int ExpiryTime { get; set; }
-
-            public string Key { get; set; }
-
-            public Object Object { get; set; }
-
-            public int TTL { get; set; }
 
             #endregion
         }
