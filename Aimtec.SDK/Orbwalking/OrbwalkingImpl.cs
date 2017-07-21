@@ -84,6 +84,8 @@ namespace Aimtec.SDK.Orbwalking
         //Members
         private float ServerAttackDetectionTick { get; set; }
 
+        private Obj_AI_Hero GangPlank { get; set; }
+
         #endregion
 
         #region Public Methods and Operators
@@ -100,6 +102,7 @@ namespace Aimtec.SDK.Orbwalking
                 SpellBook.OnStopCast += this.SpellBook_OnStopCast;
                 Render.OnRender += this.RenderManager_OnRender;
             }
+
             else
             {
                 this.Logger.Info("This Orbwalker instance is already attached to a Menu.");
@@ -140,19 +143,61 @@ namespace Aimtec.SDK.Orbwalking
             return true;
         }
 
-        public bool PlantsCheck(AttackableUnit minion)
+    
+        public bool IsValidAttackableObject(AttackableUnit unit)
         {
-            return !(minion is Obj_AI_Minion) || !((Obj_AI_Minion)minion).UnitSkinName.Contains("SRU_Plant_") || this.Config["Misc"]["attackPlants"].Enabled;
-        }
+            //Valid check
+            if (!unit.IsValidAutoRange())
+            {
+                return false;
+            }
 
-        public bool WardsCheck(AttackableUnit minion)
-        {
-            return !(minion is Obj_AI_Minion) || !((Obj_AI_Minion)minion).UnitSkinName.Contains("ward") || this.Config["Misc"]["attackWards"].Enabled;
-        }
+            if (unit is Obj_AI_Hero || unit is Obj_AI_Turret || unit.Type == GameObjectType.obj_BarracksDampener || unit.Type == GameObjectType.obj_HQ)
+            {
+                return true;
+            }
 
-        public bool IsValidAttackableUnit(AttackableUnit unit)
-        {
-            return this.PlantsCheck(unit) && this.WardsCheck(unit) && !unit.Name.Contains("Beacon");
+            //J4 flag
+            if (unit.Name.Contains("Beacon"))
+            {
+                return false;
+            }
+
+            var minion = unit as Obj_AI_Minion;
+
+            if (minion == null)
+            {
+                return false;
+            }
+
+            if (!this.Config["Misc"]["attackPlants"].Enabled && minion.UnitSkinName.Contains("SRU_Plant_"))
+            {
+                return false;
+            }
+
+            if (!this.Config["Misc"]["attackWards"].Enabled && minion.UnitSkinName.Contains("ward"))
+            {
+                return false;
+            }
+
+            if (this.GangPlank != null)
+            {
+                if (minion.UnitSkinName.Contains("gangplankbarrel"))
+                {
+                    if (!this.Config["Misc"]["attackBarrels"].Enabled)
+                    {
+                        return false;
+                    }
+
+                    //dont attack ally barrels
+                    if (this.GangPlank.IsAlly)
+                    {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         }
 
         public override bool CanAttack()
@@ -384,7 +429,7 @@ namespace Aimtec.SDK.Orbwalking
 
         AttackableUnit GetLaneClearTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && this.IsValidAttackableUnit(x));
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => this.IsValidAttackableObject(x));
 
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
@@ -516,7 +561,7 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (attackable == null)
             {
-                attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero && this.IsValidAttackableUnit(x));
+                attackable = ObjectManager.Get<AttackableUnit>().Where(x => this.IsValidAttackableObject(x));
             }
 
             var availableMinionTargets = attackable
@@ -615,7 +660,8 @@ namespace Aimtec.SDK.Orbwalking
                     new MenuSlider("extraWindup", "Additional Windup", 30, 0, 200, true),
                     new MenuBool("noBlindAA", "No AA when Blind", true, true),
                     new MenuBool("attackPlants", "Attack Plants", false, true),
-                    new MenuBool("attackWards", "Attack Wards", true, true)
+                    new MenuBool("attackWards", "Attack Wards", true, true),
+                    new MenuBool("attackBarrels", "Attack Barrels", true, true)
                 }
             };
 
@@ -623,6 +669,12 @@ namespace Aimtec.SDK.Orbwalking
             this.AddMode(this.LaneClear = new OrbwalkerMode("Laneclear", GlobalKeys.WaveClearKey, this.GetLaneClearTarget, null));
             this.AddMode(this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
             this.AddMode(this.Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, this.GetMixedModeTarget, null));
+
+            var gp = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(x => x.ChampionName.ToLower().Contains("gangplank"));
+            if (gp != null)
+            {
+                this.GangPlank = gp;
+            }
         }
 
         int NumberOfAutoAttacksInTime(Obj_AI_Base sender, AttackableUnit minion, int time)
