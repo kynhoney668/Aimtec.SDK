@@ -25,6 +25,9 @@
 
         internal HealthPredictionImplB()
         {
+
+            Console.WriteLine("called cons");
+
             Game.OnUpdate += this.GameOnUpdate;
             Obj_AI_Base.OnProcessAutoAttack += this.ObjAiBaseOnOnProcessAutoAttack;
             GameObject.OnDestroy += this.GameObjectOnOnDestroy;
@@ -32,7 +35,6 @@
             SpellBook.OnStopCast += this.SpellBook_OnStopCast;
 
             Config = new Menu.Menu("HealthPred", "HealthPrediction");
-
             Config.Add(new MenuSeperator("seperator", "Default value should be 180"));
             Config.Add(new MenuSlider("ExtraDelay", "Extra Delay", 180, 0, 250));
 

@@ -74,7 +74,7 @@ namespace Aimtec.SDK.Orbwalking
         private AttackableUnit ForcedTarget { get; set; }
 
         // TODO this completely breaks the modular design, Orbwalker and health prediction shouldnt be tightly coupled!
-        private HealthPredictionImplB HealthPrediction { get; } = new HealthPredictionImplB();
+        private HealthPredictionImplB HealthPred { get; set;  } 
 
         //Menu Getters
         private int HoldPositionRadius => this.Config["Misc"]["holdPositionRadius"].Value;
@@ -436,15 +436,15 @@ namespace Aimtec.SDK.Orbwalking
             IEnumerable<Obj_AI_Base> minions = attackableUnits
                 .Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>().OrderByDescending(x => x.MaxHealth);
 
-            var minionTurretAggro = minions.FirstOrDefault(x => this.HealthPrediction.HasTurretAggro(x));
+            var minionTurretAggro = minions.FirstOrDefault(x => this.HealthPred.HasTurretAggro(x));
 
             if (minionTurretAggro != null)
             {
-                var data = this.HealthPrediction.GetAggroData(minionTurretAggro);
+                var data = this.HealthPred.GetAggroData(minionTurretAggro);
 
                 var timeToReach = this.TimeForAutoToReachTarget(minionTurretAggro) + 50;
 
-                var predHealth1Auto = this.HealthPrediction.GetPredictedDamage(minionTurretAggro, timeToReach);
+                var predHealth1Auto = this.HealthPred.GetPredictedDamage(minionTurretAggro, timeToReach);
 
                 var dmgauto = Player.GetAutoAttackDamage(minionTurretAggro);
 
@@ -485,11 +485,19 @@ namespace Aimtec.SDK.Orbwalking
                 var tdmg = dmgauto * numautos;
 
                 var hNextTurretShot =
-                    this.HealthPrediction.GetPredictedDamage(minionTurretAggro, data.TimeUntilNextTurretAttack - 100);
+                    this.HealthPred.GetPredictedDamage(minionTurretAggro, data.TimeUntilNextTurretAttack - 100);
 
-                if (tdmg >= minionTurretAggro.Health || tdmg >= hNextTurretShot)
+                if (tdmg >= minionTurretAggro.Health)
                 {
                     return minionTurretAggro;
+                }
+
+                //Killable
+                AttackableUnit killableMinion0 = minions.FirstOrDefault(x => this.CanKillMinion(x));
+
+                if (killableMinion0 != null)
+                {
+                    return killableMinion0;
                 }
 
                 return null;
@@ -523,7 +531,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 var dmg = Player.GetAutoAttackDamage(minion);
 
-                var data = this.HealthPrediction.GetAggroData(minion);
+                var data = this.HealthPred.GetAggroData(minion);
 
                 //if our damage is enough to kill it
                 if (dmg >= predHealth)
@@ -569,7 +577,7 @@ namespace Aimtec.SDK.Orbwalking
                 .OfType<Obj_AI_Base>().Where(x => this.CanKillMinion(x));
 
             var bestMinionTarget = availableMinionTargets
-                .OrderByDescending(x => x.MaxHealth).ThenBy(x => this.HealthPrediction.GetAggroData(x)?.HasTurretAggro)
+                .OrderByDescending(x => x.MaxHealth).ThenBy(x => this.HealthPred.GetAggroData(x)?.HasTurretAggro)
                 .ThenBy(x => x.Health).FirstOrDefault();
 
             return bestMinionTarget;
@@ -610,7 +618,7 @@ namespace Aimtec.SDK.Orbwalking
         int GetPredictedHealth(Obj_AI_Base minion, int time = 0)
         {
             var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
-            return (int) Math.Ceiling(this.HealthPrediction.GetPrediction(minion, rtime));
+            return (int) Math.Ceiling(this.HealthPred.GetPrediction(minion, rtime));
         }
 
         //Gets a structure target based on the following order (Nexus, Turret, Inihibitor)
@@ -644,6 +652,8 @@ namespace Aimtec.SDK.Orbwalking
 
         private void Initialize()
         {
+            this.HealthPred = (HealthPredictionImplB) HealthPrediction.Implementation;
+
             this.Config = new Menu("Orbwalker", "Orbwalker")
             {
                 new Menu("Advanced", "Advanced")
@@ -684,6 +694,12 @@ namespace Aimtec.SDK.Orbwalking
 
             var numberOfAutos = 0;
             var adjustedTime = 0;
+
+            if (basetimePerAuto > time)
+            { 
+                Console.WriteLine("base time " + basetimePerAuto + " t " + time);
+                return 0;
+            }
 
             if (this.AttackReady)
             {
