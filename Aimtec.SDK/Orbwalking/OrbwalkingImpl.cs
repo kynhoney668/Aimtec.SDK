@@ -171,19 +171,21 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
-            if (!this.Config["Misc"]["attackPlants"].Enabled && minion.UnitSkinName.Contains("SRU_Plant_"))
+            var name = minion.UnitSkinName.ToLower();
+
+            if (!this.Config["Misc"]["attackPlants"].Enabled && name.Contains("sru_plant_"))
             {
                 return false;
             }
 
-            if (!this.Config["Misc"]["attackWards"].Enabled && minion.UnitSkinName.Contains("ward"))
+            if (!this.Config["Misc"]["attackWards"].Enabled && name.Contains("ward"))
             {
                 return false;
             }
 
             if (this.GangPlank != null)
             {
-                if (minion.UnitSkinName.ToLower().Contains("gangplankbarrel"))
+                if (name.Contains("gangplankbarrel"))
                 {
                     if (!this.Config["Misc"]["attackBarrels"].Enabled)
                     {
