@@ -269,8 +269,7 @@
         /// <inheritdoc cref="IOrbwalker" />
         public virtual bool IsReset(string missileName)
         {
-            var missileNameLc = missileName.ToLower();
-            return this.AttackResets.Contains(missileNameLc);
+            return this.AttackResets.Contains(missileName);
         }
 
         /// <inheritdoc cref="IOrbwalker" />

@@ -70,6 +70,17 @@ namespace Aimtec.SDK.Orbwalking
         private int ExtraWindUp => this.Config["Misc"]["extraWindup"].Value;
 
         /// <summary>
+        ///     Special auto attack names that do not trigger OnProcessAutoAttack
+        /// </summary>
+        private string[] SpecialAttacks =
+        {
+            "caitlynheadshotmissile",
+            "goldcardpreattack",
+            "redcardpreattack",
+            "bluecardpreattack"
+        };
+
+        /// <summary>
         ///     Gets or sets the Forced Target
         /// </summary>
         private AttackableUnit ForcedTarget { get; set; }
@@ -544,7 +555,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 if (data != null)
                 {
-                    if (predHealth > dmg && predHealth < dmg * 3 && data.TimeElapsedSinceLastMinionAttack < 1500)
+                    if (predHealth > dmg && predHealth < dmg * 1.5 && data.TimeElapsedSinceLastMinionAttack < 1300)
                     {
                         Player.IssueOrder(OrderType.Stop, Player.Position);
                         return null;
@@ -734,16 +745,14 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (sender.IsMe)
             {
-                /* Detect Caitlyn W Headshot */
-                if (Player.ChampionName == "Caitlyn")
+                var name = e.SpellData.Name.ToLower();
+
+                if (this.SpecialAttacks.Contains(name))
                 {
-                    if (e.SpellData.Name.ToLower().Contains("caitlynheadshotmissile"))
-                    {
-                        this.ServerAttackDetectionTick = Game.TickCount;
-                    }
+                    this.ObjAiHeroOnProcessAutoAttack(sender, e);
                 }
 
-                if (this.IsReset(e.SpellData.Name))
+                if (this.IsReset(name))
                 {
                     this.ResetAutoAttackTimer();
                 }

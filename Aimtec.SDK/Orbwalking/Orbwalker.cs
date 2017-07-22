@@ -5,6 +5,7 @@
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Config;
     using Aimtec.SDK.Util;
+    using System.Collections.Generic;
 
     /// <summary>
     ///     Orbwalker class
@@ -34,6 +35,7 @@
         public Orbwalker()
             : this(new OrbwalkingImpl())
         {
+            OrbwalkerInstances.Add(this);
         }
 
         #endregion
@@ -71,6 +73,11 @@
         #endregion
 
         #region Public Properties
+
+        /// <summary>
+        ///     Gets the instances of the Orbwalker
+        /// </summary>
+        public static List<IOrbwalker> OrbwalkerInstances { get; set; } = new List<IOrbwalker>();
 
         /// <summary>
         ///     Gets or sets the implementation of the orbwalker.
@@ -198,6 +205,7 @@
         /// <inheritdoc cref="IOrbwalker" />
         public void Dispose()
         {
+            OrbwalkerInstances.Remove(Implementation);
             Implementation.Dispose();
         }
 
