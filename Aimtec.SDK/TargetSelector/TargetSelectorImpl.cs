@@ -163,6 +163,8 @@
 
         private List<Weight> Weights = new List<Weight>();
 
+        private bool FocusSelected => this.Config["Misc"]["FocusSelected"].Enabled;
+
         #endregion
 
         #region Constructors and Destructors
@@ -223,12 +225,18 @@
 
         public Obj_AI_Hero GetSelectedTarget()
         {
-            return this.GetSelectedTarget(20000);
+            return this.GetSelectedTarget(20000, false);
         }
 
-        public Obj_AI_Hero GetSelectedTarget(float range)
+        public Obj_AI_Hero GetSelectedTarget(float range, bool autoattack)
         {
-            if (this.SelectedTarget.IsValidTarget(range))
+            if (!this.FocusSelected)
+            {
+                return null;
+            }
+
+            var valid = autoattack ? this.SelectedTarget.IsValidAutoRange() : this.SelectedTarget.IsValidTarget(range);
+            if (valid)
             {
                 return this.SelectedTarget;
             }
@@ -283,7 +291,7 @@
 
                 var ordered = targetWeightDictionary.Keys.OrderByDescending(k => targetWeightDictionary[k]).ToList();
 
-                var selected = GetSelectedTarget(range);
+                var selected = GetSelectedTarget(range, autoattack);
 
                 if (selected != null)
                 {
@@ -371,7 +379,7 @@
 
         public Obj_AI_Hero GetTarget(float range, bool autoattack = false)
         {
-            var selected = GetSelectedTarget(range);
+            var selected = GetSelectedTarget(range, autoattack);
 
             if (selected != null)
             {
@@ -428,9 +436,10 @@
 
             var miscMenu = new Menu("Misc", "Misc")
             {
+                new MenuBool("FocusSelected", "Focus Selected Target")
             };
 
-            //this.Config.Add(miscMenu);
+            this.Config.Add(miscMenu);
 
             this.Config.Add(new MenuBool("UseWeights", "Use Weights"));
             this.Config.Add(new MenuList("TsMode", "Mode", Enum.GetNames(typeof(TargetSelectorMode)), 0));
@@ -522,7 +531,13 @@
 
         private void GameOnOnWndProc(WndProcEventArgs args)
         {
+            if (!this.FocusSelected)
+            {
+                return;
+            }
+
             var message = args.Message;
+
             if (message == (ulong) WindowsMessages.WM_LBUTTONDOWN)
             {
                 var clickPosition = Game.CursorPos;
@@ -535,7 +550,7 @@
                 if (closestHero != null && Game.CursorPos.Distance(closestHero.Position) <= 300)
                 {
                     this.SelectedTarget = closestHero;
-                }
+                } 
 
                 else
                 {
@@ -571,7 +586,7 @@
         {
             var results = this.GetTargetsAndWeights(range, autoattack).ToList();
 
-            var selected = GetSelectedTarget(range);
+            var selected = GetSelectedTarget(range, autoattack);
 
             if (selected != null)
             {
@@ -594,7 +609,7 @@
 
                 if (selected != null)
                 {
-                    Render.Circle(this.SelectedTarget.Position, this.SelectedTarget.BoundingRadius * 2, 30, Color.Red);
+                    Render.Circle(selected.Position, selected.BoundingRadius * 2, 30, Color.Red);
                 }
             }
 
