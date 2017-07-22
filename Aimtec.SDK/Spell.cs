@@ -34,30 +34,6 @@
         public Spell(SpellSlot slot)
         {
             this.Slot = slot;
-            //Render.OnRender += this.OnRender;
-        }
-
-        private void OnRender()
-        {
-            if (!AimtecMenu.DebugEnabled)
-            {
-                return;
-            }
-
-            foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsVisible && x.IsEnemy))
-            {
-                var prediction = this.GetPrediction(enemy);
-                if (prediction != null)
-                {
-                    Render.WorldToScreen(prediction.CastPosition, out Vector2 predictionSp);
-
-                    Render.Circle(prediction.CastPosition, 100, 20, Color.Aqua);
-                    Render.Text(
-                        predictionSp + new Vector2(0, 60),
-                        Color.White,
-                        $"{this.Slot} - {prediction.HitChance}");
-                }
-            }
         }
 
         /// <summary>
@@ -179,8 +155,7 @@
         ///     Gets the percentage the spell is charged up
         /// </summary>
         public float ChargePercent
-        {
-            
+        {          
             get
             {
                 if (!this.IsChargedSpell)
@@ -298,7 +273,6 @@
 
             return Player.SpellBook.CastSpell(this.Slot, prediction.CastPosition);
         }
-
 
         /// <summary>
         ///     Casts this instance.
