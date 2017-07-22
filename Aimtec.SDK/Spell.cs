@@ -34,7 +34,7 @@
         public Spell(SpellSlot slot)
         {
             this.Slot = slot;
-            Render.OnRender += this.OnRender;
+            //Render.OnRender += this.OnRender;
         }
 
         private void OnRender()
