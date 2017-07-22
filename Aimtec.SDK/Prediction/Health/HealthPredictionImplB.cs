@@ -25,9 +25,6 @@
 
         internal HealthPredictionImplB()
         {
-
-            Console.WriteLine("called cons");
-
             Game.OnUpdate += this.GameOnUpdate;
             Obj_AI_Base.OnProcessAutoAttack += this.ObjAiBaseOnOnProcessAutoAttack;
             GameObject.OnDestroy += this.GameObjectOnOnDestroy;
