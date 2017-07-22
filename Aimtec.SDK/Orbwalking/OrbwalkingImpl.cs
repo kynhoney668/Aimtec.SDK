@@ -13,6 +13,7 @@ namespace Aimtec.SDK.Orbwalking
     using Aimtec.SDK.Prediction.Health;
     using Aimtec.SDK.TargetSelector;
     using Aimtec.SDK.Util;
+    using Aimtec.SDK.Events;
 
     internal class OrbwalkingImpl : AOrbwalker
     {
@@ -182,7 +183,7 @@ namespace Aimtec.SDK.Orbwalking
 
             if (this.GangPlank != null)
             {
-                if (minion.UnitSkinName.Contains("gangplankbarrel"))
+                if (minion.UnitSkinName.ToLower().Contains("gangplankbarrel"))
                 {
                     if (!this.Config["Misc"]["attackBarrels"].Enabled)
                     {
@@ -681,12 +682,25 @@ namespace Aimtec.SDK.Orbwalking
             this.AddMode(this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
             this.AddMode(this.Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, this.GetMixedModeTarget, null));
 
-            var gp = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(x => x.ChampionName.ToLower().Contains("gangplank"));
+            GPCheck();
+
+            GameEvents.GameStart += GameEvents_GameStart;
+        }
+
+        private void GPCheck()
+        {
+            var gp = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(x => x.ChampionName.ToLower().Equals("gangplank"));
             if (gp != null)
             {
                 this.GangPlank = gp;
             }
         }
+
+        private void GameEvents_GameStart()
+        {
+            this.GPCheck();
+        }
+
 
         int NumberOfAutoAttacksInTime(Obj_AI_Base sender, AttackableUnit minion, int time)
         {
