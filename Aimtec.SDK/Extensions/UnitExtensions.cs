@@ -235,6 +235,31 @@ namespace Aimtec.SDK.Extensions
         {
             return unit.Health / unit.MaxHealth * 100;
         }
+        
+        /// <summary>
+        ///      Returns if the unit is facing the position
+        /// </summary>
+        /// <param name="unit">The unit</param>
+        /// <param name="position">The position</param>
+        /// <returns></returns>
+        public static bool IsFacing(this Obj_AI_Base unit, Vector3 position)
+        {
+            return unit != null && unit.IsValid &&
+                   unit.Orientation.To2D().AngleBetween((position - unit.Position).To2D()) < 90;
+        }
+
+        /// <summary>
+        ///       Returns if the unit is facing the target
+        /// </summary>
+        /// <param name="unit">The unit</param>
+        /// <param name="target">The target</param>
+        /// <returns></returns>
+        public static bool IsFacing(this Obj_AI_Base unit, Obj_AI_Base target)
+        {
+            return unit != null && target != null && unit.IsValid && target.IsValid &&
+                   unit.Orientation.To2D().Perpendicular().AngleBetween((target.Position - unit.Position).To2D())
+                   < 90;
+        }
 
         /// <summary>
         ///     Determines whether the specified target is inside a determined range.
