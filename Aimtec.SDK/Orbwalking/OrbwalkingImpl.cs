@@ -697,7 +697,6 @@ namespace Aimtec.SDK.Orbwalking
 
             if (basetimePerAuto > time)
             { 
-                Console.WriteLine("base time " + basetimePerAuto + " t " + time);
                 return 0;
             }
 
