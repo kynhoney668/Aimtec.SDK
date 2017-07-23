@@ -101,6 +101,22 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
+        ///     Returns if a source unit is facing a target unit.
+        /// </summary>
+        public static bool IsFacingUnit(this Obj_AI_Base source, Obj_AI_Base target)
+        {
+            return source.Orientation.To2D().Perpendicular().AngleBetween((target.ServerPosition - source.ServerPosition).To2D()) < 90;
+        }
+
+        /// <summary>
+        ///     Returns if both source and target are facing eachother.
+        /// </summary>
+        public static bool AreBothFacingEachother(Obj_AI_Base source, Obj_AI_Base target)
+        {
+            return source.IsFacingUnit(target) && target.IsFacingUnit(source);
+        }
+
+        /// <summary>
         ///     Returns a determined buff a determined unit has.
         /// </summary>
         /// <param name="unit">The unit.</param>
