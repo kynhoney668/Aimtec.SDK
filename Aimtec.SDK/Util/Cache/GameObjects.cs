@@ -1,5 +1,6 @@
 namespace Aimtec.SDK.Util.Cache
 {
+    using Aimtec.SDK.Events;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -14,22 +15,22 @@ namespace Aimtec.SDK.Util.Cache
         /// <summary>
         ///     All game objects
         /// </summary>
-        private static readonly HashSet<GameObject> allGameObjects;
+        private static HashSet<GameObject> allGameObjects;
 
         /// <summary>
         ///     The ally heroes
         /// </summary>
-        private static readonly HashSet<Obj_AI_Hero> allyHeroes;
+        private static HashSet<Obj_AI_Hero> allyHeroes;
 
         /// <summary>
         ///     The enemy heroes
         /// </summary>
-        private static readonly HashSet<Obj_AI_Hero> enemyHeroes;
+        private static HashSet<Obj_AI_Hero> enemyHeroes;
 
         /// <summary>
         ///     The heroes
         /// </summary>
-        private static readonly HashSet<Obj_AI_Hero> HeroesI;
+        private static HashSet<Obj_AI_Hero> HeroesI;
 
         /// <summary>
         ///     The ally minions
@@ -46,6 +47,11 @@ namespace Aimtec.SDK.Util.Cache
         /// </summary>
         private static HashSet<Obj_AI_Minion> minionsI;
 
+        /// <summary>
+        ///     The local player
+        /// </summary>
+        private static Obj_AI_Hero player;
+
         #endregion
 
         #region Constructors and Destructors
@@ -58,6 +64,20 @@ namespace Aimtec.SDK.Util.Cache
             GameObject.OnCreate += GameObjectCreated;
             GameObject.OnDestroy += GameObjectDestroyed;
 
+            if (Game.Mode == GameMode.Running)
+            {
+                GameStart();
+            }
+
+            else
+            {
+                Game.OnStart += GameStart;
+            }
+        }
+
+  
+        private static void GameStart()
+        {
             allGameObjects = CreateHashSet(ObjectManager.Get<GameObject>());
 
             minionsI = CreateHashSet(ObjectManager.Get<Obj_AI_Minion>());
@@ -67,11 +87,19 @@ namespace Aimtec.SDK.Util.Cache
             HeroesI = CreateHashSet(ObjectManager.Get<Obj_AI_Hero>());
             allyHeroes = CreateHashSet(HeroesI.Where(x => x.IsAlly));
             enemyHeroes = CreateHashSet(HeroesI.Where(x => x.IsEnemy));
+
+            player = ObjectManager.GetLocalPlayer();
         }
 
         #endregion
 
         #region Public Properties
+
+        /// <summary>
+        ///     Gets the local player
+        /// </summary>
+        /// <value>The local player.</value>
+        public static Obj_AI_Hero Player => player;
 
         /// <summary>
         ///     Gets all game objects.
