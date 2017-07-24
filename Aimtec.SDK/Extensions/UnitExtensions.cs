@@ -116,6 +116,22 @@ namespace Aimtec.SDK.Extensions
             return source.IsFacingUnit(target) && target.IsFacingUnit(source);
         }
 
+        /// <returns>
+        ///     true if an unit is a Building; otherwise, false.
+        /// </returns>
+        public static bool IsBuilding(this AttackableUnit unit)
+        {
+            switch (unit.Type)
+            {
+                case GameObjectType.obj_AI_Turret:
+                case GameObjectType.obj_BarracksDampener:
+                case GameObjectType.obj_HQ:
+                    return true;
+            }
+
+            return false;
+        }
+
         /// <summary>
         ///     Returns a determined buff a determined unit has.
         /// </summary>

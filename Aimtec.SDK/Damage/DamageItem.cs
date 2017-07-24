@@ -179,7 +179,12 @@ namespace Aimtec.SDK.Damage
                               DamageType = DamageItem.ItemDamageType.Magical,
                               ItemDamage = (source, target) =>
                                   {
-                                      return source.BaseAttackDamage + 0.50 * source.TotalAbilityDamage;
+                                      if (source.HasBuff("LichBane"))
+                                      {
+                                          return 0.75 * source.BaseAttackDamage + 0.50 * source.TotalAbilityDamage;
+                                      }
+
+                                      return 0;
                                   }
                           });
 

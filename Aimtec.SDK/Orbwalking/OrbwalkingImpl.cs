@@ -77,7 +77,8 @@ namespace Aimtec.SDK.Orbwalking
             "caitlynheadshotmissile",
             "goldcardpreattack",
             "redcardpreattack",
-            "bluecardpreattack"
+            "bluecardpreattack",
+            "viktorqbuff"
         };
 
         /// <summary>
