@@ -315,14 +315,19 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (!source.SpellBook.GetSpell(SpellSlot.W).State.HasFlag(SpellState.NotLearned) && target.HealthPercent() < 30)
                                          {
+                                             double damage = 0;
                                              switch (target.Type)
                                              {
                                                  case GameObjectType.obj_AI_Hero:
-                                                     return Math.Max(0.03 + 0.03 * (source.TotalAbilityDamage / 100), 15);
+                                                     damage = Math.Max(0.03 + 0.03 * (source.TotalAbilityDamage / 100), 15);
+                                                     break;
 
                                                  case GameObjectType.obj_AI_Minion:
-                                                     return Math.Min(Math.Max(0.03 + 0.03 * (source.TotalAbilityDamage / 100), 15), 150);
+                                                     damage = Math.Min(Math.Max(0.03 + 0.03 * (source.TotalAbilityDamage / 100), 15), 150);
+                                                     break;
                                              }
+
+                                             return damage;
                                          }
 
                                          return 0;
@@ -509,6 +514,87 @@ namespace Aimtec.SDK.Damage
 
             Passives.Add(new DamagePassive
                              {
+                                 Name = "Hecarim",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("hecarimrampspeed"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.E);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Illaoi",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("IllaoiW"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W)
+                                                    + source.GetSpellDamage(target, SpellSlot.Q)
+                                                    * GameObjects.Minions.Count(
+                                                        i =>
+                                                            i.Team == source.Team &&
+                                                            i.UnitSkinName == "illaoiminion" &&
+                                                            i.Distance(target) < 800 && (i.IsFloatingHealthBarActive || i.HasBuff("illaoir2")));
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Irelia",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatTrue,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("ireliahitenstylecharged"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "JarvanIV",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("jarvanivmartialcadencecheck"))
+                                         {
+                                             return Math.Min(target.Health * 0.1, 400);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Jax",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("JaxEmpowerTwo"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
                                  Name = "Jayce",
                                  DamageType = DamagePassive.PassiveDamageType.PercentPhysical,
                                  PassiveDamage = (source, target) =>
@@ -588,7 +674,7 @@ namespace Aimtec.SDK.Damage
                                          return 0;
                                      }
                              });
-
+            /*
             Passives.Add(new DamagePassive
                              {
                                  DamageType = DamagePassive.PassiveDamageType.FlatMagical,
@@ -612,6 +698,7 @@ namespace Aimtec.SDK.Damage
                                          return 0;
                                      }
                              });
+            */
 
             Passives.Add(new DamagePassive
                              {
@@ -718,7 +805,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("ViktorPowerTransferReturn"))
                                          {
-                                            return source.GetSpellDamage(target, SpellSlot.Q, DamageStage.Empowered);
+                                            return source.GetSpellDamage(target, SpellSlot.Q, DamageStage.SecondForm);
                                          }
 
                                          return 0;

@@ -2433,6 +2433,34 @@
 		]
 	},
 	"Illaoi": {
+		"Q": [{
+			"Stage": "Default",
+			"SpellData": {
+				"SpellEffectType": "AoE",
+				"DamageType": "Physical",
+				"DamagesPerLvl": [ 10, 20, 30, 40, 50, 60, 70, 80, 90, 100, 110, 120, 130, 140, 150, 160, 170, 180 ],
+				"BonusDamages": [{
+					"DamageType": "Physical",
+					"DamagePercentages": [ 1.2, 1.2, 1.2, 1.2, 1.2 ],
+					"ScalingTarget": "Source",
+					"ScalingType": "AttackPoints"
+				}]
+			}
+		}],
+		"W": [{
+			"Stage": "Default",
+			"SpellData": {
+				"SpellEffectType": "None",
+				"BonusDamages": [{
+					"DamageType": "Physical",
+					"DamagePercentages": [ 0.03, 0.035, 0.04, 0.045, 0.05 ],
+					"ScalePer100Ad": 0.02,
+					"MaxDamageOnMinion": [ 300, 300, 300, 300, 300 ],
+					"ScalingTarget": "Target",
+					"ScalingType": "MaxHealth"
+				}]
+			}
+		}],
 		"E": [{
 			"Stage": "Default",
 			"SpellData": {
