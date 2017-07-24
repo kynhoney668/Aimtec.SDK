@@ -601,7 +601,7 @@ namespace Aimtec.SDK.Orbwalking
         //In mixed mode we prioritize killable units, then structures, then heros. If none are found, then we don't attack anything.
         AttackableUnit GetMixedModeTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => x.IsValidAutoRange() && !x.IsHero);
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => this.IsValidAttackableObject(x));
 
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
