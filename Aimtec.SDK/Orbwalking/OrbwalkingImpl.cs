@@ -128,7 +128,14 @@ namespace Aimtec.SDK.Orbwalking
 
             if (!preAttackargs.Cancel)
             {
-                if (Player.IssueOrder(OrderType.AttackUnit, target))
+                AttackableUnit targetToAttack = preAttackargs.Target;
+
+                if (this.ForcedTarget != null)
+                {
+                    targetToAttack = this.ForcedTarget;
+                }
+
+                if (Player.IssueOrder(OrderType.AttackUnit, targetToAttack))
                 {
                     this.LastAttackCommandSentTime = Game.TickCount;
                     return true;
