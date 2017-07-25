@@ -20,6 +20,30 @@ namespace Aimtec.SDK.Extensions
         #region Public Methods and Operators
 
         /// <summary>
+        ///     Gets the SpellSlot of the spell
+        /// </summary>
+        public static SpellSlot GetSpellSlot(this Obj_AI_Base unit, string spellName)
+        {
+            var spell = unit.SpellBook.Spells.FirstOrDefault(x => x.Name.Equals(spellName, StringComparison.OrdinalIgnoreCase));
+
+            if (spell != null)
+            {
+                return spell.Slot;
+            }
+
+            return SpellSlot.Unknown;
+        }
+
+        /// <summary>
+        ///     Gets the spell that this slot belongs to
+        /// </summary>
+        public static Aimtec.Spell GetSpell(this Obj_AI_Base unit, SpellSlot slot)
+        {
+            return unit.SpellBook.GetSpell(slot);
+        }
+
+
+        /// <summary>
         ///     Counts the ally heroes in range.
         /// </summary>
         /// <param name="unit">the unit.</param>
