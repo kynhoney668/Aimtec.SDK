@@ -263,7 +263,7 @@ namespace Aimtec.SDK.Extensions
         ///     Returns the current health a determined unit has, in percentual.
         /// </summary>
         /// <param name="unit">The unit.</param>
-        public static float HealthPercent(this Obj_AI_Base unit)
+        public static float HealthPercent(this AttackableUnit unit)
         {
             return unit.Health / unit.MaxHealth * 100;
         }
