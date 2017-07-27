@@ -168,7 +168,7 @@ namespace Aimtec.SDK.Damage
                     break;
             }
 
-            return Math.Max(Math.Floor(dmgPhysical + dmgMagical) * dmgReduce + source.GetPassiveFlatMod(target), 0);
+            return Math.Max(Math.Floor(dmgPhysical + dmgMagical) * dmgReduce + source.GetPassiveFlatMod(target) - 5, 0);
         }
 
         /// <summary>
