@@ -165,9 +165,13 @@
 
                 if (this.IsCharging)
                 {
-                    var maxgain = this.ChargedMaxRange - this.ChargedMinRange;
-                    var gain = this.Range - this.ChargedMinRange;
-                    return (gain / maxgain);
+                    var start = Math.Max(this.chargeReqSentT, this.chargedCastedT);
+                    var endTime = start + this.ChargeDuration - 150;
+                    var duration = endTime - start;
+                    var timePast = Game.TickCount - start;
+                    var chargePercent = (timePast / duration);
+
+                    return chargePercent * 100;
                 }
 
                 return 0;

@@ -51,7 +51,7 @@ namespace Aimtec.SDK.Extensions
         /// <returns>How many ally heroes are inside a 'float' range from the starting 'unit' GameObject.</returns>
         public static int CountAllyHeroesInRange(this GameObject unit, float range)
         {
-            return unit.Position.CountAllyHeroesInRange(range);
+            return unit.ServerPosition.CountAllyHeroesInRange(range);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Aimtec.SDK.Extensions
             float range,
             Obj_AI_Base dontIncludeStartingUnit = null)
         {
-            return unit.Position.CountEnemyHeroesInRange(range, dontIncludeStartingUnit);
+            return unit.ServerPosition.CountEnemyHeroesInRange(range, dontIncludeStartingUnit);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace Aimtec.SDK.Extensions
         /// <param name="gameObj1">The target GameObject.</param>
         public static float Distance(this GameObject gameObj, GameObject gameObj1)
         {
-            return Vector3.Distance(gameObj.ServerPosition, gameObj1.Position);
+            return Vector3.Distance(gameObj.ServerPosition, gameObj1.ServerPosition);
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Aimtec.SDK.Extensions
         /// <param name="gameObj1">The target GameObject.</param>
         public static float DistanceSqr(this GameObject gameObj, GameObject gameObj1)
         {
-            return Vector3.DistanceSquared(gameObj.ServerPosition, gameObj1.Position);
+            return Vector3.DistanceSquared(gameObj.ServerPosition, gameObj1.ServerPosition);
         }
 
         /// <summary>
@@ -301,7 +301,7 @@ namespace Aimtec.SDK.Extensions
         public static bool IsFacing(this Obj_AI_Base unit, Vector3 position)
         {
             return unit != null && unit.IsValid &&
-                   unit.Orientation.To2D().AngleBetween((position - unit.Position).To2D()) < 90;
+                   unit.Orientation.To2D().AngleBetween((position - unit.ServerPosition).To2D()) < 90;
         }
 
         /// <summary>
@@ -313,7 +313,7 @@ namespace Aimtec.SDK.Extensions
         public static bool IsFacing(this Obj_AI_Base unit, Obj_AI_Base target)
         {
             return unit != null && target != null && unit.IsValid && target.IsValid &&
-                   unit.Orientation.To2D().Perpendicular().AngleBetween((target.Position - unit.Position).To2D())
+                   unit.Orientation.To2D().Perpendicular().AngleBetween((target.ServerPosition - unit.ServerPosition).To2D())
                    < 90;
         }
 
@@ -329,7 +329,7 @@ namespace Aimtec.SDK.Extensions
         {
             if (unit != null)
             {
-                return Vector3.Distance(unit.Position, Player.Position) <= range;
+                return Vector3.Distance(unit.ServerPosition, Player.ServerPosition) <= range;
             }
 
             return false;
@@ -371,7 +371,7 @@ namespace Aimtec.SDK.Extensions
                 return false;
             }
 
-            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.Position)
+            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition)
                 < Player.GetFullAttackRange(target);
         }
 
@@ -404,16 +404,27 @@ namespace Aimtec.SDK.Extensions
                 return false;
             }
 
-            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.Position) < range
+            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition) < range
                 + (includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0);
         }
 
         /// <summary>
-        ///     Returns true if this unit is able to be targetted by spells
+        ///     Returns true if this unit is able to be targetted by spells 
         /// </summary>
+        /// <param name="unit">The unit.</param
         /// <param name="unit">The unit.</param>
-        public static bool IsValidSpellTarget(this AttackableUnit unit)
+        public static bool IsValidSpellTarget(this AttackableUnit unit, float range = float.MaxValue)
         {
+            if (!unit.IsValidTarget(range))
+            {
+                return false;
+            }
+
+            if (unit is Obj_AI_Hero)
+            {
+                return true;
+            }
+
             var mUnit = unit as Obj_AI_Minion;
 
             if (mUnit == null)
@@ -423,7 +434,7 @@ namespace Aimtec.SDK.Extensions
 
             var name = mUnit.UnitSkinName.ToLower();
 
-            if (name.Contains("barrel") || name.Contains("ward") || name.Contains("sru_plant_"))
+            if (name.Contains("ward") || name.Contains("sru_plant_") || name.Contains("barrel"))
             {
                 return false;
             }
@@ -431,6 +442,7 @@ namespace Aimtec.SDK.Extensions
             return true;
         }
 
+  
         /// <summary>
         ///     Returns the current mana a determined unit has, in percentual.
         /// </summary>
