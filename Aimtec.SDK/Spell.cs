@@ -50,7 +50,6 @@
         #endregion
 
         #region Public Properties
-
         /// <summary>
         ///     Gets or sets the name of the charged buff.
         /// </summary>
@@ -382,10 +381,10 @@
         /// </summary>
         /// <param name="target">The target.</param>
         /// <returns>PredictionOutput.</returns>
-        public PredictionOutput GetPrediction(Obj_AI_Base target)
+        public PredictionOutput GetPrediction(Obj_AI_Base target, Vector3 from = new Vector3(), Vector3 rangeCheckFrom = new Vector3())
         {
             return Prediction.Skillshots.Prediction.GetPrediction(
-                this.GetPredictionInput(target),
+                this.GetPredictionInput(target, from, rangeCheckFrom),
                 true,
                 this.Collision);
         }
@@ -395,9 +394,9 @@
         /// </summary>
         /// <param name="target">The target.</param>
         /// <returns>PredictionInput.</returns>
-        public PredictionInput GetPredictionInput(Obj_AI_Base target)
+        public PredictionInput GetPredictionInput(Obj_AI_Base target, Vector3 FromPosition = new Vector3(), Vector3 RangeCheckFromPosition =  new Vector3())
         {
-            return new PredictionInput()
+            var input = new PredictionInput()
             {
                 Delay = this.Delay,
                 Radius = this.Width,
@@ -406,6 +405,18 @@
                 Unit = target,
                 Collision = this.Collision
             };
+
+            if (!FromPosition.IsZero)
+            {
+                input.From = FromPosition;
+            }
+
+            if (!RangeCheckFromPosition.IsZero)
+            {
+                input.RangeCheckFrom = RangeCheckFromPosition;
+            }
+
+            return input;
         }
 
         /// <summary>
