@@ -518,7 +518,7 @@ namespace Aimtec.SDK.Damage
             if (source is Obj_AI_Turret)
             {
                 if (minion != null &&
-                    (minion.Name.Contains("Siege") || minion.Name.Contains("Super")))
+                    (minion.UnitSkinName.Contains("Siege") || minion.UnitSkinName.Contains("Super")))
                 {
                     amount *= 0.7;
                 }
