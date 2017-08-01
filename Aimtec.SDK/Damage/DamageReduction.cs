@@ -5,8 +5,7 @@
 namespace Aimtec.SDK.Damage
 {
     using Aimtec.SDK.Extensions;
-
-    using System;
+    
     using System.Collections.Generic;
     using System.Linq;
 
@@ -25,26 +24,6 @@ namespace Aimtec.SDK.Damage
                                            return 40;
                                       }
                               });
-
-            Reductions.Add(new DamageReduction
-            {
-                                   BuffName = "urgotentropypassive",
-                                   Type = DamageReduction.ReductionDamageType.Percent,
-                                   ReductionDamage = (source, attacker) =>
-                                       {
-                                           return 15;
-                                       }
-                               });
-
-            Reductions.Add(new DamageReduction
-            {
-                                   BuffName = "urgotswapdef",
-                                   Type = DamageReduction.ReductionDamageType.Percent,
-                                   ReductionDamage = (source, attacker) =>
-                                       {
-                                           return new[] { 30, 40, 50 }[source.SpellBook.GetSpell(SpellSlot.R).Level - 1];
-                                       }
-                               });
 
             Reductions.Add(new DamageReduction
             {
@@ -88,9 +67,7 @@ namespace Aimtec.SDK.Damage
                                    Type = DamageReduction.ReductionDamageType.Percent,
                                    ReductionDamage = (source, attacker) =>
                                        {
-										   if (ObjectManager.Get<GameObject>()
-											       .Where(o => o.Type == GameObjectType.obj_GeneralParticleEmitter)
-											       .Any(p => p.Name == "Garen_Base_W_Shoulder_L.troy" && p.IsAlly))
+										   if (ObjectManager.Get<GameObject>().Any(p => p.IsAlly && p.Name == "Garen_Base_W_Shoulder_L.troy"))
                                            {
                                                 return 60;
                                            }

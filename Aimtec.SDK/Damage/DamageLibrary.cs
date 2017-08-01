@@ -165,7 +165,7 @@ namespace Aimtec.SDK.Damage
             try
             {
                 // TODO: make this load dynamically based on current running game version.
-                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.14.json"))
+                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.15.json"))
                 {
                     if (stream == null)
                     {

@@ -50,7 +50,6 @@
         #endregion
 
         #region Public Properties
-
         /// <summary>
         ///     Gets or sets the name of the charged buff.
         /// </summary>
@@ -80,27 +79,6 @@
         /// </summary>
         /// <value>The duration of the charge.</value>
         public float ChargeDuration { get; set; }
-
-        /// <summary>
-        ///     Gets the percentage the spell is charged up
-        /// </summary>
-        public float ChargePercent
-        {
-            get
-            {
-                if (!this.IsChargedSpell)
-                {
-                    return 100;
-                }
-
-                if (!this.IsCharging)
-                {
-                    return 0;
-                }
-
-                return (this.Range - this.ChargedMinRange) / (this.ChargedMaxRange - this.ChargedMinRange);
-            }
-        }
 
         /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="Spell" /> has collision.
@@ -184,6 +162,30 @@
             }
 
             set => this.range = value;
+        }
+
+        /// <summary>
+        ///     Gets the percentage the spell is charged up
+        /// </summary>
+        public float ChargePercent
+        {          
+            get
+            {
+                if (!this.IsChargedSpell)
+                {
+                    return 100;
+                }
+
+                if (!this.IsCharging)
+                {
+                    return 0;
+                }
+
+                var start = Math.Max(this.chargeReqSentT, this.chargedCastedT);
+                var chargePercent = (Game.TickCount - start) / (start + this.ChargeDuration - 150 - start);
+
+                return chargePercent * 100;
+            }
         }
 
         /// <summary>
@@ -394,10 +396,10 @@
         /// </summary>
         /// <param name="target">The target.</param>
         /// <returns>PredictionOutput.</returns>
-        public PredictionOutput GetPrediction(Obj_AI_Base target)
+        public PredictionOutput GetPrediction(Obj_AI_Base target, Vector3 from = new Vector3(), Vector3 rangeCheckFrom = new Vector3())
         {
             return Prediction.Skillshots.Prediction.GetPrediction(
-                this.GetPredictionInput(target),
+                this.GetPredictionInput(target, from, rangeCheckFrom),
                 true,
                 this.Collision);
         }
@@ -407,9 +409,9 @@
         /// </summary>
         /// <param name="target">The target.</param>
         /// <returns>PredictionInput.</returns>
-        public PredictionInput GetPredictionInput(Obj_AI_Base target)
+        public PredictionInput GetPredictionInput(Obj_AI_Base target, Vector3 FromPosition = new Vector3(), Vector3 RangeCheckFromPosition =  new Vector3())
         {
-            return new PredictionInput()
+            var input = new PredictionInput()
             {
                 Delay = this.Delay,
                 Radius = this.Width,
@@ -419,6 +421,18 @@
                 From = this.From,
                 Collision = this.Collision
             };
+
+            if (!FromPosition.IsZero)
+            {
+                input.From = FromPosition;
+            }
+
+            if (!RangeCheckFromPosition.IsZero)
+            {
+                input.RangeCheckFrom = RangeCheckFromPosition;
+            }
+
+            return input;
         }
 
         /// <summary>

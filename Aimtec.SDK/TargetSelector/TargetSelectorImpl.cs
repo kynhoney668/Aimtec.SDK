@@ -207,7 +207,7 @@
 
         public Menu Config { get; set; }
 
-        public TargetSelectorMode Mode => (TargetSelectorMode) this.Config["TsMode"].As<MenuList>().Value;
+        public TargetSelectorMode Mode => (TargetSelectorMode)this.Config["TsMode"].As<MenuList>().Value;
 
         public Obj_AI_Hero SelectedTarget { get; set; }
 
@@ -230,15 +230,23 @@
 
         public Obj_AI_Hero GetSelectedTarget(float range, bool autoattack)
         {
-            if (!this.FocusSelected)
-            {
-                return null;
-            }
+            var force = this.Config["Misc"]["ForceSelected"].Enabled;
 
-            var valid = autoattack ? this.SelectedTarget.IsValidAutoRange() : this.SelectedTarget.IsValidTarget(range);
-            if (valid)
+            if (this.SelectedTarget.IsValidTarget())
             {
-                return this.SelectedTarget;
+                if (force)
+                {
+                    return this.SelectedTarget;
+                }
+
+                var distance = this.SelectedTarget.Distance(Player);
+
+                var inRange = autoattack ? distance < Player.GetFullAttackRange(this.SelectedTarget) : distance < range;
+
+                if (inRange)
+                {
+                    return this.SelectedTarget;
+                }
             }
 
             return null;
@@ -285,30 +293,37 @@
 
         public List<Obj_AI_Hero> GetOrderedTargets(float range, bool autoattack = false)
         {
+            List<Obj_AI_Hero> orderedTargets = new List<Obj_AI_Hero>();
+
             if (this.Config["UseWeights"].Enabled)
             {
                 var targetWeightDictionary = this.GetTargetsAndWeights(range, autoattack);
 
-                var ordered = targetWeightDictionary.Keys.OrderByDescending(k => targetWeightDictionary[k]).ToList();
+                orderedTargets = targetWeightDictionary.Keys.OrderByDescending(k => targetWeightDictionary[k]).ToList();
+            }
 
+            else
+            {
+                orderedTargets = this.GetOrderedTargetsByMode(range, autoattack).ToList();
+            }
+
+            if (this.FocusSelected)
+            {
                 var selected = GetSelectedTarget(range, autoattack);
 
                 if (selected != null)
                 {
-                    var containsSelected = ordered.Any(x => x.NetworkId == selected.NetworkId);
+                    var containsSelected = orderedTargets.Any(x => x.NetworkId == selected.NetworkId);
 
                     if (containsSelected)
                     {
-                        ordered.RemoveAll(x => x.NetworkId == selected.NetworkId);
-                        ordered.Insert(0, selected);
+                        orderedTargets.RemoveAll(x => x.NetworkId == selected.NetworkId);
+                        orderedTargets.Insert(0, selected);
                     }
                 }
-
-                return ordered;
             }
 
-            var targets = this.GetOrderedTargetsByMode(range, autoattack).ToList();
-            return targets;
+            return orderedTargets;
         }
 
         public IEnumerable<Obj_AI_Hero> GetOrderedTargetsByMode(float range, bool autoattack = false)
@@ -324,14 +339,14 @@
 
             else if (this.Mode == TargetSelectorMode.LeastAttacks)
             {
-                returnValue = validTargets.OrderBy(x => (int) Math.Ceiling(x.Health / Player.GetAutoAttackDamage(x)))
+                returnValue = validTargets.OrderBy(x => (int)Math.Ceiling(x.Health / Player.GetAutoAttackDamage(x)))
                                           .ThenByDescending(this.GetPriority);
             }
 
             else if (this.Mode == TargetSelectorMode.LeastSpells)
             {
                 returnValue = validTargets
-                    .OrderBy(x => (int) (x.Health / Player.CalculateDamage(x, DamageType.Magical, 100)))
+                    .OrderBy(x => (int)(x.Health / Player.CalculateDamage(x, DamageType.Magical, 100)))
                     .ThenByDescending(this.GetPriority);
             }
 
@@ -369,9 +384,10 @@
         public TargetPriority GetPriority(Obj_AI_Hero hero)
         {
             var slider = this.Config["TargetsMenu"]["priority" + hero.ChampionName];
+
             if (slider != null)
             {
-                return (TargetPriority) slider.Value;
+                return (TargetPriority)slider.Value;
             }
 
             return this.GetDefaultPriority(hero);
@@ -379,11 +395,14 @@
 
         public Obj_AI_Hero GetTarget(float range, bool autoattack = false)
         {
-            var selected = GetSelectedTarget(range, autoattack);
-
-            if (selected != null)
+            if (this.FocusSelected)
             {
-                return selected;
+                var selected = GetSelectedTarget(range, autoattack);
+
+                if (selected != null)
+                {
+                    return selected;
+                }
             }
 
             var target = this.GetOrderedTargets(range, autoattack).FirstOrDefault();
@@ -436,7 +455,8 @@
 
             var miscMenu = new Menu("Misc", "Misc")
             {
-                new MenuBool("FocusSelected", "Focus Selected Target")
+                new MenuBool("FocusSelected", "Focus Selected Target"),
+                new MenuBool("ForceSelected", "Force Selected (Assasin)", false).SetToolTip("Only Attack Selected Target")
             };
 
             this.Config.Add(miscMenu);
@@ -471,7 +491,7 @@
                     "Least Auto Attacks",
                     true,
                     100,
-                    target => (int) Math.Ceiling(target.Health / Player.GetAutoAttackDamage(target)),
+                    target => (int)Math.Ceiling(target.Health / Player.GetAutoAttackDamage(target)),
                     WeightEffect.LowerIsBetter));
 
             this.AddWeight(
@@ -480,7 +500,7 @@
                     "Most Priority",
                     true,
                     100,
-                    target => (int) this.GetPriority(target),
+                    target => (int)this.GetPriority(target),
                     WeightEffect.HigherIsBetter));
 
             this.AddWeight(
@@ -538,7 +558,7 @@
 
             var message = args.Message;
 
-            if (message == (ulong) WindowsMessages.WM_LBUTTONDOWN)
+            if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
             {
                 var clickPosition = Game.CursorPos;
 
@@ -550,7 +570,7 @@
                 if (closestHero != null && Game.CursorPos.Distance(closestHero.Position) <= 300)
                 {
                     this.SelectedTarget = closestHero;
-                } 
+                }
 
                 else
                 {
@@ -586,12 +606,15 @@
         {
             var results = this.GetTargetsAndWeights(range, autoattack).ToList();
 
-            var selected = GetSelectedTarget(range, autoattack);
-
-            if (selected != null)
+            if (this.FocusSelected)
             {
-                return results.OrderByDescending(x => x.Key.NetworkId == selected.NetworkId)
-                              .ThenByDescending(x => x.Value);
+                var selected = GetSelectedTarget(range, autoattack);
+
+                if (selected != null)
+                {
+                    return results.OrderByDescending(x => x.Key.NetworkId == selected.NetworkId)
+                                  .ThenByDescending(x => x.Value);
+                }
             }
 
             return results.OrderByDescending(x => x.Value);
@@ -671,7 +694,7 @@
 
                 this.Name = name;
 
-                this.MenuItem = new MenuSliderBool(name, displayName, true, defaultWeight, 0, 100);
+                this.MenuItem = new MenuSliderBool(name, displayName, enabled, defaultWeight, 0, 100);
 
                 this.WeightDefinition = definition;
 

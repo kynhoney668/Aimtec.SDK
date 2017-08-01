@@ -41,6 +41,11 @@
             return Vector2.Distance((Vector2) v1, v2);
         }
 
+        public static float Distance(this Vector3 v1, GameObject g)
+        {
+            return Vector3.Distance(v1, g.ServerPosition);
+        }
+
         public static float DistanceSqr(this Vector3 v, Vector3 v2)
         {
             return Vector3.DistanceSquared(v, v2);
@@ -102,7 +107,7 @@
         {
             var allyTurrets = ObjectManager
                 .Get<Obj_AI_Turret>().Any(
-                    t => t.IsAlly && point.Distance(t.Position)
+                    t => t.IsAlly && point.Distance(t.ServerPosition)
                         < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
             return allyTurrets;
         }
@@ -111,7 +116,7 @@
         {
             var enemyTurrets = ObjectManager
                 .Get<Obj_AI_Turret>().Any(
-                    t => t.IsEnemy && point.Distance(t.Position)
+                    t => t.IsEnemy && point.Distance(t.ServerPosition)
                         < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
             return enemyTurrets;
         }

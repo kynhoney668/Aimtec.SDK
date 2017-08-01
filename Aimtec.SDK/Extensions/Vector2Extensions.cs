@@ -140,6 +140,11 @@ namespace Aimtec.SDK.Extensions
             return Vector2.Distance(v1, (Vector2) v2);
         }
 
+        public static float Distance(this Vector2 v1, GameObject g)
+        {
+            return Vector2.Distance(v1, g.ServerPosition.To2D());
+        }
+
         /// <summary>
         ///     Gets distance squared from the segments.
         /// </summary>
@@ -274,12 +279,12 @@ namespace Aimtec.SDK.Extensions
 
         public static bool IsUnderAllyTurret(this GameObject obj)
         {
-            return obj.Position.PointUnderAllyTurret();
+            return obj.ServerPosition.PointUnderAllyTurret();
         }
 
         public static bool IsUnderEnemyTurret(this GameObject obj)
         {
-            return obj.Position.PointUnderEnemyTurret();
+            return obj.ServerPosition.PointUnderEnemyTurret();
         }
 
         /// <summary>
@@ -308,7 +313,7 @@ namespace Aimtec.SDK.Extensions
         {
             var allyTurrets = ObjectManager
                 .Get<Obj_AI_Turret>().Any(
-                    t => t.IsAlly && point.Distance(t.Position.To2D())
+                    t => t.IsAlly && point.Distance(t.ServerPosition.To2D())
                         < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
             return allyTurrets;
         }
@@ -317,7 +322,7 @@ namespace Aimtec.SDK.Extensions
         {
             var enemyTurrets = ObjectManager
                 .Get<Obj_AI_Turret>().Any(
-                    t => t.IsEnemy && point.Distance(t.Position.To2D())
+                    t => t.IsEnemy && point.Distance(t.ServerPosition.To2D())
                         < 950f + ObjectManager.GetLocalPlayer().BoundingRadius + t.BoundingRadius);
             return enemyTurrets;
         }

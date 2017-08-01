@@ -67,7 +67,8 @@
             "sejuaninorthernwinds",
             "asheq",
             "camilleq",
-            "camilleq2"
+            "camilleq2",
+            "vorpalspikes"
         };
 
         #endregion
