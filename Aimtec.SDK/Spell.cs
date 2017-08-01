@@ -135,7 +135,7 @@
         /// <summary>
         ///     Gets the last time the spell was attempted to be casted.
         /// </summary>
-        public int LastCastAttemptT { get; private set; }
+        public int LastCastAttemptT { get; set; }
 
         /// <summary>
         ///     Gets or sets the range.
