@@ -1,8 +1,6 @@
 ﻿namespace Aimtec.SDK
 {
     using System;
-    using System.Drawing;
-    using System.Linq;
 
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Menu.Config;
@@ -20,6 +18,8 @@
         private int chargedCastedT;
 
         private int chargeReqSentT;
+
+        private Vector3 from;
 
         private float range = float.MaxValue;
 
@@ -82,6 +82,27 @@
         public float ChargeDuration { get; set; }
 
         /// <summary>
+        ///     Gets the percentage the spell is charged up
+        /// </summary>
+        public float ChargePercent
+        {
+            get
+            {
+                if (!this.IsChargedSpell)
+                {
+                    return 100;
+                }
+
+                if (!this.IsCharging)
+                {
+                    return 0;
+                }
+
+                return (this.Range - this.ChargedMinRange) / (this.ChargedMaxRange - this.ChargedMinRange);
+            }
+        }
+
+        /// <summary>
         ///     Gets or sets a value indicating whether this <see cref="Spell" /> has collision.
         /// </summary>
         /// <value><c>true</c> if the spell has collision; otherwise, <c>false</c>.</value>
@@ -92,6 +113,15 @@
         /// </summary>
         /// <value>The delay.</value>
         public float Delay { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the from.
+        /// </summary>
+        public Vector3 From
+        {
+            get => this.from.IsZero ? Player.ServerPosition : this.from;
+            set => this.from = value;
+        }
 
         /// <summary>
         ///     Gets or sets the hit chance.
@@ -125,6 +155,11 @@
         public bool IsVectorSkillShot { get; set; }
 
         /// <summary>
+        ///     Gets the last time the spell was attempted to be casted.
+        /// </summary>
+        public int LastCastAttemptT { get; private set; }
+
+        /// <summary>
         ///     Gets or sets the range.
         /// </summary>
         /// <value>The range.</value>
@@ -149,29 +184,6 @@
             }
 
             set => this.range = value;
-        }
-
-        /// <summary>
-        ///     Gets the percentage the spell is charged up
-        /// </summary>
-        public float ChargePercent
-        {          
-            get
-            {
-                if (!this.IsChargedSpell)
-                {
-                    return 100;
-                }
-
-                if (this.IsCharging)
-                {
-                    var maxgain = this.ChargedMaxRange - this.ChargedMinRange;
-                    var gain = this.Range - this.ChargedMinRange;
-                    return (gain / maxgain);
-                }
-
-                return 0;
-            }
         }
 
         /// <summary>
@@ -236,23 +248,24 @@
                 return false;
             }
 
-            if (!this.IsSkillShot && !this.IsChargedSpell)
-            {
-                return Player.SpellBook.CastSpell(this.Slot, target);
-            }
-
             if (this.IsVectorSkillShot)
             {
                 if (AimtecMenu.DebugEnabled)
                 {
-                    Logger.Error("Vector skillshot should be cast using two positions");
+                    Logger.Error("Vector skillshot should be casted using two positions");
                 }
 
                 return false;
             }
 
-            var prediction =
-                Prediction.Skillshots.Prediction.GetPrediction(this.GetPredictionInput(target));
+            if (!this.IsSkillShot && !this.IsChargedSpell)
+            {
+                this.LastCastAttemptT = Game.TickCount;
+
+                return Player.SpellBook.CastSpell(this.Slot, target);
+            }
+
+            var prediction = Prediction.Skillshots.Prediction.GetPrediction(this.GetPredictionInput(target));
 
             if (prediction.HitChance < this.HitChance)
             {
@@ -270,6 +283,8 @@
                     ? this.ShootChargedSpell(prediction.CastPosition)
                     : this.StartCharging(prediction.CastPosition);
             }
+
+            this.LastCastAttemptT = Game.TickCount;
 
             return Player.SpellBook.CastSpell(this.Slot, prediction.CastPosition);
         }
@@ -293,6 +308,8 @@
                 }
             }
 
+            this.LastCastAttemptT = Game.TickCount;
+
             return Player.SpellBook.CastSpell(this.Slot);
         }
 
@@ -312,9 +329,7 @@
 
             if (this.IsChargedSpell)
             {
-                return this.IsCharging
-                    ? this.ShootChargedSpell(castPosition)
-                    : this.StartCharging(castPosition);
+                return this.IsCharging ? this.ShootChargedSpell(castPosition) : this.StartCharging(castPosition);
             }
 
             return Player.SpellBook.CastSpell(this.Slot, castPosition);
@@ -334,9 +349,7 @@
 
             if (this.IsChargedSpell)
             {
-                return this.IsCharging
-                    ? this.ShootChargedSpell(position)
-                    : this.StartCharging(position);
+                return this.IsCharging ? this.ShootChargedSpell(position) : this.StartCharging(position);
             }
 
             return Player.SpellBook.CastSpell(this.Slot, position);
@@ -365,10 +378,13 @@
         /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool CastOnUnit(GameObject obj)
         {
-            if (!this.Ready || MenuGUI.IsChatOpen() || MenuGUI.IsShopOpen())
+            if (!this.Ready || MenuGUI.IsChatOpen() || MenuGUI.IsShopOpen()
+                || this.From.Distance(obj.ServerPosition) > this.Range)
             {
                 return false;
             }
+
+            this.LastCastAttemptT = Game.TickCount;
 
             return Player.SpellBook.CastSpell(this.Slot, obj);
         }
@@ -400,6 +416,7 @@
                 Speed = this.Speed,
                 Range = this.Range,
                 Unit = target,
+                From = this.From,
                 Collision = this.Collision
             };
         }
@@ -536,10 +553,6 @@
             this.chargeReqSentT = Game.TickCount;
             return Player.SpellBook.CastSpell(this.Slot, position);
         }
-
-        #endregion
-
-        #region Methods
 
         #endregion
     }
