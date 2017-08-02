@@ -291,16 +291,32 @@
         /// <inheritdoc />
         internal IMenuComponent GetItem(string name)
         {
-            MenuComponent item = null;
+            this.Children.TryGetValue(name, out MenuComponent ritem);
 
-            this.Children.TryGetValue(name, out item);
-
-            if (item == null)
+            if (ritem != null)
             {
-                Logger.Warn("[Menu] Item: {0} was not found in the menu: {1}", name, this.InternalName);
+                return ritem;
             }
 
-            return item;
+            foreach (var item in this.Children.Values)
+            {
+                var asmenu = item as Menu;
+
+                if (asmenu == null)
+                {
+                    continue;
+                }
+
+                ritem = (MenuComponent) asmenu.GetItem(name);
+
+                if (ritem != null)
+                {
+                    return ritem;
+                }
+            }
+
+            this.Logger.Warn("[Menu] Item: {0} was not found in the menu: {1}", name, this.InternalName);
+            return null;
         }
 
         internal override void LoadValue()
