@@ -24,7 +24,7 @@ namespace Aimtec.SDK.Extensions
         /// </summary>
         public static SpellSlot GetSpellSlot(this Obj_AI_Base unit, string spellName)
         {
-            var spell = unit.SpellBook.Spells.FirstOrDefault(x => x.Name.Equals(spellName, StringComparison.OrdinalIgnoreCase));
+            var spell = unit.SpellBook.Spells.FirstOrDefault(x => !string.IsNullOrEmpty(x.Name) && x.Name.Equals(spellName, StringComparison.OrdinalIgnoreCase));
 
             return spell?.Slot ?? SpellSlot.Unknown;
         }
