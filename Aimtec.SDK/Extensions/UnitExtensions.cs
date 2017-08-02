@@ -26,12 +26,7 @@ namespace Aimtec.SDK.Extensions
         {
             var spell = unit.SpellBook.Spells.FirstOrDefault(x => x.Name.Equals(spellName, StringComparison.OrdinalIgnoreCase));
 
-            if (spell != null)
-            {
-                return spell.Slot;
-            }
-
-            return SpellSlot.Unknown;
+            return spell?.Slot ?? SpellSlot.Unknown;
         }
 
         /// <summary>
@@ -89,6 +84,12 @@ namespace Aimtec.SDK.Extensions
             return Vector3.Distance(gameObject.ServerPosition, v1);
         }
 
+        /// <summary>
+        ///     Returns the 2D distance between a gameobject and a vector.
+        /// </summary>
+        /// <param name="gameObject">The GameObject.</param>
+        /// <param name="v1">The vector.</param>
+        /// <returns></returns>
         public static float Distance(this GameObject gameObject, Vector2 v1)
         {
             return Vector2.Distance((Vector2) gameObject.ServerPosition, v1);
@@ -281,6 +282,19 @@ namespace Aimtec.SDK.Extensions
         public static bool HasItem(this Obj_AI_Base from, uint itemId)
         {
             return from.Inventory.HasItem(itemId);
+        }
+
+        /// <summary>
+        ///     Determines whether the specified target has a spell shield.
+        /// </summary>
+        /// <param name="unit">The unit.</param>
+        /// <returns>
+        ///     <c>true</c> if the specified target has a spell shield; otherwise, <c>false</c>.
+        /// </returns>
+        public static bool HasSpellShield(this Obj_AI_Base unit)
+        {
+            // probably broken 
+            return unit.HasBuffOfType(BuffType.SpellShield) || unit.HasBuffOfType(BuffType.SpellImmunity);
         }
 
         /// <summary>
