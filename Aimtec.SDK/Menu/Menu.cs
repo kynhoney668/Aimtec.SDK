@@ -289,9 +289,9 @@
         #region Methods
 
         /// <inheritdoc />
-        internal IMenuComponent GetItem(string name)
+        internal IMenuComponent GetItem(string name, bool showLog = true)
         {
-            this.Children.TryGetValue(name, out MenuComponent ritem);
+            this.Children.TryGetValue(name, out var ritem);
 
             if (ritem != null)
             {
@@ -307,7 +307,7 @@
                     continue;
                 }
 
-                ritem = (MenuComponent) asmenu.GetItem(name);
+                ritem = (MenuComponent) asmenu.GetItem(name, false);
 
                 if (ritem != null)
                 {
@@ -315,7 +315,11 @@
                 }
             }
 
-            this.Logger.Warn("[Menu] Item: {0} was not found in the menu: {1}", name, this.InternalName);
+            if (showLog)
+            {
+                this.Logger.Warn("[Menu] Item: {0} was not found in the menu: {1}", name, this.InternalName);
+            }
+
             return null;
         }
 
