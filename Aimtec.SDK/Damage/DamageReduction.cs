@@ -17,7 +17,7 @@ namespace Aimtec.SDK.Damage
 
             Reductions.Add(new DamageReduction
             {
-                                  BuffName = "Exhaust",
+                                  BuffName = "SummonerExhaust",
                                   Type = DamageReduction.ReductionDamageType.Percent,
                                   ReductionDamage = (source, attacker) =>
                                       {
@@ -31,7 +31,7 @@ namespace Aimtec.SDK.Damage
                                    Type = DamageReduction.ReductionDamageType.Percent,
                                    ReductionDamage = (source, attacker) =>
                                        {
-                                           var phantomdancerBuff = source.BuffManager.GetBuff("itemphantomdancerdebuff");
+                                           var phantomdancerBuff = source.GetBuff("itemphantomdancerdebuff");
                                            if (phantomdancerBuff?.Caster.NetworkId == attacker?.NetworkId)
                                            {
                                                 return 12;
@@ -43,7 +43,7 @@ namespace Aimtec.SDK.Damage
 
             Reductions.Add(new DamageReduction
             {
-                                   BuffName = "BraumShieldRaise",
+                                   BuffName = "braumeshieldbuff",
                                    Type = DamageReduction.ReductionDamageType.Percent,
                                    ReductionDamage = (source, attacker) =>
                                        {
@@ -78,7 +78,7 @@ namespace Aimtec.SDK.Damage
 
             Reductions.Add(new DamageReduction
             {
-                                   BuffName = "GragasWSelf",
+                                   BuffName = "gragaswself",
                                    Type = DamageReduction.ReductionDamageType.Percent,
                                    ReductionDamage = (source, attacker) =>
                                        {
@@ -96,6 +96,37 @@ namespace Aimtec.SDK.Damage
                                        }
                                });
 
+            Reductions.Add(new DamageReduction
+                               {
+                                   BuffName = "VoidStone",
+                                   DamageType = DamageType.Magical,
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
+                                       {
+                                           return 15;
+                                       }
+                               });
+
+            Reductions.Add(new DamageReduction
+                               {
+                                   BuffName = "sonapassivedebuff",
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
+                                       {
+                                           var sonapassivedebuff = source.GetBuff("sonapassivedebuff");
+                                           if (sonapassivedebuff != null)
+                                           {
+                                               var caster = sonapassivedebuff.Caster as Obj_AI_Hero;
+                                               if (caster != null)
+                                               {
+                                                   return 25 + 4 * (caster.TotalAbilityDamage / 100);
+                                               }
+                                           }
+
+                                           return 0;
+                                       }
+                               });
+
             #endregion
         }
 
@@ -106,7 +137,9 @@ namespace Aimtec.SDK.Damage
 
             foreach (var reduction in Reductions)
             {
-                if (source == null || !source.HasBuff(reduction.BuffName))
+                if (source == null ||
+                    !source.HasBuff(reduction.BuffName) ||
+                    reduction.DamageType != null && damageType != reduction.DamageType)
                 {
                     continue;
                 }
@@ -143,6 +176,8 @@ namespace Aimtec.SDK.Damage
         public class DamageReduction
         {
             public string BuffName { get; set; }
+
+            public DamageType? DamageType { get; set; }
 
             public delegate double ReductionDamageDelegateHandler(Obj_AI_Hero source, Obj_AI_Base attacker);
 

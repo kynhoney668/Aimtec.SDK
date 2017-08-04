@@ -16,7 +16,7 @@
         /// <returns>How many ally heroes are inside a 'float' range from the starting 'vector3' point.</returns>
         public static int CountAllyHeroesInRange(this Vector3 vector3, float range)
         {
-            return GameObjects.AllyHeroes.Count(h => !h.IsMe && h.IsValidTarget(range, false, false, vector3));
+            return GameObjects.AllyHeroes.Count(h => !h.IsMe && h.IsValidTarget(range, true, false, vector3));
         }
 
         /// <summary>
@@ -33,7 +33,7 @@
         {
             return GameObjects.EnemyHeroes.Count(
                 h => h.NetworkId != dontIncludeStartingUnit?.NetworkId
-                    && h.IsValidTarget(range, true, false, vector3));
+                    && h.IsValidTarget(range, false, false, vector3));
         }
 
         public static float Distance(this Vector3 v1, Vector2 v2)

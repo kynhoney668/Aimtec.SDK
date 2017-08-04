@@ -55,7 +55,6 @@
   <ItemGroup>
     <Compile Include="Bootstrap.cs" />
     <Compile Include="Damage\DamageItem.cs" />
-    <Compile Include="Damage\DamageMasteries.cs" />
     <Compile Include="Damage\DamagePassives.cs" />
     <Compile Include="Damage\DamageReduction.cs" />
     <Compile Include="Damage\MasteryId.cs" />

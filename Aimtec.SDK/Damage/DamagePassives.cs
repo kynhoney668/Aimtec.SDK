@@ -626,31 +626,26 @@ namespace Aimtec.SDK.Damage
                                          return 0;
                                      }
                              });
-            /*
+
             Passives.Add(new DamagePassive
                              {
                                  DamageType = DamagePassive.PassiveDamageType.FlatMagical,
                                  PassiveDamage = (source, target) =>
                                      {
-                                         var heroTarget = (Obj_AI_Hero)target;
-                                         if (heroTarget != null)
+                                         var buff = target.GetBuff("kalistacoopstrikemarkbuff");
+                                         if (buff != null &&
+                                             source.HasBuff("kalistacoopstrikeally"))
                                          {
-                                             var buff = heroTarget.GetBuff("kalistacoopstrikemarkbuff");
-                                             if (buff != null &&
-                                                source.HasBuff("kalistacoopstrikeally"))
+                                             var buffCaster = buff.Caster as Obj_AI_Hero;
+                                             if (buffCaster != null)
                                              {
-                                                 var buffCaster = (Obj_AI_Hero)buff.Caster;
-                                                 if (buffCaster != null)
-                                                 {
-                                                    return buffCaster.GetSpellDamage(target, SpellSlot.W);
-                                                 }
+                                                return buffCaster.GetSpellDamage(target, SpellSlot.W);
                                              }
                                          }
 
                                          return 0;
                                      }
                              });
-            */
 
             Passives.Add(new DamagePassive
                              {
@@ -758,6 +753,36 @@ namespace Aimtec.SDK.Damage
                                          if (!source.SpellBook.GetSpell(SpellSlot.E).State.HasFlag(SpellState.NotLearned))
                                          {
                                              return source.GetSpellDamage(target, SpellSlot.E);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Vayne",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("vaynetumblebonus"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.Q);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Vayne",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatTrue,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (target.GetBuffCount("vaynesilvereddebuff") == 2)
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W);
                                          }
 
                                          return 0;
