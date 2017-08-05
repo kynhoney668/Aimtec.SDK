@@ -253,6 +253,13 @@ namespace Aimtec.SDK.Orbwalking
             {
                 return false;
             }
+            
+            if (Player.ChampionName.Equals("Graves"))
+            {
+                return Game.TickCount + Game.Ping / 2 + 25 >=
+                       this.LastAttackCommandSentTime + (1.0740296828d * 1000 * Player.AttackDelay - 716.2381256175d) &&
+                       Player.HasBuff("GravesBasicAttackAmmo1");
+            }
 
             if (this.NoCancelChamps.Contains(Player.ChampionName))
             {
