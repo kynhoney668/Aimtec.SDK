@@ -515,10 +515,10 @@ namespace Aimtec.SDK.Damage
                 var targetMinion = target as Obj_AI_Minion;
                 if (targetMinion != null)
                 {
-                    var mastery = hero.GetCunningPage(MasteryId.Cunning.Savagery);
-                    if (mastery != null && hero.IsUsingMastery(mastery))
+                    var savagery = hero.GetCunningPage(MasteryId.Cunning.Savagery);
+                    if (savagery != null && hero.IsUsingMastery(savagery))
                     {
-                        amount += new[] { 1, 2, 3, 4, 5 }[mastery.Points - 1];
+                        amount += new[] { 1, 2, 3, 4, 5 }[savagery.Points - 1];
                     }
                 }
             }
@@ -562,13 +562,6 @@ namespace Aimtec.SDK.Damage
                     amount *= 1 + 3 / 100;
                 }
 
-                var battleTrance = hero.GetFerocityPage(MasteryId.Ferocity.BattleTrance);
-                if (battleTrance != null &&
-                    hero.IsUsingMastery(battleTrance))
-                {
-                    amount *= 1 + 3 / 100;
-                }
-
                 var greenfathersgift = hero.GetCunningPage(MasteryId.Cunning.GreenFathersGift);
                 if (greenfathersgift != null &&
                     hero.IsUsingMastery(greenfathersgift) &&
@@ -597,6 +590,13 @@ namespace Aimtec.SDK.Damage
 
                 if (targetHero != null)
                 {
+                    var battleTrance = hero.GetFerocityPage(MasteryId.Ferocity.BattleTrance);
+                    if (battleTrance != null &&
+                        hero.IsUsingMastery(battleTrance))
+                    {
+                        amount *= 1 + 3 / 100;
+                    }
+
                     var assassin = hero.GetCunningPage(MasteryId.Cunning.Assassin);
                     if (assassin != null &&
                         hero.IsUsingMastery(assassin) &&
