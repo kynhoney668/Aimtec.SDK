@@ -548,7 +548,7 @@ namespace Aimtec.SDK.Damage
             if (source is Obj_AI_Turret)
             {
                 if (minion != null &&
-                    (minion.UnitSkinName.Contains("Siege") || minion.UnitSkinName.Contains("Super")))
+                    (minion.UnitSkinName.Contains("MinionSiege") || minion.UnitSkinName.Contains("MinionSuper")))
                 {
                     amount *= 0.7;
                 }
@@ -572,6 +572,12 @@ namespace Aimtec.SDK.Damage
 
                 if (minion != null)
                 {
+                    if (minion.UnitSkinName.Contains("MinionMelee") &&
+                        minion.HasBuff("exaltedwithbaronnashorminion"))
+                    {
+                        amount *= 0.25;
+                    }
+
                     if (source.HasBuff("barontarget") &&
                         minion.UnitSkinName.Contains("SRU_Baron"))
                     {
