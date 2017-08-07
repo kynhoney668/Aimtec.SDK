@@ -25,23 +25,12 @@
         #region Public Methods and Operators
 
         /// <summary>
-        ///     Gets the predicted health of the target in the amount of time given.
+        ///     Gets the predicted health of the target.
         /// </summary>
         /// <param name="target">The target.</param>
         /// <param name="time">The time.</param>
         /// <returns>System.Single.</returns>
         public float GetPrediction(Obj_AI_Base target, int time)
-        {
-            return Implementation.GetPrediction(target, time);
-        }
-
-        /// <summary>
-        ///     Gets the predicted health of the target for laneclear.
-        /// </summary>
-        /// <param name="target">The target.</param>
-        /// <param name="time">The time.</param>
-        /// <returns>System.Single.</returns>
-        public float GetLaneClearHealthPrediction(Obj_AI_Base target, int time)
         {
             return Implementation.GetPrediction(target, time);
         }

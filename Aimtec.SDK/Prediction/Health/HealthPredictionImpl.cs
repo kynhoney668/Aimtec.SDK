@@ -140,11 +140,6 @@
             }
         }
 
-        public float GetLaneClearHealthPrediction(Obj_AI_Base target, int time)
-        {
-            throw new NotImplementedException();
-        }
-
         #endregion
 
         class Attack
