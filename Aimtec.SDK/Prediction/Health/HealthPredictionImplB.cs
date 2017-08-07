@@ -108,7 +108,7 @@ namespace Aimtec.SDK.Prediction.Health
 
                 foreach (var k in attacks)
                 {
-                    if (k.AttackStatus == AutoAttack.AttackState.Completed || !k.Target.IsValid || k.Target.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > 3000)
+                    if (k.AttackStatus == AutoAttack.AttackState.Completed || k.ETA < - 200 || !k.Target.IsValid || k.Target.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > 3000)
                     {
                         continue;
                     }
@@ -359,7 +359,7 @@ namespace Aimtec.SDK.Prediction.Health
         {
             public RangedAttack(Obj_AI_Base sender, Obj_AI_Base target, int extraDelay) : base(sender, target)
             {
-                this.ExtraDelay = extraDelay;
+                this.ExtraDelay = extraDelay + 60;
             }
 
             public MissileClient Missile { get; set; }
@@ -403,7 +403,7 @@ namespace Aimtec.SDK.Prediction.Health
         {
             public MeleeAttack(Obj_AI_Base sender, Obj_AI_Base target, int extraDelay) : base(sender, target)
             {
-                this.ExtraDelay = extraDelay;
+                this.ExtraDelay = extraDelay + 60;
             }
 
             public override bool Active => this.ETA > 0;
