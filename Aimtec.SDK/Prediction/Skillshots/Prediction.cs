@@ -1,6 +1,6 @@
 ﻿namespace Aimtec.SDK.Prediction.Skillshots
 {
-    class Prediction : ISkillshotPrediction
+    public class Prediction : ISkillshotPrediction
     {
         #region Public Properties
 
