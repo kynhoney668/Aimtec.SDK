@@ -63,6 +63,7 @@
     <Compile Include="Orbwalking\AOrbwalker.cs" />
     <Compile Include="Orbwalking\IOrbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkerMode.cs" />
+    <Compile Include="Prediction\Health\TurretAttackManager.cs" />
     <Compile Include="Prediction\Skillshots\IPrediction.cs" />
     <Compile Include="Prediction\Skillshots\AoE\AoEPrediction.cs" />
     <Compile Include="Prediction\Skillshots\AoE\Circle.cs" />

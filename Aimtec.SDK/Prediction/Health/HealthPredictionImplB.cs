@@ -1,499 +1,460 @@
-﻿namespace Aimtec.SDK.Prediction.Health
+﻿using Aimtec.SDK.Damage;
+using Aimtec.SDK.Extensions;
+using Aimtec.SDK.Menu.Components;
+using Aimtec.SDK.Menu.Config;
+using Aimtec.SDK.Util;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace Aimtec.SDK.Prediction.Health
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using Aimtec.SDK.Damage;
-    using Aimtec.SDK.Extensions;
-    using Aimtec.SDK.Menu.Components;
-    using Aimtec.SDK.Menu.Config;
-
     class HealthPredictionImplB : IHealthPrediction
     {
-        #region Fields
-
-        internal readonly Dictionary<int, List<Attack>> incomingAttacks = new Dictionary<int, List<Attack>>();
-
-        internal readonly Dictionary<int, AggroData> MinionAggroData = new Dictionary<int, AggroData>();
-
         internal Menu.Menu Config { get; set; }
 
-        #endregion
-
-        #region Constructors and Destructors
-
-        internal HealthPredictionImplB()
+        public HealthPredictionImplB()
         {
-            Game.OnUpdate += this.GameOnUpdate;
-            Obj_AI_Base.OnProcessAutoAttack += this.ObjAiBaseOnOnProcessAutoAttack;
-            GameObject.OnDestroy += this.GameObjectOnOnDestroy;
-            Obj_AI_Base.OnPerformCast += this.Obj_AI_Base_OnPerformCast;
-            SpellBook.OnStopCast += this.SpellBook_OnStopCast;
+            Obj_AI_Base.OnProcessAutoAttack += Obj_AI_Base_OnProcessAutoAttack;
+            GameObject.OnCreate += GameObject_OnCreate;
+            GameObject.OnDestroy += GameObject_OnDestroy;
+            Game.OnUpdate += Game_OnUpdate;
+            Obj_AI_Base.OnPerformCast += Obj_AI_Base_OnPerformCast;
+            SpellBook.OnStopCast += SpellBook_OnStopCast;
 
-            Config = new Menu.Menu("HealthPred", "HealthPrediction");
-            Config.Add(new MenuSeperator("seperator", "Default value should be 180"));
-            Config.Add(new MenuSlider("ExtraDelay", "Extra Delay", 180, 0, 250));
+
+            Config = new Menu.Menu("HealthPred", "HealthPrediction")
+            {
+                new MenuSeperator("Seperator", "Delays are 0 by default"),
+                new MenuSlider("ExtraDelayRanged", "Extra Ranged Delay", 0, 0, 150).SetToolTip("Delay for processing minion ranged attacks"),
+                new MenuSlider("ExtraDelayMelee", "Extra Melee Attacks Delay", 0, 0, 150).SetToolTip("Delay for processing minion melee attacks"),
+            };
 
             AimtecMenu.Instance.Add(this.Config);
+            
         }
 
-        #endregion
-
-        #region Properties
-
-        private Obj_AI_Hero Player => ObjectManager.GetLocalPlayer();
-
-        #endregion
-
-        #region Public Methods and Operators
-
-        public AggroData GetAggroData(Obj_AI_Base unit)
+        private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
         {
-            if (this.MinionAggroData.ContainsKey(unit.NetworkId))
+            if (!sender.IsValid)
             {
-                return this.MinionAggroData[unit.NetworkId];
+                return;
             }
 
-            return null;
-        }
+            var ob = Attacks.GetOutBoundAttacks(sender.NetworkId);
 
-        public float GetPredictedDamage(Obj_AI_Base unit, int time)
-        {
-            //If there is no incoming auto attacks detected for this unit, then it is not taking damage, so return 0.
-            if (!this.incomingAttacks.ContainsKey(unit.NetworkId))
+            if (ob != null)
             {
-                return 0;
-            }
+                var current = ob.Where(x => x.AttackStatus != AutoAttack.AttackState.Completed);
 
-            var incAttacksUnit = this.incomingAttacks[unit.NetworkId];
-
-            float predictedDmg = 0;
-
-            foreach (var attack in incAttacksUnit)
-            {
-                //if this attack will take longer than the specified time to reach the target, then ignore it
-                if (attack.ETA + this.Config["ExtraDelay"].Value > time)
+                //Remove any pending attacks or attacks in progress because the auto attack was cancelled
+                if (e.StopAnimation || e.ForceStop || e.DestroyMissile)
                 {
-                    continue;
-                }
-
-                float dmg = 0;
-
-                if (attack is AutoAttack)
-                {
-                    dmg = (float) attack.Sender.GetAutoAttackDamage(unit); //calc dmg from source to this unit
-                }
-
-                //Must be turret attack
-                else
-                {
-                    var tAttack = attack as TurretAttack;
-                    if (tAttack != null)
+                    foreach (var attack in ob)
                     {
-                        dmg = (1 + tAttack.DmgPercentageIncrease) * (float) attack.Sender.GetAutoAttackDamage(unit);
-                    }
-                }
-
-                predictedDmg += dmg;
-            }
-
-            return predictedDmg;
-        }
-
-        public float GetPrediction(Obj_AI_Base unit, int time)
-        {
-            var pred = Math.Max(0, unit.Health - this.GetPredictedDamage(unit, time));
-
-            return pred;
-        }
-
-        public bool HasTurretAggro(Obj_AI_Base unit)
-        {
-            var data = this.GetAggroData(unit);
-            if (data != null)
-            {
-                return data.HasTurretAggro;
-            }
-
-            return false;
-        }
-
-        #endregion
-
-        #region Methods
-
-        private void GameObjectOnOnDestroy(GameObject sender)
-        {
-            var mc = sender as MissileClient;
-
-            if (mc != null)
-            {
-                var source = mc.SpellCaster;
-                var targ = mc.Target as Obj_AI_Base;
-
-                if (source != null && targ != null)
-                {
-                    foreach (var value in this.incomingAttacks.Values)
-                    {
-                        value.RemoveAll(
-                            x => x.Sender.NetworkId == source.NetworkId && x.AttackName == mc.SpellData.Name
-                                && x.Target.NetworkId == targ.NetworkId);
-                    }
-
-                    if (source is Obj_AI_Turret)
-                    {
-                        if (this.MinionAggroData.ContainsKey(targ.NetworkId))
+                        if (attack.AttackStatus == AutoAttack.AttackState.Completed)
                         {
-                            var lastattack = this.MinionAggroData[targ.NetworkId].LastTurretAttack;
-                            if (lastattack != null)
-                                lastattack.Destroyed = true;
+                            continue;
+                        }
+
+                        attack.Completed();
+
+                        var rattack = attack as RangedAttack;
+
+                        if (rattack == null)
+                        {
+                            continue;
+                        }
+
+                        if (e.DestroyMissile)
+                        {
+                            rattack.MissileDestroyed();
                         }
                     }
                 }
             }
         }
 
-        private void GameOnUpdate()
-        {
-            foreach (var value in this.incomingAttacks.Values)
-            {
-                value.RemoveAll(x => Game.TickCount - x.CastTime > 1800);
-            }
-
-            foreach (var value in this.MinionAggroData.Values.ToList())
-            {
-                if (value.Unit == null || !value.Unit.IsValid || value.Unit.IsDead)
-                {
-                    this.MinionAggroData.Remove(value.NetworkID);
-                }
-            }
-        }
 
         private void Obj_AI_Base_OnPerformCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
             if (sender != null && sender.IsValid && sender.IsMelee)
             {
-                foreach (var value in this.incomingAttacks.Values)
+                var ob = Attacks.GetOutBoundAttacks(sender.NetworkId);
+
+                if (ob != null)
                 {
-                    value.RemoveAll(
-                        x => x.Sender == null || x.Target == null
-                            || x.Sender.IsMelee && x.Sender.NetworkId == sender.NetworkId);
+                    var attacks = ob.Where(x => x.AttackStatus != AutoAttack.AttackState.Completed);
+
+                    //Get the oldest attack
+                    var attack = attacks.MinBy(x => x.DetectTime);
+
+                    if (attack != null)
+                    {
+                        attack.AttackStatus = AutoAttack.AttackState.Completed;
+                    }
                 }
             }
         }
 
-        private void ObjAiBaseOnOnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs args)
+
+        public float GetPrediction(Obj_AI_Base target, int time)
         {
-            //Only detect attacks from and to minions close to us
-            if (sender == null || sender.Distance(this.Player) > 3500 || sender is Obj_AI_Hero)
+            float predictedDamage = 0;
+
+            foreach (var m in Attacks.OutBoundAttacks)
+            {
+                var attacks = m.Value;
+
+                foreach (var k in attacks)
+                {
+                    if (k.AttackStatus == AutoAttack.AttackState.Completed || !k.Target.IsValid || k.Target.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > 3000)
+                    {
+                        continue;
+                    }
+
+                    if (k.ETA < time)
+                    {
+                        predictedDamage += (float)k.Damage;
+                    }
+                }
+            }
+
+            var health = target.Health - predictedDamage;
+
+            return health;
+        }
+
+        public float GetLaneClearHealthPrediction(Obj_AI_Base target, int time)
+        {
+            float predictedDamage = 0;
+
+            var rTime = time;
+
+            foreach (var m in Attacks.OutBoundAttacks)
+            {
+                var attacks = m.Value;
+
+                foreach (var k in attacks)
+                {
+                    if (k.TNetworkId != target.NetworkId || Game.TickCount - k.DetectTime > rTime)
+                    {
+                        continue;
+                    }
+
+                    predictedDamage += (float)k.Damage;
+                }
+            }
+
+            return target.Health - predictedDamage;
+        }
+
+
+        private int LastCleanUp { get; set; }
+
+        private void Game_OnUpdate()
+        {
+            //Limit the clean up to every 2 seconds
+            if (Game.TickCount - this.LastCleanUp <= 1000)
             {
                 return;
             }
 
-            var target = args.Target as Obj_AI_Base;
-
-            if (target != null)
+            //Remove attacks more than 5 seconds old 
+            foreach (var kvp in Attacks.OutBoundAttacks)
             {
-                if (!this.MinionAggroData.ContainsKey(target.NetworkId))
+                foreach (var attack in kvp.Value)
                 {
-                    this.MinionAggroData.Add(target.NetworkId, new AggroData(target, this));
-                }
-
-                if (sender.IsTurret)
-                {
-                    var data = this.MinionAggroData[target.NetworkId];
-
-                    if (data != null)
+                    if (!attack.Sender.IsValid || attack.Sender.IsDead || !attack.Target.IsValid || attack.Target.IsDead)
                     {
-                        if (data.LastTurretAttack != null)
-                        {
-                            if (Game.TickCount - data.LastTurretAttack.CastTime < 2500)
-                            {
-                                data.TurretShotNumber++;
-                            }
-
-                            else
-                            {
-                                data.TurretShotNumber = 1;
-                            }
-                        }
-
-                        var auto = new TurretAttack(
-                            sender,
-                            target,
-                            args,
-                            data.LastTurretAttack == null ? 1 : data.TurretShotNumber,
-                            args.SpellData.Name,
-                            sender.Inventory.HasItem(1337420)); //todo: add actual item id.
-
-                        if (!this.incomingAttacks.ContainsKey(auto.Target.NetworkId))
-                        {
-                            this.incomingAttacks.Add(auto.Target.NetworkId, new List<Attack>());
-                        }
-
-                        this.incomingAttacks[auto.Target.NetworkId].Add(auto);
-
-                        data.LastTurretAttack = auto;
+                        attack.AttackStatus = AutoAttack.AttackState.Completed;
                     }
                 }
 
-                else
+                kvp.Value.RemoveAll(x => x.CanRemoveAttack);
+            }
+
+            this.LastCleanUp = Game.TickCount;
+        }
+
+        private void Obj_AI_Base_OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
+        {
+            //Ignore auto attacks happening too far away
+            if (sender == null || !sender.IsValidTarget(4000, true) || sender is Obj_AI_Hero)
+            {
+                return;
+            }
+
+            //Only process for minion targets
+            var targetM = e.Target as Obj_AI_Base;
+            if (targetM == null)
+            {
+                return;
+            }
+
+            AutoAttack attack = null;
+
+            if (sender.IsMelee)
+            {
+                attack = new MeleeAttack(sender, targetM, 0);
+            }
+
+            else
+            {
+                attack = new RangedAttack(sender, targetM, 0);
+            }
+
+            Attacks.AddAttack(attack);
+        }
+
+        private void GameObject_OnCreate(GameObject gsender)
+        {
+            if (gsender == null || !gsender.IsValid)
+            {
+                return;
+            }
+
+            var mc = gsender as MissileClient;
+
+            if (mc == null || !mc.IsValid)
+            {
+                return;
+            }
+
+            var sender = mc.SpellCaster;
+            var target = mc.Target as Obj_AI_Base;
+
+            if (sender == null || target == null || !target.IsValid || !sender.IsValid || sender.IsMelee || mc.SpellCaster is Obj_AI_Hero)
+            {
+                return;
+            }
+
+            //Ignore the missile if the speed is not the same as the auto attack speed, means not auto attack...
+            if (mc.SpellData.MissileSpeed != sender.BasicAttack.MissileSpeed)
+            {
+                return;
+            }
+
+            var attacks = Attacks.GetOutBoundAttacks(mc.SpellCaster.NetworkId);
+
+            if (attacks != null)
+            {
+                var attack = attacks.MaxBy(x => x.DetectTime);
+                if (attack != null)
                 {
-                    var auto = new AutoAttack(sender, target, args, args.SpellData.Name);
-
-                    if (!this.incomingAttacks.ContainsKey(auto.Target.NetworkId))
+                    if (attack is RangedAttack rangedAttack)
                     {
-                        this.incomingAttacks.Add(auto.Target.NetworkId, new List<Attack>());
-                    }
-
-                    this.incomingAttacks[auto.Target.NetworkId].Add(auto);
-
-                    if (this.MinionAggroData.ContainsKey(auto.Target.NetworkId))
-                    {
-                        this.MinionAggroData[auto.Target.NetworkId].LastMinionAttack = auto;
+                        rangedAttack.MissileCreated(mc);
                     }
                 }
             }
         }
 
-        private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
+        private void GameObject_OnDestroy(GameObject sender)
         {
-            if (sender.IsValid)
+            if (sender == null || !sender.IsValid)
             {
-                if (sender is Obj_AI_Turret)
-                {
-                    return;
-                }
+                return;
+            }
 
-                if (sender is Obj_AI_Base && (e.DestroyMissile || e.StopAnimation))
+            var mc = sender as MissileClient;
+
+            if (mc == null || mc.SpellCaster == null || mc.SpellCaster.IsMelee || mc.SpellCaster is Obj_AI_Hero)
+            {
+                return;
+            }
+
+            var target = mc.Target as Obj_AI_Base;
+
+            if (target == null)
+            {
+                return;
+            }
+
+            var attacks = Attacks.GetOutBoundAttacks(mc.SpellCaster.NetworkId);
+
+            if (attacks != null)
+            {
+                //Might be destroying too eearly, attack may not land when missile destroyed
+                //add the missile to the attack object
+                var attack = attacks.Where(x => x.Target.NetworkId == mc.Target.NetworkId && x.AttackStatus != AutoAttack.AttackState.Completed).MinBy(x => x.DetectTime);
+                if (attack != null)
                 {
-                    foreach (var value in this.incomingAttacks.Values)
+                    if (attack is RangedAttack rangedAttack)
                     {
-                        value.RemoveAll(x => x.Sender.NetworkId == sender.NetworkId);
+                        rangedAttack.MissileDestroyed();
                     }
                 }
             }
         }
 
-        #endregion
-
-        public class AggroData
+        public abstract class AutoAttack
         {
-            #region Constructors and Destructors
-
-            public AggroData(Obj_AI_Base unit, HealthPredictionImplB hpred)
+            public AutoAttack(Obj_AI_Base sender, Obj_AI_Base target)
             {
-                this.HealthPredInstance = hpred;
-                this.Unit = unit;
-                this.NetworkID = unit.NetworkId;
-            }
-
-            #endregion
-
-            #region Public Properties
-
-            public bool HasMinionAggro => this.TimeElapsedSinceLastMinionAttack < 500;
-
-            public bool HasTurretAggro => this.TimeElapsedSinceLastTurretAttack < 2500;
-
-            public List<Attack> IncomingAttacks =>
-                this.HealthPredInstance.incomingAttacks.ContainsKey(this.Unit.NetworkId)
-                    ? this.HealthPredInstance.incomingAttacks[this.Unit.NetworkId]
-                    : null;
-
-            public IEnumerable<AutoAttack> IncomingMinionAttacks => this
-                .IncomingAttacks.Where(x => x is AutoAttack).Cast<AutoAttack>();
-
-            public IEnumerable<TurretAttack> IncomingTurretAttacks => this
-                .IncomingAttacks.Where(x => x is TurretAttack).Cast<TurretAttack>();
-
-            public Attack LastMinionAttack { get; set; }
-
-            public TurretAttack LastTurretAttack { get; set; }
-
-            public int NetworkID { get; set; }
-
-            public int NextTurretAttackTime
-            {
-                get
-                {
-                    if (this.LastTurretAttack != null)
-                    {
-                        var sender = this.LastTurretAttack.Sender;
-                        return this.LastTurretAttack.CastTime + (int) (sender.AttackDelay * 1000)
-                            + (int) (sender.AttackCastDelay * 1000)
-                            + (int) (sender.Distance(this.Unit.Position) - sender.BoundingRadius
-                                - this.Unit.BoundingRadius) / (int) sender.BasicAttack.MissileSpeed + 50;
-                    }
-
-                    return 0;
-                }
-            }
-
-            public int TimeElapsedSinceLastMinionAttack => Game.TickCount + Game.Ping / 2
-                - (this.LastMinionAttack?.CastTime ?? 0);
-
-            public int TimeElapsedSinceLastTurretAttack => Game.TickCount - (this.LastTurretAttack?.CastTime ?? 0);
-
-            public int TimeUntilNextTurretAttack
-            {
-                get
-                {
-                    return this.NextTurretAttackTime - Game.TickCount;
-                }
-            }
-
-            public int TurretShotNumber { get; set; }
-
-            public Obj_AI_Base Unit { get; set; }
-
-            #endregion
-
-            #region Properties
-
-            private HealthPredictionImplB HealthPredInstance { get; set; }
-
-            #endregion
-        }
-
-        public class Attack
-        {
-            #region Fields
-
-            public Obj_AI_BaseMissileClientDataEventArgs args;
-
-            #endregion
-
-            #region Constructors and Destructors
-
-            public Attack(
-                Obj_AI_Base sender,
-                Obj_AI_Base target,
-                Obj_AI_BaseMissileClientDataEventArgs args,
-                string name)
-            {
+                this.AttackStatus = AttackState.Detected;
+                this.DetectTime = Game.TickCount - Game.Ping / 2;
                 this.Sender = sender;
                 this.Target = target;
-                this.StartPosition = sender.Position;
-                this.Missilespeed = args.SpellData.MissileSpeed;
-                this.args = args;
-                this.CastTime = Game.TickCount - Game.Ping / 2;
-                this.AttackName = name;
+                this.SNetworkId = sender.NetworkId;
+                this.TNetworkId = target.NetworkId;
+
+                this.Damage = sender.GetAutoAttackDamage(target);
+
+                this.StartPosition = sender.ServerPosition;
+
+                this.AnimationDelay = (int) (sender.AttackCastDelay * 1000);
             }
 
-            #endregion
+            public bool CanRemoveAttack => Game.TickCount - this.DetectTime > 5000;
 
-            #region Public Properties
+            public double Damage { get; set; }
 
-            //If there is time left until arrival, this auto has not arrived yet and is active, otherwise this auto attack has already reached the target and is inactive
-            public virtual bool Active => this.ETA >= 0;
-
-            public string AttackName { get; set; }
-
-            public int CastTime { get; set; }
-
-            public bool Destroyed { get; set; }
-
-            public float Distance => this.StartPosition.Distance(this.Target.Position) - this.Sender.BoundingRadius - this.Target.BoundingRadius;
-
-            //Gets the time left until this auto reaches target by subtracting the time elapsed from total travel time
-            public float ETA => this.TravelTime - this.TimeElapsed;
-
-            public virtual float MeleeTravelTime { get; set; }
-
-            public float Missilespeed { get; set; }
-
-            public virtual float RangedTravelTime { get; set; }
+            public int SNetworkId { get; set; }
+            public int TNetworkId { get; set; }
 
             public Obj_AI_Base Sender { get; set; }
+            public Obj_AI_Base Target { get; set; }
+
+            public int AnimationDelay { get; set; }
 
             public Vector3 StartPosition { get; set; }
 
-            public Obj_AI_Base Target { get; set; }
+            public float Distance => this.StartPosition.Distance(this.Target.Position) - this.Sender.BoundingRadius - this.Target.BoundingRadius;
 
-            //Gets the time passed by since this auto attack was detected
-            public float TimeElapsed => Game.TickCount - this.CastTime;
+            public int DetectTime { get; set; }
 
-            public virtual float TravelTime => this.Sender.IsMelee ? this.MeleeTravelTime : this.RangedTravelTime;
+            public abstract int EstArrivalTime { get; }
 
-            #endregion
-        }
+            public abstract int ETA { get; }
 
-        public class AutoAttack : Attack
-        {
-            #region Fields
+            public int ExtraDelay { get; set; }
 
-            private float extraDelay = 0;
+            public AttackState AttackStatus { get; set; } = AttackState.None;
 
-            #endregion
-
-            #region Constructors and Destructors
-
-            public AutoAttack(
-                Obj_AI_Base sender,
-                Obj_AI_Base target,
-                Obj_AI_BaseMissileClientDataEventArgs args,
-                string name)
-                : base(sender, target, args, name)
+            public enum AttackState
             {
-                this.Melee = sender.IsMelee;
+                None,
+                Detected,
+                MissileCreated,
+                MissileDestroyed,
+                Completed
             }
 
-            #endregion
-
-            #region Public Properties
-
-            public bool Melee { get; set; }
-
-            public override float MeleeTravelTime => this.Sender.AttackCastDelay * 1000f + this.extraDelay;
-
-            public override float RangedTravelTime => this.Distance / this.Missilespeed * 1000f
-                + this.Sender.AttackCastDelay * 1000f + this.extraDelay;
-
-            #endregion
-        }
-
-        public class TurretAttack : Attack
-        {
-            #region Constructors and Destructors
-
-            public TurretAttack(
-                Obj_AI_Base sender,
-                Obj_AI_Base target,
-                Obj_AI_BaseMissileClientDataEventArgs args,
-                int shotNumber,
-                string name,
-                bool hasLightning)
-                : base(sender, target, args, name)
+            public void Completed()
             {
-                this.ShotNumber = shotNumber;
-                this.HasLightningRod = hasLightning;
+                this.AttackStatus = AttackState.Completed;
             }
 
-            #endregion
+            public bool IsValid()
+            {
+                return this.Sender.IsValid && this.Target.IsValid;
+            }
 
-            #region Public Properties
+            public virtual bool Active { get; set; }
+        }
 
-            public float Damage => (1 + this.DmgPercentageIncrease)
-                * (float) this.Sender.GetAutoAttackDamage(this.Target);
 
-            public int DestroyTime { get; set; }
+        public class RangedAttack : AutoAttack
+        {
+            public RangedAttack(Obj_AI_Base sender, Obj_AI_Base target, int extraDelay) : base(sender, target)
+            {
+                this.ExtraDelay = extraDelay;
+            }
 
-            public float DmgPercentageIncrease => this.HasLightningRod
-                ? Math.Min(125f, this.HeatAmount * 1.05f) / 100
-                : 0;
+            public MissileClient Missile { get; set; }
 
-            public bool HasLightningRod { get; set; }
+            public override bool Active => this.ETA > 0;
 
-            public int HeatAmount => Math.Min(this.ShotNumber * 6, 120);
+            public override int ETA => (int) this.RegularETA;
 
-            public int ShotNumber { get; set; }
+            public int TravelTime => (int) (((StartPosition.Distance(Target.ServerPosition)) / this.Sender.BasicAttack.MissileSpeed) * 1000);
 
-            public override float TravelTime => this.Distance / this.Missilespeed * 1000
-                + this.Sender.AttackCastDelay * 1000 + 50;
+            public int TotalTimeToReach => this.AnimationDelay + this.TravelTime + this.ExtraDelay;
 
-            #endregion
+            public override int EstArrivalTime => this.DetectTime + this.TotalTimeToReach;
+
+            public int ElapsedTime => Game.TickCount - this.DetectTime;
+
+            public float RegularETA => this.EstArrivalTime - Game.TickCount;
+
+            public int MissileCreationTime { get; set; }
+
+            public int MissileDestructionTime { get; set; }
+
+            public void MissileCreated(MissileClient mc)
+            {
+                if (mc.IsValid)
+                {
+                    this.MissileCreationTime = Game.TickCount;
+                    this.AttackStatus = AttackState.MissileCreated;
+                    this.Missile = mc;
+                }
+            }
+
+            public void MissileDestroyed()
+            {
+                this.MissileDestructionTime = Game.TickCount;
+                this.AttackStatus = AttackState.Completed;
+            }
+        }
+
+        public class MeleeAttack : AutoAttack
+        {
+            public MeleeAttack(Obj_AI_Base sender, Obj_AI_Base target, int extraDelay) : base(sender, target)
+            {
+                this.ExtraDelay = extraDelay;
+            }
+
+            public override bool Active => this.ETA > 0;
+
+            public override int EstArrivalTime => this.DetectTime + (int)(Sender.AttackCastDelay * 1000);
+
+            public override int ETA => Math.Max(0, EstArrivalTime - Game.TickCount) + ExtraDelay;
+        }
+
+
+        class Attacks
+        {
+            public static Dictionary<int, List<AutoAttack>> OutBoundAttacks { get; set; } = new Dictionary<int, List<AutoAttack>>();
+
+            public static void AddAttack(AutoAttack attack)
+            {
+                AddOutBoundAttack(attack);
+            }
+
+            public static void AddOutBoundAttack(AutoAttack attack)
+            {
+                var k = attack.Sender.NetworkId;
+
+                if (!OutBoundAttacks.ContainsKey(k))
+                {
+                    OutBoundAttacks[k] = new List<AutoAttack>();
+                }
+
+                if (attack is MeleeAttack)
+                {
+                    foreach (var a in OutBoundAttacks[k])
+                    {
+                        a.Completed();
+                    }
+                }
+
+                OutBoundAttacks[k].Add(attack);
+            }
+
+
+            public static void RemoveOutBoundAttack(AutoAttack attack)
+            {
+                var k = attack.Sender.NetworkId;
+                OutBoundAttacks[k].Remove(attack);
+            }
+
+            public static List<AutoAttack> GetOutBoundAttacks(int unitID)
+            {
+                OutBoundAttacks.TryGetValue(unitID, out List <AutoAttack> attacks);
+                return attacks;
+            }
         }
     }
 }
