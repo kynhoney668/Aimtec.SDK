@@ -11,101 +11,102 @@
 
         public enum Ferocity
         {
-            Fury = 65,
+            Fury = 80,
 
-            Sorcery = 68,
+            Sorcery = 38,
 
-            FreshBlood = 81,
+            FreshBlood = 39,
 
-            Feast = 82,
+            Feast = 108,
 
-            ExposeWeakness = 83,
+            ExposeWeakness = 18,
 
-            Vampirism = 97,
+            Vampirism = 60,
 
-            NaturalTalent = 100,
+            NaturalTalent = 7,
 
-            BountyHunter = 113,
+            BountyHunter = 90,
 
-            DoubleEdgedSword = 114,
+            DoubleEdgedSword = 6,
 
-            BattleTrance = 115,
+            BattleTrance = 11,
 
-            BatteringBlows = 1,
+            BatteringBlows = 33,
 
-            PiercingThoughts = 4,
+            PiercingThoughts = 72,
 
-            WarlordsBloodlust = 17,
+            WarlordsBloodlust = 111,
 
-            FervorofBattle = 18,
+            FervorofBattle = 65,
 
-            DeathfireTouch = 20
+            DeathfireTouch = 112
         }
 
         public enum Cunning
         {
-            Wanderer = 65,
+            Wanderer = 80,
 
-            Savagery = 66,
+            Savagery = 43,
 
-            RunicAffinity = 81,
+            RunicAffinity = 39,
 
-            SecretStash = 82,
+            SecretStash = 108,
 
-            Assassin = 83,
+            Assassin = 18,
 
-            Merciless = 97,
+            Merciless = 60,
 
-            Meditation = 98,
+            Meditation = 74,
 
-            GreenFathersGift = 113,
+            GreenFathersGift = 90,
 
-            Bandit = 114,
+            Bandit = 6,
 
-            DangerousGame = 115,
+            DangerousGame = 11,
 
-            Precision = 1,
+            Precision = 33,
 
-            Intelligence = 2,
+            Intelligence = 76,
 
-            StormraidersSurge = 17,
+            StormraidersSurge = 111,
 
-            ThunderlordsDecree = 18,
+            ThunderlordsDecree = 65,
 
-            WindspeakersBlessing = 19
+            WindspeakersBlessing = 118
         }
 
+        //untested cause resolve page broken
         public enum Resolve
         {
-            Recovery = 65,
+            Recovery = 80,
 
-            Unyielding = 66,
+            Unyielding = 43,
 
-            Explorer = 81,
+            Explorer = 0,
 
-            ToughSkin = 83,
+            ToughSkin = 18,
 
-            Siegemaster = 82,
+            Siegemaster = 0,
 
-            RunicArmor = 97,
+            RunicArmor = 60,
 
-            VeteransScars = 98,
+            VeteransScars = 74,
 
-            Insight = 113,
+            Insight = 90,
 
-            Perseverance = 114,
+            Perseverance = 0,
 
-            Fearless = 115,
+            Fearless = 0,
 
-            Swiftness = 1,
+            Swiftness = 0,
 
-            LegendaryGuardian = 1,
+            LegendaryGuardian = 0,
 
-            GraspoftheUndying = 17,
+            GraspoftheUndying = 0,
 
-            CourageOfTheColossus = 18,
+            CourageOfTheColossus = 0,
 
-            StonebornPact = 19
+            StonebornPact = 0
         }
 
         #endregion

@@ -304,6 +304,7 @@ namespace Aimtec.SDK.Damage
 
             if (spellData.IsApplyOnHit || spellData.IsModifiedDamage)
             {
+                dmgPassive += source.GetPhysicalPassiveFlatMod(target);
                 dmgPassive += source.GetMagicalPassiveFlatMod(target);
             }
 
@@ -333,7 +334,7 @@ namespace Aimtec.SDK.Damage
                 }
             }
 
-            return Math.Max(Math.Floor(totalDamage * dmgReduce  + dmgPassive), 0);
+            return Math.Max(Math.Floor(totalDamage * dmgReduce + dmgPassive), 0);
         }
 
         #endregion
@@ -392,8 +393,8 @@ namespace Aimtec.SDK.Damage
             }
 
             double armorPenetrationPercent = source.PercentArmorPenetration;
-            double armorPenetrationFlat = source.PhysicalLethality * (0.6 + 0.4 * target.Level / 18);
             double bonusArmorPenetrationMod = source.PercentBonusArmorPenetration;
+            var armorPenetrationFlat = source.PhysicalLethality * (0.6 + 0.4 * source.Level / 18);
 
             switch (source.Type)
             {
@@ -542,17 +543,39 @@ namespace Aimtec.SDK.Damage
             DamageType damageType)
         {
             var hero = source as Obj_AI_Hero;
-            var minion = target as Obj_AI_Minion;
+            var turret = source as Obj_AI_Turret;
+            var minion = source as Obj_AI_Minion;
+
+            var minionTarget = target as Obj_AI_Minion;
             var targetHero = target as Obj_AI_Hero;
 
-            if (source is Obj_AI_Turret)
+            if (turret != null)
             {
-                if (minion != null &&
-                    (minion.UnitSkinName.Contains("MinionSiege") || minion.UnitSkinName.Contains("MinionSuper")))
+                if (minionTarget != null &&
+                    (minionTarget.UnitSkinName.Contains("MinionSiege") || minionTarget.UnitSkinName.Contains("MinionSuper")))
                 {
                     amount *= 0.7;
                 }
             }
+
+            if (minion != null)
+            {
+                if (minionTarget != null &&
+                    Game.MapId == GameMapId.SummonersRift)
+                {
+                    amount *= 1f + minion.PercentDamageToBarracksMinionMod;
+                }
+            }
+
+            if (minionTarget != null)
+            {
+                if (minionTarget.UnitSkinName.Contains("MinionMelee") &&
+                    minionTarget.HasBuff("exaltedwithbaronnashorminion"))
+                {
+                    amount *= 0.25;
+                }
+            }
+
             else if (hero != null)
             {
                 var doubleEdgedSword = hero.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
@@ -570,27 +593,39 @@ namespace Aimtec.SDK.Damage
                     amount *= target.Health * 3 / 100;
                 }
 
-                if (minion != null)
+                if (minionTarget != null)
                 {
-                    if (minion.UnitSkinName.Contains("MinionMelee") &&
-                        minion.HasBuff("exaltedwithbaronnashorminion"))
-                    {
-                        amount *= 0.25;
-                    }
-
                     if (source.HasBuff("barontarget") &&
-                        minion.UnitSkinName.Contains("SRU_Baron"))
+                        minionTarget.UnitSkinName.Contains("SRU_Baron"))
                     {
                         amount *= 0.5;
                     }
-                    else if (source.HasBuff("dragonbuff_tooltipmanager") &&
-                        minion.HasBuff("s5_dragonvengeance") &&
-                        minion.UnitSkinName.Contains("SRU_Dragon"))
+
+                    if (source.HasBuff("dragonbuff_tooltipmanager") &&
+                         minionTarget.HasBuff("s5_dragonvengeance") &&
+                         minionTarget.UnitSkinName.Contains("SRU_Dragon"))
                     {
-                        /* TODO: More like broscience, not 100% consistent, the effect is "7% reduced damage for each dragon killed by your team."
-                            * while this doesn't do anything else than reducing by 7% your damage for each dragon TYPE you've killed.
-                            Buffs can't tell you how many dragons you've killed, nor can the enemy buff, so there's no way to tell in-game, needs some kind of property. */
-                        amount *= 1 - 7 * (source.ValidActiveBuffs().Count(b => b.Name.Contains("dragonbuff")) - 1) / 100;
+                        /* TODO: Broscience, not 100% consistent:
+                            Real Effect: "7% reduced damage for each dragon killed by your team."
+                            Code Effect: "7% reduced damage for each dragon TYPE killed by your team."
+                            Reason for inconsistence:
+                                No Hero Buffs can tell you how many dragons you've killed, nor the name, nor its quantity
+                                    (You receive a determined buff whenever you kill a different dragon and that's it,
+                                    the quantity wont change nor further buffs will be added by killing another dragon of the same type),
+
+                                No Dragon Buffs can tell you how many dragons you've killed, nor the name, nor its quantity,
+                                    (The dragon gets the "s5_dragonvengeance" buff which reduces his damage received by 7% for each
+                                    elemental dragon killed by the attacking team and that's it, the quantity wont change nor further
+                                    buffs will be added by killing another dragon of the same type)
+
+                                No Effect Names can tell you how many dragons you've killed,
+                                No Objects Names can tell you how many dragons you've killed,
+                                No existent Property can tell you how many dragons you've killed, the best I found is "NeutralMinionsKilled", which is int, not a determined List/Array,
+                                so I can't just take it and filter the dragons.
+
+                            TL:DR; There is no way of telling in-game how many dragons a determined team has killed, so, for now, this is the best possible logic for it.
+                        */
+                        amount *= 1 - 7 * source.ValidActiveBuffs().Count(b => b.Name.Contains("dragonbuff") && b.Name.Contains("_manager")) / 100;
                     }
                 }
 
