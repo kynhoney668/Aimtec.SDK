@@ -515,10 +515,10 @@ namespace Aimtec.SDK.Damage
                 var targetMinion = target as Obj_AI_Minion;
                 if (targetMinion != null)
                 {
-                    var mastery = hero.GetCunningPage(MasteryId.Cunning.Savagery);
-                    if (mastery != null && hero.IsUsingMastery(mastery))
+                    var savagery = hero.GetCunningPage(MasteryId.Cunning.Savagery);
+                    if (savagery != null && hero.IsUsingMastery(savagery))
                     {
-                        amount += new[] { 1, 2, 3, 4, 5 }[mastery.Points - 1];
+                        amount += new[] { 1, 2, 3, 4, 5 }[savagery.Points - 1];
                     }
                 }
             }
@@ -548,7 +548,7 @@ namespace Aimtec.SDK.Damage
             if (source is Obj_AI_Turret)
             {
                 if (minion != null &&
-                    (minion.UnitSkinName.Contains("Siege") || minion.UnitSkinName.Contains("Super")))
+                    (minion.UnitSkinName.Contains("MinionSiege") || minion.UnitSkinName.Contains("MinionSuper")))
                 {
                     amount *= 0.7;
                 }
@@ -558,13 +558,6 @@ namespace Aimtec.SDK.Damage
                 var doubleEdgedSword = hero.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
                 if (doubleEdgedSword != null &&
                     hero.IsUsingMastery(doubleEdgedSword))
-                {
-                    amount *= 1 + 3 / 100;
-                }
-
-                var battleTrance = hero.GetFerocityPage(MasteryId.Ferocity.BattleTrance);
-                if (battleTrance != null &&
-                    hero.IsUsingMastery(battleTrance))
                 {
                     amount *= 1 + 3 / 100;
                 }
@@ -579,6 +572,12 @@ namespace Aimtec.SDK.Damage
 
                 if (minion != null)
                 {
+                    if (minion.UnitSkinName.Contains("MinionMelee") &&
+                        minion.HasBuff("exaltedwithbaronnashorminion"))
+                    {
+                        amount *= 0.25;
+                    }
+
                     if (source.HasBuff("barontarget") &&
                         minion.UnitSkinName.Contains("SRU_Baron"))
                     {
@@ -597,6 +596,13 @@ namespace Aimtec.SDK.Damage
 
                 if (targetHero != null)
                 {
+                    var battleTrance = hero.GetFerocityPage(MasteryId.Ferocity.BattleTrance);
+                    if (battleTrance != null &&
+                        hero.IsUsingMastery(battleTrance))
+                    {
+                        amount *= 1 + 3 / 100;
+                    }
+
                     var assassin = hero.GetCunningPage(MasteryId.Cunning.Assassin);
                     if (assassin != null &&
                         hero.IsUsingMastery(assassin) &&

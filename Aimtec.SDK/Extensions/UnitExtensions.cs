@@ -426,7 +426,7 @@ namespace Aimtec.SDK.Extensions
         ///     Returns true if this unit is able to be targetted by spells 
         /// </summary>
         /// <param name="unit">The unit.</param
-        /// <param name="unit">The unit.</param>
+        /// <param name="range">The range.</param>
         public static bool IsValidSpellTarget(this AttackableUnit unit, float range = float.MaxValue)
         {
             if (!unit.IsValidTarget(range))
@@ -440,14 +440,12 @@ namespace Aimtec.SDK.Extensions
             }
 
             var mUnit = unit as Obj_AI_Minion;
-
             if (mUnit == null)
             {
                 return false;
             }
 
             var name = mUnit.UnitSkinName.ToLower();
-
             if (name.Contains("ward") || name.Contains("sru_plant_") || name.Contains("barrel"))
             {
                 return false;

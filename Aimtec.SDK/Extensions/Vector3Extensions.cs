@@ -56,9 +56,9 @@
             return Vector2.DistanceSquared((Vector2) v1, v2);
         }
 
-        public static float DistanceSquared(this Vector3 v1, Vector3 v2, bool calc3d = false)
+        public static float DistanceSquared(this Vector3 v1, Vector3 v2, bool calc3D = false)
         {
-            return calc3d ? Vector3.DistanceSquared(v1, v2) : Vector2.DistanceSquared((Vector2) v1, (Vector2) v2);
+            return calc3D ? Vector3.DistanceSquared(v1, v2) : Vector2.DistanceSquared((Vector2) v1, (Vector2) v2);
         }
 
         /// <summary>
@@ -129,7 +129,7 @@
         /// <summary>
         ///     Converts a Vector3 World Position to a Vector2 Minimap Position
         /// </summary>
-        /// <param name="vector3">The World Position.</param>
+        /// <param name="worldPos">The World Position.</param>
         public static Vector2 ToMiniMapPosition(this Vector3 worldPos)
         {
             Render.WorldToMinimap(worldPos, out Vector2 miniMapPosition);
@@ -139,7 +139,7 @@
         /// <summary>
         ///     Converts a Vector3 World Position to a Vector2 Screen Position
         /// </summary>
-        /// <param name="vector3">The World Position.</param>
+        /// <param name="worldPos">The World Position.</param>
         public static Vector2 ToScreenPosition(this Vector3 worldPos)
         {
             Render.WorldToScreen(worldPos, out Vector2 screenPosition);

@@ -168,11 +168,12 @@ namespace Aimtec.SDK.Damage
 
                                                  case GameObjectType.obj_AI_Hero:
                                                      var critDamageMultiplier = source.HasItem(ItemId.InfinityEdge) ? 2.5 : 2;
+
                                                      damage = (50 + 0.5 * critDamageMultiplier * source.Crit*100) / 100 * source.TotalAttackDamage;
+
                                                      if (target.HasBuff("caitlynyordletrapinternal"))
                                                      {
-                                                         damage +=
-                                                            new[] { 30, 70, 110, 150, 190 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] + 0.7 * source.TotalAttackDamage;
+                                                         damage += new[] { 30, 70, 110, 150, 190 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] + 0.7 * source.TotalAttackDamage;
                                                      }
                                                      break;
                                              }
@@ -192,8 +193,9 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("camiller"))
                                          {
-                                             var level = source.SpellBook.GetSpell(SpellSlot.R).Level - 1;
-                                             return new[] { 5, 10, 15 }[level] + new[] { 0.04, 0.06, 0.08 }[level] * (target.MaxHealth - target.Health);
+                                             return
+                                                new[] { 5, 10, 15 }[source.SpellBook.GetSpell(SpellSlot.R).Level - 1] +
+                                                new[] { 0.04, 0.06, 0.08 }[source.SpellBook.GetSpell(SpellSlot.R).Level - 1] * (target.MaxHealth - target.Health);
                                          }
 
                                          return 0;
@@ -668,6 +670,41 @@ namespace Aimtec.SDK.Damage
                                             return 20 + 0.1 * source.TotalAbilityDamage + (source.HasBuff("NetherBlade")
                                                 ? source.GetSpellDamage(target, SpellSlot.W)
                                                 : 0);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "MissFortune",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         var passiveObject = ObjectManager.Get<GameObject>()
+                                                .FirstOrDefault(o => o.IsValid && o.Name == "MissFortune_Base_P_Mark.troy");
+                                         if (passiveObject != null)
+                                         {
+                                             var passiveUnit = ObjectManager.Get<AttackableUnit>()
+                                                    .Where(m => m.IsValidTarget())
+                                                    .MinBy(o => o.Distance(passiveObject));
+
+                                             if (passiveUnit != null &&
+                                                 target != passiveUnit)
+                                             {
+                                                 return source.TotalAttackDamage * (source.Level < 4
+                                                                                        ? 0.5 :
+                                                                                    source.Level < 7
+                                                                                        ? 0.6 :
+                                                                                    source.Level < 9
+                                                                                        ? 0.7 :
+                                                                                    source.Level < 11
+                                                                                        ? 0.9 :
+                                                                                    source.Level < 13
+                                                                                        ? 0.9
+                                                                                        : 1);
+                                             }
                                          }
 
                                          return 0;

@@ -109,6 +109,16 @@ namespace Aimtec.SDK.Damage
 
             Reductions.Add(new DamageReduction
                                {
+                                   BuffName = "FerociousHowl",
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
+                                       {
+                                           return new[] { 55, 65, 75 }[source.SpellBook.GetSpell(SpellSlot.R).Level - 1];
+                                       }
+                               });
+
+            Reductions.Add(new DamageReduction
+                               {
                                    BuffName = "sonapassivedebuff",
                                    Type = DamageReduction.ReductionDamageType.Percent,
                                    ReductionDamage = (source, attacker) =>
