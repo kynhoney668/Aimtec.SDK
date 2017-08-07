@@ -294,7 +294,7 @@ namespace Aimtec.SDK.Damage
 
             public double GetDamage(Obj_AI_Base source, Obj_AI_Base target)
             {
-                if (this.ItemDamage != null)
+                if (source != null && target != null && this.ItemDamage != null)
                 {
                     return this.ItemDamage(source, target);
                 }

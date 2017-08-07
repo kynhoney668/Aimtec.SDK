@@ -818,6 +818,35 @@ namespace Aimtec.SDK.Damage
 
             Passives.Add(new DamagePassive
                              {
+                                 Name = "Thresh",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (!source.SpellBook.GetSpell(SpellSlot.E).State.HasFlag(SpellState.NotLearned))
+                                         {
+                                             var multiplier = (double)(source.GetBuffCount("threshpassivesoulsgain") + (0.5f + 0.3f * source.SpellBook.GetSpell(SpellSlot.E).Level) * source.TotalAttackDamage);
+                                             if (source.HasBuff("threshepassive3"))
+                                             {
+                                                 multiplier *= 0.5;
+                                             }
+                                             else if (source.HasBuff("threshepassive2"))
+                                             {
+                                                 multiplier *= 0.333;
+                                             }
+                                             else if (source.HasBuff("threshepassive1"))
+                                             {
+                                                 multiplier *= 0.25;
+                                             }
+
+                                             return multiplier;
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
                                  Name = "Vayne",
                                  DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
                                  PassiveDamage = (source, target) =>
@@ -948,7 +977,7 @@ namespace Aimtec.SDK.Damage
 
             public double GetDamage(Obj_AI_Hero source, Obj_AI_Base target)
             {
-                if (this.PassiveDamage != null)
+                if (source != null && target != null && this.PassiveDamage != null)
                 {
                     return this.PassiveDamage(source, target);
                 }

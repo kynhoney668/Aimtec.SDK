@@ -195,7 +195,7 @@ namespace Aimtec.SDK.Damage
 
             public double GetDamageReduction(Obj_AI_Hero source, Obj_AI_Base attacker)
             {
-                if (this.ReductionDamage != null)
+                if (source != null && attacker != null && this.ReductionDamage != null)
                 {
                     return this.ReductionDamage(source, attacker);
                 }
