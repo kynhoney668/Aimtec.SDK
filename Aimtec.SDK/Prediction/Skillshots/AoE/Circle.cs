@@ -12,7 +12,7 @@
 
         public static PredictionOutput GetCirclePrediction(PredictionInput input)
         {
-            var mainTargetPrediction = Prediction.GetPrediction(input, false, true);
+            var mainTargetPrediction = Prediction.Instance.GetPrediction(input, false, true);
             var posibleTargets = new List<PossibleTarget>
             {
                 new PossibleTarget { Position = (Vector2) mainTargetPrediction.UnitPosition, Unit = input.Unit }

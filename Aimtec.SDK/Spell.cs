@@ -274,7 +274,7 @@
             var input = this.GetPredictionInput(target);
             input.AoE = aoe;
 
-            var prediction = Prediction.Skillshots.Prediction.GetPrediction(input);
+            var prediction = Prediction.Skillshots.Prediction.Instance.GetPrediction(input);
 
             if (prediction.HitChance < this.HitChance)
             {
@@ -411,10 +411,8 @@
             Vector3 fromPos = new Vector3(),
             Vector3 rangeCheckFrom = new Vector3())
         {
-            return Prediction.Skillshots.Prediction.GetPrediction(
-                this.GetPredictionInput(target, fromPos, rangeCheckFrom),
-                true,
-                this.Collision);
+            return Prediction.Skillshots.Prediction.Instance.GetPrediction(
+                this.GetPredictionInput(target, fromPos, rangeCheckFrom));
         }
 
         /// <summary>

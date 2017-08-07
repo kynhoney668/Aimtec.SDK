@@ -11,7 +11,7 @@
 
         public static PredictionOutput GetConePrediction(PredictionInput input)
         {
-            var mainTargetPrediction = Prediction.GetPrediction(input, false, true);
+            var mainTargetPrediction = Prediction.Instance.GetPrediction(input, false, true);
 
             var posibleTargets = new List<PossibleTarget>
             {

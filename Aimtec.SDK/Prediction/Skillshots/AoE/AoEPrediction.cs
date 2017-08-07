@@ -37,7 +37,7 @@
             {
                 input.Unit = enemy;
 
-                var prediction = Prediction.GetPrediction(input, false, false);
+                var prediction = Prediction.Instance.GetPrediction(input, false, false);
                 if (prediction.HitChance >= HitChance.High)
                 {
                     result.Add(new PossibleTarget { Position = (Vector2) prediction.UnitPosition, Unit = enemy });

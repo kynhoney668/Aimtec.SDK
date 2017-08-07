@@ -63,6 +63,7 @@
     <Compile Include="Orbwalking\AOrbwalker.cs" />
     <Compile Include="Orbwalking\IOrbwalker.cs" />
     <Compile Include="Orbwalking\OrbwalkerMode.cs" />
+    <Compile Include="Prediction\Skillshots\IPrediction.cs" />
     <Compile Include="Prediction\Skillshots\AoE\AoEPrediction.cs" />
     <Compile Include="Prediction\Skillshots\AoE\Circle.cs" />
     <Compile Include="Prediction\Skillshots\AoE\Cone.cs" />
@@ -71,6 +72,7 @@
     <Compile Include="Prediction\Skillshots\HitChance.cs" />
     <Compile Include="Prediction\Skillshots\PathTracker.cs" />
     <Compile Include="Prediction\Skillshots\Prediction.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionImpl.cs" />
     <Compile Include="Prediction\Skillshots\PredictionInput.cs" />
     <Compile Include="Prediction\Skillshots\PredictionOutput.cs" />
     <Compile Include="Prediction\Skillshots\SkillshotType.cs" />

@@ -44,7 +44,7 @@
                             checkRangeFrom: input.RangeCheckFrom)))
                     {
                         input.Unit = minion;
-                        var minionPrediction = Prediction.GetPrediction(input, false, false);
+                        var minionPrediction = Prediction.Instance.GetPrediction(input, false, false);
                         if (((Vector2) minionPrediction.UnitPosition).DistanceSquared(
                             (Vector2) input.From,
                             (Vector2) position,
@@ -63,7 +63,7 @@
                             checkRangeFrom: input.RangeCheckFrom)))
                     {
                         input.Unit = hero;
-                        var prediction = Prediction.GetPrediction(input, false, false);
+                        var prediction = Prediction.Instance.GetPrediction(input, false, false);
                         if (((Vector2) prediction.UnitPosition).DistanceSquared(
                             (Vector2) input.From,
                             (Vector2) position,
