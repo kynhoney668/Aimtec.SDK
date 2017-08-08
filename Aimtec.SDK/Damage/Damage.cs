@@ -140,6 +140,8 @@ namespace Aimtec.SDK.Damage
             dmgPhysical = source.CalculatePhysicalDamage(target, dmgPhysical);
             dmgMagical = source.CalculateMagicDamage(target, dmgMagical);
 
+            dmgPhysical += source.GetPassiveFlatMod(target);
+
             switch (targetHero?.ChampionName)
             {
                 case "Amumu":
@@ -149,9 +151,6 @@ namespace Aimtec.SDK.Damage
                     }
                     break;
             }
-
-            dmgPhysical += source.GetPhysicalPassiveFlatMod(target);
-            dmgMagical += source.GetMagicalPassiveFlatMod(target);
 
             return Math.Max(Math.Floor(dmgPhysical + dmgMagical) * dmgReduce, 0);
         }
@@ -214,7 +213,7 @@ namespace Aimtec.SDK.Damage
                 if (!string.IsNullOrEmpty(spellData.ScalingBuff))
                 {
                     var buffCount = (spellData.ScalingBuffTarget == DamageScalingTarget.Source ? source : target)
-                        .GetBuffCount(spellData.ScalingBuff);
+                        .GetRealBuffCount(spellData.ScalingBuff);
 
                     dmgBase = buffCount > 0 ? dmgBase * (buffCount + spellData.ScalingBuffOffset) : 0;
                 }
@@ -304,8 +303,7 @@ namespace Aimtec.SDK.Damage
 
             if (spellData.IsApplyOnHit || spellData.IsModifiedDamage)
             {
-                dmgPassive += source.GetPhysicalPassiveFlatMod(target);
-                dmgPassive += source.GetMagicalPassiveFlatMod(target);
+                dmgPassive += source.GetPassiveFlatMod(target);
             }
 
             if (source.ChampionName == "Sejuani" &&
@@ -438,63 +436,12 @@ namespace Aimtec.SDK.Damage
         }
 
         /// <summary>
-        ///     Gets the magical passive flat mod.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="target">The target.</param>
-        /// <returns>System.Double.</returns>
-        private static double GetMagicalPassiveFlatMod(this Obj_AI_Base source, Obj_AI_Base target)
-        {
-            var amount = 0d;
-            var hero = source as Obj_AI_Hero;
-            if (hero != null)
-            {
-                var ardentCenserBuff = hero.GetBuff("itemangelhandbuff");
-                if (ardentCenserBuff != null)
-                {
-                    var ardentCenserBuffCaster = ardentCenserBuff.Caster as Obj_AI_Hero;
-                    if (ardentCenserBuffCaster != null)
-                    {
-                        amount += 19.12 + 0.88 * ardentCenserBuffCaster.Level;
-                    }
-                }
-
-                var namiE = hero.GetBuff("NamiE");
-                if (namiE != null)
-                {
-                    var namiECaster = namiE.Caster as Obj_AI_Hero;
-                    if (namiECaster != null)
-                    {
-                        amount += namiECaster.GetSpellDamage(target, SpellSlot.E);
-                    }
-                }
-
-                var leonaPassive = target.GetBuff("LeonaSunlight");
-                if (leonaPassive != null)
-                {
-                    var leonaPassiveCaster = leonaPassive.Caster as Obj_AI_Hero;
-                    if (leonaPassiveCaster != null)
-                    {
-                        amount += 15 + 5 * leonaPassiveCaster.Level;
-                    }
-                }
-
-                if (target.GetBuffCount("braummarkcounter") == 3)
-                {
-                    amount += 16 + 10 * hero.Level;
-                }
-            }
-
-            return amount;
-        }
-
-        /// <summary>
         ///     Gets the physical passive flat mod.
         /// </summary>
         /// <param name="source">The source.</param>
         /// <param name="target">The target.</param>
         /// <returns>System.Double.</returns>
-        private static double GetPhysicalPassiveFlatMod(this Obj_AI_Base source, Obj_AI_Base target)
+        private static double GetPassiveFlatMod(this Obj_AI_Base source, Obj_AI_Base target)
         {
             var amount = 0d;
 

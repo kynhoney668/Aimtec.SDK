@@ -131,7 +131,7 @@ namespace Aimtec.SDK.Damage
             if (!string.IsNullOrEmpty(spellBonus.ScalingBuff))
             {
                 var buffCount = (spellBonus.ScalingBuffTarget == DamageScalingTarget.Source ? source : target)
-                    .GetBuffCount(spellBonus.ScalingBuff);
+                    .GetRealBuffCount(spellBonus.ScalingBuff);
                 dmg = buffCount > 0 ? dmg * (buffCount + spellBonus.ScalingBuffOffset) : 0d;
             }
 

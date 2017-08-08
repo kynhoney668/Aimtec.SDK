@@ -21,6 +21,103 @@ namespace Aimtec.SDK.Damage
 
             Passives.Add(new DamagePassive
                              {
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         var ardentCenserBuff = source.GetBuff("itemangelhandbuff");
+                                         if (ardentCenserBuff != null)
+                                         {
+                                             var ardentCenserBuffCaster = ardentCenserBuff.Caster as Obj_AI_Hero;
+                                             if (ardentCenserBuffCaster != null)
+                                             {
+                                                 return 19.12 + 0.88 * ardentCenserBuffCaster.Level;
+                                             }
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         var namiE = source.GetBuff("NamiE");
+                                         if (namiE != null)
+                                         {
+                                             var namiECaster = namiE.Caster as Obj_AI_Hero;
+                                             if (namiECaster != null)
+                                             {
+                                                 return namiECaster.GetSpellDamage(target, SpellSlot.E);
+                                             }
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         var leonaPassive = target.GetBuff("LeonaSunlight");
+                                         if (leonaPassive != null)
+                                         {
+                                             var leonaPassiveCaster = leonaPassive.Caster as Obj_AI_Hero;
+                                             if (leonaPassiveCaster != null)
+                                             {
+                                                 return 15 + 5 * leonaPassiveCaster.Level;
+                                             }
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (target.GetBuffCount("braummarkcounter") == 3)
+                                         {
+                                             return 16 + 10 * source.Level;
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+
+            Passives.Add(new DamagePassive
+                             {
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         var buff = target.GetBuff("kalistacoopstrikemarkbuff");
+                                         if (buff != null &&
+                                             source.HasBuff("kalistacoopstrikeally"))
+                                         {
+                                             var buffCaster = buff.Caster as Obj_AI_Hero;
+                                             if (buffCaster != null)
+                                             {
+                                                 if (target.Type == GameObjectType.obj_AI_Minion && target.Health < 125)
+                                                 {
+                                                     return target.Health;
+                                                 }
+
+                                                 return buffCaster.GetSpellDamage(target, SpellSlot.W);
+                                             }
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
                                  Name = "Aatrox",
                                  DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
                                  PassiveDamage = (source, target) =>
@@ -111,9 +208,9 @@ namespace Aimtec.SDK.Damage
                                  DamageType = DamagePassive.PassiveDamageType.FlatMagical,
                                  PassiveDamage = (source, target) =>
                                      {
-                                         if (source.GetBuffCount("bardpspiritammocount") > 0)
+                                         if (source.GetRealBuffCount("bardpspiritammocount") > 0)
                                          {
-                                             return 30 + 15 * (source.GetBuffCount("bardpdisplaychimecount") / 5) + 0.3 * source.TotalAbilityDamage;
+                                             return 30 + 15 * (source.GetRealBuffCount("bardpdisplaychimecount") / 5) + 0.3 * source.TotalAbilityDamage;
                                          }
 
                                          return 0;
@@ -493,39 +590,16 @@ namespace Aimtec.SDK.Damage
                                  DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
                                  PassiveDamage = (source, target) =>
                                      {
-                                         if (source.HasBuff("jarvanivmartialcadencecheck"))
+                                         if (!target.HasBuff("jarvanivmartialcadencecheck"))
                                          {
-                                             return Math.Min(target.Health * 0.1, 400);
-                                         }
+                                             switch (target.Type)
+                                             {
+                                                 case GameObjectType.obj_AI_Hero:
+                                                     return target.Health * 0.1;
 
-                                         return 0;
-                                     }
-                             });
-
-            Passives.Add(new DamagePassive
-                             {
-                                 Name = "Jax",
-                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
-                                 PassiveDamage = (source, target) =>
-                                     {
-                                         if (source.HasBuff("JaxEmpowerTwo"))
-                                         {
-                                             return source.GetSpellDamage(target, SpellSlot.W);
-                                         }
-
-                                         return 0;
-                                     }
-                             });
-
-            Passives.Add(new DamagePassive
-                             {
-                                 Name = "JarvanIV",
-                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
-                                 PassiveDamage = (source, target) =>
-                                     {
-                                         if (source.HasBuff("jarvanivmartialcadencecheck"))
-                                         {
-                                             return Math.Min(target.Health * 0.1, 400);
+                                                 case GameObjectType.obj_AI_Minion:
+                                                     return Math.Min(target.Health * 0.1, 400);
+                                             }
                                          }
 
                                          return 0;
@@ -590,10 +664,10 @@ namespace Aimtec.SDK.Damage
                                          if (source.HasBuff("JhinPassiveAttackBuff"))
                                          {
                                              return (source.Level < 6
-                                                            ? 0.15
-                                                            : (source.Level < 11
-                                                                    ? 0.2
-                                                                    : 0.25)) * (target.MaxHealth - target.Health) * (source.HasItem(ItemId.InfinityEdge) ? 1.875 : 1.5);
+                                                        ? 0.15 :
+                                                        source.Level < 11
+                                                           ? 0.2
+                                                           : 0.25) * (target.MaxHealth - target.Health) * (source.HasItem(ItemId.InfinityEdge) ? 1.875 : 1.5);
                                          }
 
                                          return 0;
@@ -637,31 +711,6 @@ namespace Aimtec.SDK.Damage
 
             Passives.Add(new DamagePassive
                              {
-                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
-                                 PassiveDamage = (source, target) =>
-                                     {
-                                         var buff = target.GetBuff("kalistacoopstrikemarkbuff");
-                                         if (buff != null &&
-                                             source.HasBuff("kalistacoopstrikeally"))
-                                         {
-                                             var buffCaster = buff.Caster as Obj_AI_Hero;
-                                             if (buffCaster != null)
-                                             {
-                                                 if (target.Type == GameObjectType.obj_AI_Minion && target.Health < 125)
-                                                 {
-                                                     return target.Health;
-                                                 }
-
-                                                 return buffCaster.GetSpellDamage(target, SpellSlot.W);
-                                             }
-                                         }
-
-                                         return 0;
-                                     }
-                             });
-
-            Passives.Add(new DamagePassive
-                             {
                                  Name = "Kalista",
                                  DamageType = DamagePassive.PassiveDamageType.PercentPhysical,
                                  PassiveDamage = (source, target) =>
@@ -681,6 +730,99 @@ namespace Aimtec.SDK.Damage
                                              return 20 + 0.1 * source.TotalAbilityDamage + (source.HasBuff("NetherBlade")
                                                                                                 ? source.GetSpellDamage(target, SpellSlot.W)
                                                                                                 : 0);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "KogMaw",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("kogmawbioarcanebarrage"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Lucian",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("lucianpassivebuff"))
+                                         {
+                                             double multiplier;
+                                             switch (target.Type)
+                                             {
+                                                 case GameObjectType.obj_AI_Minion:
+                                                     multiplier = 1;
+                                                     break;
+
+                                                 default:
+                                                     multiplier = source.Level < 6
+                                                                     ? 0.3 :
+                                                                     source.Level < 11
+                                                                        ? 0.4 :
+                                                                        source.Level < 16
+                                                                           ? 0.5
+                                                                           : 0.6;
+                                                     break;
+                                             }
+
+                                             return source.TotalAttackDamage * multiplier;
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Lux",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("luxilluminatingfraulein"))
+                                         {
+                                             return 10 + 10 * source.Level + 0.2 * source.TotalAbilityDamage;
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "MasterYi",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("doublestrike"))
+                                         {
+                                             return 0.5 * source.TotalAttackDamage;
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "MasterYi",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatTrue,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("wujustylesuperchargedvisual"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.E);
                                          }
 
                                          return 0;
@@ -732,12 +874,27 @@ namespace Aimtec.SDK.Damage
 
             Passives.Add(new DamagePassive
                              {
+                                 Name = "Nasus",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("NasusQ"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.Q) + source.GetRealBuffCount("nasusqstacks");
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
                                  Name = "Orianna",
                                  DamageType = DamagePassive.PassiveDamageType.FlatMagical,
                                  PassiveDamage = (source, target) =>
                                      {
                                          var baseDamage = 0.15 * source.TotalAbilityDamage +
-                                                          source.Level < 4
+                                                          (source.Level < 4
                                                               ? 10 :
                                                               source.Level < 7
                                                                   ? 18 :
@@ -747,9 +904,9 @@ namespace Aimtec.SDK.Damage
                                                                           ? 34 :
                                                                           source.Level < 16
                                                                               ? 42
-                                                                              : 50;
+                                                                              : 50);
 
-                                         return baseDamage + baseDamage * (0.20 * source.GetBuffCount("orianapowerdaggerdisplay"));
+                                         return baseDamage * (1 + 0.20 * source.GetRealBuffCount("orianapowerdaggerdisplay"));
                                      }
                              });
 
@@ -824,7 +981,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (!source.SpellBook.GetSpell(SpellSlot.E).State.HasFlag(SpellState.NotLearned))
                                          {
-                                             var multiplier = (double)(source.GetBuffCount("threshpassivesoulsgain") + (0.5f + 0.3f * source.SpellBook.GetSpell(SpellSlot.E).Level) * source.TotalAttackDamage);
+                                             var multiplier = (double)(source.GetRealBuffCount("threshpassivesoulsgain") + (0.5f + 0.3f * source.SpellBook.GetSpell(SpellSlot.E).Level) * source.TotalAttackDamage);
                                              if (source.HasBuff("threshepassive3"))
                                              {
                                                  multiplier *= 0.5;
@@ -912,7 +1069,6 @@ namespace Aimtec.SDK.Damage
                 }
 
                 var passiveDamage = passive.GetDamage(source, target);
-
                 switch (passive.DamageType)
                 {
                     case DamagePassive.PassiveDamageType.FlatPhysical:
