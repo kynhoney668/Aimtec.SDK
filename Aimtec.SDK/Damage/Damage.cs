@@ -78,8 +78,10 @@ namespace Aimtec.SDK.Damage
         /// <returns>System.Double.</returns>
         public static double GetAutoAttackDamage(this Obj_AI_Base source, Obj_AI_Base target)
         {
-            var dmgPhysical = (double) source.TotalAttackDamage;
+            var dmgPhysical = (double)source.TotalAttackDamage;
             var dmgMagical = 0d;
+            var dmgTrue = 0d;
+
             var dmgReduce = 1d;
 
             var hero = source as Obj_AI_Hero;
@@ -90,9 +92,11 @@ namespace Aimtec.SDK.Damage
                 var passiveDamage = DamagePassives.ComputePassiveDamages(hero, target);
                 dmgPhysical += passiveDamage.PhysicalDamage;
                 dmgMagical += passiveDamage.MagicalDamage;
+                dmgTrue += passiveDamage.TrueDamage;
 
                 dmgPhysical *= passiveDamage.PhysicalDamagePercent;
                 dmgMagical *= passiveDamage.MagicalDamagePercent;
+                dmgTrue *= passiveDamage.TrueDamagePercent;
 
                 if (target is Obj_AI_Minion)
                 {
@@ -152,7 +156,7 @@ namespace Aimtec.SDK.Damage
                     break;
             }
 
-            return Math.Max(Math.Floor(dmgPhysical + dmgMagical) * dmgReduce, 0);
+            return Math.Max(Math.Floor(dmgPhysical + dmgMagical) * dmgReduce + dmgTrue, 0);
         }
 
         /// <summary>
@@ -523,7 +527,7 @@ namespace Aimtec.SDK.Damage
                 }
             }
 
-            else if (hero != null)
+            if (hero != null)
             {
                 var doubleEdgedSword = hero.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
                 if (doubleEdgedSword != null &&
