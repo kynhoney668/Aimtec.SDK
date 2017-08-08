@@ -178,6 +178,25 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
+        ///     Returns the real number of the stacks of the 'buffname' buff the target possesses.
+        /// </summary>
+        /// <param name="from">The target.</param>
+        /// <param name="buffname">The buffname.</param>
+        public static int GetRealBuffCount(this Obj_AI_Base from, string buffname)
+        {
+            var getBuffCount = from.BuffManager.GetBuffCount(buffname, true);
+            switch (getBuffCount)
+            {
+                case -1:
+                    return 0;
+                case 0:
+                    return 1;
+            }
+
+            return getBuffCount;
+        }
+
+        /// <summary>
         ///     Gets the full attack range.
         /// </summary>
         /// <param name="source">The source.</param>
