@@ -316,19 +316,34 @@
 			}
 		],
 		"E": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "Single",
-				"DamageType": "Magical",
-				"Damages": [50.0, 75.0, 100.0, 125.0, 150.0],
-				"BonusDamages": [{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Single",
 					"DamageType": "Magical",
-					"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
-					"ScalingTarget": "Source",
-					"ScalingType": "AbilityPoints"
-				}]
+					"Damages": [50.0, 75.0, 100.0, 125.0, 150.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "Empowered",
+				"SpellData": {
+					"SpellEffectType": "Single",
+					"DamageType": "Magical",
+					"Damages": [100.0, 150.0, 200.0, 250.0, 300.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}]
+				}
 			}
-		}],
+		],
 		"R": [{
 				"Stage": "Default",
 				"SpellData": {
