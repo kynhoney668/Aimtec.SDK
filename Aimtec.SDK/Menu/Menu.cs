@@ -70,7 +70,7 @@
         ///     Gets the children.
         /// </summary>
         /// <value>The children.</value>
-        internal override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
+        public override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
 
         /// <summary>
         ///     Gets a value indicating whether this instance is a menu.

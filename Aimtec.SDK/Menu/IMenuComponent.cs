@@ -6,6 +6,7 @@
     using Aimtec.SDK.Menu.Components;
     using static Aimtec.SDK.Menu.MenuComponent;
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     ///     Interface IMenuComponent
@@ -47,6 +48,12 @@
         /// </summary>
         /// <value><c>true</c> if enabled; otherwise, <c>false</c>.</value>
         Menu Parent { get; set; }
+
+        /// <summary>
+        ///     Gets the children.
+        /// </summary>
+        /// <value>The children.</value>
+        Dictionary<string, MenuComponent> Children { get; }
 
         #endregion
 

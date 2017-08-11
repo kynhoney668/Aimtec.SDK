@@ -75,15 +75,12 @@
         /// <inheritdoc />
         public Menu Parent { get; set; }
 
+        /// <inheritdoc />
+        public virtual Dictionary<string, MenuComponent> Children { get; }
+
         #endregion
 
         #region Properties
-
-        /// <summary>
-        ///     The children of this menu
-        /// </summary>
-        /// <value>The children.</value>
-        internal virtual Dictionary<string, MenuComponent> Children { get; }
 
         /// <summary>
         ///     Gets or sets the position.

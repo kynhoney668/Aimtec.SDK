@@ -59,8 +59,6 @@
 
         #region Properties
 
-        internal override Dictionary<string, MenuComponent> Children { get; } = new Dictionary<string, MenuComponent>();
-
         internal override bool IsMenu { get; } = false;
 
         internal override bool Visible
