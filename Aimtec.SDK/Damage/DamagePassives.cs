@@ -459,11 +459,17 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (target.HasBuff("FizzW"))
                                          {
-                                             if (ObjectManager.Get<GameObject>().Any(o => o.Distance(target) <= 50 && o.Name == "Fizz_Base_W_DmgMarker_champion.troy"))
+                                             if (ObjectManager.Get<GameObject>().Any(o =>
+                                                    o.IsValid &&
+                                                    o.Distance(target) <= 50 &&
+                                                    o.Name == "Fizz_Base_W_DmgMarker_champion.troy"))
                                              {
                                                  return source.GetSpellDamage(target, SpellSlot.W);
                                              }
-                                             if (ObjectManager.Get<GameObject>().Any(o => o.Distance(target) <= 50 && o.Name == "Fizz_Base_W_DmgMarkerMaintain.troy"))
+                                             if (ObjectManager.Get<GameObject>().Any(o =>
+                                                    o.IsValid &&
+                                                    o.Distance(target) <= 50 &&
+                                                    o.Name == "Fizz_Base_W_DmgMarkerMaintain.troy"))
                                              {
                                                  return source.GetSpellDamage(target, SpellSlot.W, DamageStage.Empowered);
                                              }
@@ -730,6 +736,60 @@ namespace Aimtec.SDK.Damage
                                              return 20 + 0.1 * source.TotalAbilityDamage + (source.HasBuff("NetherBlade")
                                                                                                 ? source.GetSpellDamage(target, SpellSlot.W)
                                                                                                 : 0);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Kayle",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (!source.SpellBook.GetSpell(SpellSlot.E).State.HasFlag(SpellState.NotLearned))
+                                         {
+                                             if (source.HasBuff("JudicatorRighteousFury"))
+                                             {
+                                                 return source.GetSpellDamage(target, SpellSlot.E, DamageStage.Empowered);
+                                             }
+
+                                             return source.GetSpellDamage(target, SpellSlot.E);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Kled",
+                                 DamageType = DamagePassive.PassiveDamageType.PercentPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (target is Obj_AI_Hero &&
+                                            source.SpellBook.GetSpell(SpellSlot.Q).Name == "KledRiderQ")
+                                         {
+                                             return 0.8;
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Kled",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (ObjectManager.Get<GameObject>().Any(o =>
+                                                o.IsValid &&
+                                                o.Distance(target) <= 50 &&
+                                                o.Name == "Kled_Base_W_4th_ready.troy"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W);
                                          }
 
                                          return 0;

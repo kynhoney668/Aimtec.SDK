@@ -3377,49 +3377,88 @@
 		}]
 	},
 	"Kayle": {
-		"Q": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "Single",
-				"DamageType": "Magical",
-				"Damages": [60.0, 110.0, 160.0, 210.0, 260.0],
-				"BonusDamages": [{
-						"DamageType": "Magical",
-						"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
-						"ScalingTarget": "Source",
-						"ScalingType": "BonusAttackPoints"
-					},
-					{
-						"DamageType": "Magical",
-						"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
-						"ScalingTarget": "Source",
-						"ScalingType": "AbilityPoints"
-					}
-				]
+		"Q": [
+			{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Single",
+					"DamageType": "Magical",
+					"Damages": [60.0, 110.0, 160.0, 210.0, 260.0],
+					"BonusDamages": [
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
+							"ScalingTarget": "Source",
+							"ScalingType": "BonusAttackPoints"
+						},
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
+							"ScalingTarget": "Source",
+							"ScalingType": "AbilityPoints"
+						}
+					]
+				}
 			}
-		}],
-		"E": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "None",
-				"IsApplyOnHit": true,
-				"DamageType": "Magical",
-				"Damages": [20.0, 30.0, 40.0, 50.0, 60.0],
-				"BonusDamages": [{
-						"DamageType": "Magical",
-						"DamagePercentages": [0.3, 0.3, 0.3, 0.3, 0.3],
-						"ScalingTarget": "Source",
-						"ScalingType": "AbilityPoints"
-					},
-					{
-						"DamageType": "Magical",
-						"DamagePercentages": [0.2, 0.25, 0.3, 0.35, 0.4],
-						"ScalingTarget": "Source",
-						"ScalingType": "AttackPoints"
-					}
-				]
+		],
+		"E": [
+			{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "Attack",
+					"DamageType": "Magical",
+					"Damages": [10.0, 15.0, 20.0, 25.0, 30.0],
+					"BonusDamages": [
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [0.15, 0.15, 0.15, 0.15, 0.15],
+							"ScalingTarget": "Source",
+							"ScalingType": "AbilityPoints"
+						}
+					]
+				}
+			},
+			{
+				"Stage": "Empowered",
+				"SpellData": {
+					"SpellEffectType": "Attack",
+					"IsApplyOnHit": true,
+					"DamageType": "Magical",
+					"Damages": [20.0, 30.0, 40.0, 50.0, 60.0],
+					"BonusDamages": [
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [0.3, 0.3, 0.3, 0.3, 0.3],
+							"ScalingTarget": "Source",
+							"ScalingType": "AbilityPoints"
+						}
+					]
+				}
+			},
+			{
+				"Stage": "AreaOfEffect",
+				"SpellData": {
+					"SpellEffectType": "Attack",
+					"IsApplyOnHit": true,
+					"DamageType": "Magical",
+					"Damages": [20.0, 30.0, 40.0, 50.0, 60.0],
+					"BonusDamages": [
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [0.3, 0.3, 0.3, 0.3, 0.3],
+							"ScalingTarget": "Source",
+							"ScalingType": "AbilityPoints"
+						},
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [0.2, 0.25, 0.3, 0.35, 0.4],
+							"ScalingTarget": "Source",
+							"ScalingType": "AttackPoints"
+						}
+					]
+				}
 			}
-		}]
+		]
 	},
 	"Kayn": {
 		"Q": [
@@ -3873,7 +3912,8 @@
 				"Damages": [20.0, 30.0, 40.0, 50.0, 60.0],
 				"BonusDamages": [{
 					"DamageType": "Physical",
-					"DamagePercentages": [0.4, 0.45, 0.5, 0.55, 0.6],
+					"MaxDamageOnMonster": [200, 200, 200, 200, 200],
+					"DamagePercentages": [0.04, 0.045, 0.05, 0.055, 0.06],
 					"ScalePer100BonusAd": 0.05,
 					"ScalingTarget": "Target",
 					"ScalingType": "MaxHealth"

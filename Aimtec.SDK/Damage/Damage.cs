@@ -276,11 +276,22 @@ namespace Aimtec.SDK.Damage
                         * spellData.ScalePerTargetMissHealth + 1;
                 }
 
-                if (target is Obj_AI_Minion && spellData.MaxDamageOnMinion?.Count > 0)
+                if (target is Obj_AI_Minion)
                 {
-                    totalDamage = Math.Min(
-                        totalDamage,
-                        spellData.MaxDamageOnMinion[Math.Min(spellLevel - 1, spellData.MaxDamageOnMinion.Count - 1)]);
+                    if (spellData.MaxDamageOnMinion?.Count > 0)
+                    {
+                        totalDamage = Math.Min(
+                            totalDamage,
+                            spellData.MaxDamageOnMinion[Math.Min(spellLevel - 1, spellData.MaxDamageOnMinion.Count - 1)]);
+                    }
+
+                    if (target.Team == GameObjectTeam.Neutral &&
+                        spellData.MaxDamageOnMonster?.Count > 0)
+                    {
+                        totalDamage = Math.Min(
+                            totalDamage,
+                            spellData.MaxDamageOnMonster[Math.Min(spellLevel - 1, spellData.MaxDamageOnMonster.Count - 1)]);
+                    }
                 }
 
                 if (spellData.IsApplyOnHit || spellData.IsModifiedDamage)
