@@ -268,7 +268,8 @@ namespace Aimtec.SDK.Damage
 
                                                      damage = (50 + 0.5 * critDamageMultiplier * source.Crit * 100) / 100 * source.TotalAttackDamage;
 
-                                                     if (target.HasBuff("caitlynyordletrapinternal"))
+                                                     if (target.HasBuff("caitlynyordletrapinternal") &&
+                                                        !source.SpellBook.GetSpell(SpellSlot.W).State.HasFlag(SpellState.NotLearned))
                                                      {
                                                          damage += new[] { 30, 70, 110, 150, 190 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] + 0.7 * source.TotalAttackDamage;
                                                      }
