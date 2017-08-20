@@ -774,7 +774,7 @@ namespace Aimtec.SDK.Damage
                                              return 0.8;
                                          }
 
-                                         return 0;
+                                         return 1;
                                      }
                              });
 
