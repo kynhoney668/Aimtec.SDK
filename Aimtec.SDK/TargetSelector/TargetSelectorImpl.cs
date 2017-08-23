@@ -536,7 +536,7 @@
                     "Min MR",
                     false,
                     100,
-                    target => target.SpellBlock,
+                    target => target.SpellBlock + target.BonusSpellBlock,
                     WeightEffect.LowerIsBetter));
 
             this.AddWeight(

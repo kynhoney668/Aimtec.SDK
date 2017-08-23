@@ -92,6 +92,12 @@ namespace Aimtec.SDK.Damage
                 case DamageScalingType.Armor:
                     origin = sourceScale.Armor;
                     break;
+                case DamageScalingType.BonusMagicArmor:
+                    origin = sourceScale.BonusSpellBlock;
+                    break;
+                case DamageScalingType.MagicArmor:
+                    origin = sourceScale.SpellBlock;
+                    break;
                 case DamageScalingType.MaxMana:
                     origin = sourceScale.MaxMana;
                     break;

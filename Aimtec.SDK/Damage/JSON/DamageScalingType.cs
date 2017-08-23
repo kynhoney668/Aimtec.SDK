@@ -56,6 +56,16 @@ namespace Aimtec.SDK.Damage.JSON
         Armor,
 
         /// <summary>
+        ///     The bonus magic armor
+        /// </summary>
+        BonusMagicArmor,
+
+        /// <summary>
+        ///     The magic armor
+        /// </summary>
+        MagicArmor,
+
+        /// <summary>
         ///     The maximum mana
         /// </summary>
         MaxMana,
