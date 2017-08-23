@@ -68,7 +68,7 @@ namespace Aimtec.SDK.Damage
                                              var leonaPassiveCaster = leonaPassive.Caster as Obj_AI_Hero;
                                              if (leonaPassiveCaster != null)
                                              {
-                                                 return 15 + 5 * leonaPassiveCaster.Level;
+                                                 return 18 + 7 * leonaPassiveCaster.Level;
                                              }
                                          }
 
