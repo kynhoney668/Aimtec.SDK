@@ -211,7 +211,12 @@ namespace Aimtec.SDK.Damage
                                   {
                                       if (source.GetBuffCount("ItemStatikShankCharge") == 100)
                                       {
-                                          return new[] { 50, 50, 50, 50, 50, 50, 56, 67, 72, 77, 83, 88, 94, 99, 104, 110, 115, 120 }[source.Level - 1];
+                                          if (source.Level <= 0 || source.Level > 18)
+                                          {
+                                              Console.WriteLine("If you see this, alert eox. rfc" + source.Level + source.UnitSkinName);
+                                          }
+
+                                          return new[] { 50, 50, 50, 50, 50, 50, 56, 67, 72, 77, 83, 88, 94, 99, 104, 110, 115, 120 }[Math.Max(0, source.Level - 1)];
                                       }
 
                                       return 0;
@@ -226,7 +231,12 @@ namespace Aimtec.SDK.Damage
                                   {
                                       if (source.GetBuffCount("ItemStatikShankCharge") == 100)
                                       {
-                                          return new[] { 60, 60, 60, 60, 60, 68, 76, 84, 91, 99, 107, 114, 122, 130, 137, 145, 153, 160 }[source.Level - 1];
+                                          if (source.Level <= 0 || source.Level > 18)
+                                          {
+                                              Console.WriteLine("If you see this, alert eox. shiv" + source.Level + source.UnitSkinName);
+                                          }
+
+                                          return new[] { 60, 60, 60, 60, 60, 68, 76, 84, 91, 99, 107, 114, 122, 130, 137, 145, 153, 160 }[Math.Max(0, source.Level - 1)];
                                       }
 
                                       return 0;
