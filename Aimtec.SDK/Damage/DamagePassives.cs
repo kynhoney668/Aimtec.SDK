@@ -148,7 +148,7 @@ namespace Aimtec.SDK.Damage
                                              return
                                                  0.5 * source.FlatPhysicalDamageMod +
                                                  0.75 * source.TotalAbilityDamage +
-                                                 new[] { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 40, 50, 60, 70, 80, 90, 100 }[Math.Min(source.Level - 1, 17)];
+                                                 new[] { 10, 12, 14, 16, 18, 20, 22, 24, 26, 28, 30, 40, 50, 60, 70, 80, 90, 100 }[source.Level - 1];
                                          }
 
                                          return 0;
@@ -358,7 +358,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.GetBuffCount("dianapassivemarker") == 2)
                                          {
-                                             return new[] { 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 105, 120, 135, 155, 175, 200, 225, 250 }[Math.Min(source.Level - 1, 17)] + 0.8 * source.TotalAbilityDamage;
+                                             return new[] { 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 105, 120, 135, 155, 175, 200, 225, 250 }[source.Level - 1] + 0.8 * source.TotalAbilityDamage;
                                          }
 
                                          return 0;
@@ -403,7 +403,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (target.GetBuffCount("ekkostacks") == 2)
                                          {
-                                             return new[] { 30, 40, 50, 60, 70, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140 }[Math.Min(source.Level - 1, 17)] + 0.8 * source.TotalAbilityDamage;
+                                             return new[] { 30, 40, 50, 60, 70, 80, 85, 90, 95, 100, 105, 110, 115, 120, 125, 130, 135, 140 }[source.Level - 1] + 0.8 * source.TotalAbilityDamage;
                                          }
 
                                          return 0;
@@ -653,7 +653,7 @@ namespace Aimtec.SDK.Damage
                                          {
                                              return
                                                  (source.TotalAttackDamage
-                                                        + Math.Round((new[] { 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40 }[Math.Min(source.Level - 1, 17)]
+                                                        + Math.Round((new[] { 2, 3, 4, 5, 6, 7, 8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 40 }[source.Level - 1]
                                                                         + Math.Round(source.Crit * 100 / 10 * 4)
                                                                         + Math.Round((source.AttackSpeedMod - 1) * 100 / 10) * 2.5) / 100 * source.TotalAttackDamage)) * (source.HasItem(ItemId.InfinityEdge) ? 0.875 : 0.5);
                                          }
