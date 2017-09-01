@@ -368,6 +368,14 @@ namespace Aimtec.SDK.Orbwalking
             {
                 return;
             }
+            
+            if (this.ForcedTarget != null)
+            {
+                if (this.ForcedTarget.IsDead || !this.ForcedTarget.IsValidTarget())
+                {
+                    this.ForcedTarget = null;
+                }
+            }
 
             /// <summary>
             ///     Execute the specific logic for this mode if any
