@@ -369,12 +369,10 @@ namespace Aimtec.SDK.Orbwalking
                 return;
             }
             
-            if (this.ForcedTarget != null)
+            if (this.ForcedTarget != null &&
+                !this.ForcedTarget.IsValidTarget())
             {
-                if (this.ForcedTarget.IsDead || !this.ForcedTarget.IsValidTarget())
-                {
-                    this.ForcedTarget = null;
-                }
+                this.ForcedTarget = null;
             }
 
             /// <summary>
