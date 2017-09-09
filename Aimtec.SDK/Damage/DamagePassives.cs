@@ -21,6 +21,28 @@ namespace Aimtec.SDK.Damage
 
             Passives.Add(new DamagePassive
                              {
+                                 DamageType = DamagePassive.PassiveDamageType.FlatTrue,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         var lizardElderBuff = source.GetBuff("BlessingoftheLizardElder");
+                                         if (lizardElderBuff != null)
+                                         {
+                                             var lizardElderBuffCaster = lizardElderBuff.Caster as Obj_AI_Hero;
+                                             if (lizardElderBuffCaster != null)
+                                             {
+                                                 if (!target.HasBuff("blessingofthelizardelderslow"))
+                                                 {
+                                                     return 2 + 2 * lizardElderBuffCaster.Level;
+                                                 }
+                                             }
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
                                  DamageType = DamagePassive.PassiveDamageType.FlatMagical,
                                  PassiveDamage = (source, target) =>
                                      {
