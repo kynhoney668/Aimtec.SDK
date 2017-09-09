@@ -65,7 +65,7 @@
             Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName,
+                this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
                 RenderTextFlags.VerticalCenter);
 
             // Render arrow outline 1 - left arrow 

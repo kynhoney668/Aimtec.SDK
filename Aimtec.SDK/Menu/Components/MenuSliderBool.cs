@@ -34,8 +34,8 @@
             string displayName,
             bool enabled,
             int value,
-            int minValue,
-            int maxValue,
+            int minValue = 0,
+            int maxValue = 100,
             bool shared = false)
         {
             this.InternalName = internalName;

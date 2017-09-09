@@ -56,7 +56,7 @@
         {
             var hero = sender as Obj_AI_Hero;
 
-            if (hero == null || !hero.IsValid)
+            if (hero == null || !hero.IsValid || hero.ChampionName == "PracticeTool_TargetDummy")
             {
                 return;
             }

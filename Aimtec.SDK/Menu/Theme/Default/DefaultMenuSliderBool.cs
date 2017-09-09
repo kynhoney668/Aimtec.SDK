@@ -54,7 +54,7 @@
             Aimtec.Render.Text(
                 displayNamePosition,
                 Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName,
+                this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
                 RenderTextFlags.VerticalCenter);
 
             var beforeSliderPos = position + new Vector2(beforeSliderWidth, 0);

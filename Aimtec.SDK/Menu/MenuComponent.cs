@@ -199,7 +199,7 @@
 
         internal Logger Logger => LogManager.GetCurrentClassLogger();
 
-        private string ToolTip { get; set; }
+        internal string ToolTip { get; set; }
 
         #endregion
 
