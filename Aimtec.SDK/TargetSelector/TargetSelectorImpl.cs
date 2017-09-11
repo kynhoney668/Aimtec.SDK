@@ -240,9 +240,7 @@
                 }
 
                 var distance = this.SelectedTarget.Distance(Player);
-
                 var inRange = autoattack ? distance < Player.GetFullAttackRange(this.SelectedTarget) : distance < range;
-
                 if (inRange)
                 {
                     return this.SelectedTarget;
@@ -298,10 +296,8 @@
             if (this.Config["UseWeights"].Enabled)
             {
                 var targetWeightDictionary = this.GetTargetsAndWeights(range, autoattack);
-
                 orderedTargets = targetWeightDictionary.Keys.OrderByDescending(k => targetWeightDictionary[k]).ToList();
             }
-
             else
             {
                 orderedTargets = this.GetOrderedTargetsByMode(range, autoattack).ToList();
@@ -310,11 +306,9 @@
             if (this.FocusSelected)
             {
                 var selected = this.GetSelectedTarget(range, autoattack);
-
                 if (selected != null)
                 {
                     var containsSelected = orderedTargets.Any(x => x.NetworkId == selected.NetworkId);
-
                     if (containsSelected)
                     {
                         orderedTargets.RemoveAll(x => x.NetworkId == selected.NetworkId);
@@ -332,50 +326,51 @@
 
             IEnumerable<Obj_AI_Hero> returnValue = null;
 
-            if (this.Mode == TargetSelectorMode.Closest)
+            switch (this.Mode)
             {
-                returnValue = validTargets.OrderBy(x => x.Distance(Player));
-            }
+                case TargetSelectorMode.Closest:
+                    returnValue = validTargets.OrderBy(x => x.Distance(Player));
+                    break;
 
-            else if (this.Mode == TargetSelectorMode.LeastAttacks)
-            {
-                returnValue = validTargets.OrderBy(x => (int)Math.Ceiling(x.Health / Player.GetAutoAttackDamage(x)))
-                                          .ThenByDescending(this.GetPriority);
-            }
+                case TargetSelectorMode.LeastAttacks:
+                    returnValue = validTargets
+                        .OrderBy(x => (int)Math.Ceiling(x.Health / Player.GetAutoAttackDamage(x)))
+                        .ThenByDescending(this.GetPriority);
+                    break;
 
-            else if (this.Mode == TargetSelectorMode.LeastSpells)
-            {
-                returnValue = validTargets
-                    .OrderBy(x => (int)(x.Health / Player.CalculateDamage(x, DamageType.Magical, 100)))
-                    .ThenByDescending(this.GetPriority);
-            }
+                case TargetSelectorMode.LeastSpells:
+                    returnValue = validTargets
+                        .OrderBy(x => (int)(x.Health / Player.CalculateDamage(x, DamageType.Magical, 100)))
+                        .ThenByDescending(this.GetPriority);
+                    break;
 
-            else if (this.Mode == TargetSelectorMode.LowestHealth)
-            {
-                returnValue = validTargets.OrderBy(x => x.Health).ThenByDescending(this.GetPriority);
-            }
+                case TargetSelectorMode.LowestHealth:
+                    returnValue = validTargets
+                        .OrderBy(x => x.Health)
+                        .ThenByDescending(this.GetPriority);
+                    break;
 
-            else if (this.Mode == TargetSelectorMode.MostAd)
-            {
-                returnValue = validTargets.OrderByDescending(x => x.TotalAttackDamage)
-                                          .ThenByDescending(this.GetPriority);
-            }
+                case TargetSelectorMode.MostAd:
+                    returnValue = validTargets
+                        .OrderByDescending(x => x.TotalAttackDamage)
+                        .ThenByDescending(this.GetPriority);
+                    break;
 
-            else if (this.Mode == TargetSelectorMode.MostAp)
-            {
-                returnValue = validTargets.OrderByDescending(x => x.TotalAbilityDamage)
-                                          .ThenByDescending(this.GetPriority);
-            }
+                case TargetSelectorMode.MostAp:
+                    returnValue = validTargets
+                        .OrderByDescending(x => x.TotalAbilityDamage)
+                        .ThenByDescending(this.GetPriority);
+                    break;
 
-            else if (this.Mode == TargetSelectorMode.NearMouse)
-            {
-                returnValue = validTargets.OrderBy(x => x.Distance(Game.CursorPos))
-                                          .ThenByDescending(this.GetPriority);
-            }
+                case TargetSelectorMode.NearMouse:
+                    returnValue = validTargets
+                        .OrderBy(x => x.Distance(Game.CursorPos))
+                        .ThenByDescending(this.GetPriority);
+                    break;
 
-            else if (this.Mode == TargetSelectorMode.MostPriority)
-            {
-                returnValue = validTargets.OrderBy(this.GetPriority);
+                case TargetSelectorMode.MostPriority:
+                    returnValue = validTargets.OrderBy(this.GetPriority);
+                    break;
             }
 
             return returnValue;
@@ -384,7 +379,6 @@
         public TargetPriority GetPriority(Obj_AI_Hero hero)
         {
             var slider = this.Config["TargetsMenu"]["priority" + hero.ChampionName];
-
             if (slider != null)
             {
                 return (TargetPriority)slider.Value;
@@ -398,7 +392,6 @@
             if (this.FocusSelected)
             {
                 var selected = this.GetSelectedTarget(range, autoattack);
-
                 if (selected != null)
                 {
                     return selected;
@@ -406,7 +399,6 @@
             }
 
             var target = this.GetOrderedTargets(range, autoattack).FirstOrDefault();
-
             if (target != null)
             {
                 return target;
@@ -417,8 +409,7 @@
 
         public IEnumerable<Obj_AI_Hero> GetValidTargets(float range, bool autoattack)
         {
-            var enemies = ObjectManager.Get<Obj_AI_Hero>()
-                                       .Where(x => autoattack ? x.IsValidAutoRange() : x.IsValidTarget(range));
+            var enemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => autoattack ? x.IsValidAutoRange() : x.IsValidTarget(range));
             return enemies;
         }
 
@@ -433,16 +424,13 @@
             this.Config = new Menu("Aimtec.TS", "Target Selector");
 
             var weights = new Menu("WeightsMenu", "Weights");
-
             this.Config.Add(weights);
 
             var targetsMenu = new Menu("TargetsMenu", "Targets");
-
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy))
             {
                 targetsMenu.Add(new MenuSlider("priority" + enemy.ChampionName, enemy.ChampionName, (int)this.GetDefaultPriority(enemy), 1, 5));
             }
-
             this.Config.Add(targetsMenu);
 
             var drawings = new Menu("Drawings", "Drawings")
@@ -557,7 +545,6 @@
             }
 
             var message = args.Message;
-
             if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
             {
                 var clickPosition = Game.CursorPos;
@@ -571,7 +558,6 @@
                 {
                     this.SelectedTarget = closestHero;
                 }
-
                 else
                 {
                     this.SelectedTarget = null;
@@ -628,7 +614,6 @@
             if (indicateSelected)
             {
                 var selected = this.GetSelectedTarget();
-
                 if (selected != null)
                 {
                     Render.Circle(selected.Position, selected.BoundingRadius * 2, 30, Color.Red);
@@ -647,14 +632,10 @@
                         var target = targ.Key;
                         if (target != null)
                         {
-                            Render.Text(
-                                basepos + new Vector2(0, i * 15),
-                                Color.Red,
-                                target.ChampionName + " " + targ.Value);
+                            Render.Text(basepos + new Vector2(0, i * 15), Color.Red, target.ChampionName + " " + targ.Value);
                         }
                     }
                 }
-
                 else
                 {
                     var ordered = this.GetOrderedTargetsByMode(50000, showOrderAuto).ToList();

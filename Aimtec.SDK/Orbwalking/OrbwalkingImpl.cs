@@ -122,7 +122,6 @@ namespace Aimtec.SDK.Orbwalking
                 SpellBook.OnStopCast += this.SpellBook_OnStopCast;
                 Render.OnRender += this.RenderManager_OnRender;
             }
-
             else
             {
                 this.Logger.Info("This Orbwalker instance is already attached to a Menu.");
@@ -135,8 +134,7 @@ namespace Aimtec.SDK.Orbwalking
 
             if (!preAttackargs.Cancel)
             {
-                AttackableUnit targetToAttack = preAttackargs.Target;
-
+                var targetToAttack = preAttackargs.Target;
                 if (this.ForcedTarget != null)
                 {
                     targetToAttack = this.ForcedTarget;
@@ -221,14 +219,12 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             var minion = unit as Obj_AI_Minion;
-
             if (minion == null)
             {
                 return false;
             }
 
             var name = minion.UnitSkinName.ToLower();
-
             if (!this.Config["Farming"]["AttackPlants"].Enabled && name.Contains("sru_plant_"))
             {
                 return false;
@@ -367,7 +363,8 @@ namespace Aimtec.SDK.Orbwalking
 
         public override AttackableUnit FindTarget(OrbwalkerMode mode)
         {
-            if (this.ForcedTarget != null && this.ForcedTarget.IsValidAutoRange())
+            if (this.ForcedTarget != null &&
+                this.ForcedTarget.IsValidAutoRange())
             {
                 return this.ForcedTarget;
             }
@@ -393,7 +390,6 @@ namespace Aimtec.SDK.Orbwalking
         public override void Orbwalk()
         {
             var mode = this.GetActiveMode();
-
             if (mode == null)
             {
                 return;
@@ -466,7 +462,7 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-        bool CanKillMinion(Obj_AI_Base minion, int time = 0)
+        private bool CanKillMinion(Obj_AI_Base minion, int time = 0)
         {
             var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
 
@@ -531,7 +527,7 @@ namespace Aimtec.SDK.Orbwalking
                 return null;
             }
 
-            var structure = this.GetStructureTarget(attackableUnits);
+            var structure = GetStructureTarget(attackableUnits);
 
             if (structure != null)
             {
@@ -746,12 +742,12 @@ namespace Aimtec.SDK.Orbwalking
             return null;
         }
 
-        AttackableUnit GetLastHitTarget()
+        private AttackableUnit GetLastHitTarget()
         {
             return this.GetLastHitTarget(null);
         }
 
-        AttackableUnit GetLastHitTarget(IEnumerable<AttackableUnit> attackable)
+        private AttackableUnit GetLastHitTarget(IEnumerable<AttackableUnit> attackable)
         {
             if (attackable == null)
             {
@@ -769,7 +765,7 @@ namespace Aimtec.SDK.Orbwalking
         }
 
         //In mixed mode we prioritize killable units, then structures, then heros. If none are found, then we don't attack anything.
-        AttackableUnit GetMixedModeTarget()
+        private AttackableUnit GetMixedModeTarget()
         {
             var attackable = ObjectManager.Get<AttackableUnit>().Where(this.IsValidAttackableObject);
 
@@ -784,7 +780,7 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             //Structures
-            var structure = this.GetStructureTarget(attackableUnits);
+            var structure = GetStructureTarget(attackableUnits);
             if (structure != null)
             {
                 return structure;
@@ -800,14 +796,14 @@ namespace Aimtec.SDK.Orbwalking
             return null;
         }
 
-        int GetPredictedHealth(Obj_AI_Base minion, int time = 0)
+        private int GetPredictedHealth(Obj_AI_Base minion, int time = 0)
         {
             var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
             return (int)Math.Ceiling(HealthPrediction.Implementation.GetPrediction(minion, rtime));
         }
 
         //Gets a structure target based on the following order (Nexus, Turret, Inihibitor)
-        AttackableUnit GetStructureTarget(IEnumerable<AttackableUnit> attackable)
+        private static AttackableUnit GetStructureTarget(IEnumerable<AttackableUnit> attackable)
         {
             //Nexus
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
@@ -963,7 +959,7 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-        bool ShouldWaitMinion(Obj_AI_Base minion)
+        private bool ShouldWaitMinion(Obj_AI_Base minion)
         {
             var time = this.TimeForAutoToReachTarget(minion) + (int)Player.AttackDelay * 1000 + 100;
             var pred = HealthPrediction.Implementation.GetLaneClearHealthPrediction(minion, (int)(time * 2f));
@@ -977,7 +973,6 @@ namespace Aimtec.SDK.Orbwalking
             return false;
         }
 
-
         private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
         {
             if (sender.IsMe && (e.DestroyMissile || e.ForceStop || e.StopAnimation))
@@ -986,6 +981,7 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
+        // ReSharper disable once SuggestBaseTypeForParameter
         private int TimeForAutoToReachTarget(AttackableUnit minion, bool applyDelay = false)
         {
             var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;

@@ -81,15 +81,8 @@
         {
             Logger.Info("Disposing the old Implementation");
 
-            if (TargetSelectorMenu != null)
-            {
-                TargetSelectorMenu.Dispose();
-            }
-
-            if (Implementation != null)
-            {
-                Implementation.Dispose();
-            }
+            TargetSelectorMenu?.Dispose();
+            Implementation?.Dispose();
         }
 
         /// <summary>
