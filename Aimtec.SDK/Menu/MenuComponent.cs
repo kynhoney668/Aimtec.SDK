@@ -70,7 +70,7 @@
         public int Value => ((IReturns<int>)this).Value;
 
         /// <inheritdoc />
-        public bool Enabled => ((IReturns<bool>) this).Value;
+        public bool Enabled => ((IReturns<bool>)this).Value;
 
         /// <inheritdoc />
         public Menu Parent { get; set; }

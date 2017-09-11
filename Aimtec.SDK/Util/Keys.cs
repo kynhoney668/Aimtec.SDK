@@ -1,4 +1,5 @@
-﻿namespace Aimtec.SDK.Util
+﻿// ReSharper disable InconsistentNaming
+namespace Aimtec.SDK.Util
 {
     using System;
 
@@ -156,28 +157,22 @@
         /// <summary>
         ///     The IME convert key.
         /// </summary>
-        ImeConvert = FinalMode | MButton,
+        IMEConvert = FinalMode | MButton,
 
         /// <summary>
         ///     The IME nonconvert key.
         /// </summary>
-        ImeNonconvert = ImeConvert | LButton,
-
-        /// <summary>
-        ///     The IME accept key, replaces IMEAceept.
-        /// </summary>
-        ImeAccept = ImeConvert | RButton,
+        IMENonconvert = IMEConvert | LButton,
 
         /// <summary>
         ///     The IME accept key.
         /// </summary>
-        [Obsolete("Obsolete, use IMEAccept instead.")]
-        ImeAceept = ImeAccept,
+        IMEAccept = IMEConvert | RButton,
 
         /// <summary>
         ///     The IME mode change key.
         /// </summary>
-        ImeModeChange = ImeAccept | LButton,
+        IMEModeChange = IMEAccept | LButton,
 
         /// <summary>
         ///     The SPACEBAR key.
@@ -867,7 +862,7 @@
         /// <summary>
         ///     The OEM pipe key on a US standard keyboard (Windows 2000 or later).
         /// </summary>
-        OemPipe = Oem3 | ImeConvert,
+        OemPipe = Oem3 | IMEConvert,
 
         /// <summary>
         ///     The OEM 5 key.
@@ -978,6 +973,6 @@
         /// <summary>
         ///     The ALT modifier key.
         /// </summary>
-        Alt = 262144
+        Alt = 262144,
     }
 }
