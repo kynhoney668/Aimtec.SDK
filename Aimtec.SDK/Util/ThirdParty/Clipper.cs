@@ -543,21 +543,22 @@ namespace Aimtec.SDK.Util.ThirdParty
 
     public enum ClipType
     {
-        CtIntersection,
+        ctIntersection,
 
-        CtUnion,
+        ctUnion,
 
-        CtDifference,
+        ctDifference,
 
-        CtXor
-    }
+        ctXor
+    };
 
     public enum PolyType
     {
-        PtSubject,
+        ptSubject,
 
-        PtClip
-    }
+        ptClip
+    };
+
 
     //By far the most widely used winding rules for polygon filling are
     //EvenOdd & NonZero (GDI, GDI+, XLib, OpenGL, Cairo, AGG, Quartz, SVG, Gr32)
@@ -1124,7 +1125,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         public bool AddPath(Path pg, PolyType polyType, bool closed)
         {
 #if use_lines
-            if (!closed && polyType == PolyType.PtClip)
+            if (!closed && polyType == PolyType.ptClip)
                 throw new ClipperException("AddPath: Open paths must be subject.");
 #else
       if (!Closed)
@@ -1829,8 +1830,8 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             var paths = Minkowski(poly1, poly2, false, true);
             var c = new Clipper();
-            c.AddPaths(paths, PolyType.PtSubject, true);
-            c.Execute(ClipType.CtUnion, paths, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+            c.AddPaths(paths, PolyType.ptSubject, true);
+            c.Execute(ClipType.ctUnion, paths, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
             return paths;
         }
         //------------------------------------------------------------------------------
@@ -1839,8 +1840,8 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             var paths = Minkowski(pattern, path, true, pathIsClosed);
             var c = new Clipper();
-            c.AddPaths(paths, PolyType.PtSubject, true);
-            c.Execute(ClipType.CtUnion, paths, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+            c.AddPaths(paths, PolyType.ptSubject, true);
+            c.Execute(ClipType.ctUnion, paths, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
             return paths;
         }
         //------------------------------------------------------------------------------
@@ -1852,14 +1853,14 @@ namespace Aimtec.SDK.Util.ThirdParty
             for (var i = 0; i < paths.Count; ++i)
             {
                 var tmp = Minkowski(pattern, paths[i], true, pathIsClosed);
-                c.AddPaths(tmp, PolyType.PtSubject, true);
+                c.AddPaths(tmp, PolyType.ptSubject, true);
                 if (pathIsClosed)
                 {
                     var path = TranslatePath(paths[i], pattern[0]);
-                    c.AddPath(path, PolyType.PtClip, true);
+                    c.AddPath(path, PolyType.ptClip, true);
                 }
             }
-            c.Execute(ClipType.CtUnion, solution, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+            c.Execute(ClipType.ctUnion, solution, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
             return solution;
         }
         //------------------------------------------------------------------------------
@@ -1959,8 +1960,8 @@ namespace Aimtec.SDK.Util.ThirdParty
             var result = new Paths();
             var c = new Clipper();
             c.StrictlySimple = true;
-            c.AddPath(poly, PolyType.PtSubject, true);
-            c.Execute(ClipType.CtUnion, result, fillType, fillType);
+            c.AddPath(poly, PolyType.ptSubject, true);
+            c.Execute(ClipType.ctUnion, result, fillType, fillType);
             return result;
         }
         //------------------------------------------------------------------------------
@@ -1970,8 +1971,8 @@ namespace Aimtec.SDK.Util.ThirdParty
             var result = new Paths();
             var c = new Clipper();
             c.StrictlySimple = true;
-            c.AddPaths(polys, PolyType.PtSubject, true);
-            c.Execute(ClipType.CtUnion, result, fillType, fillType);
+            c.AddPaths(polys, PolyType.ptSubject, true);
+            c.Execute(ClipType.ctUnion, result, fillType, fillType);
             return result;
         }
         //------------------------------------------------------------------------------
@@ -3520,7 +3521,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                     return;
                 //if intersecting a subj line with a subj poly ...
                 if (e1.PolyTyp == e2.PolyTyp && e1.WindDelta != e2.WindDelta
-                    && this.mClipType == ClipType.CtUnion)
+                    && this.mClipType == ClipType.ctUnion)
                 {
                     if (e1.WindDelta == 0)
                     {
@@ -3544,14 +3545,14 @@ namespace Aimtec.SDK.Util.ThirdParty
                 else if (e1.PolyTyp != e2.PolyTyp)
                 {
                     if (e1.WindDelta == 0 && Math.Abs(e2.WindCnt) == 1
-                        && (this.mClipType != ClipType.CtUnion || e2.WindCnt2 == 0))
+                        && (this.mClipType != ClipType.ctUnion || e2.WindCnt2 == 0))
                     {
                         this.AddOutPt(e1, pt);
                         if (e1Contributing)
                             e1.OutIdx = Unassigned;
                     }
                     else if (e2.WindDelta == 0 && Math.Abs(e1.WindCnt) == 1
-                             && (this.mClipType != ClipType.CtUnion || e1.WindCnt2 == 0))
+                             && (this.mClipType != ClipType.ctUnion || e1.WindCnt2 == 0))
                     {
                         this.AddOutPt(e2, pt);
                         if (e2Contributing)
@@ -3597,7 +3598,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             }
 
             PolyFillType e1FillType, e2FillType, e1FillType2, e2FillType2;
-            if (e1.PolyTyp == PolyType.PtSubject)
+            if (e1.PolyTyp == PolyType.ptSubject)
             {
                 e1FillType = this.mSubjFillType;
                 e1FillType2 = this.mClipFillType;
@@ -3607,7 +3608,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                 e1FillType = this.mClipFillType;
                 e1FillType2 = this.mSubjFillType;
             }
-            if (e2.PolyTyp == PolyType.PtSubject)
+            if (e2.PolyTyp == PolyType.ptSubject)
             {
                 e2FillType = this.mSubjFillType;
                 e2FillType2 = this.mClipFillType;
@@ -3647,7 +3648,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             if (e1Contributing && e2Contributing)
             {
                 if (e1Wc != 0 && e1Wc != 1 || e2Wc != 0 && e2Wc != 1
-                    || e1.PolyTyp != e2.PolyTyp && this.mClipType != ClipType.CtXor)
+                    || e1.PolyTyp != e2.PolyTyp && this.mClipType != ClipType.ctXor)
                 {
                     this.AddLocalMaxPoly(e1, e2, pt);
                 }
@@ -3713,20 +3714,20 @@ namespace Aimtec.SDK.Util.ThirdParty
                 else if (e1Wc == 1 && e2Wc == 1)
                     switch (this.mClipType)
                     {
-                        case ClipType.CtIntersection:
+                        case ClipType.ctIntersection:
                             if (e1Wc2 > 0 && e2Wc2 > 0)
                                 this.AddLocalMinPoly(e1, e2, pt);
                             break;
-                        case ClipType.CtUnion:
+                        case ClipType.ctUnion:
                             if (e1Wc2 <= 0 && e2Wc2 <= 0)
                                 this.AddLocalMinPoly(e1, e2, pt);
                             break;
-                        case ClipType.CtDifference:
-                            if (e1.PolyTyp == PolyType.PtClip && e1Wc2 > 0 && e2Wc2 > 0
-                                || e1.PolyTyp == PolyType.PtSubject && e1Wc2 <= 0 && e2Wc2 <= 0)
+                        case ClipType.ctDifference:
+                            if (e1.PolyTyp == PolyType.ptClip && e1Wc2 > 0 && e2Wc2 > 0
+                                || e1.PolyTyp == PolyType.ptSubject && e1Wc2 <= 0 && e2Wc2 <= 0)
                                 this.AddLocalMinPoly(e1, e2, pt);
                             break;
-                        case ClipType.CtXor:
+                        case ClipType.ctXor:
                             this.AddLocalMinPoly(e1, e2, pt);
                             break;
                     }
@@ -3814,7 +3815,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         private bool IsContributing(Edge edge)
         {
             PolyFillType pft, pft2;
-            if (edge.PolyTyp == PolyType.PtSubject)
+            if (edge.PolyTyp == PolyType.ptSubject)
             {
                 pft = this.mSubjFillType;
                 pft2 = this.mClipFillType;
@@ -3848,7 +3849,7 @@ namespace Aimtec.SDK.Util.ThirdParty
 
             switch (this.mClipType)
             {
-                case ClipType.CtIntersection:
+                case ClipType.ctIntersection:
                     switch (pft2)
                     {
                         case PolyFillType.pftEvenOdd:
@@ -3856,7 +3857,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                         case PolyFillType.pftPositive: return edge.WindCnt2 > 0;
                         default: return edge.WindCnt2 < 0;
                     }
-                case ClipType.CtUnion:
+                case ClipType.ctUnion:
                     switch (pft2)
                     {
                         case PolyFillType.pftEvenOdd:
@@ -3864,8 +3865,8 @@ namespace Aimtec.SDK.Util.ThirdParty
                         case PolyFillType.pftPositive: return edge.WindCnt2 <= 0;
                         default: return edge.WindCnt2 >= 0;
                     }
-                case ClipType.CtDifference:
-                    if (edge.PolyTyp == PolyType.PtSubject)
+                case ClipType.ctDifference:
+                    if (edge.PolyTyp == PolyType.ptSubject)
                         switch (pft2)
                         {
                             case PolyFillType.pftEvenOdd:
@@ -3881,7 +3882,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                             case PolyFillType.pftPositive: return edge.WindCnt2 > 0;
                             default: return edge.WindCnt2 < 0;
                         }
-                case ClipType.CtXor:
+                case ClipType.ctXor:
                     if (edge.WindDelta == 0) //XOr always contributing unless open
                         switch (pft2)
                         {
@@ -3899,7 +3900,7 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         private bool IsEvenOddAltFillType(Edge edge)
         {
-            if (edge.PolyTyp == PolyType.PtSubject)
+            if (edge.PolyTyp == PolyType.ptSubject)
                 return this.mClipFillType == PolyFillType.pftEvenOdd;
             return this.mSubjFillType == PolyFillType.pftEvenOdd;
         }
@@ -3907,7 +3908,7 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         private bool IsEvenOddFillType(Edge edge)
         {
-            if (edge.PolyTyp == PolyType.PtSubject)
+            if (edge.PolyTyp == PolyType.ptSubject)
                 return this.mSubjFillType == PolyFillType.pftEvenOdd;
             return this.mClipFillType == PolyFillType.pftEvenOdd;
         }
@@ -4722,7 +4723,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             if (e == null)
             {
                 PolyFillType pft;
-                pft = edge.PolyTyp == PolyType.PtSubject ? this.mSubjFillType : this.mClipFillType;
+                pft = edge.PolyTyp == PolyType.ptSubject ? this.mSubjFillType : this.mClipFillType;
                 if (edge.WindDelta == 0)
                     edge.WindCnt = pft == PolyFillType.pftNegative ? -1 : 1;
                 else
@@ -4730,7 +4731,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                 edge.WindCnt2 = 0;
                 e = this.MActiveEdges; //ie get ready to calc WindCnt2
             }
-            else if (edge.WindDelta == 0 && this.mClipType != ClipType.CtUnion)
+            else if (edge.WindDelta == 0 && this.mClipType != ClipType.ctUnion)
             {
                 edge.WindCnt = 1;
                 edge.WindCnt2 = e.WindCnt2;
@@ -5017,10 +5018,10 @@ namespace Aimtec.SDK.Util.ThirdParty
             this.DoOffset(delta);
             //now clean up 'corners' ...
             var clpr = new Clipper();
-            clpr.AddPaths(this.mDestPolys, PolyType.PtSubject, true);
+            clpr.AddPaths(this.mDestPolys, PolyType.ptSubject, true);
             if (delta > 0)
             {
-                clpr.Execute(ClipType.CtUnion, solution, PolyFillType.pftPositive, PolyFillType.pftPositive);
+                clpr.Execute(ClipType.ctUnion, solution, PolyFillType.pftPositive, PolyFillType.pftPositive);
             }
             else
             {
@@ -5032,9 +5033,9 @@ namespace Aimtec.SDK.Util.ThirdParty
                 outer.Add(new IntPoint(r.Right + 10, r.Top - 10));
                 outer.Add(new IntPoint(r.Left - 10, r.Top - 10));
 
-                clpr.AddPath(outer, PolyType.PtSubject, true);
+                clpr.AddPath(outer, PolyType.ptSubject, true);
                 clpr.ReverseSolution = true;
-                clpr.Execute(ClipType.CtUnion, solution, PolyFillType.pftNegative, PolyFillType.pftNegative);
+                clpr.Execute(ClipType.ctUnion, solution, PolyFillType.pftNegative, PolyFillType.pftNegative);
                 if (solution.Count > 0)
                     solution.RemoveAt(0);
             }
@@ -5049,10 +5050,10 @@ namespace Aimtec.SDK.Util.ThirdParty
 
             //now clean up 'corners' ...
             var clpr = new Clipper();
-            clpr.AddPaths(this.mDestPolys, PolyType.PtSubject, true);
+            clpr.AddPaths(this.mDestPolys, PolyType.ptSubject, true);
             if (delta > 0)
             {
-                clpr.Execute(ClipType.CtUnion, solution, PolyFillType.pftPositive, PolyFillType.pftPositive);
+                clpr.Execute(ClipType.ctUnion, solution, PolyFillType.pftPositive, PolyFillType.pftPositive);
             }
             else
             {
@@ -5064,9 +5065,9 @@ namespace Aimtec.SDK.Util.ThirdParty
                 outer.Add(new IntPoint(r.Right + 10, r.Top - 10));
                 outer.Add(new IntPoint(r.Left - 10, r.Top - 10));
 
-                clpr.AddPath(outer, PolyType.PtSubject, true);
+                clpr.AddPath(outer, PolyType.ptSubject, true);
                 clpr.ReverseSolution = true;
-                clpr.Execute(ClipType.CtUnion, solution, PolyFillType.pftNegative, PolyFillType.pftNegative);
+                clpr.Execute(ClipType.ctUnion, solution, PolyFillType.pftNegative, PolyFillType.pftNegative);
                 //remove the outer PolyNode rectangle ...
                 if (solution.ChildCount == 1 && solution.Childs[0].ChildCount > 0)
                 {
