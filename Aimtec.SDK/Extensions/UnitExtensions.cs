@@ -6,6 +6,8 @@ namespace Aimtec.SDK.Extensions
 
     using Aimtec.SDK.Damage;
 
+    using Spell = Aimtec.Spell;
+
     /// <summary>
     ///     Class UnitExtensions.
     /// </summary>
@@ -32,7 +34,7 @@ namespace Aimtec.SDK.Extensions
         /// <summary>
         ///     Gets the spell that this slot belongs to
         /// </summary>
-        public static Aimtec.Spell GetSpell(this Obj_AI_Base unit, SpellSlot slot)
+        public static Spell GetSpell(this Obj_AI_Base unit, SpellSlot slot)
         {
             return unit.SpellBook.GetSpell(slot);
         }

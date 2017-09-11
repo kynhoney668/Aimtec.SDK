@@ -1,12 +1,11 @@
 ﻿namespace Aimtec.SDK.Menu
 {
-    using System.Drawing;
-
-    using Aimtec.SDK.Menu.Theme;
-    using Aimtec.SDK.Menu.Components;
-    using static Aimtec.SDK.Menu.MenuComponent;
     using System;
     using System.Collections.Generic;
+
+    using Aimtec.SDK.Menu.Components;
+
+    using static MenuComponent;
 
     /// <summary>
     ///     Interface IMenuComponent

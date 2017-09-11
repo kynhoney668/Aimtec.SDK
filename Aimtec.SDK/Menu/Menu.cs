@@ -44,8 +44,8 @@
         public Menu(string internalName, string displayName, bool isRoot = false)
         {
             var callingAssembly = Assembly.GetCallingAssembly();
-            var GUID = (GuidAttribute) Attribute.GetCustomAttribute(callingAssembly, typeof(GuidAttribute));
-            var assemblyGuidShort = GUID.Value.Substring(0, 5);
+            var guid = (GuidAttribute) Attribute.GetCustomAttribute(callingAssembly, typeof(GuidAttribute));
+            var assemblyGuidShort = guid.Value.Substring(0, 5);
             var assemblyName = Assembly.GetCallingAssembly().GetName().Name;
 
             this.Root = isRoot;
@@ -189,8 +189,7 @@
         {
             if (!this.Root)
             {
-                throw new Exception(
-                    $"You can only attach a Root Menu. If this is supposed to be your root menu, set isRoot to true in the constructor.");
+                throw new Exception("You can only attach a Root Menu. If this is supposed to be your root menu, set isRoot to true in the constructor.");
             }
 
             this.LoadValue();
@@ -289,7 +288,7 @@
         #region Methods
 
         /// <inheritdoc />
-        internal IMenuComponent GetItem(string name, bool showLog = true)
+        internal IMenuComponent GetItem(string name, bool showLog = false)
         {
             this.Children.TryGetValue(name, out var ritem);
 
@@ -307,7 +306,7 @@
                     continue;
                 }
 
-                ritem = (MenuComponent) asmenu.GetItem(name, false);
+                ritem = (MenuComponent) asmenu.GetItem(name);
 
                 if (ritem != null)
                 {
@@ -375,13 +374,13 @@
                 else if (child is MenuSlider)
                 {
                     var slider = child as MenuSlider;
-                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue.ToString());
+                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue);
                 }
 
                 else if (child is MenuSliderBool)
                 {
                     var slider = child as MenuSliderBool;
-                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue.ToString());
+                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue);
                 }
 
                 else
@@ -395,7 +394,7 @@
                 }
             }
 
-            this.Width = (int) (maxWidth + MenuManager.Instance.Theme.BaseMenuWidth);
+            this.Width = maxWidth + MenuManager.Instance.Theme.BaseMenuWidth;
         }
 
         #endregion

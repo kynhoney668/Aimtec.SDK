@@ -112,7 +112,7 @@
             }
 
             // TODO: Add damage to this (Missing in Spell data API)
-            value.Add(new Attack { Source = sender, Target = e.Sender, });
+            value.Add(new Attack { Source = sender, Target = e.Sender });
         }
 
         private void OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)

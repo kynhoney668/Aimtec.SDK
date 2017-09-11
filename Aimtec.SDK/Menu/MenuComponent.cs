@@ -22,7 +22,7 @@
     {
         #region Fields
 
-        private string _AssemblyConfigDirectoryName;
+        private string assemblyConfigDirectoryName;
 
         #endregion
 
@@ -123,12 +123,12 @@
             get
             {
                 return this.Root || this.Parent == null
-                    ? this._AssemblyConfigDirectoryName
+                    ? this.assemblyConfigDirectoryName
                     : this.Parent.AssemblyConfigDirectoryName;
             }
             set
             {
-                this._AssemblyConfigDirectoryName = value;
+                this.assemblyConfigDirectoryName = value;
             }
         }
 

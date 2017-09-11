@@ -6,7 +6,7 @@
     {
         #region Fields
 
-        private Vector3 @from;
+        private Vector3 from;
 
         private Vector3 rangeCheckFrom;
 
@@ -25,9 +25,9 @@
 
         public Vector3 From
         {
-            get => this.from.IsZero ? ObjectManager.GetLocalPlayer().Position : this.@from;
+            get => this.from.IsZero ? ObjectManager.GetLocalPlayer().Position : this.from;
 
-            set => this.@from = value;
+            set => this.from = value;
         }
 
         public float Radius { get; set; } = 1f;

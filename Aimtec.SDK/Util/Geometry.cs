@@ -27,19 +27,19 @@
             float v2,
             float delay = 0f)
         {
-            float sP1x = startPoint1.X,
-                  sP1y = startPoint1.Y,
-                  eP1x = endPoint1.X,
-                  eP1y = endPoint1.Y,
-                  sP2x = startPoint2.X,
-                  sP2y = startPoint2.Y;
+            float sP1X = startPoint1.X,
+                  sP1Y = startPoint1.Y,
+                  eP1X = endPoint1.X,
+                  eP1Y = endPoint1.Y,
+                  sP2X = startPoint2.X,
+                  sP2Y = startPoint2.Y;
 
-            float d = eP1x - sP1x, e = eP1y - sP1y;
+            float d = eP1X - sP1X, e = eP1Y - sP1Y;
             float dist = (float) Math.Sqrt(d * d + e * e), t1 = float.NaN;
-            float S = Math.Abs(dist) > float.Epsilon ? v1 * d / dist : 0,
-                  K = Math.Abs(dist) > float.Epsilon ? v1 * e / dist : 0f;
+            float s = Math.Abs(dist) > float.Epsilon ? v1 * d / dist : 0,
+                  k = Math.Abs(dist) > float.Epsilon ? v1 * e / dist : 0f;
 
-            float r = sP2x - sP1x, j = sP2y - sP1y;
+            float r = sP2X - sP1X, j = sP2Y - sP1Y;
             var c = r * r + j * j;
 
             if (dist > 0f)
@@ -55,7 +55,7 @@
                 }
                 else
                 {
-                    float a = S * S + K * K - v2 * v2, b = -r * S - j * K;
+                    float a = s * s + k * k - v2 * v2, b = -r * s - j * k;
 
                     if (Math.Abs(a) < float.Epsilon)
                     {
@@ -100,11 +100,11 @@
                 t1 = 0f;
             }
 
-            return new VectorMovementCollisionResult()
-            {
-                Time = t1,
-                Position = !float.IsNaN(t1) ? new Vector2(sP1x + S * t1, sP1y + K * t1) : new Vector2()
-            };
+            return new VectorMovementCollisionResult
+						{
+							Time = t1,
+							Position = !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : new Vector2()
+						};
         }
 
         #endregion

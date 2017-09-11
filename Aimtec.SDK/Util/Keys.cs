@@ -156,28 +156,28 @@
         /// <summary>
         ///     The IME convert key.
         /// </summary>
-        IMEConvert = FinalMode | MButton,
+        ImeConvert = FinalMode | MButton,
 
         /// <summary>
         ///     The IME nonconvert key.
         /// </summary>
-        IMENonconvert = IMEConvert | LButton,
+        ImeNonconvert = ImeConvert | LButton,
 
         /// <summary>
         ///     The IME accept key, replaces IMEAceept.
         /// </summary>
-        IMEAccept = IMEConvert | RButton,
+        ImeAccept = ImeConvert | RButton,
 
         /// <summary>
         ///     The IME accept key.
         /// </summary>
         [Obsolete("Obsolete, use IMEAccept instead.")]
-        IMEAceept = IMEAccept,
+        ImeAceept = ImeAccept,
 
         /// <summary>
         ///     The IME mode change key.
         /// </summary>
-        IMEModeChange = IMEAccept | LButton,
+        ImeModeChange = ImeAccept | LButton,
 
         /// <summary>
         ///     The SPACEBAR key.
@@ -867,7 +867,7 @@
         /// <summary>
         ///     The OEM pipe key on a US standard keyboard (Windows 2000 or later).
         /// </summary>
-        OemPipe = Oem3 | IMEConvert,
+        OemPipe = Oem3 | ImeConvert,
 
         /// <summary>
         ///     The OEM 5 key.
@@ -978,6 +978,6 @@
         /// <summary>
         ///     The ALT modifier key.
         /// </summary>
-        Alt = 262144,
+        Alt = 262144
     }
 }

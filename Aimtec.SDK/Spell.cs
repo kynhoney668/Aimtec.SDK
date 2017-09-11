@@ -427,16 +427,16 @@
             Vector3 fromPosition = new Vector3(),
             Vector3 rangeCheckFromPosition = new Vector3())
         {
-            var input = new PredictionInput()
-            {
-                Delay = this.Delay,
-                Radius = this.Width,
-                Speed = this.Speed,
-                Range = this.Range,
-                Unit = target,
-                From = this.From,
-                Collision = this.Collision
-            };
+            var input = new PredictionInput
+                            {
+                                Delay = this.Delay,
+                                Radius = this.Width,
+                                Speed = this.Speed,
+                                Range = this.Range,
+                                Unit = target,
+                                From = this.From,
+                                Collision = this.Collision
+                            };
 
             if (!fromPosition.IsZero)
             {

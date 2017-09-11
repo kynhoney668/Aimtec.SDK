@@ -1,11 +1,11 @@
 ﻿namespace Aimtec.SDK.Orbwalking
 {
     using System;
+    using System.Collections.Generic;
 
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Config;
     using Aimtec.SDK.Util;
-    using System.Collections.Generic;
 
     /// <summary>
     ///     Orbwalker class

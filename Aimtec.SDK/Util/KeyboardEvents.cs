@@ -8,21 +8,21 @@
         /// <summary>
         ///     The key down event.
         /// </summary>
-        KEYBDEVENTF_KEYDOWN = 0x0,
+        KeybdeventfKeydown = 0x0,
 
         /// <summary>
         ///     The key up event.
         /// </summary>
-        KEYBDEVENTF_KEYUP = 0x2,
+        KeybdeventfKeyup = 0x2,
 
         /// <summary>
         ///     The shift virtual event.
         /// </summary>
-        KEYBDEVENTF_SHIFTVIRTUAL = 0x10,
+        KeybdeventfShiftvirtual = 0x10,
 
         /// <summary>
         ///     The shift scan code event.
         /// </summary>
-        KEYBDEVENTF_SHIFTSCANCODE = 0x2a,
+        KeybdeventfShiftscancode = 0x2a
     }
 }

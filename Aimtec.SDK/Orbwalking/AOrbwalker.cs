@@ -27,7 +27,7 @@
         /// </summary>
         protected Menu Config;
 
-        private string[] _attackResets =
+        private string[] attackResets =
         {
             "dariusnoxiantacticsonh",
             "fiorae",
@@ -97,8 +97,8 @@
         /// <inheritdoc cref="IOrbwalker" />
         public string[] AttackResets
         {
-            get => this._attackResets;
-            set => this._attackResets = value;
+            get => this.attackResets;
+            set => this.attackResets = value;
         }
 
         /// <inheritdoc cref="IOrbwalker" />

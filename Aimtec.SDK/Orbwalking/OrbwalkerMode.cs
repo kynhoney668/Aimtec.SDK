@@ -16,7 +16,7 @@
         /// <summary>
         ///     The target selection logic for this mode
         /// </summary>
-        public TargetDelegate GetTargetImplementation = null;
+        public TargetDelegate GetTargetImplementation;
 
         /// <summary>
         ///     This Orbwalker Mode's logic
@@ -28,9 +28,9 @@
         /// </summary>
         public AOrbwalker ParentInstance;
 
-        private bool _attackEnabled;
+        private bool attackEnabled;
 
-        private bool _moveEnabled;
+        private bool moveEnabled;
 
         #endregion
 
@@ -113,11 +113,11 @@
                     return true;
                 }
 
-                return this._attackEnabled;
+                return this.attackEnabled;
             }
             set
             {
-                this._attackEnabled = value;
+                this.attackEnabled = value;
             }
         }
 
@@ -142,11 +142,11 @@
                 {
                     return true;
                 }
-                return this._moveEnabled;
+                return this.moveEnabled;
             }
             set
             {
-                this._moveEnabled = value;
+                this.moveEnabled = value;
             }
         }
 

@@ -99,7 +99,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
 
         #endregion
-    };
+    }
 
     //------------------------------------------------------------------------------
     // PolyTree & PolyNode classes
@@ -109,7 +109,7 @@ namespace Aimtec.SDK.Util.ThirdParty
     {
         #region Fields
 
-        internal List<PolyNode> m_AllPolys = new List<PolyNode>();
+        internal List<PolyNode> MAllPolys = new List<PolyNode>();
 
         #endregion
 
@@ -119,9 +119,9 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             get
             {
-                var result = this.m_AllPolys.Count;
+                var result = this.MAllPolys.Count;
                 //with negative offsets, ignore the hidden outer polygon ...
-                if (result > 0 && this.m_Childs[0] != this.m_AllPolys[0])
+                if (result > 0 && this.MChilds[0] != this.MAllPolys[0])
                     result--;
                 return result;
             }
@@ -136,18 +136,17 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         public void Clear()
         {
-            for (var i = 0; i < this.m_AllPolys.Count; i++)
-                this.m_AllPolys[i] = null;
-            this.m_AllPolys.Clear();
-            this.m_Childs.Clear();
+            for (var i = 0; i < this.MAllPolys.Count; i++)
+                this.MAllPolys[i] = null;
+            this.MAllPolys.Clear();
+            this.MChilds.Clear();
         }
 
         public PolyNode GetFirst()
         {
-            if (this.m_Childs.Count > 0)
-                return this.m_Childs[0];
-            else
-                return null;
+            if (this.MChilds.Count > 0)
+                return this.MChilds[0];
+            return null;
         }
 
         #endregion
@@ -157,17 +156,17 @@ namespace Aimtec.SDK.Util.ThirdParty
     {
         #region Fields
 
-        internal List<PolyNode> m_Childs = new List<PolyNode>();
+        internal List<PolyNode> MChilds = new List<PolyNode>();
 
-        internal EndType m_endtype;
+        internal EndType MEndtype;
 
-        internal int m_Index;
+        internal int MIndex;
 
-        internal JoinType m_jointype;
+        internal JoinType MJointype;
 
-        internal PolyNode m_Parent;
+        internal PolyNode MParent;
 
-        internal Path m_polygon = new Path();
+        internal Path MPolygon = new Path();
 
         #endregion
 
@@ -177,7 +176,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             get
             {
-                return this.m_Childs.Count;
+                return this.MChilds.Count;
             }
         }
 
@@ -185,7 +184,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             get
             {
-                return this.m_Childs;
+                return this.MChilds;
             }
         }
 
@@ -193,7 +192,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             get
             {
-                return this.m_polygon;
+                return this.MPolygon;
             }
         }
 
@@ -211,7 +210,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             get
             {
-                return this.m_Parent;
+                return this.MParent;
             }
         }
 
@@ -221,42 +220,40 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         public PolyNode GetNext()
         {
-            if (this.m_Childs.Count > 0)
-                return this.m_Childs[0];
-            else
-                return this.GetNextSiblingUp();
+            if (this.MChilds.Count > 0)
+                return this.MChilds[0];
+            return this.GetNextSiblingUp();
         }
 
         #endregion
 
         #region Methods
 
-        internal void AddChild(PolyNode Child)
+        internal void AddChild(PolyNode child)
         {
-            var cnt = this.m_Childs.Count;
-            this.m_Childs.Add(Child);
-            Child.m_Parent = this;
-            Child.m_Index = cnt;
+            var cnt = this.MChilds.Count;
+            this.MChilds.Add(child);
+            child.MParent = this;
+            child.MIndex = cnt;
         }
 
         internal PolyNode GetNextSiblingUp()
         {
-            if (this.m_Parent == null)
+            if (this.MParent == null)
                 return null;
-            else if (this.m_Index == this.m_Parent.m_Childs.Count - 1)
-                return this.m_Parent.GetNextSiblingUp();
-            else
-                return this.m_Parent.m_Childs[this.m_Index + 1];
+            if (this.MIndex == this.MParent.MChilds.Count - 1)
+                return this.MParent.GetNextSiblingUp();
+            return this.MParent.MChilds[this.MIndex + 1];
         }
 
         private bool IsHoleNode()
         {
             var result = true;
-            var node = this.m_Parent;
+            var node = this.MParent;
             while (node != null)
             {
                 result = !result;
-                node = node.m_Parent;
+                node = node.MParent;
             }
             return result;
         }
@@ -357,31 +354,28 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             if ((object) val1 == (object) val2)
                 return true;
-            else if ((object) val1 == null || (object) val2 == null)
+            if ((object) val1 == null || (object) val2 == null)
                 return false;
             return val1.hi == val2.hi && val1.lo == val2.lo;
         }
 
         public static explicit operator double(Int128 val)
         {
-            const double shift64 = 18446744073709551616.0; //2^64
+            const double Shift64 = 18446744073709551616.0; //2^64
             if (val.hi < 0)
             {
                 if (val.lo == 0)
-                    return (double) val.hi * shift64;
-                else
-                    return -(double) (~val.lo + ~val.hi * shift64);
+                    return val.hi * Shift64;
+                return -(~val.lo + ~val.hi * Shift64);
             }
-            else
-                return (double) (val.lo + val.hi * shift64);
+            return val.lo + val.hi * Shift64;
         }
 
         public static bool operator >(Int128 val1, Int128 val2)
         {
             if (val1.hi != val2.hi)
                 return val1.hi > val2.hi;
-            else
-                return val1.lo > val2.lo;
+            return val1.lo > val2.lo;
         }
 
         public static bool operator !=(Int128 val1, Int128 val2)
@@ -393,8 +387,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             if (val1.hi != val2.hi)
                 return val1.hi < val2.hi;
-            else
-                return val1.lo < val2.lo;
+            return val1.lo < val2.lo;
         }
 
         public static Int128 operator -(Int128 lhs, Int128 rhs)
@@ -406,8 +399,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             if (val.lo == 0)
                 return new Int128(-val.hi, 0);
-            else
-                return new Int128(~val.hi, ~val.lo + 1);
+            return new Int128(~val.hi, ~val.lo + 1);
         }
 
         public override bool Equals(Object obj)
@@ -429,7 +421,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
 
         #endregion
-    };
+    }
 
     //------------------------------------------------------------------------------
     //------------------------------------------------------------------------------
@@ -504,8 +496,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                 var a = (IntPoint) obj;
                 return this.X == a.X && this.Y == a.Y;
             }
-            else
-                return false;
+            return false;
         }
 
         public override int GetHashCode()
@@ -519,13 +510,13 @@ namespace Aimtec.SDK.Util.ThirdParty
     {
         #region Fields
 
-        public cInt bottom;
+        public cInt Bottom;
 
-        public cInt left;
+        public cInt Left;
 
-        public cInt right;
+        public cInt Right;
 
-        public cInt top;
+        public cInt Top;
 
         #endregion
 
@@ -533,18 +524,18 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         public IntRect(cInt l, cInt t, cInt r, cInt b)
         {
-            this.left = l;
-            this.top = t;
-            this.right = r;
-            this.bottom = b;
+            this.Left = l;
+            this.Top = t;
+            this.Right = r;
+            this.Bottom = b;
         }
 
         public IntRect(IntRect ir)
         {
-            this.left = ir.left;
-            this.top = ir.top;
-            this.right = ir.right;
-            this.bottom = ir.bottom;
+            this.Left = ir.Left;
+            this.Top = ir.Top;
+            this.Right = ir.Right;
+            this.Bottom = ir.Bottom;
         }
 
         #endregion
@@ -552,21 +543,21 @@ namespace Aimtec.SDK.Util.ThirdParty
 
     public enum ClipType
     {
-        ctIntersection,
+        CtIntersection,
 
-        ctUnion,
+        CtUnion,
 
-        ctDifference,
+        CtDifference,
 
-        ctXor
-    };
+        CtXor
+    }
 
     public enum PolyType
     {
-        ptSubject,
+        PtSubject,
 
-        ptClip
-    };
+        PtClip
+    }
 
     //By far the most widely used winding rules for polygon filling are
     //EvenOdd & NonZero (GDI, GDI+, XLib, OpenGL, Cairo, AGG, Quartz, SVG, Gr32)
@@ -574,52 +565,52 @@ namespace Aimtec.SDK.Util.ThirdParty
     //see http://glprogramming.com/red/chapter11.html
     public enum PolyFillType
     {
-        pftEvenOdd,
+        PftEvenOdd,
 
-        pftNonZero,
+        PftNonZero,
 
-        pftPositive,
+        PftPositive,
 
-        pftNegative
-    };
+        PftNegative
+    }
 
     public enum JoinType
     {
-        jtSquare,
+        JtSquare,
 
-        jtRound,
+        JtRound,
 
-        jtMiter
-    };
+        JtMiter
+    }
 
     public enum EndType
     {
-        etClosedPolygon,
+        EtClosedPolygon,
 
-        etClosedLine,
+        EtClosedLine,
 
-        etOpenButt,
+        EtOpenButt,
 
-        etOpenSquare,
+        EtOpenSquare,
 
-        etOpenRound
-    };
+        EtOpenRound
+    }
 
     internal enum EdgeSide
     {
-        esLeft,
+        EsLeft,
 
-        esRight
-    };
+        EsRight
+    }
 
     internal enum Direction
     {
-        dRightToLeft,
+        DRightToLeft,
 
-        dLeftToRight
-    };
+        DLeftToRight
+    }
 
-    internal class TEdge
+    internal class Edge
     {
         #region Fields
 
@@ -631,23 +622,23 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         internal double Dx;
 
-        internal TEdge Next;
+        internal Edge Next;
 
-        internal TEdge NextInAEL;
+        internal Edge NextInAel;
 
-        internal TEdge NextInLML;
+        internal Edge NextInLml;
 
-        internal TEdge NextInSEL;
+        internal Edge NextInSel;
 
         internal int OutIdx;
 
         internal PolyType PolyTyp;
 
-        internal TEdge Prev;
+        internal Edge Prev;
 
-        internal TEdge PrevInAEL;
+        internal Edge PrevInAel;
 
-        internal TEdge PrevInSEL;
+        internal Edge PrevInSel;
 
         internal EdgeSide Side; //side only refers to current side of solution poly
 
@@ -660,20 +651,20 @@ namespace Aimtec.SDK.Util.ThirdParty
         internal int WindDelta; //1 or -1 depending on winding direction
 
         #endregion
-    };
+    }
 
     public class IntersectNode
     {
         #region Fields
 
-        internal TEdge Edge1;
+        internal Edge Edge1;
 
-        internal TEdge Edge2;
+        internal Edge Edge2;
 
         internal IntPoint Pt;
 
         #endregion
-    };
+    }
 
     public class MyIntersectNodeSort : IComparer<IntersectNode>
     {
@@ -684,10 +675,9 @@ namespace Aimtec.SDK.Util.ThirdParty
             var i = node2.Pt.Y - node1.Pt.Y;
             if (i > 0)
                 return 1;
-            else if (i < 0)
+            if (i < 0)
                 return -1;
-            else
-                return 0;
+            return 0;
         }
 
         #endregion
@@ -697,16 +687,16 @@ namespace Aimtec.SDK.Util.ThirdParty
     {
         #region Fields
 
-        internal TEdge LeftBound;
+        internal Edge LeftBound;
 
         internal LocalMinima Next;
 
-        internal TEdge RightBound;
+        internal Edge RightBound;
 
         internal cInt Y;
 
         #endregion
-    };
+    }
 
     internal class Scanbeam
     {
@@ -717,7 +707,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         internal cInt Y;
 
         #endregion
-    };
+    }
 
     internal class Maxima
     {
@@ -730,7 +720,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         internal cInt X;
 
         #endregion
-    };
+    }
 
     //OutRec: contains a path in the clipping solution. Edges in the AEL will
     //carry a pointer to an OutRec when they are part of the clipping solution.
@@ -753,7 +743,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         internal OutPt Pts;
 
         #endregion
-    };
+    }
 
     internal class OutPt
     {
@@ -768,7 +758,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         internal IntPoint Pt;
 
         #endregion
-    };
+    }
 
     internal class Join
     {
@@ -781,46 +771,46 @@ namespace Aimtec.SDK.Util.ThirdParty
         internal OutPt OutPt2;
 
         #endregion
-    };
+    }
 
     public class ClipperBase
     {
-        internal const double horizontal = -3.4E+38;
+        internal const double Horizontal = -3.4E+38;
 
         internal const int Skip = -2;
 
         internal const int Unassigned = -1;
 
-        internal const double tolerance = 1.0E-20;
+        internal const double Tolerance = 1.0E-20;
 
-        internal static bool near_zero(double val)
+        internal static bool NearZero(double val)
         {
-            return val > -tolerance && val < tolerance;
+            return val > -Tolerance && val < Tolerance;
         }
 
 #if use_int32
     public const cInt loRange = 0x7FFF;
     public const cInt hiRange = 0x7FFF;
 #else
-        public const cInt loRange = 0x3FFFFFFF;
-        public const cInt hiRange = 0x3FFFFFFFFFFFFFFFL;
+        public const cInt LoRange = 0x3FFFFFFF;
+        public const cInt HiRange = 0x3FFFFFFFFFFFFFFFL;
 #endif
 
-        internal LocalMinima m_MinimaList;
+        internal LocalMinima MMinimaList;
 
-        internal LocalMinima m_CurrentLM;
+        internal LocalMinima MCurrentLm;
 
-        internal List<List<TEdge>> m_edges = new List<List<TEdge>>();
+        internal List<List<Edge>> MEdges = new List<List<Edge>>();
 
-        internal Scanbeam m_Scanbeam;
+        internal Scanbeam MScanbeam;
 
-        internal List<OutRec> m_PolyOuts;
+        internal List<OutRec> MPolyOuts;
 
-        internal TEdge m_ActiveEdges;
+        internal Edge MActiveEdges;
 
-        internal bool m_UseFullRange;
+        internal bool MUseFullRange;
 
-        internal bool m_HasOpenPaths;
+        internal bool MHasOpenPaths;
 
         //------------------------------------------------------------------------------
 
@@ -835,7 +825,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        internal static bool IsHorizontal(TEdge e)
+        internal static bool IsHorizontal(Edge e)
         {
             return e.Delta.Y == 0;
         }
@@ -855,26 +845,25 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        internal bool PointOnLineSegment(IntPoint pt, IntPoint linePt1, IntPoint linePt2, bool UseFullRange)
+        internal bool PointOnLineSegment(IntPoint pt, IntPoint linePt1, IntPoint linePt2, bool useFullRange)
         {
-            if (UseFullRange)
+            if (useFullRange)
                 return pt.X == linePt1.X && pt.Y == linePt1.Y || pt.X == linePt2.X && pt.Y == linePt2.Y
                     || pt.X > linePt1.X == pt.X < linePt2.X && pt.Y > linePt1.Y == pt.Y < linePt2.Y
                     && Int128.Int128Mul(pt.X - linePt1.X, linePt2.Y - linePt1.Y)
                     == Int128.Int128Mul(linePt2.X - linePt1.X, pt.Y - linePt1.Y);
-            else
-                return pt.X == linePt1.X && pt.Y == linePt1.Y || pt.X == linePt2.X && pt.Y == linePt2.Y
-                    || pt.X > linePt1.X == pt.X < linePt2.X && pt.Y > linePt1.Y == pt.Y < linePt2.Y
-                    && (pt.X - linePt1.X) * (linePt2.Y - linePt1.Y) == (linePt2.X - linePt1.X) * (pt.Y - linePt1.Y);
+            return pt.X == linePt1.X && pt.Y == linePt1.Y || pt.X == linePt2.X && pt.Y == linePt2.Y
+                   || pt.X > linePt1.X == pt.X < linePt2.X && pt.Y > linePt1.Y == pt.Y < linePt2.Y
+                   && (pt.X - linePt1.X) * (linePt2.Y - linePt1.Y) == (linePt2.X - linePt1.X) * (pt.Y - linePt1.Y);
         }
         //------------------------------------------------------------------------------
 
-        internal bool PointOnPolygon(IntPoint pt, OutPt pp, bool UseFullRange)
+        internal bool PointOnPolygon(IntPoint pt, OutPt pp, bool useFullRange)
         {
             var pp2 = pp;
             while (true)
             {
-                if (this.PointOnLineSegment(pt, pp2.Pt, pp2.Next.Pt, UseFullRange))
+                if (this.PointOnLineSegment(pt, pp2.Pt, pp2.Next.Pt, useFullRange))
                     return true;
                 pp2 = pp2.Next;
                 if (pp2 == pp)
@@ -884,85 +873,82 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        internal static bool SlopesEqual(TEdge e1, TEdge e2, bool UseFullRange)
+        internal static bool SlopesEqual(Edge e1, Edge e2, bool useFullRange)
         {
-            if (UseFullRange)
+            if (useFullRange)
                 return Int128.Int128Mul(e1.Delta.Y, e2.Delta.X) == Int128.Int128Mul(e1.Delta.X, e2.Delta.Y);
-            else
-                return (cInt) e1.Delta.Y * e2.Delta.X == (cInt) e1.Delta.X * e2.Delta.Y;
+            return e1.Delta.Y * e2.Delta.X == e1.Delta.X * e2.Delta.Y;
         }
         //------------------------------------------------------------------------------
 
-        internal static bool SlopesEqual(IntPoint pt1, IntPoint pt2, IntPoint pt3, bool UseFullRange)
+        internal static bool SlopesEqual(IntPoint pt1, IntPoint pt2, IntPoint pt3, bool useFullRange)
         {
-            if (UseFullRange)
+            if (useFullRange)
                 return Int128.Int128Mul(pt1.Y - pt2.Y, pt2.X - pt3.X) == Int128.Int128Mul(pt1.X - pt2.X, pt2.Y - pt3.Y);
-            else
-                return (cInt) (pt1.Y - pt2.Y) * (pt2.X - pt3.X) - (cInt) (pt1.X - pt2.X) * (pt2.Y - pt3.Y) == 0;
+            return (pt1.Y - pt2.Y) * (pt2.X - pt3.X) - (pt1.X - pt2.X) * (pt2.Y - pt3.Y) == 0;
         }
         //------------------------------------------------------------------------------
 
-        internal static bool SlopesEqual(IntPoint pt1, IntPoint pt2, IntPoint pt3, IntPoint pt4, bool UseFullRange)
+        internal static bool SlopesEqual(IntPoint pt1, IntPoint pt2, IntPoint pt3, IntPoint pt4, bool useFullRange)
         {
-            if (UseFullRange)
+            if (useFullRange)
                 return Int128.Int128Mul(pt1.Y - pt2.Y, pt3.X - pt4.X) == Int128.Int128Mul(pt1.X - pt2.X, pt3.Y - pt4.Y);
-            else
-                return (cInt) (pt1.Y - pt2.Y) * (pt3.X - pt4.X) - (cInt) (pt1.X - pt2.X) * (pt3.Y - pt4.Y) == 0;
+            return (pt1.Y - pt2.Y) * (pt3.X - pt4.X) - (pt1.X - pt2.X) * (pt3.Y - pt4.Y) == 0;
         }
         //------------------------------------------------------------------------------
 
         internal ClipperBase() //constructor (nb: no external instantiation)
         {
-            this.m_MinimaList = null;
-            this.m_CurrentLM = null;
-            this.m_UseFullRange = false;
-            this.m_HasOpenPaths = false;
+            this.MMinimaList = null;
+            this.MCurrentLm = null;
+            this.MUseFullRange = false;
+            this.MHasOpenPaths = false;
         }
         //------------------------------------------------------------------------------
 
         public virtual void Clear()
         {
             this.DisposeLocalMinimaList();
-            for (var i = 0; i < this.m_edges.Count; ++i)
+            for (var i = 0; i < this.MEdges.Count; ++i)
             {
-                for (var j = 0; j < this.m_edges[i].Count; ++j)
-                    this.m_edges[i][j] = null;
-                this.m_edges[i].Clear();
+                for (var j = 0; j < this.MEdges[i].Count; ++j)
+                    this.MEdges[i][j] = null;
+                this.MEdges[i].Clear();
             }
-            this.m_edges.Clear();
-            this.m_UseFullRange = false;
-            this.m_HasOpenPaths = false;
+            this.MEdges.Clear();
+            this.MUseFullRange = false;
+            this.MHasOpenPaths = false;
         }
         //------------------------------------------------------------------------------
 
         private void DisposeLocalMinimaList()
         {
-            while (this.m_MinimaList != null)
+            while (this.MMinimaList != null)
             {
-                var tmpLm = this.m_MinimaList.Next;
-                this.m_MinimaList = null;
-                this.m_MinimaList = tmpLm;
+                var tmpLm = this.MMinimaList.Next;
+                this.MMinimaList = null;
+                this.MMinimaList = tmpLm;
             }
-            this.m_CurrentLM = null;
+            this.MCurrentLm = null;
         }
         //------------------------------------------------------------------------------
 
-        void RangeTest(IntPoint Pt, ref bool useFullRange)
+        void RangeTest(IntPoint pt, ref bool useFullRange)
         {
             if (useFullRange)
             {
-                if (Pt.X > hiRange || Pt.Y > hiRange || -Pt.X > hiRange || -Pt.Y > hiRange)
+                if (pt.X > HiRange || pt.Y > HiRange || -pt.X > HiRange || -pt.Y > HiRange)
                     throw new ClipperException("Coordinate outside allowed range");
             }
-            else if (Pt.X > loRange || Pt.Y > loRange || -Pt.X > loRange || -Pt.Y > loRange)
+            else if (pt.X > LoRange || pt.Y > LoRange || -pt.X > LoRange || -pt.Y > LoRange)
             {
                 useFullRange = true;
-                this.RangeTest(Pt, ref useFullRange);
+                this.RangeTest(pt, ref useFullRange);
             }
         }
         //------------------------------------------------------------------------------
 
-        private void InitEdge(TEdge e, TEdge eNext, TEdge ePrev, IntPoint pt)
+        private void InitEdge(Edge e, Edge eNext, Edge ePrev, IntPoint pt)
         {
             e.Next = eNext;
             e.Prev = ePrev;
@@ -971,7 +957,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private void InitEdge2(TEdge e, PolyType polyType)
+        private void InitEdge2(Edge e, PolyType polyType)
         {
             if (e.Curr.Y >= e.Next.Curr.Y)
             {
@@ -988,316 +974,316 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private TEdge FindNextLocMin(TEdge E)
+        private Edge FindNextLocMin(Edge e)
         {
-            TEdge E2;
+            Edge e2;
             for (;;)
             {
-                while (E.Bot != E.Prev.Bot || E.Curr == E.Top)
-                    E = E.Next;
-                if (E.Dx != horizontal && E.Prev.Dx != horizontal)
+                while (e.Bot != e.Prev.Bot || e.Curr == e.Top)
+                    e = e.Next;
+                if (e.Dx != Horizontal && e.Prev.Dx != Horizontal)
                     break;
-                while (E.Prev.Dx == horizontal)
-                    E = E.Prev;
-                E2 = E;
-                while (E.Dx == horizontal)
-                    E = E.Next;
-                if (E.Top.Y == E.Prev.Bot.Y)
+                while (e.Prev.Dx == Horizontal)
+                    e = e.Prev;
+                e2 = e;
+                while (e.Dx == Horizontal)
+                    e = e.Next;
+                if (e.Top.Y == e.Prev.Bot.Y)
                     continue; //ie just an intermediate horz.
-                if (E2.Prev.Bot.X < E.Bot.X)
-                    E = E2;
+                if (e2.Prev.Bot.X < e.Bot.X)
+                    e = e2;
                 break;
             }
-            return E;
+            return e;
         }
         //------------------------------------------------------------------------------
 
-        private TEdge ProcessBound(TEdge E, bool LeftBoundIsForward)
+        private Edge ProcessBound(Edge e, bool leftBoundIsForward)
         {
-            TEdge EStart, Result = E;
-            TEdge Horz;
+            Edge eStart, result = e;
+            Edge horz;
 
-            if (Result.OutIdx == Skip)
+            if (result.OutIdx == Skip)
             {
                 //check if there are edges beyond the skip edge in the bound and if so
                 //create another LocMin and calling ProcessBound once more ...
-                E = Result;
-                if (LeftBoundIsForward)
+                e = result;
+                if (leftBoundIsForward)
                 {
-                    while (E.Top.Y == E.Next.Bot.Y)
-                        E = E.Next;
-                    while (E != Result && E.Dx == horizontal)
-                        E = E.Prev;
+                    while (e.Top.Y == e.Next.Bot.Y)
+                        e = e.Next;
+                    while (e != result && e.Dx == Horizontal)
+                        e = e.Prev;
                 }
                 else
                 {
-                    while (E.Top.Y == E.Prev.Bot.Y)
-                        E = E.Prev;
-                    while (E != Result && E.Dx == horizontal)
-                        E = E.Next;
+                    while (e.Top.Y == e.Prev.Bot.Y)
+                        e = e.Prev;
+                    while (e != result && e.Dx == Horizontal)
+                        e = e.Next;
                 }
-                if (E == Result)
+                if (e == result)
                 {
-                    if (LeftBoundIsForward)
-                        Result = E.Next;
+                    if (leftBoundIsForward)
+                        result = e.Next;
                     else
-                        Result = E.Prev;
+                        result = e.Prev;
                 }
                 else
                 {
                     //there are more edges in the bound beyond result starting with E
-                    if (LeftBoundIsForward)
-                        E = Result.Next;
+                    if (leftBoundIsForward)
+                        e = result.Next;
                     else
-                        E = Result.Prev;
+                        e = result.Prev;
                     var locMin = new LocalMinima();
                     locMin.Next = null;
-                    locMin.Y = E.Bot.Y;
+                    locMin.Y = e.Bot.Y;
                     locMin.LeftBound = null;
-                    locMin.RightBound = E;
-                    E.WindDelta = 0;
-                    Result = this.ProcessBound(E, LeftBoundIsForward);
+                    locMin.RightBound = e;
+                    e.WindDelta = 0;
+                    result = this.ProcessBound(e, leftBoundIsForward);
                     this.InsertLocalMinima(locMin);
                 }
-                return Result;
+                return result;
             }
 
-            if (E.Dx == horizontal)
+            if (e.Dx == Horizontal)
             {
                 //We need to be careful with open paths because this may not be a
                 //true local minima (ie E may be following a skip edge).
                 //Also, consecutive horz. edges may start heading left before going right.
-                if (LeftBoundIsForward)
-                    EStart = E.Prev;
+                if (leftBoundIsForward)
+                    eStart = e.Prev;
                 else
-                    EStart = E.Next;
-                if (EStart.Dx == horizontal) //ie an adjoining horizontal skip edge
+                    eStart = e.Next;
+                if (eStart.Dx == Horizontal) //ie an adjoining horizontal skip edge
                 {
-                    if (EStart.Bot.X != E.Bot.X && EStart.Top.X != E.Bot.X)
-                        this.ReverseHorizontal(E);
+                    if (eStart.Bot.X != e.Bot.X && eStart.Top.X != e.Bot.X)
+                        this.ReverseHorizontal(e);
                 }
-                else if (EStart.Bot.X != E.Bot.X)
-                    this.ReverseHorizontal(E);
+                else if (eStart.Bot.X != e.Bot.X)
+                    this.ReverseHorizontal(e);
             }
 
-            EStart = E;
-            if (LeftBoundIsForward)
+            eStart = e;
+            if (leftBoundIsForward)
             {
-                while (Result.Top.Y == Result.Next.Bot.Y && Result.Next.OutIdx != Skip)
-                    Result = Result.Next;
-                if (Result.Dx == horizontal && Result.Next.OutIdx != Skip)
+                while (result.Top.Y == result.Next.Bot.Y && result.Next.OutIdx != Skip)
+                    result = result.Next;
+                if (result.Dx == Horizontal && result.Next.OutIdx != Skip)
                 {
                     //nb: at the top of a bound, horizontals are added to the bound
                     //only when the preceding edge attaches to the horizontal's left vertex
                     //unless a Skip edge is encountered when that becomes the top divide
-                    Horz = Result;
-                    while (Horz.Prev.Dx == horizontal)
-                        Horz = Horz.Prev;
-                    if (Horz.Prev.Top.X > Result.Next.Top.X)
-                        Result = Horz.Prev;
+                    horz = result;
+                    while (horz.Prev.Dx == Horizontal)
+                        horz = horz.Prev;
+                    if (horz.Prev.Top.X > result.Next.Top.X)
+                        result = horz.Prev;
                 }
-                while (E != Result)
+                while (e != result)
                 {
-                    E.NextInLML = E.Next;
-                    if (E.Dx == horizontal && E != EStart && E.Bot.X != E.Prev.Top.X)
-                        this.ReverseHorizontal(E);
-                    E = E.Next;
+                    e.NextInLml = e.Next;
+                    if (e.Dx == Horizontal && e != eStart && e.Bot.X != e.Prev.Top.X)
+                        this.ReverseHorizontal(e);
+                    e = e.Next;
                 }
-                if (E.Dx == horizontal && E != EStart && E.Bot.X != E.Prev.Top.X)
-                    this.ReverseHorizontal(E);
-                Result = Result.Next; //move to the edge just beyond current bound
+                if (e.Dx == Horizontal && e != eStart && e.Bot.X != e.Prev.Top.X)
+                    this.ReverseHorizontal(e);
+                result = result.Next; //move to the edge just beyond current bound
             }
             else
             {
-                while (Result.Top.Y == Result.Prev.Bot.Y && Result.Prev.OutIdx != Skip)
-                    Result = Result.Prev;
-                if (Result.Dx == horizontal && Result.Prev.OutIdx != Skip)
+                while (result.Top.Y == result.Prev.Bot.Y && result.Prev.OutIdx != Skip)
+                    result = result.Prev;
+                if (result.Dx == Horizontal && result.Prev.OutIdx != Skip)
                 {
-                    Horz = Result;
-                    while (Horz.Next.Dx == horizontal)
-                        Horz = Horz.Next;
-                    if (Horz.Next.Top.X == Result.Prev.Top.X || Horz.Next.Top.X > Result.Prev.Top.X)
-                        Result = Horz.Next;
+                    horz = result;
+                    while (horz.Next.Dx == Horizontal)
+                        horz = horz.Next;
+                    if (horz.Next.Top.X == result.Prev.Top.X || horz.Next.Top.X > result.Prev.Top.X)
+                        result = horz.Next;
                 }
 
-                while (E != Result)
+                while (e != result)
                 {
-                    E.NextInLML = E.Prev;
-                    if (E.Dx == horizontal && E != EStart && E.Bot.X != E.Next.Top.X)
-                        this.ReverseHorizontal(E);
-                    E = E.Prev;
+                    e.NextInLml = e.Prev;
+                    if (e.Dx == Horizontal && e != eStart && e.Bot.X != e.Next.Top.X)
+                        this.ReverseHorizontal(e);
+                    e = e.Prev;
                 }
-                if (E.Dx == horizontal && E != EStart && E.Bot.X != E.Next.Top.X)
-                    this.ReverseHorizontal(E);
-                Result = Result.Prev; //move to the edge just beyond current bound
+                if (e.Dx == Horizontal && e != eStart && e.Bot.X != e.Next.Top.X)
+                    this.ReverseHorizontal(e);
+                result = result.Prev; //move to the edge just beyond current bound
             }
-            return Result;
+            return result;
         }
         //------------------------------------------------------------------------------
 
-        public bool AddPath(Path pg, PolyType polyType, bool Closed)
+        public bool AddPath(Path pg, PolyType polyType, bool closed)
         {
 #if use_lines
-            if (!Closed && polyType == PolyType.ptClip)
+            if (!closed && polyType == PolyType.PtClip)
                 throw new ClipperException("AddPath: Open paths must be subject.");
 #else
       if (!Closed)
         throw new ClipperException("AddPath: Open paths have been disabled.");
 #endif
 
-            var highI = (int) pg.Count - 1;
-            if (Closed)
+            var highI = pg.Count - 1;
+            if (closed)
                 while (highI > 0 && pg[highI] == pg[0])
                     --highI;
             while (highI > 0 && pg[highI] == pg[highI - 1])
                 --highI;
-            if (Closed && highI < 2 || !Closed && highI < 1)
+            if (closed && highI < 2 || !closed && highI < 1)
                 return false;
 
             //create a new edge array ...
-            var edges = new List<TEdge>(highI + 1);
+            var edges = new List<Edge>(highI + 1);
             for (var i = 0; i <= highI; i++)
-                edges.Add(new TEdge());
+                edges.Add(new Edge());
 
-            var IsFlat = true;
+            var isFlat = true;
 
             //1. Basic (first) edge initialization ...
             edges[1].Curr = pg[1];
-            this.RangeTest(pg[0], ref this.m_UseFullRange);
-            this.RangeTest(pg[highI], ref this.m_UseFullRange);
+            this.RangeTest(pg[0], ref this.MUseFullRange);
+            this.RangeTest(pg[highI], ref this.MUseFullRange);
             this.InitEdge(edges[0], edges[1], edges[highI], pg[0]);
             this.InitEdge(edges[highI], edges[0], edges[highI - 1], pg[highI]);
             for (var i = highI - 1; i >= 1; --i)
             {
-                this.RangeTest(pg[i], ref this.m_UseFullRange);
+                this.RangeTest(pg[i], ref this.MUseFullRange);
                 this.InitEdge(edges[i], edges[i + 1], edges[i - 1], pg[i]);
             }
             var eStart = edges[0];
 
             //2. Remove duplicate vertices, and (when closed) collinear edges ...
-            TEdge E = eStart, eLoopStop = eStart;
+            Edge e = eStart, eLoopStop = eStart;
             for (;;)
             {
                 //nb: allows matching start and end points when not Closed ...
-                if (E.Curr == E.Next.Curr && (Closed || E.Next != eStart))
+                if (e.Curr == e.Next.Curr && (closed || e.Next != eStart))
                 {
-                    if (E == E.Next)
+                    if (e == e.Next)
                         break;
-                    if (E == eStart)
-                        eStart = E.Next;
-                    E = this.RemoveEdge(E);
-                    eLoopStop = E;
+                    if (e == eStart)
+                        eStart = e.Next;
+                    e = this.RemoveEdge(e);
+                    eLoopStop = e;
                     continue;
                 }
-                if (E.Prev == E.Next)
+                if (e.Prev == e.Next)
                     break; //only two vertices
-                else if (Closed && SlopesEqual(E.Prev.Curr, E.Curr, E.Next.Curr, this.m_UseFullRange)
-                    && (!this.PreserveCollinear || !this.Pt2IsBetweenPt1AndPt3(E.Prev.Curr, E.Curr, E.Next.Curr)))
+                if (closed && SlopesEqual(e.Prev.Curr, e.Curr, e.Next.Curr, this.MUseFullRange)
+                    && (!this.PreserveCollinear || !this.Pt2IsBetweenPt1AndPt3(e.Prev.Curr, e.Curr, e.Next.Curr)))
                 {
                     //Collinear edges are allowed for open paths but in closed paths
                     //the default is to merge adjacent collinear edges into a single edge.
                     //However, if the PreserveCollinear property is enabled, only overlapping
                     //collinear edges (ie spikes) will be removed from closed paths.
-                    if (E == eStart)
-                        eStart = E.Next;
-                    E = this.RemoveEdge(E);
-                    E = E.Prev;
-                    eLoopStop = E;
+                    if (e == eStart)
+                        eStart = e.Next;
+                    e = this.RemoveEdge(e);
+                    e = e.Prev;
+                    eLoopStop = e;
                     continue;
                 }
-                E = E.Next;
-                if (E == eLoopStop || !Closed && E.Next == eStart)
+                e = e.Next;
+                if (e == eLoopStop || !closed && e.Next == eStart)
                     break;
             }
 
-            if (!Closed && E == E.Next || Closed && E.Prev == E.Next)
+            if (!closed && e == e.Next || closed && e.Prev == e.Next)
                 return false;
 
-            if (!Closed)
+            if (!closed)
             {
-                this.m_HasOpenPaths = true;
+                this.MHasOpenPaths = true;
                 eStart.Prev.OutIdx = Skip;
             }
 
             //3. Do second stage of edge initialization ...
-            E = eStart;
+            e = eStart;
             do
             {
-                this.InitEdge2(E, polyType);
-                E = E.Next;
-                if (IsFlat && E.Curr.Y != eStart.Curr.Y)
-                    IsFlat = false;
+                this.InitEdge2(e, polyType);
+                e = e.Next;
+                if (isFlat && e.Curr.Y != eStart.Curr.Y)
+                    isFlat = false;
             }
-            while (E != eStart);
+            while (e != eStart);
 
             //4. Finally, add edge bounds to LocalMinima list ...
 
             //Totally flat paths must be handled differently when adding them
             //to LocalMinima list to avoid endless loops etc ...
-            if (IsFlat)
+            if (isFlat)
             {
-                if (Closed)
+                if (closed)
                     return false;
-                E.Prev.OutIdx = Skip;
+                e.Prev.OutIdx = Skip;
                 var locMin = new LocalMinima();
                 locMin.Next = null;
-                locMin.Y = E.Bot.Y;
+                locMin.Y = e.Bot.Y;
                 locMin.LeftBound = null;
-                locMin.RightBound = E;
-                locMin.RightBound.Side = EdgeSide.esRight;
+                locMin.RightBound = e;
+                locMin.RightBound.Side = EdgeSide.EsRight;
                 locMin.RightBound.WindDelta = 0;
                 for (;;)
                 {
-                    if (E.Bot.X != E.Prev.Top.X)
-                        this.ReverseHorizontal(E);
-                    if (E.Next.OutIdx == Skip)
+                    if (e.Bot.X != e.Prev.Top.X)
+                        this.ReverseHorizontal(e);
+                    if (e.Next.OutIdx == Skip)
                         break;
-                    E.NextInLML = E.Next;
-                    E = E.Next;
+                    e.NextInLml = e.Next;
+                    e = e.Next;
                 }
                 this.InsertLocalMinima(locMin);
-                this.m_edges.Add(edges);
+                this.MEdges.Add(edges);
                 return true;
             }
 
-            this.m_edges.Add(edges);
+            this.MEdges.Add(edges);
             bool leftBoundIsForward;
-            TEdge EMin = null;
+            Edge eMin = null;
 
             //workaround to avoid an endless loop in the while loop below when
             //open paths have matching start and end points ...
-            if (E.Prev.Bot == E.Prev.Top)
-                E = E.Next;
+            if (e.Prev.Bot == e.Prev.Top)
+                e = e.Next;
 
             for (;;)
             {
-                E = this.FindNextLocMin(E);
-                if (E == EMin)
+                e = this.FindNextLocMin(e);
+                if (e == eMin)
                     break;
-                else if (EMin == null)
-                    EMin = E;
+                if (eMin == null)
+                    eMin = e;
 
                 //E and E.Prev now share a local minima (left aligned if horizontal).
                 //Compare their slopes to find which starts which bound ...
                 var locMin = new LocalMinima();
                 locMin.Next = null;
-                locMin.Y = E.Bot.Y;
-                if (E.Dx < E.Prev.Dx)
+                locMin.Y = e.Bot.Y;
+                if (e.Dx < e.Prev.Dx)
                 {
-                    locMin.LeftBound = E.Prev;
-                    locMin.RightBound = E;
+                    locMin.LeftBound = e.Prev;
+                    locMin.RightBound = e;
                     leftBoundIsForward = false; //Q.nextInLML = Q.prev
                 }
                 else
                 {
-                    locMin.LeftBound = E;
-                    locMin.RightBound = E.Prev;
+                    locMin.LeftBound = e;
+                    locMin.RightBound = e.Prev;
                     leftBoundIsForward = true; //Q.nextInLML = Q.next
                 }
-                locMin.LeftBound.Side = EdgeSide.esLeft;
-                locMin.RightBound.Side = EdgeSide.esRight;
+                locMin.LeftBound.Side = EdgeSide.EsLeft;
+                locMin.RightBound.Side = EdgeSide.EsRight;
 
-                if (!Closed)
+                if (!closed)
                     locMin.LeftBound.WindDelta = 0;
                 else if (locMin.LeftBound.Next == locMin.RightBound)
                     locMin.LeftBound.WindDelta = -1;
@@ -1305,13 +1291,13 @@ namespace Aimtec.SDK.Util.ThirdParty
                     locMin.LeftBound.WindDelta = 1;
                 locMin.RightBound.WindDelta = -locMin.LeftBound.WindDelta;
 
-                E = this.ProcessBound(locMin.LeftBound, leftBoundIsForward);
-                if (E.OutIdx == Skip)
-                    E = this.ProcessBound(E, leftBoundIsForward);
+                e = this.ProcessBound(locMin.LeftBound, leftBoundIsForward);
+                if (e.OutIdx == Skip)
+                    e = this.ProcessBound(e, leftBoundIsForward);
 
-                var E2 = this.ProcessBound(locMin.RightBound, !leftBoundIsForward);
-                if (E2.OutIdx == Skip)
-                    E2 = this.ProcessBound(E2, !leftBoundIsForward);
+                var e2 = this.ProcessBound(locMin.RightBound, !leftBoundIsForward);
+                if (e2.OutIdx == Skip)
+                    e2 = this.ProcessBound(e2, !leftBoundIsForward);
 
                 if (locMin.LeftBound.OutIdx == Skip)
                     locMin.LeftBound = null;
@@ -1319,7 +1305,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                     locMin.RightBound = null;
                 this.InsertLocalMinima(locMin);
                 if (!leftBoundIsForward)
-                    E = E2;
+                    e = e2;
             }
             return true;
         }
@@ -1339,14 +1325,13 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             if (pt1 == pt3 || pt1 == pt2 || pt3 == pt2)
                 return false;
-            else if (pt1.X != pt3.X)
+            if (pt1.X != pt3.X)
                 return pt2.X > pt1.X == pt2.X < pt3.X;
-            else
-                return pt2.Y > pt1.Y == pt2.Y < pt3.Y;
+            return pt2.Y > pt1.Y == pt2.Y < pt3.Y;
         }
         //------------------------------------------------------------------------------
 
-        TEdge RemoveEdge(TEdge e)
+        Edge RemoveEdge(Edge e)
         {
             //removes e from double_linked_list (but without removing from memory)
             e.Prev.Next = e.Next;
@@ -1357,12 +1342,12 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private void SetDx(TEdge e)
+        private void SetDx(Edge e)
         {
             e.Delta.X = e.Top.X - e.Bot.X;
             e.Delta.Y = e.Top.Y - e.Bot.Y;
             if (e.Delta.Y == 0)
-                e.Dx = horizontal;
+                e.Dx = Horizontal;
             else
                 e.Dx = (double) e.Delta.X / e.Delta.Y;
         }
@@ -1370,18 +1355,18 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         private void InsertLocalMinima(LocalMinima newLm)
         {
-            if (this.m_MinimaList == null)
+            if (this.MMinimaList == null)
             {
-                this.m_MinimaList = newLm;
+                this.MMinimaList = newLm;
             }
-            else if (newLm.Y >= this.m_MinimaList.Y)
+            else if (newLm.Y >= this.MMinimaList.Y)
             {
-                newLm.Next = this.m_MinimaList;
-                this.m_MinimaList = newLm;
+                newLm.Next = this.MMinimaList;
+                this.MMinimaList = newLm;
             }
             else
             {
-                var tmpLm = this.m_MinimaList;
+                var tmpLm = this.MMinimaList;
                 while (tmpLm.Next != null && newLm.Y < tmpLm.Next.Y)
                     tmpLm = tmpLm.Next;
                 newLm.Next = tmpLm.Next;
@@ -1390,19 +1375,19 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        internal Boolean PopLocalMinima(cInt Y, out LocalMinima current)
+        internal Boolean PopLocalMinima(cInt y, out LocalMinima current)
         {
-            current = this.m_CurrentLM;
-            if (this.m_CurrentLM != null && this.m_CurrentLM.Y == Y)
+            current = this.MCurrentLm;
+            if (this.MCurrentLm != null && this.MCurrentLm.Y == y)
             {
-                this.m_CurrentLM = this.m_CurrentLM.Next;
+                this.MCurrentLm = this.MCurrentLm.Next;
                 return true;
             }
             return false;
         }
         //------------------------------------------------------------------------------
 
-        private void ReverseHorizontal(TEdge e)
+        private void ReverseHorizontal(Edge e)
         {
             //swap horizontal edges' top and bottom x's so they follow the natural
             //progression of the bounds - ie so their xbots will align with the
@@ -1416,13 +1401,13 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         internal virtual void Reset()
         {
-            this.m_CurrentLM = this.m_MinimaList;
-            if (this.m_CurrentLM == null)
+            this.MCurrentLm = this.MMinimaList;
+            if (this.MCurrentLm == null)
                 return; //ie nothing to process
 
             //reset all edges ...
-            this.m_Scanbeam = null;
-            var lm = this.m_MinimaList;
+            this.MScanbeam = null;
+            var lm = this.MMinimaList;
             while (lm != null)
             {
                 this.InsertScanbeam(lm.Y);
@@ -1440,7 +1425,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                 }
                 lm = lm.Next;
             }
-            this.m_ActiveEdges = null;
+            this.MActiveEdges = null;
         }
         //------------------------------------------------------------------------------
 
@@ -1452,73 +1437,73 @@ namespace Aimtec.SDK.Util.ThirdParty
             if (i == cnt)
                 return new IntRect(0, 0, 0, 0);
             var result = new IntRect();
-            result.left = paths[i][0].X;
-            result.right = result.left;
-            result.top = paths[i][0].Y;
-            result.bottom = result.top;
+            result.Left = paths[i][0].X;
+            result.Right = result.Left;
+            result.Top = paths[i][0].Y;
+            result.Bottom = result.Top;
             for (; i < cnt; i++)
             for (var j = 0; j < paths[i].Count; j++)
             {
-                if (paths[i][j].X < result.left)
-                    result.left = paths[i][j].X;
-                else if (paths[i][j].X > result.right)
-                    result.right = paths[i][j].X;
-                if (paths[i][j].Y < result.top)
-                    result.top = paths[i][j].Y;
-                else if (paths[i][j].Y > result.bottom)
-                    result.bottom = paths[i][j].Y;
+                if (paths[i][j].X < result.Left)
+                    result.Left = paths[i][j].X;
+                else if (paths[i][j].X > result.Right)
+                    result.Right = paths[i][j].X;
+                if (paths[i][j].Y < result.Top)
+                    result.Top = paths[i][j].Y;
+                else if (paths[i][j].Y > result.Bottom)
+                    result.Bottom = paths[i][j].Y;
             }
             return result;
         }
         //------------------------------------------------------------------------------
 
-        internal void InsertScanbeam(cInt Y)
+        internal void InsertScanbeam(cInt y)
         {
             //single-linked list: sorted descending, ignoring dups.
-            if (this.m_Scanbeam == null)
+            if (this.MScanbeam == null)
             {
-                this.m_Scanbeam = new Scanbeam();
-                this.m_Scanbeam.Next = null;
-                this.m_Scanbeam.Y = Y;
+                this.MScanbeam = new Scanbeam();
+                this.MScanbeam.Next = null;
+                this.MScanbeam.Y = y;
             }
-            else if (Y > this.m_Scanbeam.Y)
+            else if (y > this.MScanbeam.Y)
             {
                 var newSb = new Scanbeam();
-                newSb.Y = Y;
-                newSb.Next = this.m_Scanbeam;
-                this.m_Scanbeam = newSb;
+                newSb.Y = y;
+                newSb.Next = this.MScanbeam;
+                this.MScanbeam = newSb;
             }
             else
             {
-                var sb2 = this.m_Scanbeam;
-                while (sb2.Next != null && Y <= sb2.Next.Y)
+                var sb2 = this.MScanbeam;
+                while (sb2.Next != null && y <= sb2.Next.Y)
                     sb2 = sb2.Next;
-                if (Y == sb2.Y)
+                if (y == sb2.Y)
                     return; //ie ignores duplicates
                 var newSb = new Scanbeam();
-                newSb.Y = Y;
+                newSb.Y = y;
                 newSb.Next = sb2.Next;
                 sb2.Next = newSb;
             }
         }
         //------------------------------------------------------------------------------
 
-        internal Boolean PopScanbeam(out cInt Y)
+        internal Boolean PopScanbeam(out cInt y)
         {
-            if (this.m_Scanbeam == null)
+            if (this.MScanbeam == null)
             {
-                Y = 0;
+                y = 0;
                 return false;
             }
-            Y = this.m_Scanbeam.Y;
-            this.m_Scanbeam = this.m_Scanbeam.Next;
+            y = this.MScanbeam.Y;
+            this.MScanbeam = this.MScanbeam.Next;
             return true;
         }
         //------------------------------------------------------------------------------
 
         internal Boolean LocalMinimaPending()
         {
-            return this.m_CurrentLM != null;
+            return this.MCurrentLm != null;
         }
         //------------------------------------------------------------------------------
 
@@ -1532,118 +1517,118 @@ namespace Aimtec.SDK.Util.ThirdParty
             result.Pts = null;
             result.BottomPt = null;
             result.PolyNode = null;
-            this.m_PolyOuts.Add(result);
-            result.Idx = this.m_PolyOuts.Count - 1;
+            this.MPolyOuts.Add(result);
+            result.Idx = this.MPolyOuts.Count - 1;
             return result;
         }
         //------------------------------------------------------------------------------
 
         internal void DisposeOutRec(int index)
         {
-            var outRec = this.m_PolyOuts[index];
+            var outRec = this.MPolyOuts[index];
             outRec.Pts = null;
             outRec = null;
-            this.m_PolyOuts[index] = null;
+            this.MPolyOuts[index] = null;
         }
         //------------------------------------------------------------------------------
 
-        internal void UpdateEdgeIntoAEL(ref TEdge e)
+        internal void UpdateEdgeIntoAel(ref Edge e)
         {
-            if (e.NextInLML == null)
+            if (e.NextInLml == null)
                 throw new ClipperException("UpdateEdgeIntoAEL: invalid call");
-            var AelPrev = e.PrevInAEL;
-            var AelNext = e.NextInAEL;
-            e.NextInLML.OutIdx = e.OutIdx;
-            if (AelPrev != null)
-                AelPrev.NextInAEL = e.NextInLML;
+            var aelPrev = e.PrevInAel;
+            var aelNext = e.NextInAel;
+            e.NextInLml.OutIdx = e.OutIdx;
+            if (aelPrev != null)
+                aelPrev.NextInAel = e.NextInLml;
             else
-                this.m_ActiveEdges = e.NextInLML;
-            if (AelNext != null)
-                AelNext.PrevInAEL = e.NextInLML;
-            e.NextInLML.Side = e.Side;
-            e.NextInLML.WindDelta = e.WindDelta;
-            e.NextInLML.WindCnt = e.WindCnt;
-            e.NextInLML.WindCnt2 = e.WindCnt2;
-            e = e.NextInLML;
+                this.MActiveEdges = e.NextInLml;
+            if (aelNext != null)
+                aelNext.PrevInAel = e.NextInLml;
+            e.NextInLml.Side = e.Side;
+            e.NextInLml.WindDelta = e.WindDelta;
+            e.NextInLml.WindCnt = e.WindCnt;
+            e.NextInLml.WindCnt2 = e.WindCnt2;
+            e = e.NextInLml;
             e.Curr = e.Bot;
-            e.PrevInAEL = AelPrev;
-            e.NextInAEL = AelNext;
+            e.PrevInAel = aelPrev;
+            e.NextInAel = aelNext;
             if (!IsHorizontal(e))
                 this.InsertScanbeam(e.Top.Y);
         }
         //------------------------------------------------------------------------------
 
-        internal void SwapPositionsInAEL(TEdge edge1, TEdge edge2)
+        internal void SwapPositionsInAel(Edge edge1, Edge edge2)
         {
             //check that one or other edge hasn't already been removed from AEL ...
-            if (edge1.NextInAEL == edge1.PrevInAEL || edge2.NextInAEL == edge2.PrevInAEL)
+            if (edge1.NextInAel == edge1.PrevInAel || edge2.NextInAel == edge2.PrevInAel)
                 return;
 
-            if (edge1.NextInAEL == edge2)
+            if (edge1.NextInAel == edge2)
             {
-                var next = edge2.NextInAEL;
+                var next = edge2.NextInAel;
                 if (next != null)
-                    next.PrevInAEL = edge1;
-                var prev = edge1.PrevInAEL;
+                    next.PrevInAel = edge1;
+                var prev = edge1.PrevInAel;
                 if (prev != null)
-                    prev.NextInAEL = edge2;
-                edge2.PrevInAEL = prev;
-                edge2.NextInAEL = edge1;
-                edge1.PrevInAEL = edge2;
-                edge1.NextInAEL = next;
+                    prev.NextInAel = edge2;
+                edge2.PrevInAel = prev;
+                edge2.NextInAel = edge1;
+                edge1.PrevInAel = edge2;
+                edge1.NextInAel = next;
             }
-            else if (edge2.NextInAEL == edge1)
+            else if (edge2.NextInAel == edge1)
             {
-                var next = edge1.NextInAEL;
+                var next = edge1.NextInAel;
                 if (next != null)
-                    next.PrevInAEL = edge2;
-                var prev = edge2.PrevInAEL;
+                    next.PrevInAel = edge2;
+                var prev = edge2.PrevInAel;
                 if (prev != null)
-                    prev.NextInAEL = edge1;
-                edge1.PrevInAEL = prev;
-                edge1.NextInAEL = edge2;
-                edge2.PrevInAEL = edge1;
-                edge2.NextInAEL = next;
+                    prev.NextInAel = edge1;
+                edge1.PrevInAel = prev;
+                edge1.NextInAel = edge2;
+                edge2.PrevInAel = edge1;
+                edge2.NextInAel = next;
             }
             else
             {
-                var next = edge1.NextInAEL;
-                var prev = edge1.PrevInAEL;
-                edge1.NextInAEL = edge2.NextInAEL;
-                if (edge1.NextInAEL != null)
-                    edge1.NextInAEL.PrevInAEL = edge1;
-                edge1.PrevInAEL = edge2.PrevInAEL;
-                if (edge1.PrevInAEL != null)
-                    edge1.PrevInAEL.NextInAEL = edge1;
-                edge2.NextInAEL = next;
-                if (edge2.NextInAEL != null)
-                    edge2.NextInAEL.PrevInAEL = edge2;
-                edge2.PrevInAEL = prev;
-                if (edge2.PrevInAEL != null)
-                    edge2.PrevInAEL.NextInAEL = edge2;
+                var next = edge1.NextInAel;
+                var prev = edge1.PrevInAel;
+                edge1.NextInAel = edge2.NextInAel;
+                if (edge1.NextInAel != null)
+                    edge1.NextInAel.PrevInAel = edge1;
+                edge1.PrevInAel = edge2.PrevInAel;
+                if (edge1.PrevInAel != null)
+                    edge1.PrevInAel.NextInAel = edge1;
+                edge2.NextInAel = next;
+                if (edge2.NextInAel != null)
+                    edge2.NextInAel.PrevInAel = edge2;
+                edge2.PrevInAel = prev;
+                if (edge2.PrevInAel != null)
+                    edge2.PrevInAel.NextInAel = edge2;
             }
 
-            if (edge1.PrevInAEL == null)
-                this.m_ActiveEdges = edge1;
-            else if (edge2.PrevInAEL == null)
-                this.m_ActiveEdges = edge2;
+            if (edge1.PrevInAel == null)
+                this.MActiveEdges = edge1;
+            else if (edge2.PrevInAel == null)
+                this.MActiveEdges = edge2;
         }
         //------------------------------------------------------------------------------
 
-        internal void DeleteFromAEL(TEdge e)
+        internal void DeleteFromAel(Edge e)
         {
-            var AelPrev = e.PrevInAEL;
-            var AelNext = e.NextInAEL;
-            if (AelPrev == null && AelNext == null && e != this.m_ActiveEdges)
+            var aelPrev = e.PrevInAel;
+            var aelNext = e.NextInAel;
+            if (aelPrev == null && aelNext == null && e != this.MActiveEdges)
                 return; //already deleted
-            if (AelPrev != null)
-                AelPrev.NextInAEL = AelNext;
+            if (aelPrev != null)
+                aelPrev.NextInAel = aelNext;
             else
-                this.m_ActiveEdges = AelNext;
-            if (AelNext != null)
-                AelNext.PrevInAEL = AelPrev;
-            e.NextInAEL = null;
-            e.PrevInAEL = null;
+                this.MActiveEdges = aelNext;
+            if (aelNext != null)
+                aelNext.PrevInAel = aelPrev;
+            e.NextInAel = null;
+            e.PrevInAel = null;
         }
 
         //------------------------------------------------------------------------------
@@ -1653,60 +1638,60 @@ namespace Aimtec.SDK.Util.ThirdParty
     {
         #region Constants
 
-        public const int ioPreserveCollinear = 4;
+        public const int IoPreserveCollinear = 4;
 
         //InitOptions that can be passed to the constructor ...
-        public const int ioReverseSolution = 1;
+        public const int IoReverseSolution = 1;
 
-        public const int ioStrictlySimple = 2;
+        public const int IoStrictlySimple = 2;
 
         #endregion
 
         #region Fields
 
-        private PolyFillType m_ClipFillType;
+        private PolyFillType mClipFillType;
 
-        private ClipType m_ClipType;
+        private ClipType mClipType;
 
-        private bool m_ExecuteLocked;
+        private bool mExecuteLocked;
 
-        private List<Join> m_GhostJoins;
+        private List<Join> mGhostJoins;
 
-        private List<IntersectNode> m_IntersectList;
+        private List<IntersectNode> mIntersectList;
 
-        IComparer<IntersectNode> m_IntersectNodeComparer;
+        IComparer<IntersectNode> mIntersectNodeComparer;
 
-        private List<Join> m_Joins;
+        private List<Join> mJoins;
 
-        private Maxima m_Maxima;
+        private Maxima mMaxima;
 
-        private TEdge m_SortedEdges;
+        private Edge mSortedEdges;
 
-        private PolyFillType m_SubjFillType;
+        private PolyFillType mSubjFillType;
 
-        private bool m_UsingPolyTree;
+        private bool mUsingPolyTree;
 
         #endregion
 
         #region Constructors and Destructors
 
-        public Clipper(int InitOptions = 0)
-            : base() //constructor
+        public Clipper(int initOptions = 0)
+            //constructor
         {
-            this.m_Scanbeam = null;
-            this.m_Maxima = null;
-            this.m_ActiveEdges = null;
-            this.m_SortedEdges = null;
-            this.m_IntersectList = new List<IntersectNode>();
-            this.m_IntersectNodeComparer = new MyIntersectNodeSort();
-            this.m_ExecuteLocked = false;
-            this.m_UsingPolyTree = false;
-            this.m_PolyOuts = new List<OutRec>();
-            this.m_Joins = new List<Join>();
-            this.m_GhostJoins = new List<Join>();
-            this.ReverseSolution = (ioReverseSolution & InitOptions) != 0;
-            this.StrictlySimple = (ioStrictlySimple & InitOptions) != 0;
-            this.PreserveCollinear = (ioPreserveCollinear & InitOptions) != 0;
+            this.MScanbeam = null;
+            this.mMaxima = null;
+            this.MActiveEdges = null;
+            this.mSortedEdges = null;
+            this.mIntersectList = new List<IntersectNode>();
+            this.mIntersectNodeComparer = new MyIntersectNodeSort();
+            this.mExecuteLocked = false;
+            this.mUsingPolyTree = false;
+            this.MPolyOuts = new List<OutRec>();
+            this.mJoins = new List<Join>();
+            this.mGhostJoins = new List<Join>();
+            this.ReverseSolution = (IoReverseSolution & initOptions) != 0;
+            this.StrictlySimple = (IoStrictlySimple & initOptions) != 0;
+            this.PreserveCollinear = (IoPreserveCollinear & initOptions) != 0;
 #if use_xyz
             this.ZFillFunction = null;
 #endif
@@ -1720,12 +1705,12 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         internal enum NodeType
         {
-            ntAny,
+            NtAny,
 
-            ntOpen,
+            NtOpen,
 
-            ntClosed
-        };
+            NtClosed
+        }
 
         #endregion
 
@@ -1746,7 +1731,7 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         public static double Area(Path poly)
         {
-            var cnt = (int) poly.Count;
+            var cnt = poly.Count;
             if (cnt < 3)
                 return 0;
             double a = 0;
@@ -1835,7 +1820,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             var result = new Paths();
             result.Capacity = polytree.Total;
-            AddPolyNodeToPaths(polytree, NodeType.ntClosed, result);
+            AddPolyNodeToPaths(polytree, NodeType.NtClosed, result);
             return result;
         }
         //------------------------------------------------------------------------------
@@ -1844,8 +1829,8 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             var paths = Minkowski(poly1, poly2, false, true);
             var c = new Clipper();
-            c.AddPaths(paths, PolyType.ptSubject, true);
-            c.Execute(ClipType.ctUnion, paths, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+            c.AddPaths(paths, PolyType.PtSubject, true);
+            c.Execute(ClipType.CtUnion, paths, PolyFillType.PftNonZero, PolyFillType.PftNonZero);
             return paths;
         }
         //------------------------------------------------------------------------------
@@ -1854,8 +1839,8 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             var paths = Minkowski(pattern, path, true, pathIsClosed);
             var c = new Clipper();
-            c.AddPaths(paths, PolyType.ptSubject, true);
-            c.Execute(ClipType.ctUnion, paths, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+            c.AddPaths(paths, PolyType.PtSubject, true);
+            c.Execute(ClipType.CtUnion, paths, PolyFillType.PftNonZero, PolyFillType.PftNonZero);
             return paths;
         }
         //------------------------------------------------------------------------------
@@ -1867,14 +1852,14 @@ namespace Aimtec.SDK.Util.ThirdParty
             for (var i = 0; i < paths.Count; ++i)
             {
                 var tmp = Minkowski(pattern, paths[i], true, pathIsClosed);
-                c.AddPaths(tmp, PolyType.ptSubject, true);
+                c.AddPaths(tmp, PolyType.PtSubject, true);
                 if (pathIsClosed)
                 {
                     var path = TranslatePath(paths[i], pattern[0]);
-                    c.AddPath(path, PolyType.ptClip, true);
+                    c.AddPath(path, PolyType.PtClip, true);
                 }
             }
-            c.Execute(ClipType.ctUnion, solution, PolyFillType.pftNonZero, PolyFillType.pftNonZero);
+            c.Execute(ClipType.CtUnion, solution, PolyFillType.PftNonZero, PolyFillType.PftNonZero);
             return solution;
         }
         //------------------------------------------------------------------------------
@@ -1885,7 +1870,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             result.Capacity = polytree.ChildCount;
             for (var i = 0; i < polytree.ChildCount; i++)
                 if (polytree.Childs[i].IsOpen)
-                    result.Add(polytree.Childs[i].m_polygon);
+                    result.Add(polytree.Childs[i].MPolygon);
             return result;
         }
         //------------------------------------------------------------------------------
@@ -1925,7 +1910,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                                 - (double) (ipNext.X - pt.X) * (ip.Y - pt.Y);
                             if (d == 0)
                                 return -1;
-                            else if (d > 0 == ipNext.Y > ip.Y)
+                            if (d > 0 == ipNext.Y > ip.Y)
                                 result = 1 - result;
                         }
                     }
@@ -1937,7 +1922,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                                 - (double) (ipNext.X - pt.X) * (ip.Y - pt.Y);
                             if (d == 0)
                                 return -1;
-                            else if (d > 0 == ipNext.Y > ip.Y)
+                            if (d > 0 == ipNext.Y > ip.Y)
                                 result = 1 - result;
                         }
                     }
@@ -1951,7 +1936,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             var result = new Paths();
             result.Capacity = polytree.Total;
-            AddPolyNodeToPaths(polytree, NodeType.ntAny, result);
+            AddPolyNodeToPaths(polytree, NodeType.NtAny, result);
             return result;
         }
         //------------------------------------------------------------------------------
@@ -1969,53 +1954,53 @@ namespace Aimtec.SDK.Util.ThirdParty
         // Convert self-intersecting polygons into simple polygons
         //------------------------------------------------------------------------------
 
-        public static Paths SimplifyPolygon(Path poly, PolyFillType fillType = PolyFillType.pftEvenOdd)
+        public static Paths SimplifyPolygon(Path poly, PolyFillType fillType = PolyFillType.PftEvenOdd)
         {
             var result = new Paths();
             var c = new Clipper();
             c.StrictlySimple = true;
-            c.AddPath(poly, PolyType.ptSubject, true);
-            c.Execute(ClipType.ctUnion, result, fillType, fillType);
+            c.AddPath(poly, PolyType.PtSubject, true);
+            c.Execute(ClipType.CtUnion, result, fillType, fillType);
             return result;
         }
         //------------------------------------------------------------------------------
 
-        public static Paths SimplifyPolygons(Paths polys, PolyFillType fillType = PolyFillType.pftEvenOdd)
+        public static Paths SimplifyPolygons(Paths polys, PolyFillType fillType = PolyFillType.PftEvenOdd)
         {
             var result = new Paths();
             var c = new Clipper();
             c.StrictlySimple = true;
-            c.AddPaths(polys, PolyType.ptSubject, true);
-            c.Execute(ClipType.ctUnion, result, fillType, fillType);
+            c.AddPaths(polys, PolyType.PtSubject, true);
+            c.Execute(ClipType.CtUnion, result, fillType, fillType);
             return result;
         }
         //------------------------------------------------------------------------------
 
-        public bool Execute(ClipType clipType, Paths solution, PolyFillType FillType = PolyFillType.pftEvenOdd)
+        public bool Execute(ClipType clipType, Paths solution, PolyFillType fillType = PolyFillType.PftEvenOdd)
         {
-            return this.Execute(clipType, solution, FillType, FillType);
+            return this.Execute(clipType, solution, fillType, fillType);
         }
         //------------------------------------------------------------------------------
 
-        public bool Execute(ClipType clipType, PolyTree polytree, PolyFillType FillType = PolyFillType.pftEvenOdd)
+        public bool Execute(ClipType clipType, PolyTree polytree, PolyFillType fillType = PolyFillType.PftEvenOdd)
         {
-            return this.Execute(clipType, polytree, FillType, FillType);
+            return this.Execute(clipType, polytree, fillType, fillType);
         }
         //------------------------------------------------------------------------------
 
         public bool Execute(ClipType clipType, Paths solution, PolyFillType subjFillType, PolyFillType clipFillType)
         {
-            if (this.m_ExecuteLocked)
+            if (this.mExecuteLocked)
                 return false;
-            if (this.m_HasOpenPaths)
+            if (this.MHasOpenPaths)
                 throw new ClipperException("Error: PolyTree struct is needed for open path clipping.");
 
-            this.m_ExecuteLocked = true;
+            this.mExecuteLocked = true;
             solution.Clear();
-            this.m_SubjFillType = subjFillType;
-            this.m_ClipFillType = clipFillType;
-            this.m_ClipType = clipType;
-            this.m_UsingPolyTree = false;
+            this.mSubjFillType = subjFillType;
+            this.mClipFillType = clipFillType;
+            this.mClipType = clipType;
+            this.mUsingPolyTree = false;
             bool succeeded;
             try
             {
@@ -2027,7 +2012,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             finally
             {
                 this.DisposeAllPolyPts();
-                this.m_ExecuteLocked = false;
+                this.mExecuteLocked = false;
             }
             return succeeded;
         }
@@ -2035,13 +2020,13 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         public bool Execute(ClipType clipType, PolyTree polytree, PolyFillType subjFillType, PolyFillType clipFillType)
         {
-            if (this.m_ExecuteLocked)
+            if (this.mExecuteLocked)
                 return false;
-            this.m_ExecuteLocked = true;
-            this.m_SubjFillType = subjFillType;
-            this.m_ClipFillType = clipFillType;
-            this.m_ClipType = clipType;
-            this.m_UsingPolyTree = true;
+            this.mExecuteLocked = true;
+            this.mSubjFillType = subjFillType;
+            this.mClipFillType = clipFillType;
+            this.mClipType = clipType;
+            this.mUsingPolyTree = true;
             bool succeeded;
             try
             {
@@ -2053,7 +2038,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             finally
             {
                 this.DisposeAllPolyPts();
-                this.m_ExecuteLocked = false;
+                this.mExecuteLocked = false;
             }
             return succeeded;
         }
@@ -2069,27 +2054,27 @@ namespace Aimtec.SDK.Util.ThirdParty
             var match = true;
             switch (nt)
             {
-                case NodeType.ntOpen: return;
-                case NodeType.ntClosed:
+                case NodeType.NtOpen: return;
+                case NodeType.NtClosed:
                     match = !polynode.IsOpen;
                     break;
                 default: break;
             }
 
-            if (polynode.m_polygon.Count > 0 && match)
-                paths.Add(polynode.m_polygon);
+            if (polynode.MPolygon.Count > 0 && match)
+                paths.Add(polynode.MPolygon);
             foreach (var pn in polynode.Childs)
                 AddPolyNodeToPaths(pn, nt, paths);
         }
         //------------------------------------------------------------------------------
 
-        internal static Paths Minkowski(Path pattern, Path path, bool IsSum, bool IsClosed)
+        internal static Paths Minkowski(Path pattern, Path path, bool isSum, bool isClosed)
         {
-            var delta = IsClosed ? 1 : 0;
+            var delta = isClosed ? 1 : 0;
             var polyCnt = pattern.Count;
             var pathCnt = path.Count;
             var result = new Paths(pathCnt);
-            if (IsSum)
+            if (isSum)
                 for (var i = 0; i < pathCnt; i++)
                 {
                     var p = new Path(polyCnt);
@@ -2143,7 +2128,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             double a = 0;
             do
             {
-                a = a + (double) (op.Prev.Pt.X + op.Pt.X) * (double) (op.Prev.Pt.Y - op.Pt.Y);
+                a = a + (op.Prev.Pt.X + op.Pt.X) * (double) (op.Prev.Pt.Y - op.Pt.Y);
                 op = op.Next;
             }
             while (op != opFirst);
@@ -2165,50 +2150,49 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        internal TEdge GetMaximaPair(TEdge e)
+        internal Edge GetMaximaPair(Edge e)
         {
-            if (e.Next.Top == e.Top && e.Next.NextInLML == null)
+            if (e.Next.Top == e.Top && e.Next.NextInLml == null)
                 return e.Next;
-            else if (e.Prev.Top == e.Top && e.Prev.NextInLML == null)
+            if (e.Prev.Top == e.Top && e.Prev.NextInLml == null)
                 return e.Prev;
-            else
-                return null;
+            return null;
         }
         //------------------------------------------------------------------------------
 
-        internal TEdge GetMaximaPairEx(TEdge e)
+        internal Edge GetMaximaPairEx(Edge e)
         {
             //as above but returns null if MaxPair isn't in AEL (unless it's horizontal)
             var result = this.GetMaximaPair(e);
             if (result == null || result.OutIdx == Skip
-                || result.NextInAEL == result.PrevInAEL && !IsHorizontal(result))
+                || result.NextInAel == result.PrevInAel && !IsHorizontal(result))
                 return null;
             return result;
         }
         //------------------------------------------------------------------------------
 
-        internal Boolean PopEdgeFromSEL(out TEdge e)
+        internal Boolean PopEdgeFromSel(out Edge e)
         {
             //Pop edge from front of SEL (ie SEL is a FILO list)
-            e = this.m_SortedEdges;
+            e = this.mSortedEdges;
             if (e == null)
                 return false;
             var oldE = e;
-            this.m_SortedEdges = e.NextInSEL;
-            if (this.m_SortedEdges != null)
-                this.m_SortedEdges.PrevInSEL = null;
-            oldE.NextInSEL = null;
-            oldE.PrevInSEL = null;
+            this.mSortedEdges = e.NextInSel;
+            if (this.mSortedEdges != null)
+                this.mSortedEdges.PrevInSel = null;
+            oldE.NextInSel = null;
+            oldE.PrevInSel = null;
             return true;
         }
         //------------------------------------------------------------------------------
 
 #if use_xyz
-        internal void SetZ(ref IntPoint pt, TEdge e1, TEdge e2)
+        internal void SetZ(ref IntPoint pt, Edge e1, Edge e2)
         {
             if (pt.Z != 0 || this.ZFillFunction == null)
                 return;
-            else if (pt == e1.Bot)
+            if (pt == e1.Bot)
                 pt.Z = e1.Bot.Z;
             else if (pt == e1.Top)
                 pt.Z = e1.Top.Z;
@@ -2239,11 +2223,11 @@ namespace Aimtec.SDK.Util.ThirdParty
             //A = (y¹ - y²); B = (x² - x¹); C = (y² - y¹)x¹ - (x² - x¹)y¹
             //perpendicular distance of point (x³,y³) = (Ax³ + By³ + C)/Sqrt(A² + B²)
             //see http://en.wikipedia.org/wiki/Perpendicular_distance
-            double A = ln1.Y - ln2.Y;
-            double B = ln2.X - ln1.X;
-            var C = A * ln1.X + B * ln1.Y;
-            C = A * pt.X + B * pt.Y - C;
-            return C * C / (A * A + B * B);
+            double a = ln1.Y - ln2.Y;
+            double b = ln2.X - ln1.X;
+            var c = a * ln1.X + b * ln1.Y;
+            c = a * pt.X + b * pt.Y - c;
+            return c * c / (a * a + b * b);
         }
         //------------------------------------------------------------------------------
 
@@ -2273,11 +2257,11 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //----------------------------------------------------------------------
 
-        private static OutRec ParseFirstLeft(OutRec FirstLeft)
+        private static OutRec ParseFirstLeft(OutRec firstLeft)
         {
-            while (FirstLeft != null && FirstLeft.Pts == null)
-                FirstLeft = FirstLeft.FirstLeft;
-            return FirstLeft;
+            while (firstLeft != null && firstLeft.Pts == null)
+                firstLeft = firstLeft.FirstLeft;
+            return firstLeft;
         }
         //------------------------------------------------------------------------------
 
@@ -2289,46 +2273,46 @@ namespace Aimtec.SDK.Util.ThirdParty
             var result = 0;
             var startOp = op;
             cInt ptx = pt.X, pty = pt.Y;
-            cInt poly0x = op.Pt.X, poly0y = op.Pt.Y;
+            cInt poly0X = op.Pt.X, poly0Y = op.Pt.Y;
             do
             {
                 op = op.Next;
-                cInt poly1x = op.Pt.X, poly1y = op.Pt.Y;
+                cInt poly1X = op.Pt.X, poly1Y = op.Pt.Y;
 
-                if (poly1y == pty)
+                if (poly1Y == pty)
                 {
-                    if (poly1x == ptx || poly0y == pty && poly1x > ptx == poly0x < ptx)
+                    if (poly1X == ptx || poly0Y == pty && poly1X > ptx == poly0X < ptx)
                         return -1;
                 }
-                if (poly0y < pty != poly1y < pty)
+                if (poly0Y < pty != poly1Y < pty)
                 {
-                    if (poly0x >= ptx)
+                    if (poly0X >= ptx)
                     {
-                        if (poly1x > ptx)
+                        if (poly1X > ptx)
                             result = 1 - result;
                         else
                         {
-                            var d = (double) (poly0x - ptx) * (poly1y - pty) - (double) (poly1x - ptx) * (poly0y - pty);
+                            var d = (double) (poly0X - ptx) * (poly1Y - pty) - (double) (poly1X - ptx) * (poly0Y - pty);
                             if (d == 0)
                                 return -1;
-                            if (d > 0 == poly1y > poly0y)
+                            if (d > 0 == poly1Y > poly0Y)
                                 result = 1 - result;
                         }
                     }
                     else
                     {
-                        if (poly1x > ptx)
+                        if (poly1X > ptx)
                         {
-                            var d = (double) (poly0x - ptx) * (poly1y - pty) - (double) (poly1x - ptx) * (poly0y - pty);
+                            var d = (double) (poly0X - ptx) * (poly1Y - pty) - (double) (poly1X - ptx) * (poly0Y - pty);
                             if (d == 0)
                                 return -1;
-                            if (d > 0 == poly1y > poly0y)
+                            if (d > 0 == poly1Y > poly0Y)
                                 result = 1 - result;
                         }
                     }
                 }
-                poly0x = poly1x;
-                poly0y = poly1y;
+                poly0X = poly1X;
+                poly0Y = poly1Y;
             }
             while (startOp != op);
             return result;
@@ -2368,24 +2352,19 @@ namespace Aimtec.SDK.Util.ThirdParty
             {
                 if (pt1.X > pt2.X == pt1.X < pt3.X)
                     return DistanceFromLineSqrd(pt1, pt2, pt3) < distSqrd;
-                else if (pt2.X > pt1.X == pt2.X < pt3.X)
+                if (pt2.X > pt1.X == pt2.X < pt3.X)
                     return DistanceFromLineSqrd(pt2, pt1, pt3) < distSqrd;
-                else
-                    return DistanceFromLineSqrd(pt3, pt1, pt2) < distSqrd;
+                return DistanceFromLineSqrd(pt3, pt1, pt2) < distSqrd;
             }
-            else
-            {
-                if (pt1.Y > pt2.Y == pt1.Y < pt3.Y)
-                    return DistanceFromLineSqrd(pt1, pt2, pt3) < distSqrd;
-                else if (pt2.Y > pt1.Y == pt2.Y < pt3.Y)
-                    return DistanceFromLineSqrd(pt2, pt1, pt3) < distSqrd;
-                else
-                    return DistanceFromLineSqrd(pt3, pt1, pt2) < distSqrd;
-            }
+            if (pt1.Y > pt2.Y == pt1.Y < pt3.Y)
+                return DistanceFromLineSqrd(pt1, pt2, pt3) < distSqrd;
+            if (pt2.Y > pt1.Y == pt2.Y < pt3.Y)
+                return DistanceFromLineSqrd(pt2, pt1, pt3) < distSqrd;
+            return DistanceFromLineSqrd(pt3, pt1, pt2) < distSqrd;
         }
         //------------------------------------------------------------------------------
 
-        private static void SwapPolyIndexes(TEdge edge1, TEdge edge2)
+        private static void SwapPolyIndexes(Edge edge1, Edge edge2)
         {
             var outIdx = edge1.OutIdx;
             edge1.OutIdx = edge2.OutIdx;
@@ -2393,7 +2372,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private static void SwapSides(TEdge edge1, TEdge edge2)
+        private static void SwapSides(Edge edge1, Edge edge2)
         {
             var side = edge1.Side;
             edge1.Side = edge2.Side;
@@ -2401,7 +2380,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private static cInt TopX(TEdge edge, cInt currentY)
+        private static cInt TopX(Edge edge, cInt currentY)
         {
             if (currentY == edge.Top.Y)
                 return edge.Top.X;
@@ -2418,47 +2397,47 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private void AddEdgeToSEL(TEdge edge)
+        private void AddEdgeToSel(Edge edge)
         {
             //SEL pointers in PEdge are use to build transient lists of horizontal edges.
             //However, since we don't need to worry about processing order, all additions
             //are made to the front of the list ...
-            if (this.m_SortedEdges == null)
+            if (this.mSortedEdges == null)
             {
-                this.m_SortedEdges = edge;
-                edge.PrevInSEL = null;
-                edge.NextInSEL = null;
+                this.mSortedEdges = edge;
+                edge.PrevInSel = null;
+                edge.NextInSel = null;
             }
             else
             {
-                edge.NextInSEL = this.m_SortedEdges;
-                edge.PrevInSEL = null;
-                this.m_SortedEdges.PrevInSEL = edge;
-                this.m_SortedEdges = edge;
+                edge.NextInSel = this.mSortedEdges;
+                edge.PrevInSel = null;
+                this.mSortedEdges.PrevInSel = edge;
+                this.mSortedEdges = edge;
             }
         }
         //------------------------------------------------------------------------------
 
-        private void AddGhostJoin(OutPt Op, IntPoint OffPt)
+        private void AddGhostJoin(OutPt op, IntPoint offPt)
         {
             var j = new Join();
-            j.OutPt1 = Op;
-            j.OffPt = OffPt;
-            this.m_GhostJoins.Add(j);
+            j.OutPt1 = op;
+            j.OffPt = offPt;
+            this.mGhostJoins.Add(j);
         }
         //------------------------------------------------------------------------------
 
-        private void AddJoin(OutPt Op1, OutPt Op2, IntPoint OffPt)
+        private void AddJoin(OutPt op1, OutPt op2, IntPoint offPt)
         {
             var j = new Join();
-            j.OutPt1 = Op1;
-            j.OutPt2 = Op2;
-            j.OffPt = OffPt;
-            this.m_Joins.Add(j);
+            j.OutPt1 = op1;
+            j.OutPt2 = op2;
+            j.OffPt = offPt;
+            this.mJoins.Add(j);
         }
         //------------------------------------------------------------------------------
 
-        private void AddLocalMaxPoly(TEdge e1, TEdge e2, IntPoint pt)
+        private void AddLocalMaxPoly(Edge e1, Edge e2, IntPoint pt)
         {
             this.AddOutPt(e1, pt);
             if (e2.WindDelta == 0)
@@ -2475,33 +2454,33 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private OutPt AddLocalMinPoly(TEdge e1, TEdge e2, IntPoint pt)
+        private OutPt AddLocalMinPoly(Edge e1, Edge e2, IntPoint pt)
         {
             OutPt result;
-            TEdge e, prevE;
+            Edge e, prevE;
             if (IsHorizontal(e2) || e1.Dx > e2.Dx)
             {
                 result = this.AddOutPt(e1, pt);
                 e2.OutIdx = e1.OutIdx;
-                e1.Side = EdgeSide.esLeft;
-                e2.Side = EdgeSide.esRight;
+                e1.Side = EdgeSide.EsLeft;
+                e2.Side = EdgeSide.EsRight;
                 e = e1;
-                if (e.PrevInAEL == e2)
-                    prevE = e2.PrevInAEL;
+                if (e.PrevInAel == e2)
+                    prevE = e2.PrevInAel;
                 else
-                    prevE = e.PrevInAEL;
+                    prevE = e.PrevInAel;
             }
             else
             {
                 result = this.AddOutPt(e2, pt);
                 e1.OutIdx = e2.OutIdx;
-                e1.Side = EdgeSide.esRight;
-                e2.Side = EdgeSide.esLeft;
+                e1.Side = EdgeSide.EsRight;
+                e2.Side = EdgeSide.EsLeft;
                 e = e2;
-                if (e.PrevInAEL == e1)
-                    prevE = e1.PrevInAEL;
+                if (e.PrevInAel == e1)
+                    prevE = e1.PrevInAel;
                 else
-                    prevE = e.PrevInAEL;
+                    prevE = e.PrevInAel;
             }
 
             if (prevE != null && prevE.OutIdx >= 0 && prevE.Top.Y < pt.Y && e.Top.Y < pt.Y)
@@ -2513,7 +2492,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                     prevE.Top,
                     new IntPoint(xE, pt.Y),
                     e.Top,
-                    this.m_UseFullRange))
+                    this.MUseFullRange))
                 {
                     var outPt = this.AddOutPt(prevE, pt);
                     this.AddJoin(result, outPt, e.Top);
@@ -2523,7 +2502,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private OutPt AddOutPt(TEdge e, IntPoint pt)
+        private OutPt AddOutPt(Edge e, IntPoint pt)
         {
             if (e.OutIdx < 0)
             {
@@ -2542,13 +2521,13 @@ namespace Aimtec.SDK.Util.ThirdParty
             }
             else
             {
-                var outRec = this.m_PolyOuts[e.OutIdx];
+                var outRec = this.MPolyOuts[e.OutIdx];
                 //OutRec.Pts is the 'Left-most' point & OutRec.Pts.Prev is the 'Right-most'
                 var op = outRec.Pts;
-                var ToFront = e.Side == EdgeSide.esLeft;
-                if (ToFront && pt == op.Pt)
+                var toFront = e.Side == EdgeSide.EsLeft;
+                if (toFront && pt == op.Pt)
                     return op;
-                else if (!ToFront && pt == op.Prev.Pt)
+                if (!toFront && pt == op.Prev.Pt)
                     return op.Prev;
 
                 var newOp = new OutPt();
@@ -2558,17 +2537,17 @@ namespace Aimtec.SDK.Util.ThirdParty
                 newOp.Prev = op.Prev;
                 newOp.Prev.Next = newOp;
                 op.Prev = newOp;
-                if (ToFront)
+                if (toFront)
                     outRec.Pts = newOp;
                 return newOp;
             }
         }
         //------------------------------------------------------------------------------
 
-        private void AppendPolygon(TEdge e1, TEdge e2)
+        private void AppendPolygon(Edge e1, Edge e2)
         {
-            var outRec1 = this.m_PolyOuts[e1.OutIdx];
-            var outRec2 = this.m_PolyOuts[e2.OutIdx];
+            var outRec1 = this.MPolyOuts[e1.OutIdx];
+            var outRec2 = this.MPolyOuts[e2.OutIdx];
 
             OutRec holeStateRec;
             if (this.OutRec1RightOfOutRec2(outRec1, outRec2))
@@ -2580,52 +2559,52 @@ namespace Aimtec.SDK.Util.ThirdParty
 
             //get the start and ends of both output polygons and
             //join E2 poly onto E1 poly and delete pointers to E2 ...
-            var p1_lft = outRec1.Pts;
-            var p1_rt = p1_lft.Prev;
-            var p2_lft = outRec2.Pts;
-            var p2_rt = p2_lft.Prev;
+            var p1Lft = outRec1.Pts;
+            var p1Rt = p1Lft.Prev;
+            var p2Lft = outRec2.Pts;
+            var p2Rt = p2Lft.Prev;
 
             //join e2 poly onto e1 poly and delete pointers to e2 ...
-            if (e1.Side == EdgeSide.esLeft)
+            if (e1.Side == EdgeSide.EsLeft)
             {
-                if (e2.Side == EdgeSide.esLeft)
+                if (e2.Side == EdgeSide.EsLeft)
                 {
                     //z y x a b c
-                    this.ReversePolyPtLinks(p2_lft);
-                    p2_lft.Next = p1_lft;
-                    p1_lft.Prev = p2_lft;
-                    p1_rt.Next = p2_rt;
-                    p2_rt.Prev = p1_rt;
-                    outRec1.Pts = p2_rt;
+                    this.ReversePolyPtLinks(p2Lft);
+                    p2Lft.Next = p1Lft;
+                    p1Lft.Prev = p2Lft;
+                    p1Rt.Next = p2Rt;
+                    p2Rt.Prev = p1Rt;
+                    outRec1.Pts = p2Rt;
                 }
                 else
                 {
                     //x y z a b c
-                    p2_rt.Next = p1_lft;
-                    p1_lft.Prev = p2_rt;
-                    p2_lft.Prev = p1_rt;
-                    p1_rt.Next = p2_lft;
-                    outRec1.Pts = p2_lft;
+                    p2Rt.Next = p1Lft;
+                    p1Lft.Prev = p2Rt;
+                    p2Lft.Prev = p1Rt;
+                    p1Rt.Next = p2Lft;
+                    outRec1.Pts = p2Lft;
                 }
             }
             else
             {
-                if (e2.Side == EdgeSide.esRight)
+                if (e2.Side == EdgeSide.EsRight)
                 {
                     //a b c z y x
-                    this.ReversePolyPtLinks(p2_lft);
-                    p1_rt.Next = p2_rt;
-                    p2_rt.Prev = p1_rt;
-                    p2_lft.Next = p1_lft;
-                    p1_lft.Prev = p2_lft;
+                    this.ReversePolyPtLinks(p2Lft);
+                    p1Rt.Next = p2Rt;
+                    p2Rt.Prev = p1Rt;
+                    p2Lft.Next = p1Lft;
+                    p1Lft.Prev = p2Lft;
                 }
                 else
                 {
                     //a b c x y z
-                    p1_rt.Next = p2_lft;
-                    p2_lft.Prev = p1_rt;
-                    p1_lft.Prev = p2_rt;
-                    p2_rt.Next = p1_lft;
+                    p1Rt.Next = p2Lft;
+                    p2Lft.Prev = p1Rt;
+                    p1Lft.Prev = p2Rt;
+                    p2Rt.Next = p1Lft;
                 }
             }
 
@@ -2641,22 +2620,22 @@ namespace Aimtec.SDK.Util.ThirdParty
 
             outRec2.FirstLeft = outRec1;
 
-            var OKIdx = e1.OutIdx;
-            var ObsoleteIdx = e2.OutIdx;
+            var okIdx = e1.OutIdx;
+            var obsoleteIdx = e2.OutIdx;
 
             e1.OutIdx = Unassigned; //nb: safe because we only get here via AddLocalMaxPoly
             e2.OutIdx = Unassigned;
 
-            var e = this.m_ActiveEdges;
+            var e = this.MActiveEdges;
             while (e != null)
             {
-                if (e.OutIdx == ObsoleteIdx)
+                if (e.OutIdx == obsoleteIdx)
                 {
-                    e.OutIdx = OKIdx;
+                    e.OutIdx = okIdx;
                     e.Side = e1.Side;
                     break;
                 }
-                e = e.NextInAEL;
+                e = e.NextInAel;
             }
             outRec2.Idx = outRec1.Idx;
         }
@@ -2664,29 +2643,29 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         private void BuildIntersectList(cInt topY)
         {
-            if (this.m_ActiveEdges == null)
+            if (this.MActiveEdges == null)
                 return;
 
             //prepare for sorting ...
-            var e = this.m_ActiveEdges;
-            this.m_SortedEdges = e;
+            var e = this.MActiveEdges;
+            this.mSortedEdges = e;
             while (e != null)
             {
-                e.PrevInSEL = e.PrevInAEL;
-                e.NextInSEL = e.NextInAEL;
+                e.PrevInSel = e.PrevInAel;
+                e.NextInSel = e.NextInAel;
                 e.Curr.X = TopX(e, topY);
-                e = e.NextInAEL;
+                e = e.NextInAel;
             }
 
             //bubblesort ...
             var isModified = true;
-            while (isModified && this.m_SortedEdges != null)
+            while (isModified && this.mSortedEdges != null)
             {
                 isModified = false;
-                e = this.m_SortedEdges;
-                while (e.NextInSEL != null)
+                e = this.mSortedEdges;
+                while (e.NextInSel != null)
                 {
-                    var eNext = e.NextInSEL;
+                    var eNext = e.NextInSel;
                     if (e.Curr.X > eNext.Curr.X)
                     {
                         this.IntersectPoint(e, eNext, out IntPoint pt);
@@ -2696,30 +2675,30 @@ namespace Aimtec.SDK.Util.ThirdParty
                         newNode.Edge1 = e;
                         newNode.Edge2 = eNext;
                         newNode.Pt = pt;
-                        this.m_IntersectList.Add(newNode);
+                        this.mIntersectList.Add(newNode);
 
-                        this.SwapPositionsInSEL(e, eNext);
+                        this.SwapPositionsInSel(e, eNext);
                         isModified = true;
                     }
                     else
                         e = eNext;
                 }
-                if (e.PrevInSEL != null)
-                    e.PrevInSEL.NextInSEL = null;
+                if (e.PrevInSel != null)
+                    e.PrevInSel.NextInSel = null;
                 else
                     break;
             }
-            this.m_SortedEdges = null;
+            this.mSortedEdges = null;
         }
         //------------------------------------------------------------------------------
 
         private void BuildResult(Paths polyg)
         {
             polyg.Clear();
-            polyg.Capacity = this.m_PolyOuts.Count;
-            for (var i = 0; i < this.m_PolyOuts.Count; i++)
+            polyg.Capacity = this.MPolyOuts.Count;
+            for (var i = 0; i < this.MPolyOuts.Count; i++)
             {
-                var outRec = this.m_PolyOuts[i];
+                var outRec = this.MPolyOuts[i];
                 if (outRec.Pts == null)
                     continue;
                 var p = outRec.Pts.Prev;
@@ -2742,34 +2721,34 @@ namespace Aimtec.SDK.Util.ThirdParty
             polytree.Clear();
 
             //add each output polygon/contour to polytree ...
-            polytree.m_AllPolys.Capacity = this.m_PolyOuts.Count;
-            for (var i = 0; i < this.m_PolyOuts.Count; i++)
+            polytree.MAllPolys.Capacity = this.MPolyOuts.Count;
+            for (var i = 0; i < this.MPolyOuts.Count; i++)
             {
-                var outRec = this.m_PolyOuts[i];
+                var outRec = this.MPolyOuts[i];
                 var cnt = this.PointCount(outRec.Pts);
                 if (outRec.IsOpen && cnt < 2 || !outRec.IsOpen && cnt < 3)
                     continue;
                 this.FixHoleLinkage(outRec);
                 var pn = new PolyNode();
-                polytree.m_AllPolys.Add(pn);
+                polytree.MAllPolys.Add(pn);
                 outRec.PolyNode = pn;
-                pn.m_polygon.Capacity = cnt;
+                pn.MPolygon.Capacity = cnt;
                 var op = outRec.Pts.Prev;
                 for (var j = 0; j < cnt; j++)
                 {
-                    pn.m_polygon.Add(op.Pt);
+                    pn.MPolygon.Add(op.Pt);
                     op = op.Prev;
                 }
             }
 
             //fixup PolyNode links etc ...
-            polytree.m_Childs.Capacity = this.m_PolyOuts.Count;
-            for (var i = 0; i < this.m_PolyOuts.Count; i++)
+            polytree.MChilds.Capacity = this.MPolyOuts.Count;
+            for (var i = 0; i < this.MPolyOuts.Count; i++)
             {
-                var outRec = this.m_PolyOuts[i];
+                var outRec = this.MPolyOuts[i];
                 if (outRec.PolyNode == null)
                     continue;
-                else if (outRec.IsOpen)
+                if (outRec.IsOpen)
                 {
                     outRec.PolyNode.IsOpen = true;
                     polytree.AddChild(outRec.PolyNode);
@@ -2782,74 +2761,74 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private void CopyAELToSEL()
+        private void CopyAeltoSel()
         {
-            var e = this.m_ActiveEdges;
-            this.m_SortedEdges = e;
+            var e = this.MActiveEdges;
+            this.mSortedEdges = e;
             while (e != null)
             {
-                e.PrevInSEL = e.PrevInAEL;
-                e.NextInSEL = e.NextInAEL;
-                e = e.NextInAEL;
+                e.PrevInSel = e.PrevInAel;
+                e.NextInSel = e.NextInAel;
+                e = e.NextInAel;
             }
         }
         //------------------------------------------------------------------------------
 
-        private void DeleteFromSEL(TEdge e)
+        private void DeleteFromSel(Edge e)
         {
-            var SelPrev = e.PrevInSEL;
-            var SelNext = e.NextInSEL;
-            if (SelPrev == null && SelNext == null && e != this.m_SortedEdges)
+            var selPrev = e.PrevInSel;
+            var selNext = e.NextInSel;
+            if (selPrev == null && selNext == null && e != this.mSortedEdges)
                 return; //already deleted
-            if (SelPrev != null)
-                SelPrev.NextInSEL = SelNext;
+            if (selPrev != null)
+                selPrev.NextInSel = selNext;
             else
-                this.m_SortedEdges = SelNext;
-            if (SelNext != null)
-                SelNext.PrevInSEL = SelPrev;
-            e.NextInSEL = null;
-            e.PrevInSEL = null;
+                this.mSortedEdges = selNext;
+            if (selNext != null)
+                selNext.PrevInSel = selPrev;
+            e.NextInSel = null;
+            e.PrevInSel = null;
         }
         //------------------------------------------------------------------------------
 
         private void DisposeAllPolyPts()
         {
-            for (var i = 0; i < this.m_PolyOuts.Count; ++i)
+            for (var i = 0; i < this.MPolyOuts.Count; ++i)
                 this.DisposeOutRec(i);
-            this.m_PolyOuts.Clear();
+            this.MPolyOuts.Clear();
         }
         //------------------------------------------------------------------------------
 
-        private void DoMaxima(TEdge e)
+        private void DoMaxima(Edge e)
         {
             var eMaxPair = this.GetMaximaPairEx(e);
             if (eMaxPair == null)
             {
                 if (e.OutIdx >= 0)
                     this.AddOutPt(e, e.Top);
-                this.DeleteFromAEL(e);
+                this.DeleteFromAel(e);
                 return;
             }
 
-            var eNext = e.NextInAEL;
+            var eNext = e.NextInAel;
             while (eNext != null && eNext != eMaxPair)
             {
                 this.IntersectEdges(e, eNext, e.Top);
-                this.SwapPositionsInAEL(e, eNext);
-                eNext = e.NextInAEL;
+                this.SwapPositionsInAel(e, eNext);
+                eNext = e.NextInAel;
             }
 
             if (e.OutIdx == Unassigned && eMaxPair.OutIdx == Unassigned)
             {
-                this.DeleteFromAEL(e);
-                this.DeleteFromAEL(eMaxPair);
+                this.DeleteFromAel(e);
+                this.DeleteFromAel(eMaxPair);
             }
             else if (e.OutIdx >= 0 && eMaxPair.OutIdx >= 0)
             {
                 if (e.OutIdx >= 0)
                     this.AddLocalMaxPoly(e, eMaxPair, e.Top);
-                this.DeleteFromAEL(e);
-                this.DeleteFromAEL(eMaxPair);
+                this.DeleteFromAel(e);
+                this.DeleteFromAel(eMaxPair);
             }
 #if use_lines
             else if (e.WindDelta == 0)
@@ -2859,14 +2838,14 @@ namespace Aimtec.SDK.Util.ThirdParty
                     this.AddOutPt(e, e.Top);
                     e.OutIdx = Unassigned;
                 }
-                this.DeleteFromAEL(e);
+                this.DeleteFromAel(e);
 
                 if (eMaxPair.OutIdx >= 0)
                 {
                     this.AddOutPt(eMaxPair, e.Top);
                     eMaxPair.OutIdx = Unassigned;
                 }
-                this.DeleteFromAEL(eMaxPair);
+                this.DeleteFromAel(eMaxPair);
             }
 #endif
             else
@@ -2877,9 +2856,9 @@ namespace Aimtec.SDK.Util.ThirdParty
         private void DoSimplePolygons()
         {
             var i = 0;
-            while (i < this.m_PolyOuts.Count)
+            while (i < this.MPolyOuts.Count)
             {
-                var outrec = this.m_PolyOuts[i++];
+                var outrec = this.MPolyOuts[i++];
                 var op = outrec.Pts;
                 if (op == null || outrec.IsOpen)
                     continue;
@@ -2907,7 +2886,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                                 //OutRec2 is contained by OutRec1 ...
                                 outrec2.IsHole = !outrec.IsHole;
                                 outrec2.FirstLeft = outrec;
-                                if (this.m_UsingPolyTree)
+                                if (this.mUsingPolyTree)
                                     this.FixupFirstLefts2(outrec2, outrec);
                             }
                             else if (Poly2ContainsPoly1(outrec.Pts, outrec2.Pts))
@@ -2917,7 +2896,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                                 outrec.IsHole = !outrec2.IsHole;
                                 outrec2.FirstLeft = outrec.FirstLeft;
                                 outrec.FirstLeft = outrec2;
-                                if (this.m_UsingPolyTree)
+                                if (this.mUsingPolyTree)
                                     this.FixupFirstLefts2(outrec, outrec2);
                             }
                             else
@@ -2925,7 +2904,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                                 //the 2 polygons are separate ...
                                 outrec2.IsHole = outrec.IsHole;
                                 outrec2.FirstLeft = outrec.FirstLeft;
-                                if (this.m_UsingPolyTree)
+                                if (this.mUsingPolyTree)
                                     this.FixupFirstLefts1(outrec, outrec2);
                             }
                             op2 = op; //ie get ready for the next iteration
@@ -2939,12 +2918,12 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        OutPt DupOutPt(OutPt outPt, bool InsertAfter)
+        OutPt DupOutPt(OutPt outPt, bool insertAfter)
         {
             var result = new OutPt();
             result.Pt = outPt.Pt;
             result.Idx = outPt.Idx;
-            if (InsertAfter)
+            if (insertAfter)
             {
                 result.Next = outPt.Next;
                 result.Prev = outPt;
@@ -2962,23 +2941,21 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //----------------------------------------------------------------------
 
-        private bool E2InsertsBeforeE1(TEdge e1, TEdge e2)
+        private bool E2InsertsBeforeE1(Edge e1, Edge e2)
         {
             if (e2.Curr.X == e1.Curr.X)
             {
                 if (e2.Top.Y > e1.Top.Y)
                     return e2.Top.X < TopX(e1, e2.Top.Y);
-                else
-                    return e1.Top.X > TopX(e2, e1.Top.Y);
+                return e1.Top.X > TopX(e2, e1.Top.Y);
             }
-            else
-                return e2.Curr.X < e1.Curr.X;
+            return e2.Curr.X < e1.Curr.X;
         }
         //------------------------------------------------------------------------------
 
         private bool EdgesAdjacent(IntersectNode inode)
         {
-            return inode.Edge1.NextInSEL == inode.Edge2 || inode.Edge1.PrevInSEL == inode.Edge2;
+            return inode.Edge1.NextInSel == inode.Edge2 || inode.Edge1.PrevInSel == inode.Edge2;
         }
         //------------------------------------------------------------------------------
 
@@ -2987,24 +2964,24 @@ namespace Aimtec.SDK.Util.ThirdParty
             try
             {
                 this.Reset();
-                this.m_SortedEdges = null;
-                this.m_Maxima = null;
+                this.mSortedEdges = null;
+                this.mMaxima = null;
                 if (!this.PopScanbeam(out long botY))
                     return false;
-                this.InsertLocalMinimaIntoAEL(botY);
+                this.InsertLocalMinimaIntoAel(botY);
                 while (this.PopScanbeam(out long topY) || this.LocalMinimaPending())
                 {
                     this.ProcessHorizontals();
-                    this.m_GhostJoins.Clear();
+                    this.mGhostJoins.Clear();
                     if (!this.ProcessIntersections(topY))
                         return false;
                     this.ProcessEdgesAtTopOfScanbeam(topY);
                     botY = topY;
-                    this.InsertLocalMinimaIntoAEL(botY);
+                    this.InsertLocalMinimaIntoAel(botY);
                 }
 
                 //fix orientations ...
-                foreach (var outRec in this.m_PolyOuts)
+                foreach (var outRec in this.MPolyOuts)
                 {
                     if (outRec.Pts == null || outRec.IsOpen)
                         continue;
@@ -3014,11 +2991,11 @@ namespace Aimtec.SDK.Util.ThirdParty
 
                 this.JoinCommonEdges();
 
-                foreach (var outRec in this.m_PolyOuts)
+                foreach (var outRec in this.MPolyOuts)
                 {
                     if (outRec.Pts == null)
                         continue;
-                    else if (outRec.IsOpen)
+                    if (outRec.IsOpen)
                         this.FixupOutPolyline(outRec);
                     else
                         this.FixupOutPolygon(outRec);
@@ -3031,8 +3008,8 @@ namespace Aimtec.SDK.Util.ThirdParty
             //catch { return false; }
             finally
             {
-                this.m_Joins.Clear();
-                this.m_GhostJoins.Clear();
+                this.mJoins.Clear();
+                this.mGhostJoins.Clear();
             }
         }
         //---------------------------------------------------------------------------
@@ -3042,37 +3019,36 @@ namespace Aimtec.SDK.Util.ThirdParty
             var p = btmPt1.Prev;
             while (p.Pt == btmPt1.Pt && p != btmPt1)
                 p = p.Prev;
-            var dx1p = Math.Abs(this.GetDx(btmPt1.Pt, p.Pt));
+            var dx1P = Math.Abs(this.GetDx(btmPt1.Pt, p.Pt));
             p = btmPt1.Next;
             while (p.Pt == btmPt1.Pt && p != btmPt1)
                 p = p.Next;
-            var dx1n = Math.Abs(this.GetDx(btmPt1.Pt, p.Pt));
+            var dx1N = Math.Abs(this.GetDx(btmPt1.Pt, p.Pt));
 
             p = btmPt2.Prev;
             while (p.Pt == btmPt2.Pt && p != btmPt2)
                 p = p.Prev;
-            var dx2p = Math.Abs(this.GetDx(btmPt2.Pt, p.Pt));
+            var dx2P = Math.Abs(this.GetDx(btmPt2.Pt, p.Pt));
             p = btmPt2.Next;
             while (p.Pt == btmPt2.Pt && p != btmPt2)
                 p = p.Next;
-            var dx2n = Math.Abs(this.GetDx(btmPt2.Pt, p.Pt));
+            var dx2N = Math.Abs(this.GetDx(btmPt2.Pt, p.Pt));
 
-            if (Math.Max(dx1p, dx1n) == Math.Max(dx2p, dx2n) && Math.Min(dx1p, dx1n) == Math.Min(dx2p, dx2n))
+            if (Math.Max(dx1P, dx1N) == Math.Max(dx2P, dx2N) && Math.Min(dx1P, dx1N) == Math.Min(dx2P, dx2N))
                 return this.Area(btmPt1) > 0; //if otherwise identical use orientation
-            else
-                return dx1p >= dx2p && dx1p >= dx2n || dx1n >= dx2p && dx1n >= dx2n;
+            return dx1P >= dx2P && dx1P >= dx2N || dx1N >= dx2P && dx1N >= dx2N;
         }
         //----------------------------------------------------------------------
 
-        private void FixupFirstLefts1(OutRec OldOutRec, OutRec NewOutRec)
+        private void FixupFirstLefts1(OutRec oldOutRec, OutRec newOutRec)
         {
-            foreach (var outRec in this.m_PolyOuts)
+            foreach (var outRec in this.MPolyOuts)
             {
                 var firstLeft = ParseFirstLeft(outRec.FirstLeft);
-                if (outRec.Pts != null && firstLeft == OldOutRec)
+                if (outRec.Pts != null && firstLeft == oldOutRec)
                 {
-                    if (Poly2ContainsPoly1(outRec.Pts, NewOutRec.Pts))
-                        outRec.FirstLeft = NewOutRec;
+                    if (Poly2ContainsPoly1(outRec.Pts, newOutRec.Pts))
+                        outRec.FirstLeft = newOutRec;
                 }
             }
         }
@@ -3085,7 +3061,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             //every polygon that's also contained by OuterOutRec's FirstLeft container
             //(including nil) to see if they've become inner to the new inner polygon ...
             var orfl = outerOutRec.FirstLeft;
-            foreach (var outRec in this.m_PolyOuts)
+            foreach (var outRec in this.MPolyOuts)
             {
                 if (outRec.Pts == null || outRec == outerOutRec || outRec == innerOutRec)
                     continue;
@@ -3102,14 +3078,14 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //----------------------------------------------------------------------
 
-        private void FixupFirstLefts3(OutRec OldOutRec, OutRec NewOutRec)
+        private void FixupFirstLefts3(OutRec oldOutRec, OutRec newOutRec)
         {
             //same as FixupFirstLefts1 but doesn't call Poly2ContainsPoly1()
-            foreach (var outRec in this.m_PolyOuts)
+            foreach (var outRec in this.MPolyOuts)
             {
                 var firstLeft = ParseFirstLeft(outRec.FirstLeft);
-                if (outRec.Pts != null && firstLeft == OldOutRec)
-                    outRec.FirstLeft = NewOutRec;
+                if (outRec.Pts != null && firstLeft == oldOutRec)
+                    outRec.FirstLeft = newOutRec;
             }
         }
         //------------------------------------------------------------------------------
@@ -3119,25 +3095,25 @@ namespace Aimtec.SDK.Util.ThirdParty
             //pre-condition: intersections are sorted bottom-most first.
             //Now it's crucial that intersections are made only between adjacent edges,
             //so to ensure this the order of intersections may need adjusting ...
-            this.m_IntersectList.Sort(this.m_IntersectNodeComparer);
+            this.mIntersectList.Sort(this.mIntersectNodeComparer);
 
-            this.CopyAELToSEL();
-            var cnt = this.m_IntersectList.Count;
+            this.CopyAeltoSel();
+            var cnt = this.mIntersectList.Count;
             for (var i = 0; i < cnt; i++)
             {
-                if (!this.EdgesAdjacent(this.m_IntersectList[i]))
+                if (!this.EdgesAdjacent(this.mIntersectList[i]))
                 {
                     var j = i + 1;
-                    while (j < cnt && !this.EdgesAdjacent(this.m_IntersectList[j]))
+                    while (j < cnt && !this.EdgesAdjacent(this.mIntersectList[j]))
                         j++;
                     if (j == cnt)
                         return false;
 
-                    var tmp = this.m_IntersectList[i];
-                    this.m_IntersectList[i] = this.m_IntersectList[j];
-                    this.m_IntersectList[j] = tmp;
+                    var tmp = this.mIntersectList[i];
+                    this.mIntersectList[i] = this.mIntersectList[j];
+                    this.mIntersectList[j] = tmp;
                 }
-                this.SwapPositionsInSEL(this.m_IntersectList[i].Edge1, this.m_IntersectList[i].Edge2);
+                this.SwapPositionsInSel(this.mIntersectList[i].Edge1, this.mIntersectList[i].Edge2);
             }
             return true;
         }
@@ -3147,7 +3123,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             //FixupOutPolygon() - removes duplicate points and simplifies consecutive
             //parallel edges by removing the middle vertex.
-            OutPt lastOK = null;
+            OutPt lastOk = null;
             outRec.BottomPt = null;
             var pp = outRec.Pts;
             var preserveCol = this.PreserveCollinear || this.StrictlySimple;
@@ -3160,20 +3136,20 @@ namespace Aimtec.SDK.Util.ThirdParty
                 }
                 //test for duplicate points and collinear edges ...
                 if (pp.Pt == pp.Next.Pt || pp.Pt == pp.Prev.Pt
-                    || SlopesEqual(pp.Prev.Pt, pp.Pt, pp.Next.Pt, this.m_UseFullRange) && (!preserveCol
+                    || SlopesEqual(pp.Prev.Pt, pp.Pt, pp.Next.Pt, this.MUseFullRange) && (!preserveCol
                         || !this.Pt2IsBetweenPt1AndPt3(pp.Prev.Pt, pp.Pt, pp.Next.Pt)))
                 {
-                    lastOK = null;
+                    lastOk = null;
                     pp.Prev.Next = pp.Next;
                     pp.Next.Prev = pp.Prev;
                     pp = pp.Prev;
                 }
-                else if (pp == lastOK)
+                else if (pp == lastOk)
                     break;
                 else
                 {
-                    if (lastOK == null)
-                        lastOK = pp;
+                    if (lastOk == null)
+                        lastOk = pp;
                     pp = pp.Next;
                 }
             }
@@ -3184,18 +3160,18 @@ namespace Aimtec.SDK.Util.ThirdParty
         private void FixupOutPolyline(OutRec outrec)
         {
             var pp = outrec.Pts;
-            var lastPP = pp.Prev;
-            while (pp != lastPP)
+            var lastPp = pp.Prev;
+            while (pp != lastPp)
             {
                 pp = pp.Next;
                 if (pp.Pt == pp.Prev.Pt)
                 {
-                    if (pp == lastPP)
-                        lastPP = pp.Prev;
-                    var tmpPP = pp.Prev;
-                    tmpPP.Next = pp.Next;
-                    pp.Next.Prev = tmpPP;
-                    pp = tmpPP;
+                    if (pp == lastPp)
+                        lastPp = pp.Prev;
+                    var tmpPp = pp.Prev;
+                    tmpPp.Next = pp.Next;
+                    pp.Next.Prev = tmpPp;
+                    pp = tmpPp;
                 }
             }
             if (pp == pp.Prev)
@@ -3248,36 +3224,34 @@ namespace Aimtec.SDK.Util.ThirdParty
         private double GetDx(IntPoint pt1, IntPoint pt2)
         {
             if (pt1.Y == pt2.Y)
-                return horizontal;
-            else
-                return (double) (pt2.X - pt1.X) / (pt2.Y - pt1.Y);
+                return Horizontal;
+            return (double) (pt2.X - pt1.X) / (pt2.Y - pt1.Y);
         }
         //------------------------------------------------------------------------------
 
-        void GetHorzDirection(TEdge HorzEdge, out Direction Dir, out cInt Left, out cInt Right)
+        void GetHorzDirection(Edge horzEdge, out Direction dir, out cInt left, out cInt right)
         {
-            if (HorzEdge.Bot.X < HorzEdge.Top.X)
+            if (horzEdge.Bot.X < horzEdge.Top.X)
             {
-                Left = HorzEdge.Bot.X;
-                Right = HorzEdge.Top.X;
-                Dir = Direction.dLeftToRight;
+                left = horzEdge.Bot.X;
+                right = horzEdge.Top.X;
+                dir = Direction.DLeftToRight;
             }
             else
             {
-                Left = HorzEdge.Top.X;
-                Right = HorzEdge.Bot.X;
-                Dir = Direction.dRightToLeft;
+                left = horzEdge.Top.X;
+                right = horzEdge.Bot.X;
+                dir = Direction.DRightToLeft;
             }
         }
         //------------------------------------------------------------------------------
 
-        private OutPt GetLastOutPt(TEdge e)
+        private OutPt GetLastOutPt(Edge e)
         {
-            var outRec = this.m_PolyOuts[e.OutIdx];
-            if (e.Side == EdgeSide.esLeft)
+            var outRec = this.MPolyOuts[e.OutIdx];
+            if (e.Side == EdgeSide.EsLeft)
                 return outRec.Pts;
-            else
-                return outRec.Pts.Prev;
+            return outRec.Pts.Prev;
         }
         //------------------------------------------------------------------------------
 
@@ -3292,141 +3266,140 @@ namespace Aimtec.SDK.Util.ThirdParty
             var bPt2 = outRec2.BottomPt;
             if (bPt1.Pt.Y > bPt2.Pt.Y)
                 return outRec1;
-            else if (bPt1.Pt.Y < bPt2.Pt.Y)
+            if (bPt1.Pt.Y < bPt2.Pt.Y)
                 return outRec2;
-            else if (bPt1.Pt.X < bPt2.Pt.X)
+            if (bPt1.Pt.X < bPt2.Pt.X)
                 return outRec1;
-            else if (bPt1.Pt.X > bPt2.Pt.X)
+            if (bPt1.Pt.X > bPt2.Pt.X)
                 return outRec2;
-            else if (bPt1.Next == bPt1)
+            if (bPt1.Next == bPt1)
                 return outRec2;
-            else if (bPt2.Next == bPt2)
+            if (bPt2.Next == bPt2)
                 return outRec1;
-            else if (this.FirstIsBottomPt(bPt1, bPt2))
+            if (this.FirstIsBottomPt(bPt1, bPt2))
                 return outRec1;
-            else
-                return outRec2;
+            return outRec2;
         }
         //------------------------------------------------------------------------------
 
-        private TEdge GetNextInAEL(TEdge e, Direction Direction)
+        private Edge GetNextInAel(Edge e, Direction direction)
         {
-            return Direction == Direction.dLeftToRight ? e.NextInAEL : e.PrevInAEL;
+            return direction == Direction.DLeftToRight ? e.NextInAel : e.PrevInAel;
         }
         //------------------------------------------------------------------------------
 
         private OutRec GetOutRec(int idx)
         {
-            var outrec = this.m_PolyOuts[idx];
-            while (outrec != this.m_PolyOuts[outrec.Idx])
-                outrec = this.m_PolyOuts[outrec.Idx];
+            var outrec = this.MPolyOuts[idx];
+            while (outrec != this.MPolyOuts[outrec.Idx])
+                outrec = this.MPolyOuts[outrec.Idx];
             return outrec;
         }
         //------------------------------------------------------------------------------
 
-        bool GetOverlap(cInt a1, cInt a2, cInt b1, cInt b2, out cInt Left, out cInt Right)
+        bool GetOverlap(cInt a1, cInt a2, cInt b1, cInt b2, out cInt left, out cInt right)
         {
             if (a1 < a2)
             {
                 if (b1 < b2)
                 {
-                    Left = Math.Max(a1, b1);
-                    Right = Math.Min(a2, b2);
+                    left = Math.Max(a1, b1);
+                    right = Math.Min(a2, b2);
                 }
                 else
                 {
-                    Left = Math.Max(a1, b2);
-                    Right = Math.Min(a2, b1);
+                    left = Math.Max(a1, b2);
+                    right = Math.Min(a2, b1);
                 }
             }
             else
             {
                 if (b1 < b2)
                 {
-                    Left = Math.Max(a2, b1);
-                    Right = Math.Min(a1, b2);
+                    left = Math.Max(a2, b1);
+                    right = Math.Min(a1, b2);
                 }
                 else
                 {
-                    Left = Math.Max(a2, b2);
-                    Right = Math.Min(a1, b1);
+                    left = Math.Max(a2, b2);
+                    right = Math.Min(a1, b1);
                 }
             }
-            return Left < Right;
+            return left < right;
         }
         //------------------------------------------------------------------------------
 
-        private bool HorzSegmentsOverlap(cInt seg1a, cInt seg1b, cInt seg2a, cInt seg2b)
+        private bool HorzSegmentsOverlap(cInt seg1A, cInt seg1B, cInt seg2A, cInt seg2B)
         {
-            if (seg1a > seg1b)
-                this.Swap(ref seg1a, ref seg1b);
-            if (seg2a > seg2b)
-                this.Swap(ref seg2a, ref seg2b);
-            return seg1a < seg2b && seg2a < seg1b;
+            if (seg1A > seg1B)
+                this.Swap(ref seg1A, ref seg1B);
+            if (seg2A > seg2B)
+                this.Swap(ref seg2A, ref seg2B);
+            return seg1A < seg2B && seg2A < seg1B;
         }
         //------------------------------------------------------------------------------
 
-        private void InsertEdgeIntoAEL(TEdge edge, TEdge startEdge)
+        private void InsertEdgeIntoAel(Edge edge, Edge startEdge)
         {
-            if (this.m_ActiveEdges == null)
+            if (this.MActiveEdges == null)
             {
-                edge.PrevInAEL = null;
-                edge.NextInAEL = null;
-                this.m_ActiveEdges = edge;
+                edge.PrevInAel = null;
+                edge.NextInAel = null;
+                this.MActiveEdges = edge;
             }
-            else if (startEdge == null && this.E2InsertsBeforeE1(this.m_ActiveEdges, edge))
+            else if (startEdge == null && this.E2InsertsBeforeE1(this.MActiveEdges, edge))
             {
-                edge.PrevInAEL = null;
-                edge.NextInAEL = this.m_ActiveEdges;
-                this.m_ActiveEdges.PrevInAEL = edge;
-                this.m_ActiveEdges = edge;
+                edge.PrevInAel = null;
+                edge.NextInAel = this.MActiveEdges;
+                this.MActiveEdges.PrevInAel = edge;
+                this.MActiveEdges = edge;
             }
             else
             {
                 if (startEdge == null)
-                    startEdge = this.m_ActiveEdges;
-                while (startEdge.NextInAEL != null && !this.E2InsertsBeforeE1(startEdge.NextInAEL, edge))
-                    startEdge = startEdge.NextInAEL;
-                edge.NextInAEL = startEdge.NextInAEL;
-                if (startEdge.NextInAEL != null)
-                    startEdge.NextInAEL.PrevInAEL = edge;
-                edge.PrevInAEL = startEdge;
-                startEdge.NextInAEL = edge;
+                    startEdge = this.MActiveEdges;
+                while (startEdge.NextInAel != null && !this.E2InsertsBeforeE1(startEdge.NextInAel, edge))
+                    startEdge = startEdge.NextInAel;
+                edge.NextInAel = startEdge.NextInAel;
+                if (startEdge.NextInAel != null)
+                    startEdge.NextInAel.PrevInAel = edge;
+                edge.PrevInAel = startEdge;
+                startEdge.NextInAel = edge;
             }
         }
 
-        private void InsertLocalMinimaIntoAEL(cInt botY)
+        private void InsertLocalMinimaIntoAel(cInt botY)
         {
             while (this.PopLocalMinima(botY, out LocalMinima lm))
             {
                 var lb = lm.LeftBound;
                 var rb = lm.RightBound;
 
-                OutPt Op1 = null;
+                OutPt op1 = null;
                 if (lb == null)
                 {
-                    this.InsertEdgeIntoAEL(rb, null);
+                    this.InsertEdgeIntoAel(rb, null);
                     this.SetWindingCount(rb);
                     if (this.IsContributing(rb))
-                        Op1 = this.AddOutPt(rb, rb.Bot);
+                        op1 = this.AddOutPt(rb, rb.Bot);
                 }
                 else if (rb == null)
                 {
-                    this.InsertEdgeIntoAEL(lb, null);
+                    this.InsertEdgeIntoAel(lb, null);
                     this.SetWindingCount(lb);
                     if (this.IsContributing(lb))
-                        Op1 = this.AddOutPt(lb, lb.Bot);
+                        op1 = this.AddOutPt(lb, lb.Bot);
                     this.InsertScanbeam(lb.Top.Y);
                 }
                 else
                 {
-                    this.InsertEdgeIntoAEL(lb, null);
-                    this.InsertEdgeIntoAEL(rb, lb);
+                    this.InsertEdgeIntoAel(lb, null);
+                    this.InsertEdgeIntoAel(rb, lb);
                     this.SetWindingCount(lb);
                     rb.WindCnt = lb.WindCnt;
                     rb.WindCnt2 = lb.WindCnt2;
                     if (this.IsContributing(lb))
-                        Op1 = this.AddLocalMinPoly(lb, rb, lb.Bot);
+                        op1 = this.AddLocalMinPoly(lb, rb, lb.Bot);
                     this.InsertScanbeam(lb.Top.Y);
                 }
 
@@ -3434,9 +3407,9 @@ namespace Aimtec.SDK.Util.ThirdParty
                 {
                     if (IsHorizontal(rb))
                     {
-                        if (rb.NextInLML != null)
-                            this.InsertScanbeam(rb.NextInLML.Top.Y);
-                        this.AddEdgeToSEL(rb);
+                        if (rb.NextInLml != null)
+                            this.InsertScanbeam(rb.NextInLml.Top.Y);
+                        this.AddEdgeToSel(rb);
                     }
                     else
                         this.InsertScanbeam(rb.Top.Y);
@@ -3446,74 +3419,74 @@ namespace Aimtec.SDK.Util.ThirdParty
                     continue;
 
                 //if output polygons share an Edge with a horizontal rb, they'll need joining later ...
-                if (Op1 != null && IsHorizontal(rb) && this.m_GhostJoins.Count > 0 && rb.WindDelta != 0)
+                if (op1 != null && IsHorizontal(rb) && this.mGhostJoins.Count > 0 && rb.WindDelta != 0)
                 {
-                    for (var i = 0; i < this.m_GhostJoins.Count; i++)
+                    for (var i = 0; i < this.mGhostJoins.Count; i++)
                     {
                         //if the horizontal Rb and a 'ghost' horizontal overlap, then convert
                         //the 'ghost' join to a real join ready for later ...
-                        var j = this.m_GhostJoins[i];
+                        var j = this.mGhostJoins[i];
                         if (this.HorzSegmentsOverlap(j.OutPt1.Pt.X, j.OffPt.X, rb.Bot.X, rb.Top.X))
-                            this.AddJoin(j.OutPt1, Op1, j.OffPt);
+                            this.AddJoin(j.OutPt1, op1, j.OffPt);
                     }
                 }
 
-                if (lb.OutIdx >= 0 && lb.PrevInAEL != null && lb.PrevInAEL.Curr.X == lb.Bot.X
-                    && lb.PrevInAEL.OutIdx >= 0
-                    && SlopesEqual(lb.PrevInAEL.Curr, lb.PrevInAEL.Top, lb.Curr, lb.Top, this.m_UseFullRange)
-                    && lb.WindDelta != 0 && lb.PrevInAEL.WindDelta != 0)
+                if (lb.OutIdx >= 0 && lb.PrevInAel != null && lb.PrevInAel.Curr.X == lb.Bot.X
+                    && lb.PrevInAel.OutIdx >= 0
+                    && SlopesEqual(lb.PrevInAel.Curr, lb.PrevInAel.Top, lb.Curr, lb.Top, this.MUseFullRange)
+                    && lb.WindDelta != 0 && lb.PrevInAel.WindDelta != 0)
                 {
-                    var Op2 = this.AddOutPt(lb.PrevInAEL, lb.Bot);
-                    this.AddJoin(Op1, Op2, lb.Top);
+                    var op2 = this.AddOutPt(lb.PrevInAel, lb.Bot);
+                    this.AddJoin(op1, op2, lb.Top);
                 }
 
-                if (lb.NextInAEL != rb)
+                if (lb.NextInAel != rb)
                 {
-                    if (rb.OutIdx >= 0 && rb.PrevInAEL.OutIdx >= 0
-                        && SlopesEqual(rb.PrevInAEL.Curr, rb.PrevInAEL.Top, rb.Curr, rb.Top, this.m_UseFullRange)
-                        && rb.WindDelta != 0 && rb.PrevInAEL.WindDelta != 0)
+                    if (rb.OutIdx >= 0 && rb.PrevInAel.OutIdx >= 0
+                        && SlopesEqual(rb.PrevInAel.Curr, rb.PrevInAel.Top, rb.Curr, rb.Top, this.MUseFullRange)
+                        && rb.WindDelta != 0 && rb.PrevInAel.WindDelta != 0)
                     {
-                        var Op2 = this.AddOutPt(rb.PrevInAEL, rb.Bot);
-                        this.AddJoin(Op1, Op2, rb.Top);
+                        var op2 = this.AddOutPt(rb.PrevInAel, rb.Bot);
+                        this.AddJoin(op1, op2, rb.Top);
                     }
 
-                    var e = lb.NextInAEL;
+                    var e = lb.NextInAel;
                     if (e != null)
                         while (e != rb)
                         {
                             //nb: For calculating winding counts etc, IntersectEdges() assumes
                             //that param1 will be to the right of param2 ABOVE the intersection ...
                             this.IntersectEdges(rb, e, lb.Curr); //order important here
-                            e = e.NextInAEL;
+                            e = e.NextInAel;
                         }
                 }
             }
         }
         //------------------------------------------------------------------------------
 
-        private void InsertMaxima(cInt X)
+        private void InsertMaxima(cInt x)
         {
             //double-linked list: sorted ascending, ignoring dups.
             var newMax = new Maxima();
-            newMax.X = X;
-            if (this.m_Maxima == null)
+            newMax.X = x;
+            if (this.mMaxima == null)
             {
-                this.m_Maxima = newMax;
-                this.m_Maxima.Next = null;
-                this.m_Maxima.Prev = null;
+                this.mMaxima = newMax;
+                this.mMaxima.Next = null;
+                this.mMaxima.Prev = null;
             }
-            else if (X < this.m_Maxima.X)
+            else if (x < this.mMaxima.X)
             {
-                newMax.Next = this.m_Maxima;
+                newMax.Next = this.mMaxima;
                 newMax.Prev = null;
-                this.m_Maxima = newMax;
+                this.mMaxima = newMax;
             }
             else
             {
-                var m = this.m_Maxima;
-                while (m.Next != null && X >= m.Next.X)
+                var m = this.mMaxima;
+                while (m.Next != null && x >= m.Next.X)
                     m = m.Next;
-                if (X == m.X)
+                if (x == m.X)
                     return; //ie ignores duplicates (& CG to clean up newMax)
                 //insert newMax between m and m.Next ...
                 newMax.Next = m.Next;
@@ -3525,7 +3498,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private void IntersectEdges(TEdge e1, TEdge e2, IntPoint pt)
+        private void IntersectEdges(Edge e1, Edge e2, IntPoint pt)
         {
             //e1 will be to the left of e2 BELOW the intersection. Therefore e1 is before
             //e2 in AEL except when e1 is being inserted at the intersection point ...
@@ -3546,8 +3519,8 @@ namespace Aimtec.SDK.Util.ThirdParty
                 if (e1.WindDelta == 0 && e2.WindDelta == 0)
                     return;
                 //if intersecting a subj line with a subj poly ...
-                else if (e1.PolyTyp == e2.PolyTyp && e1.WindDelta != e2.WindDelta
-                    && this.m_ClipType == ClipType.ctUnion)
+                if (e1.PolyTyp == e2.PolyTyp && e1.WindDelta != e2.WindDelta
+                    && this.mClipType == ClipType.CtUnion)
                 {
                     if (e1.WindDelta == 0)
                     {
@@ -3571,14 +3544,14 @@ namespace Aimtec.SDK.Util.ThirdParty
                 else if (e1.PolyTyp != e2.PolyTyp)
                 {
                     if (e1.WindDelta == 0 && Math.Abs(e2.WindCnt) == 1
-                        && (this.m_ClipType != ClipType.ctUnion || e2.WindCnt2 == 0))
+                        && (this.mClipType != ClipType.CtUnion || e2.WindCnt2 == 0))
                     {
                         this.AddOutPt(e1, pt);
                         if (e1Contributing)
                             e1.OutIdx = Unassigned;
                     }
                     else if (e2.WindDelta == 0 && Math.Abs(e1.WindCnt) == 1
-                        && (this.m_ClipType != ClipType.ctUnion || e1.WindCnt2 == 0))
+                             && (this.mClipType != ClipType.CtUnion || e1.WindCnt2 == 0))
                     {
                         this.AddOutPt(e2, pt);
                         if (e2Contributing)
@@ -3624,34 +3597,34 @@ namespace Aimtec.SDK.Util.ThirdParty
             }
 
             PolyFillType e1FillType, e2FillType, e1FillType2, e2FillType2;
-            if (e1.PolyTyp == PolyType.ptSubject)
+            if (e1.PolyTyp == PolyType.PtSubject)
             {
-                e1FillType = this.m_SubjFillType;
-                e1FillType2 = this.m_ClipFillType;
+                e1FillType = this.mSubjFillType;
+                e1FillType2 = this.mClipFillType;
             }
             else
             {
-                e1FillType = this.m_ClipFillType;
-                e1FillType2 = this.m_SubjFillType;
+                e1FillType = this.mClipFillType;
+                e1FillType2 = this.mSubjFillType;
             }
-            if (e2.PolyTyp == PolyType.ptSubject)
+            if (e2.PolyTyp == PolyType.PtSubject)
             {
-                e2FillType = this.m_SubjFillType;
-                e2FillType2 = this.m_ClipFillType;
+                e2FillType = this.mSubjFillType;
+                e2FillType2 = this.mClipFillType;
             }
             else
             {
-                e2FillType = this.m_ClipFillType;
-                e2FillType2 = this.m_SubjFillType;
+                e2FillType = this.mClipFillType;
+                e2FillType2 = this.mSubjFillType;
             }
 
             int e1Wc, e2Wc;
             switch (e1FillType)
             {
-                case PolyFillType.pftPositive:
+                case PolyFillType.PftPositive:
                     e1Wc = e1.WindCnt;
                     break;
-                case PolyFillType.pftNegative:
+                case PolyFillType.PftNegative:
                     e1Wc = -e1.WindCnt;
                     break;
                 default:
@@ -3660,10 +3633,10 @@ namespace Aimtec.SDK.Util.ThirdParty
             }
             switch (e2FillType)
             {
-                case PolyFillType.pftPositive:
+                case PolyFillType.PftPositive:
                     e2Wc = e2.WindCnt;
                     break;
-                case PolyFillType.pftNegative:
+                case PolyFillType.PftNegative:
                     e2Wc = -e2.WindCnt;
                     break;
                 default:
@@ -3674,7 +3647,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             if (e1Contributing && e2Contributing)
             {
                 if (e1Wc != 0 && e1Wc != 1 || e2Wc != 0 && e2Wc != 1
-                    || e1.PolyTyp != e2.PolyTyp && this.m_ClipType != ClipType.ctXor)
+                    || e1.PolyTyp != e2.PolyTyp && this.mClipType != ClipType.CtXor)
                 {
                     this.AddLocalMaxPoly(e1, e2, pt);
                 }
@@ -3710,10 +3683,10 @@ namespace Aimtec.SDK.Util.ThirdParty
                 cInt e1Wc2, e2Wc2;
                 switch (e1FillType2)
                 {
-                    case PolyFillType.pftPositive:
+                    case PolyFillType.PftPositive:
                         e1Wc2 = e1.WindCnt2;
                         break;
-                    case PolyFillType.pftNegative:
+                    case PolyFillType.PftNegative:
                         e1Wc2 = -e1.WindCnt2;
                         break;
                     default:
@@ -3722,10 +3695,10 @@ namespace Aimtec.SDK.Util.ThirdParty
                 }
                 switch (e2FillType2)
                 {
-                    case PolyFillType.pftPositive:
+                    case PolyFillType.PftPositive:
                         e2Wc2 = e2.WindCnt2;
                         break;
-                    case PolyFillType.pftNegative:
+                    case PolyFillType.PftNegative:
                         e2Wc2 = -e2.WindCnt2;
                         break;
                     default:
@@ -3738,22 +3711,22 @@ namespace Aimtec.SDK.Util.ThirdParty
                     this.AddLocalMinPoly(e1, e2, pt);
                 }
                 else if (e1Wc == 1 && e2Wc == 1)
-                    switch (this.m_ClipType)
+                    switch (this.mClipType)
                     {
-                        case ClipType.ctIntersection:
+                        case ClipType.CtIntersection:
                             if (e1Wc2 > 0 && e2Wc2 > 0)
                                 this.AddLocalMinPoly(e1, e2, pt);
                             break;
-                        case ClipType.ctUnion:
+                        case ClipType.CtUnion:
                             if (e1Wc2 <= 0 && e2Wc2 <= 0)
                                 this.AddLocalMinPoly(e1, e2, pt);
                             break;
-                        case ClipType.ctDifference:
-                            if (e1.PolyTyp == PolyType.ptClip && e1Wc2 > 0 && e2Wc2 > 0
-                                || e1.PolyTyp == PolyType.ptSubject && e1Wc2 <= 0 && e2Wc2 <= 0)
+                        case ClipType.CtDifference:
+                            if (e1.PolyTyp == PolyType.PtClip && e1Wc2 > 0 && e2Wc2 > 0
+                                || e1.PolyTyp == PolyType.PtSubject && e1Wc2 <= 0 && e2Wc2 <= 0)
                                 this.AddLocalMinPoly(e1, e2, pt);
                             break;
-                        case ClipType.ctXor:
+                        case ClipType.CtXor:
                             this.AddLocalMinPoly(e1, e2, pt);
                             break;
                     }
@@ -3763,7 +3736,7 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private void IntersectPoint(TEdge edge1, TEdge edge2, out IntPoint ip)
+        private void IntersectPoint(Edge edge1, Edge edge2, out IntPoint ip)
         {
             ip = new IntPoint();
             double b1, b2;
@@ -3838,32 +3811,32 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private bool IsContributing(TEdge edge)
+        private bool IsContributing(Edge edge)
         {
             PolyFillType pft, pft2;
-            if (edge.PolyTyp == PolyType.ptSubject)
+            if (edge.PolyTyp == PolyType.PtSubject)
             {
-                pft = this.m_SubjFillType;
-                pft2 = this.m_ClipFillType;
+                pft = this.mSubjFillType;
+                pft2 = this.mClipFillType;
             }
             else
             {
-                pft = this.m_ClipFillType;
-                pft2 = this.m_SubjFillType;
+                pft = this.mClipFillType;
+                pft2 = this.mSubjFillType;
             }
 
             switch (pft)
             {
-                case PolyFillType.pftEvenOdd:
+                case PolyFillType.PftEvenOdd:
                     //return false if a subj line has been flagged as inside a subj polygon
                     if (edge.WindDelta == 0 && edge.WindCnt != 1)
                         return false;
                     break;
-                case PolyFillType.pftNonZero:
+                case PolyFillType.PftNonZero:
                     if (Math.Abs(edge.WindCnt) != 1)
                         return false;
                     break;
-                case PolyFillType.pftPositive:
+                case PolyFillType.PftPositive:
                     if (edge.WindCnt != 1)
                         return false;
                     break;
@@ -3873,48 +3846,48 @@ namespace Aimtec.SDK.Util.ThirdParty
                     break;
             }
 
-            switch (this.m_ClipType)
+            switch (this.mClipType)
             {
-                case ClipType.ctIntersection:
+                case ClipType.CtIntersection:
                     switch (pft2)
                     {
-                        case PolyFillType.pftEvenOdd:
-                        case PolyFillType.pftNonZero: return edge.WindCnt2 != 0;
-                        case PolyFillType.pftPositive: return edge.WindCnt2 > 0;
+                        case PolyFillType.PftEvenOdd:
+                        case PolyFillType.PftNonZero: return edge.WindCnt2 != 0;
+                        case PolyFillType.PftPositive: return edge.WindCnt2 > 0;
                         default: return edge.WindCnt2 < 0;
                     }
-                case ClipType.ctUnion:
+                case ClipType.CtUnion:
                     switch (pft2)
                     {
-                        case PolyFillType.pftEvenOdd:
-                        case PolyFillType.pftNonZero: return edge.WindCnt2 == 0;
-                        case PolyFillType.pftPositive: return edge.WindCnt2 <= 0;
+                        case PolyFillType.PftEvenOdd:
+                        case PolyFillType.PftNonZero: return edge.WindCnt2 == 0;
+                        case PolyFillType.PftPositive: return edge.WindCnt2 <= 0;
                         default: return edge.WindCnt2 >= 0;
                     }
-                case ClipType.ctDifference:
-                    if (edge.PolyTyp == PolyType.ptSubject)
+                case ClipType.CtDifference:
+                    if (edge.PolyTyp == PolyType.PtSubject)
                         switch (pft2)
                         {
-                            case PolyFillType.pftEvenOdd:
-                            case PolyFillType.pftNonZero: return edge.WindCnt2 == 0;
-                            case PolyFillType.pftPositive: return edge.WindCnt2 <= 0;
+                            case PolyFillType.PftEvenOdd:
+                            case PolyFillType.PftNonZero: return edge.WindCnt2 == 0;
+                            case PolyFillType.PftPositive: return edge.WindCnt2 <= 0;
                             default: return edge.WindCnt2 >= 0;
                         }
                     else
                         switch (pft2)
                         {
-                            case PolyFillType.pftEvenOdd:
-                            case PolyFillType.pftNonZero: return edge.WindCnt2 != 0;
-                            case PolyFillType.pftPositive: return edge.WindCnt2 > 0;
+                            case PolyFillType.PftEvenOdd:
+                            case PolyFillType.PftNonZero: return edge.WindCnt2 != 0;
+                            case PolyFillType.PftPositive: return edge.WindCnt2 > 0;
                             default: return edge.WindCnt2 < 0;
                         }
-                case ClipType.ctXor:
+                case ClipType.CtXor:
                     if (edge.WindDelta == 0) //XOr always contributing unless open
                         switch (pft2)
                         {
-                            case PolyFillType.pftEvenOdd:
-                            case PolyFillType.pftNonZero: return edge.WindCnt2 == 0;
-                            case PolyFillType.pftPositive: return edge.WindCnt2 <= 0;
+                            case PolyFillType.PftEvenOdd:
+                            case PolyFillType.PftNonZero: return edge.WindCnt2 == 0;
+                            case PolyFillType.PftPositive: return edge.WindCnt2 <= 0;
                             default: return edge.WindCnt2 >= 0;
                         }
                     else
@@ -3924,47 +3897,45 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private bool IsEvenOddAltFillType(TEdge edge)
+        private bool IsEvenOddAltFillType(Edge edge)
         {
-            if (edge.PolyTyp == PolyType.ptSubject)
-                return this.m_ClipFillType == PolyFillType.pftEvenOdd;
-            else
-                return this.m_SubjFillType == PolyFillType.pftEvenOdd;
+            if (edge.PolyTyp == PolyType.PtSubject)
+                return this.mClipFillType == PolyFillType.PftEvenOdd;
+            return this.mSubjFillType == PolyFillType.PftEvenOdd;
         }
         //------------------------------------------------------------------------------
 
-        private bool IsEvenOddFillType(TEdge edge)
+        private bool IsEvenOddFillType(Edge edge)
         {
-            if (edge.PolyTyp == PolyType.ptSubject)
-                return this.m_SubjFillType == PolyFillType.pftEvenOdd;
-            else
-                return this.m_ClipFillType == PolyFillType.pftEvenOdd;
+            if (edge.PolyTyp == PolyType.PtSubject)
+                return this.mSubjFillType == PolyFillType.PftEvenOdd;
+            return this.mClipFillType == PolyFillType.PftEvenOdd;
         }
         //------------------------------------------------------------------------------
 
-        private bool IsIntermediate(TEdge e, double Y)
+        private bool IsIntermediate(Edge e, double y)
         {
-            return e.Top.Y == Y && e.NextInLML != null;
+            return e.Top.Y == y && e.NextInLml != null;
         }
         //------------------------------------------------------------------------------
 
-        private bool IsMaxima(TEdge e, double Y)
+        private bool IsMaxima(Edge e, double y)
         {
-            return e != null && e.Top.Y == Y && e.NextInLML == null;
+            return e != null && e.Top.Y == y && e.NextInLml == null;
         }
         //------------------------------------------------------------------------------
 
-        private bool IsMinima(TEdge e)
+        private bool IsMinima(Edge e)
         {
-            return e != null && e.Prev.NextInLML != e && e.Next.NextInLML != e;
+            return e != null && e.Prev.NextInLml != e && e.Next.NextInLml != e;
         }
         //------------------------------------------------------------------------------
 
         private void JoinCommonEdges()
         {
-            for (var i = 0; i < this.m_Joins.Count; i++)
+            for (var i = 0; i < this.mJoins.Count; i++)
             {
-                var join = this.m_Joins[i];
+                var join = this.mJoins[i];
 
                 var outRec1 = this.GetOutRec(join.OutPt1.Idx);
                 var outRec2 = this.GetOutRec(join.OutPt2.Idx);
@@ -4007,7 +3978,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                         outRec2.IsHole = !outRec1.IsHole;
                         outRec2.FirstLeft = outRec1;
 
-                        if (this.m_UsingPolyTree)
+                        if (this.mUsingPolyTree)
                             this.FixupFirstLefts2(outRec2, outRec1);
 
                         if ((outRec2.IsHole ^ this.ReverseSolution) == this.Area(outRec2) > 0)
@@ -4021,7 +3992,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                         outRec2.FirstLeft = outRec1.FirstLeft;
                         outRec1.FirstLeft = outRec2;
 
-                        if (this.m_UsingPolyTree)
+                        if (this.mUsingPolyTree)
                             this.FixupFirstLefts2(outRec1, outRec2);
 
                         if ((outRec1.IsHole ^ this.ReverseSolution) == this.Area(outRec1) > 0)
@@ -4034,7 +4005,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                         outRec2.FirstLeft = outRec1.FirstLeft;
 
                         //fixup FirstLeft pointers that may need reassigning to OutRec2
-                        if (this.m_UsingPolyTree)
+                        if (this.mUsingPolyTree)
                             this.FixupFirstLefts1(outRec1, outRec2);
                     }
                 }
@@ -4052,18 +4023,18 @@ namespace Aimtec.SDK.Util.ThirdParty
                     outRec2.FirstLeft = outRec1;
 
                     //fixup FirstLeft pointers that may need reassigning to OutRec1
-                    if (this.m_UsingPolyTree)
+                    if (this.mUsingPolyTree)
                         this.FixupFirstLefts3(outRec2, outRec1);
                 }
             }
         }
         //------------------------------------------------------------------------------
 
-        bool JoinHorz(OutPt op1, OutPt op1b, OutPt op2, OutPt op2b, IntPoint Pt, bool DiscardLeft)
+        bool JoinHorz(OutPt op1, OutPt op1B, OutPt op2, OutPt op2B, IntPoint pt, bool discardLeft)
         {
-            var Dir1 = op1.Pt.X > op1b.Pt.X ? Direction.dRightToLeft : Direction.dLeftToRight;
-            var Dir2 = op2.Pt.X > op2b.Pt.X ? Direction.dRightToLeft : Direction.dLeftToRight;
-            if (Dir1 == Dir2)
+            var dir1 = op1.Pt.X > op1B.Pt.X ? Direction.DRightToLeft : Direction.DLeftToRight;
+            var dir2 = op2.Pt.X > op2B.Pt.X ? Direction.DRightToLeft : Direction.DLeftToRight;
+            if (dir1 == dir2)
                 return false;
 
             //When DiscardLeft, we want Op1b to be on the Left of Op1, otherwise we
@@ -4071,80 +4042,80 @@ namespace Aimtec.SDK.Util.ThirdParty
             //So, to facilitate this while inserting Op1b and Op2b ...
             //when DiscardLeft, make sure we're AT or RIGHT of Pt before adding Op1b,
             //otherwise make sure we're AT or LEFT of Pt. (Likewise with Op2b.)
-            if (Dir1 == Direction.dLeftToRight)
+            if (dir1 == Direction.DLeftToRight)
             {
-                while (op1.Next.Pt.X <= Pt.X && op1.Next.Pt.X >= op1.Pt.X && op1.Next.Pt.Y == Pt.Y)
+                while (op1.Next.Pt.X <= pt.X && op1.Next.Pt.X >= op1.Pt.X && op1.Next.Pt.Y == pt.Y)
                     op1 = op1.Next;
-                if (DiscardLeft && op1.Pt.X != Pt.X)
+                if (discardLeft && op1.Pt.X != pt.X)
                     op1 = op1.Next;
-                op1b = this.DupOutPt(op1, !DiscardLeft);
-                if (op1b.Pt != Pt)
+                op1B = this.DupOutPt(op1, !discardLeft);
+                if (op1B.Pt != pt)
                 {
-                    op1 = op1b;
-                    op1.Pt = Pt;
-                    op1b = this.DupOutPt(op1, !DiscardLeft);
+                    op1 = op1B;
+                    op1.Pt = pt;
+                    op1B = this.DupOutPt(op1, !discardLeft);
                 }
             }
             else
             {
-                while (op1.Next.Pt.X >= Pt.X && op1.Next.Pt.X <= op1.Pt.X && op1.Next.Pt.Y == Pt.Y)
+                while (op1.Next.Pt.X >= pt.X && op1.Next.Pt.X <= op1.Pt.X && op1.Next.Pt.Y == pt.Y)
                     op1 = op1.Next;
-                if (!DiscardLeft && op1.Pt.X != Pt.X)
+                if (!discardLeft && op1.Pt.X != pt.X)
                     op1 = op1.Next;
-                op1b = this.DupOutPt(op1, DiscardLeft);
-                if (op1b.Pt != Pt)
+                op1B = this.DupOutPt(op1, discardLeft);
+                if (op1B.Pt != pt)
                 {
-                    op1 = op1b;
-                    op1.Pt = Pt;
-                    op1b = this.DupOutPt(op1, DiscardLeft);
+                    op1 = op1B;
+                    op1.Pt = pt;
+                    op1B = this.DupOutPt(op1, discardLeft);
                 }
             }
 
-            if (Dir2 == Direction.dLeftToRight)
+            if (dir2 == Direction.DLeftToRight)
             {
-                while (op2.Next.Pt.X <= Pt.X && op2.Next.Pt.X >= op2.Pt.X && op2.Next.Pt.Y == Pt.Y)
+                while (op2.Next.Pt.X <= pt.X && op2.Next.Pt.X >= op2.Pt.X && op2.Next.Pt.Y == pt.Y)
                     op2 = op2.Next;
-                if (DiscardLeft && op2.Pt.X != Pt.X)
+                if (discardLeft && op2.Pt.X != pt.X)
                     op2 = op2.Next;
-                op2b = this.DupOutPt(op2, !DiscardLeft);
-                if (op2b.Pt != Pt)
+                op2B = this.DupOutPt(op2, !discardLeft);
+                if (op2B.Pt != pt)
                 {
-                    op2 = op2b;
-                    op2.Pt = Pt;
-                    op2b = this.DupOutPt(op2, !DiscardLeft);
+                    op2 = op2B;
+                    op2.Pt = pt;
+                    op2B = this.DupOutPt(op2, !discardLeft);
                 }
                 ;
             }
             else
             {
-                while (op2.Next.Pt.X >= Pt.X && op2.Next.Pt.X <= op2.Pt.X && op2.Next.Pt.Y == Pt.Y)
+                while (op2.Next.Pt.X >= pt.X && op2.Next.Pt.X <= op2.Pt.X && op2.Next.Pt.Y == pt.Y)
                     op2 = op2.Next;
-                if (!DiscardLeft && op2.Pt.X != Pt.X)
+                if (!discardLeft && op2.Pt.X != pt.X)
                     op2 = op2.Next;
-                op2b = this.DupOutPt(op2, DiscardLeft);
-                if (op2b.Pt != Pt)
+                op2B = this.DupOutPt(op2, discardLeft);
+                if (op2B.Pt != pt)
                 {
-                    op2 = op2b;
-                    op2.Pt = Pt;
-                    op2b = this.DupOutPt(op2, DiscardLeft);
+                    op2 = op2B;
+                    op2.Pt = pt;
+                    op2B = this.DupOutPt(op2, discardLeft);
                 }
                 ;
             }
             ;
 
-            if (Dir1 == Direction.dLeftToRight == DiscardLeft)
+            if (dir1 == Direction.DLeftToRight == discardLeft)
             {
                 op1.Prev = op2;
                 op2.Next = op1;
-                op1b.Next = op2b;
-                op2b.Prev = op1b;
+                op1B.Next = op2B;
+                op2B.Prev = op1B;
             }
             else
             {
                 op1.Next = op2;
                 op2.Prev = op1;
-                op1b.Prev = op2b;
-                op2b.Next = op1b;
+                op1B.Prev = op2B;
+                op2B.Next = op1B;
             }
             return true;
         }
@@ -4152,8 +4123,8 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         private bool JoinPoints(Join j, OutRec outRec1, OutRec outRec2)
         {
-            OutPt op1 = j.OutPt1, op1b;
-            OutPt op2 = j.OutPt2, op2b;
+            OutPt op1 = j.OutPt1, op1B;
+            OutPt op2 = j.OutPt2, op2B;
 
             //There are 3 kinds of joins for output polygons ...
             //1. Horizontal joins where Join.OutPt1 & Join.OutPt2 are vertices anywhere
@@ -4169,155 +4140,146 @@ namespace Aimtec.SDK.Util.ThirdParty
                 //Strictly Simple join ...
                 if (outRec1 != outRec2)
                     return false;
-                op1b = j.OutPt1.Next;
-                while (op1b != op1 && op1b.Pt == j.OffPt)
-                    op1b = op1b.Next;
-                var reverse1 = op1b.Pt.Y > j.OffPt.Y;
-                op2b = j.OutPt2.Next;
-                while (op2b != op2 && op2b.Pt == j.OffPt)
-                    op2b = op2b.Next;
-                var reverse2 = op2b.Pt.Y > j.OffPt.Y;
+                op1B = j.OutPt1.Next;
+                while (op1B != op1 && op1B.Pt == j.OffPt)
+                    op1B = op1B.Next;
+                var reverse1 = op1B.Pt.Y > j.OffPt.Y;
+                op2B = j.OutPt2.Next;
+                while (op2B != op2 && op2B.Pt == j.OffPt)
+                    op2B = op2B.Next;
+                var reverse2 = op2B.Pt.Y > j.OffPt.Y;
                 if (reverse1 == reverse2)
                     return false;
                 if (reverse1)
                 {
-                    op1b = this.DupOutPt(op1, false);
-                    op2b = this.DupOutPt(op2, true);
+                    op1B = this.DupOutPt(op1, false);
+                    op2B = this.DupOutPt(op2, true);
                     op1.Prev = op2;
                     op2.Next = op1;
-                    op1b.Next = op2b;
-                    op2b.Prev = op1b;
+                    op1B.Next = op2B;
+                    op2B.Prev = op1B;
                     j.OutPt1 = op1;
-                    j.OutPt2 = op1b;
+                    j.OutPt2 = op1B;
                     return true;
                 }
-                else
-                {
-                    op1b = this.DupOutPt(op1, true);
-                    op2b = this.DupOutPt(op2, false);
-                    op1.Next = op2;
-                    op2.Prev = op1;
-                    op1b.Prev = op2b;
-                    op2b.Next = op1b;
-                    j.OutPt1 = op1;
-                    j.OutPt2 = op1b;
-                    return true;
-                }
+                op1B = this.DupOutPt(op1, true);
+                op2B = this.DupOutPt(op2, false);
+                op1.Next = op2;
+                op2.Prev = op1;
+                op1B.Prev = op2B;
+                op2B.Next = op1B;
+                j.OutPt1 = op1;
+                j.OutPt2 = op1B;
+                return true;
             }
-            else if (isHorizontal)
+            if (isHorizontal)
             {
                 //treat horizontal joins differently to non-horizontal joins since with
                 //them we're not yet sure where the overlapping is. OutPt1.Pt & OutPt2.Pt
                 //may be anywhere along the horizontal edge.
-                op1b = op1;
-                while (op1.Prev.Pt.Y == op1.Pt.Y && op1.Prev != op1b && op1.Prev != op2)
+                op1B = op1;
+                while (op1.Prev.Pt.Y == op1.Pt.Y && op1.Prev != op1B && op1.Prev != op2)
                     op1 = op1.Prev;
-                while (op1b.Next.Pt.Y == op1b.Pt.Y && op1b.Next != op1 && op1b.Next != op2)
-                    op1b = op1b.Next;
-                if (op1b.Next == op1 || op1b.Next == op2)
+                while (op1B.Next.Pt.Y == op1B.Pt.Y && op1B.Next != op1 && op1B.Next != op2)
+                    op1B = op1B.Next;
+                if (op1B.Next == op1 || op1B.Next == op2)
                     return false; //a flat 'polygon'
 
-                op2b = op2;
-                while (op2.Prev.Pt.Y == op2.Pt.Y && op2.Prev != op2b && op2.Prev != op1b)
+                op2B = op2;
+                while (op2.Prev.Pt.Y == op2.Pt.Y && op2.Prev != op2B && op2.Prev != op1B)
                     op2 = op2.Prev;
-                while (op2b.Next.Pt.Y == op2b.Pt.Y && op2b.Next != op2 && op2b.Next != op1)
-                    op2b = op2b.Next;
-                if (op2b.Next == op2 || op2b.Next == op1)
+                while (op2B.Next.Pt.Y == op2B.Pt.Y && op2B.Next != op2 && op2B.Next != op1)
+                    op2B = op2B.Next;
+                if (op2B.Next == op2 || op2B.Next == op1)
                     return false; //a flat 'polygon'
                 //Op1 -. Op1b & Op2 -. Op2b are the extremites of the horizontal edges
-                if (!this.GetOverlap(op1.Pt.X, op1b.Pt.X, op2.Pt.X, op2b.Pt.X, out long Left, out long Right))
+                if (!this.GetOverlap(op1.Pt.X, op1B.Pt.X, op2.Pt.X, op2B.Pt.X, out long left, out long right))
                     return false;
 
                 //DiscardLeftSide: when overlapping edges are joined, a spike will created
                 //which needs to be cleaned up. However, we don't want Op1 or Op2 caught up
                 //on the discard Side as either may still be needed for other joins ...
-                IntPoint Pt;
-                bool DiscardLeftSide;
-                if (op1.Pt.X >= Left && op1.Pt.X <= Right)
+                IntPoint pt;
+                bool discardLeftSide;
+                if (op1.Pt.X >= left && op1.Pt.X <= right)
                 {
-                    Pt = op1.Pt;
-                    DiscardLeftSide = op1.Pt.X > op1b.Pt.X;
+                    pt = op1.Pt;
+                    discardLeftSide = op1.Pt.X > op1B.Pt.X;
                 }
-                else if (op2.Pt.X >= Left && op2.Pt.X <= Right)
+                else if (op2.Pt.X >= left && op2.Pt.X <= right)
                 {
-                    Pt = op2.Pt;
-                    DiscardLeftSide = op2.Pt.X > op2b.Pt.X;
+                    pt = op2.Pt;
+                    discardLeftSide = op2.Pt.X > op2B.Pt.X;
                 }
-                else if (op1b.Pt.X >= Left && op1b.Pt.X <= Right)
+                else if (op1B.Pt.X >= left && op1B.Pt.X <= right)
                 {
-                    Pt = op1b.Pt;
-                    DiscardLeftSide = op1b.Pt.X > op1.Pt.X;
+                    pt = op1B.Pt;
+                    discardLeftSide = op1B.Pt.X > op1.Pt.X;
                 }
                 else
                 {
-                    Pt = op2b.Pt;
-                    DiscardLeftSide = op2b.Pt.X > op2.Pt.X;
+                    pt = op2B.Pt;
+                    discardLeftSide = op2B.Pt.X > op2.Pt.X;
                 }
                 j.OutPt1 = op1;
                 j.OutPt2 = op2;
-                return this.JoinHorz(op1, op1b, op2, op2b, Pt, DiscardLeftSide);
+                return this.JoinHorz(op1, op1B, op2, op2B, pt, discardLeftSide);
             }
-            else
+            //nb: For non-horizontal joins ...
+            //    1. Jr.OutPt1.Pt.Y == Jr.OutPt2.Pt.Y
+            //    2. Jr.OutPt1.Pt > Jr.OffPt.Y
+
+            //make sure the polygons are correctly oriented ...
+            op1B = op1.Next;
+            while (op1B.Pt == op1.Pt && op1B != op1)
+                op1B = op1B.Next;
+            var Reverse1 = op1B.Pt.Y > op1.Pt.Y || !SlopesEqual(op1.Pt, op1B.Pt, j.OffPt, this.MUseFullRange);
+            if (Reverse1)
             {
-                //nb: For non-horizontal joins ...
-                //    1. Jr.OutPt1.Pt.Y == Jr.OutPt2.Pt.Y
-                //    2. Jr.OutPt1.Pt > Jr.OffPt.Y
-
-                //make sure the polygons are correctly oriented ...
-                op1b = op1.Next;
-                while (op1b.Pt == op1.Pt && op1b != op1)
-                    op1b = op1b.Next;
-                var Reverse1 = op1b.Pt.Y > op1.Pt.Y || !SlopesEqual(op1.Pt, op1b.Pt, j.OffPt, this.m_UseFullRange);
-                if (Reverse1)
-                {
-                    op1b = op1.Prev;
-                    while (op1b.Pt == op1.Pt && op1b != op1)
-                        op1b = op1b.Prev;
-                    if (op1b.Pt.Y > op1.Pt.Y || !SlopesEqual(op1.Pt, op1b.Pt, j.OffPt, this.m_UseFullRange))
-                        return false;
-                }
-                ;
-                op2b = op2.Next;
-                while (op2b.Pt == op2.Pt && op2b != op2)
-                    op2b = op2b.Next;
-                var Reverse2 = op2b.Pt.Y > op2.Pt.Y || !SlopesEqual(op2.Pt, op2b.Pt, j.OffPt, this.m_UseFullRange);
-                if (Reverse2)
-                {
-                    op2b = op2.Prev;
-                    while (op2b.Pt == op2.Pt && op2b != op2)
-                        op2b = op2b.Prev;
-                    if (op2b.Pt.Y > op2.Pt.Y || !SlopesEqual(op2.Pt, op2b.Pt, j.OffPt, this.m_UseFullRange))
-                        return false;
-                }
-
-                if (op1b == op1 || op2b == op2 || op1b == op2b || outRec1 == outRec2 && Reverse1 == Reverse2)
+                op1B = op1.Prev;
+                while (op1B.Pt == op1.Pt && op1B != op1)
+                    op1B = op1B.Prev;
+                if (op1B.Pt.Y > op1.Pt.Y || !SlopesEqual(op1.Pt, op1B.Pt, j.OffPt, this.MUseFullRange))
                     return false;
-
-                if (Reverse1)
-                {
-                    op1b = this.DupOutPt(op1, false);
-                    op2b = this.DupOutPt(op2, true);
-                    op1.Prev = op2;
-                    op2.Next = op1;
-                    op1b.Next = op2b;
-                    op2b.Prev = op1b;
-                    j.OutPt1 = op1;
-                    j.OutPt2 = op1b;
-                    return true;
-                }
-                else
-                {
-                    op1b = this.DupOutPt(op1, true);
-                    op2b = this.DupOutPt(op2, false);
-                    op1.Next = op2;
-                    op2.Prev = op1;
-                    op1b.Prev = op2b;
-                    op2b.Next = op1b;
-                    j.OutPt1 = op1;
-                    j.OutPt2 = op1b;
-                    return true;
-                }
             }
+            ;
+            op2B = op2.Next;
+            while (op2B.Pt == op2.Pt && op2B != op2)
+                op2B = op2B.Next;
+            var Reverse2 = op2B.Pt.Y > op2.Pt.Y || !SlopesEqual(op2.Pt, op2B.Pt, j.OffPt, this.MUseFullRange);
+            if (Reverse2)
+            {
+                op2B = op2.Prev;
+                while (op2B.Pt == op2.Pt && op2B != op2)
+                    op2B = op2B.Prev;
+                if (op2B.Pt.Y > op2.Pt.Y || !SlopesEqual(op2.Pt, op2B.Pt, j.OffPt, this.MUseFullRange))
+                    return false;
+            }
+
+            if (op1B == op1 || op2B == op2 || op1B == op2B || outRec1 == outRec2 && Reverse1 == Reverse2)
+                return false;
+
+            if (Reverse1)
+            {
+                op1B = this.DupOutPt(op1, false);
+                op2B = this.DupOutPt(op2, true);
+                op1.Prev = op2;
+                op2.Next = op1;
+                op1B.Next = op2B;
+                op2B.Prev = op1B;
+                j.OutPt1 = op1;
+                j.OutPt2 = op1B;
+                return true;
+            }
+            op1B = this.DupOutPt(op1, true);
+            op2B = this.DupOutPt(op2, false);
+            op1.Next = op2;
+            op2.Prev = op1;
+            op1B.Prev = op2B;
+            op2B.Next = op1B;
+            j.OutPt1 = op1;
+            j.OutPt2 = op1B;
+            return true;
         }
         //------------------------------------------------------------------------------
 
@@ -4352,39 +4314,39 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         private void ProcessEdgesAtTopOfScanbeam(cInt topY)
         {
-            var e = this.m_ActiveEdges;
+            var e = this.MActiveEdges;
             while (e != null)
             {
                 //1. process maxima, treating them as if they're 'bent' horizontal edges,
                 //   but exclude maxima with horizontal edges. nb: e can't be a horizontal.
-                var IsMaximaEdge = this.IsMaxima(e, topY);
+                var isMaximaEdge = this.IsMaxima(e, topY);
 
-                if (IsMaximaEdge)
+                if (isMaximaEdge)
                 {
                     var eMaxPair = this.GetMaximaPairEx(e);
-                    IsMaximaEdge = eMaxPair == null || !IsHorizontal(eMaxPair);
+                    isMaximaEdge = eMaxPair == null || !IsHorizontal(eMaxPair);
                 }
 
-                if (IsMaximaEdge)
+                if (isMaximaEdge)
                 {
                     if (this.StrictlySimple)
                         this.InsertMaxima(e.Top.X);
-                    var ePrev = e.PrevInAEL;
+                    var ePrev = e.PrevInAel;
                     this.DoMaxima(e);
                     if (ePrev == null)
-                        e = this.m_ActiveEdges;
+                        e = this.MActiveEdges;
                     else
-                        e = ePrev.NextInAEL;
+                        e = ePrev.NextInAel;
                 }
                 else
                 {
                     //2. promote horizontal edges, otherwise update Curr.X and Curr.Y ...
-                    if (this.IsIntermediate(e, topY) && IsHorizontal(e.NextInLML))
+                    if (this.IsIntermediate(e, topY) && IsHorizontal(e.NextInLml))
                     {
-                        this.UpdateEdgeIntoAEL(ref e);
+                        this.UpdateEdgeIntoAel(ref e);
                         if (e.OutIdx >= 0)
                             this.AddOutPt(e, e.Bot);
-                        this.AddEdgeToSEL(e);
+                        this.AddEdgeToSel(e);
                     }
                     else
                     {
@@ -4403,7 +4365,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                     //make sure both edges have a vertex here ...
                     if (this.StrictlySimple)
                     {
-                        var ePrev = e.PrevInAEL;
+                        var ePrev = e.PrevInAel;
                         if (e.OutIdx >= 0 && e.WindDelta != 0 && ePrev != null && ePrev.OutIdx >= 0
                             && ePrev.Curr.X == e.Curr.X && ePrev.WindDelta != 0)
                         {
@@ -4417,16 +4379,16 @@ namespace Aimtec.SDK.Util.ThirdParty
                         }
                     }
 
-                    e = e.NextInAEL;
+                    e = e.NextInAel;
                 }
             }
 
             //3. Process horizontals at the Top of the scanbeam ...
             this.ProcessHorizontals();
-            this.m_Maxima = null;
+            this.mMaxima = null;
 
             //4. Promote intermediate vertices ...
-            e = this.m_ActiveEdges;
+            e = this.MActiveEdges;
             while (e != null)
             {
                 if (this.IsIntermediate(e, topY))
@@ -4434,14 +4396,14 @@ namespace Aimtec.SDK.Util.ThirdParty
                     OutPt op = null;
                     if (e.OutIdx >= 0)
                         op = this.AddOutPt(e, e.Top);
-                    this.UpdateEdgeIntoAEL(ref e);
+                    this.UpdateEdgeIntoAel(ref e);
 
                     //if output polygons share an edge, they'll need joining later ...
-                    var ePrev = e.PrevInAEL;
-                    var eNext = e.NextInAEL;
+                    var ePrev = e.PrevInAel;
+                    var eNext = e.NextInAel;
                     if (ePrev != null && ePrev.Curr.X == e.Bot.X && ePrev.Curr.Y == e.Bot.Y && op != null
                         && ePrev.OutIdx >= 0 && ePrev.Curr.Y > ePrev.Top.Y
-                        && SlopesEqual(e.Curr, e.Top, ePrev.Curr, ePrev.Top, this.m_UseFullRange) && e.WindDelta != 0
+                        && SlopesEqual(e.Curr, e.Top, ePrev.Curr, ePrev.Top, this.MUseFullRange) && e.WindDelta != 0
                         && ePrev.WindDelta != 0)
                     {
                         var op2 = this.AddOutPt(ePrev, e.Bot);
@@ -4449,35 +4411,35 @@ namespace Aimtec.SDK.Util.ThirdParty
                     }
                     else if (eNext != null && eNext.Curr.X == e.Bot.X && eNext.Curr.Y == e.Bot.Y && op != null
                         && eNext.OutIdx >= 0 && eNext.Curr.Y > eNext.Top.Y
-                        && SlopesEqual(e.Curr, e.Top, eNext.Curr, eNext.Top, this.m_UseFullRange) && e.WindDelta != 0
+                        && SlopesEqual(e.Curr, e.Top, eNext.Curr, eNext.Top, this.MUseFullRange) && e.WindDelta != 0
                         && eNext.WindDelta != 0)
                     {
                         var op2 = this.AddOutPt(eNext, e.Bot);
                         this.AddJoin(op, op2, e.Top);
                     }
                 }
-                e = e.NextInAEL;
+                e = e.NextInAel;
             }
         }
         //------------------------------------------------------------------------
 
-        private void ProcessHorizontal(TEdge horzEdge)
+        private void ProcessHorizontal(Edge horzEdge)
         {
-            var IsOpen = horzEdge.WindDelta == 0;
+            var isOpen = horzEdge.WindDelta == 0;
 
             this.GetHorzDirection(horzEdge, out Direction dir, out long horzLeft, out long horzRight);
 
-            TEdge eLastHorz = horzEdge, eMaxPair = null;
-            while (eLastHorz.NextInLML != null && IsHorizontal(eLastHorz.NextInLML))
-                eLastHorz = eLastHorz.NextInLML;
-            if (eLastHorz.NextInLML == null)
+            Edge eLastHorz = horzEdge, eMaxPair = null;
+            while (eLastHorz.NextInLml != null && IsHorizontal(eLastHorz.NextInLml))
+                eLastHorz = eLastHorz.NextInLml;
+            if (eLastHorz.NextInLml == null)
                 eMaxPair = this.GetMaximaPair(eLastHorz);
 
-            var currMax = this.m_Maxima;
+            var currMax = this.mMaxima;
             if (currMax != null)
             {
                 //get the first maxima in range (X) ...
-                if (dir == Direction.dLeftToRight)
+                if (dir == Direction.DLeftToRight)
                 {
                     while (currMax != null && currMax.X <= horzEdge.Bot.X)
                         currMax = currMax.Next;
@@ -4496,8 +4458,8 @@ namespace Aimtec.SDK.Util.ThirdParty
             OutPt op1 = null;
             for (;;) //loop through consec. horizontal edges
             {
-                var IsLastHorz = horzEdge == eLastHorz;
-                var e = this.GetNextInAEL(horzEdge, dir);
+                var isLastHorz = horzEdge == eLastHorz;
+                var e = this.GetNextInAel(horzEdge, dir);
                 while (e != null)
                 {
                     //this code block inserts extra coords into horizontal edges (in output
@@ -4505,11 +4467,11 @@ namespace Aimtec.SDK.Util.ThirdParty
                     //'simplifying' polygons (ie if the Simplify property is set).
                     if (currMax != null)
                     {
-                        if (dir == Direction.dLeftToRight)
+                        if (dir == Direction.DLeftToRight)
                         {
                             while (currMax != null && currMax.X < e.Curr.X)
                             {
-                                if (horzEdge.OutIdx >= 0 && !IsOpen)
+                                if (horzEdge.OutIdx >= 0 && !isOpen)
                                     this.AddOutPt(horzEdge, new IntPoint(currMax.X, horzEdge.Bot.Y));
                                 currMax = currMax.Next;
                             }
@@ -4518,7 +4480,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                         {
                             while (currMax != null && currMax.X > e.Curr.X)
                             {
-                                if (horzEdge.OutIdx >= 0 && !IsOpen)
+                                if (horzEdge.OutIdx >= 0 && !isOpen)
                                     this.AddOutPt(horzEdge, new IntPoint(currMax.X, horzEdge.Bot.Y));
                                 currMax = currMax.Prev;
                             }
@@ -4526,26 +4488,26 @@ namespace Aimtec.SDK.Util.ThirdParty
                     }
                     ;
 
-                    if (dir == Direction.dLeftToRight && e.Curr.X > horzRight
-                        || dir == Direction.dRightToLeft && e.Curr.X < horzLeft)
+                    if (dir == Direction.DLeftToRight && e.Curr.X > horzRight
+                        || dir == Direction.DRightToLeft && e.Curr.X < horzLeft)
                         break;
 
                     //Also break if we've got to the end of an intermediate horizontal edge ...
                     //nb: Smaller Dx's are to the right of larger Dx's ABOVE the horizontal.
-                    if (e.Curr.X == horzEdge.Top.X && horzEdge.NextInLML != null && e.Dx < horzEdge.NextInLML.Dx)
+                    if (e.Curr.X == horzEdge.Top.X && horzEdge.NextInLml != null && e.Dx < horzEdge.NextInLml.Dx)
                         break;
 
-                    if (horzEdge.OutIdx >= 0 && !IsOpen) //note: may be done multiple times
+                    if (horzEdge.OutIdx >= 0 && !isOpen) //note: may be done multiple times
                     {
 #if use_xyz
-                        if (dir == Direction.dLeftToRight)
+                        if (dir == Direction.DLeftToRight)
                             this.SetZ(ref e.Curr, horzEdge, e);
                         else
                             this.SetZ(ref e.Curr, e, horzEdge);
 #endif
 
                         op1 = this.AddOutPt(horzEdge, e.Curr);
-                        var eNextHorz = this.m_SortedEdges;
+                        var eNextHorz = this.mSortedEdges;
                         while (eNextHorz != null)
                         {
                             if (eNextHorz.OutIdx >= 0 && this.HorzSegmentsOverlap(
@@ -4557,42 +4519,42 @@ namespace Aimtec.SDK.Util.ThirdParty
                                 var op2 = this.GetLastOutPt(eNextHorz);
                                 this.AddJoin(op2, op1, eNextHorz.Top);
                             }
-                            eNextHorz = eNextHorz.NextInSEL;
+                            eNextHorz = eNextHorz.NextInSel;
                         }
                         this.AddGhostJoin(op1, horzEdge.Bot);
                     }
 
                     //OK, so far we're still in range of the horizontal Edge  but make sure
                     //we're at the last of consec. horizontals when matching with eMaxPair
-                    if (e == eMaxPair && IsLastHorz)
+                    if (e == eMaxPair && isLastHorz)
                     {
                         if (horzEdge.OutIdx >= 0)
                             this.AddLocalMaxPoly(horzEdge, eMaxPair, horzEdge.Top);
-                        this.DeleteFromAEL(horzEdge);
-                        this.DeleteFromAEL(eMaxPair);
+                        this.DeleteFromAel(horzEdge);
+                        this.DeleteFromAel(eMaxPair);
                         return;
                     }
 
-                    if (dir == Direction.dLeftToRight)
+                    if (dir == Direction.DLeftToRight)
                     {
-                        var Pt = new IntPoint(e.Curr.X, horzEdge.Curr.Y);
-                        this.IntersectEdges(horzEdge, e, Pt);
+                        var pt = new IntPoint(e.Curr.X, horzEdge.Curr.Y);
+                        this.IntersectEdges(horzEdge, e, pt);
                     }
                     else
                     {
-                        var Pt = new IntPoint(e.Curr.X, horzEdge.Curr.Y);
-                        this.IntersectEdges(e, horzEdge, Pt);
+                        var pt = new IntPoint(e.Curr.X, horzEdge.Curr.Y);
+                        this.IntersectEdges(e, horzEdge, pt);
                     }
-                    var eNext = this.GetNextInAEL(e, dir);
-                    this.SwapPositionsInAEL(horzEdge, e);
+                    var eNext = this.GetNextInAel(e, dir);
+                    this.SwapPositionsInAel(horzEdge, e);
                     e = eNext;
                 } //end while(e != null)
 
                 //Break out of loop if HorzEdge.NextInLML is not also horizontal ...
-                if (horzEdge.NextInLML == null || !IsHorizontal(horzEdge.NextInLML))
+                if (horzEdge.NextInLml == null || !IsHorizontal(horzEdge.NextInLml))
                     break;
 
-                this.UpdateEdgeIntoAEL(ref horzEdge);
+                this.UpdateEdgeIntoAel(ref horzEdge);
                 if (horzEdge.OutIdx >= 0)
                     this.AddOutPt(horzEdge, horzEdge.Bot);
                 this.GetHorzDirection(horzEdge, out dir, out horzLeft, out horzRight);
@@ -4601,7 +4563,7 @@ namespace Aimtec.SDK.Util.ThirdParty
             if (horzEdge.OutIdx >= 0 && op1 == null)
             {
                 op1 = this.GetLastOutPt(horzEdge);
-                var eNextHorz = this.m_SortedEdges;
+                var eNextHorz = this.mSortedEdges;
                 while (eNextHorz != null)
                 {
                     if (eNextHorz.OutIdx >= 0 && this.HorzSegmentsOverlap(
@@ -4613,46 +4575,46 @@ namespace Aimtec.SDK.Util.ThirdParty
                         var op2 = this.GetLastOutPt(eNextHorz);
                         this.AddJoin(op2, op1, eNextHorz.Top);
                     }
-                    eNextHorz = eNextHorz.NextInSEL;
+                    eNextHorz = eNextHorz.NextInSel;
                 }
                 this.AddGhostJoin(op1, horzEdge.Top);
             }
 
-            if (horzEdge.NextInLML != null)
+            if (horzEdge.NextInLml != null)
             {
                 if (horzEdge.OutIdx >= 0)
                 {
                     op1 = this.AddOutPt(horzEdge, horzEdge.Top);
 
-                    this.UpdateEdgeIntoAEL(ref horzEdge);
+                    this.UpdateEdgeIntoAel(ref horzEdge);
                     if (horzEdge.WindDelta == 0)
                         return;
                     //nb: HorzEdge is no longer horizontal here
-                    var ePrev = horzEdge.PrevInAEL;
-                    var eNext = horzEdge.NextInAEL;
+                    var ePrev = horzEdge.PrevInAel;
+                    var eNext = horzEdge.NextInAel;
                     if (ePrev != null && ePrev.Curr.X == horzEdge.Bot.X && ePrev.Curr.Y == horzEdge.Bot.Y
                         && ePrev.WindDelta != 0 && ePrev.OutIdx >= 0 && ePrev.Curr.Y > ePrev.Top.Y
-                        && SlopesEqual(horzEdge, ePrev, this.m_UseFullRange))
+                        && SlopesEqual(horzEdge, ePrev, this.MUseFullRange))
                     {
                         var op2 = this.AddOutPt(ePrev, horzEdge.Bot);
                         this.AddJoin(op1, op2, horzEdge.Top);
                     }
                     else if (eNext != null && eNext.Curr.X == horzEdge.Bot.X && eNext.Curr.Y == horzEdge.Bot.Y
                         && eNext.WindDelta != 0 && eNext.OutIdx >= 0 && eNext.Curr.Y > eNext.Top.Y
-                        && SlopesEqual(horzEdge, eNext, this.m_UseFullRange))
+                        && SlopesEqual(horzEdge, eNext, this.MUseFullRange))
                     {
                         var op2 = this.AddOutPt(eNext, horzEdge.Bot);
                         this.AddJoin(op1, op2, horzEdge.Top);
                     }
                 }
                 else
-                    this.UpdateEdgeIntoAEL(ref horzEdge);
+                    this.UpdateEdgeIntoAel(ref horzEdge);
             }
             else
             {
                 if (horzEdge.OutIdx >= 0)
                     this.AddOutPt(horzEdge, horzEdge.Top);
-                this.DeleteFromAEL(horzEdge);
+                this.DeleteFromAel(horzEdge);
             }
         }
         //------------------------------------------------------------------------------
@@ -4660,47 +4622,47 @@ namespace Aimtec.SDK.Util.ThirdParty
         private void ProcessHorizontals()
         {
             //m_SortedEdges;
-            while (this.PopEdgeFromSEL(out TEdge horzEdge))
+            while (this.PopEdgeFromSel(out Edge horzEdge))
                 this.ProcessHorizontal(horzEdge);
         }
         //------------------------------------------------------------------------------
 
         private bool ProcessIntersections(cInt topY)
         {
-            if (this.m_ActiveEdges == null)
+            if (this.MActiveEdges == null)
                 return true;
             try
             {
                 this.BuildIntersectList(topY);
-                if (this.m_IntersectList.Count == 0)
+                if (this.mIntersectList.Count == 0)
                     return true;
-                if (this.m_IntersectList.Count == 1 || this.FixupIntersectionOrder())
+                if (this.mIntersectList.Count == 1 || this.FixupIntersectionOrder())
                     this.ProcessIntersectList();
                 else
                     return false;
             }
             catch
             {
-                this.m_SortedEdges = null;
-                this.m_IntersectList.Clear();
+                this.mSortedEdges = null;
+                this.mIntersectList.Clear();
                 throw new ClipperException("ProcessIntersections error");
             }
-            this.m_SortedEdges = null;
+            this.mSortedEdges = null;
             return true;
         }
         //------------------------------------------------------------------------------
 
         private void ProcessIntersectList()
         {
-            for (var i = 0; i < this.m_IntersectList.Count; i++)
+            for (var i = 0; i < this.mIntersectList.Count; i++)
             {
-                var iNode = this.m_IntersectList[i];
+                var iNode = this.mIntersectList[i];
                 {
                     this.IntersectEdges(iNode.Edge1, iNode.Edge2, iNode.Pt);
-                    this.SwapPositionsInAEL(iNode.Edge1, iNode.Edge2);
+                    this.SwapPositionsInAel(iNode.Edge1, iNode.Edge2);
                 }
             }
-            this.m_IntersectList.Clear();
+            this.mIntersectList.Clear();
         }
         //------------------------------------------------------------------------------
 
@@ -4722,10 +4684,10 @@ namespace Aimtec.SDK.Util.ThirdParty
         }
         //------------------------------------------------------------------------------
 
-        private void SetHoleState(TEdge e, OutRec outRec)
+        private void SetHoleState(Edge e, OutRec outRec)
         {
-            var e2 = e.PrevInAEL;
-            TEdge eTmp = null;
+            var e2 = e.PrevInAel;
+            Edge eTmp = null;
             while (e2 != null)
             {
                 if (e2.OutIdx >= 0 && e2.WindDelta != 0)
@@ -4735,7 +4697,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                     else if (eTmp.OutIdx == e2.OutIdx)
                         eTmp = null; //paired               
                 }
-                e2 = e2.PrevInAEL;
+                e2 = e2.PrevInAel;
             }
 
             if (eTmp == null)
@@ -4745,34 +4707,34 @@ namespace Aimtec.SDK.Util.ThirdParty
             }
             else
             {
-                outRec.FirstLeft = this.m_PolyOuts[eTmp.OutIdx];
+                outRec.FirstLeft = this.MPolyOuts[eTmp.OutIdx];
                 outRec.IsHole = !outRec.FirstLeft.IsHole;
             }
         }
         //------------------------------------------------------------------------------
 
-        private void SetWindingCount(TEdge edge)
+        private void SetWindingCount(Edge edge)
         {
-            var e = edge.PrevInAEL;
+            var e = edge.PrevInAel;
             //find the edge of the same polytype that immediately preceeds 'edge' in AEL
             while (e != null && (e.PolyTyp != edge.PolyTyp || e.WindDelta == 0))
-                e = e.PrevInAEL;
+                e = e.PrevInAel;
             if (e == null)
             {
                 PolyFillType pft;
-                pft = edge.PolyTyp == PolyType.ptSubject ? this.m_SubjFillType : this.m_ClipFillType;
+                pft = edge.PolyTyp == PolyType.PtSubject ? this.mSubjFillType : this.mClipFillType;
                 if (edge.WindDelta == 0)
-                    edge.WindCnt = pft == PolyFillType.pftNegative ? -1 : 1;
+                    edge.WindCnt = pft == PolyFillType.PftNegative ? -1 : 1;
                 else
                     edge.WindCnt = edge.WindDelta;
                 edge.WindCnt2 = 0;
-                e = this.m_ActiveEdges; //ie get ready to calc WindCnt2
+                e = this.MActiveEdges; //ie get ready to calc WindCnt2
             }
-            else if (edge.WindDelta == 0 && this.m_ClipType != ClipType.ctUnion)
+            else if (edge.WindDelta == 0 && this.mClipType != ClipType.CtUnion)
             {
                 edge.WindCnt = 1;
                 edge.WindCnt2 = e.WindCnt2;
-                e = e.NextInAEL; //ie get ready to calc WindCnt2
+                e = e.NextInAel; //ie get ready to calc WindCnt2
             }
             else if (this.IsEvenOddFillType(edge))
             {
@@ -4780,22 +4742,22 @@ namespace Aimtec.SDK.Util.ThirdParty
                 if (edge.WindDelta == 0)
                 {
                     //are we inside a subj polygon ...
-                    var Inside = true;
-                    var e2 = e.PrevInAEL;
+                    var inside = true;
+                    var e2 = e.PrevInAel;
                     while (e2 != null)
                     {
                         if (e2.PolyTyp == e.PolyTyp && e2.WindDelta != 0)
-                            Inside = !Inside;
-                        e2 = e2.PrevInAEL;
+                            inside = !inside;
+                        e2 = e2.PrevInAel;
                     }
-                    edge.WindCnt = Inside ? 0 : 1;
+                    edge.WindCnt = inside ? 0 : 1;
                 }
                 else
                 {
                     edge.WindCnt = edge.WindDelta;
                 }
                 edge.WindCnt2 = e.WindCnt2;
-                e = e.NextInAEL; //ie get ready to calc WindCnt2
+                e = e.NextInAel; //ie get ready to calc WindCnt2
             }
             else
             {
@@ -4832,7 +4794,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                         edge.WindCnt = e.WindCnt + edge.WindDelta;
                 }
                 edge.WindCnt2 = e.WindCnt2;
-                e = e.NextInAEL; //ie get ready to calc WindCnt2
+                e = e.NextInAel; //ie get ready to calc WindCnt2
             }
 
             //update WindCnt2 ...
@@ -4843,7 +4805,7 @@ namespace Aimtec.SDK.Util.ThirdParty
                 {
                     if (e.WindDelta != 0)
                         edge.WindCnt2 = edge.WindCnt2 == 0 ? 1 : 0;
-                    e = e.NextInAEL;
+                    e = e.NextInAel;
                 }
             }
             else
@@ -4852,67 +4814,67 @@ namespace Aimtec.SDK.Util.ThirdParty
                 while (e != edge)
                 {
                     edge.WindCnt2 += e.WindDelta;
-                    e = e.NextInAEL;
+                    e = e.NextInAel;
                 }
             }
         }
         //------------------------------------------------------------------------------
 
-        private void SwapPositionsInSEL(TEdge edge1, TEdge edge2)
+        private void SwapPositionsInSel(Edge edge1, Edge edge2)
         {
-            if (edge1.NextInSEL == null && edge1.PrevInSEL == null)
+            if (edge1.NextInSel == null && edge1.PrevInSel == null)
                 return;
-            if (edge2.NextInSEL == null && edge2.PrevInSEL == null)
+            if (edge2.NextInSel == null && edge2.PrevInSel == null)
                 return;
 
-            if (edge1.NextInSEL == edge2)
+            if (edge1.NextInSel == edge2)
             {
-                var next = edge2.NextInSEL;
+                var next = edge2.NextInSel;
                 if (next != null)
-                    next.PrevInSEL = edge1;
-                var prev = edge1.PrevInSEL;
+                    next.PrevInSel = edge1;
+                var prev = edge1.PrevInSel;
                 if (prev != null)
-                    prev.NextInSEL = edge2;
-                edge2.PrevInSEL = prev;
-                edge2.NextInSEL = edge1;
-                edge1.PrevInSEL = edge2;
-                edge1.NextInSEL = next;
+                    prev.NextInSel = edge2;
+                edge2.PrevInSel = prev;
+                edge2.NextInSel = edge1;
+                edge1.PrevInSel = edge2;
+                edge1.NextInSel = next;
             }
-            else if (edge2.NextInSEL == edge1)
+            else if (edge2.NextInSel == edge1)
             {
-                var next = edge1.NextInSEL;
+                var next = edge1.NextInSel;
                 if (next != null)
-                    next.PrevInSEL = edge2;
-                var prev = edge2.PrevInSEL;
+                    next.PrevInSel = edge2;
+                var prev = edge2.PrevInSel;
                 if (prev != null)
-                    prev.NextInSEL = edge1;
-                edge1.PrevInSEL = prev;
-                edge1.NextInSEL = edge2;
-                edge2.PrevInSEL = edge1;
-                edge2.NextInSEL = next;
+                    prev.NextInSel = edge1;
+                edge1.PrevInSel = prev;
+                edge1.NextInSel = edge2;
+                edge2.PrevInSel = edge1;
+                edge2.NextInSel = next;
             }
             else
             {
-                var next = edge1.NextInSEL;
-                var prev = edge1.PrevInSEL;
-                edge1.NextInSEL = edge2.NextInSEL;
-                if (edge1.NextInSEL != null)
-                    edge1.NextInSEL.PrevInSEL = edge1;
-                edge1.PrevInSEL = edge2.PrevInSEL;
-                if (edge1.PrevInSEL != null)
-                    edge1.PrevInSEL.NextInSEL = edge1;
-                edge2.NextInSEL = next;
-                if (edge2.NextInSEL != null)
-                    edge2.NextInSEL.PrevInSEL = edge2;
-                edge2.PrevInSEL = prev;
-                if (edge2.PrevInSEL != null)
-                    edge2.PrevInSEL.NextInSEL = edge2;
+                var next = edge1.NextInSel;
+                var prev = edge1.PrevInSel;
+                edge1.NextInSel = edge2.NextInSel;
+                if (edge1.NextInSel != null)
+                    edge1.NextInSel.PrevInSel = edge1;
+                edge1.PrevInSel = edge2.PrevInSel;
+                if (edge1.PrevInSel != null)
+                    edge1.PrevInSel.NextInSel = edge1;
+                edge2.NextInSel = next;
+                if (edge2.NextInSel != null)
+                    edge2.NextInSel.PrevInSel = edge2;
+                edge2.PrevInSel = prev;
+                if (edge2.PrevInSel != null)
+                    edge2.PrevInSel.NextInSel = edge2;
             }
 
-            if (edge1.PrevInSEL == null)
-                this.m_SortedEdges = edge1;
-            else if (edge2.PrevInSEL == null)
-                this.m_SortedEdges = edge2;
+            if (edge1.PrevInSel == null)
+                this.mSortedEdges = edge1;
+            else if (edge2.PrevInSel == null)
+                this.mSortedEdges = edge2;
         }
         //------------------------------------------------------------------------------
 
@@ -4941,39 +4903,39 @@ namespace Aimtec.SDK.Util.ThirdParty
     {
         #region Constants
 
-        private const double def_arc_tolerance = 0.25;
+        private const double DefArcTolerance = 0.25;
 
-        private const double two_pi = Math.PI * 2;
+        private const double TwoPi = Math.PI * 2;
 
         #endregion
 
         #region Fields
 
-        private double m_delta, m_sinA, m_sin, m_cos;
+        private double mDelta, mSinA, mSin, mCos;
 
-        private Path m_destPoly;
+        private Path mDestPoly;
 
-        private Paths m_destPolys;
+        private Paths mDestPolys;
 
-        private IntPoint m_lowest;
+        private IntPoint mLowest;
 
-        private double m_miterLim, m_StepsPerRad;
+        private double mMiterLim, mStepsPerRad;
 
-        private List<DoublePoint> m_normals = new List<DoublePoint>();
+        private List<DoublePoint> mNormals = new List<DoublePoint>();
 
-        private PolyNode m_polyNodes = new PolyNode();
+        private PolyNode mPolyNodes = new PolyNode();
 
-        private Path m_srcPoly;
+        private Path mSrcPoly;
 
         #endregion
 
         #region Constructors and Destructors
 
-        public ClipperOffset(double miterLimit = 2.0, double arcTolerance = def_arc_tolerance)
+        public ClipperOffset(double miterLimit = 2.0, double arcTolerance = DefArcTolerance)
         {
             this.MiterLimit = miterLimit;
             this.ArcTolerance = arcTolerance;
-            this.m_lowest.X = -1;
+            this.mLowest.X = -1;
         }
 
         #endregion
@@ -4996,40 +4958,40 @@ namespace Aimtec.SDK.Util.ThirdParty
             if (highI < 0)
                 return;
             var newNode = new PolyNode();
-            newNode.m_jointype = joinType;
-            newNode.m_endtype = endType;
+            newNode.MJointype = joinType;
+            newNode.MEndtype = endType;
 
             //strip duplicate points from path and also get index to the lowest point ...
-            if (endType == EndType.etClosedLine || endType == EndType.etClosedPolygon)
+            if (endType == EndType.EtClosedLine || endType == EndType.EtClosedPolygon)
                 while (highI > 0 && path[0] == path[highI])
                     highI--;
-            newNode.m_polygon.Capacity = highI + 1;
-            newNode.m_polygon.Add(path[0]);
+            newNode.MPolygon.Capacity = highI + 1;
+            newNode.MPolygon.Add(path[0]);
             int j = 0, k = 0;
             for (var i = 1; i <= highI; i++)
-                if (newNode.m_polygon[j] != path[i])
+                if (newNode.MPolygon[j] != path[i])
                 {
                     j++;
-                    newNode.m_polygon.Add(path[i]);
-                    if (path[i].Y > newNode.m_polygon[k].Y || path[i].Y == newNode.m_polygon[k].Y
-                        && path[i].X < newNode.m_polygon[k].X)
+                    newNode.MPolygon.Add(path[i]);
+                    if (path[i].Y > newNode.MPolygon[k].Y || path[i].Y == newNode.MPolygon[k].Y
+                        && path[i].X < newNode.MPolygon[k].X)
                         k = j;
                 }
-            if (endType == EndType.etClosedPolygon && j < 2)
+            if (endType == EndType.EtClosedPolygon && j < 2)
                 return;
 
-            this.m_polyNodes.AddChild(newNode);
+            this.mPolyNodes.AddChild(newNode);
 
             //if this path's lowest pt is lower than all the others then update m_lowest
-            if (endType != EndType.etClosedPolygon)
+            if (endType != EndType.EtClosedPolygon)
                 return;
-            if (this.m_lowest.X < 0)
-                this.m_lowest = new IntPoint(this.m_polyNodes.ChildCount - 1, k);
+            if (this.mLowest.X < 0)
+                this.mLowest = new IntPoint(this.mPolyNodes.ChildCount - 1, k);
             else
             {
-                var ip = this.m_polyNodes.Childs[(int) this.m_lowest.X].m_polygon[(int) this.m_lowest.Y];
-                if (newNode.m_polygon[k].Y > ip.Y || newNode.m_polygon[k].Y == ip.Y && newNode.m_polygon[k].X < ip.X)
-                    this.m_lowest = new IntPoint(this.m_polyNodes.ChildCount - 1, k);
+                var ip = this.mPolyNodes.Childs[(int) this.mLowest.X].MPolygon[(int) this.mLowest.Y];
+                if (newNode.MPolygon[k].Y > ip.Y || newNode.MPolygon[k].Y == ip.Y && newNode.MPolygon[k].X < ip.X)
+                    this.mLowest = new IntPoint(this.mPolyNodes.ChildCount - 1, k);
             }
         }
         //------------------------------------------------------------------------------
@@ -5043,8 +5005,8 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         public void Clear()
         {
-            this.m_polyNodes.Childs.Clear();
-            this.m_lowest.X = -1;
+            this.mPolyNodes.Childs.Clear();
+            this.mLowest.X = -1;
         }
         //------------------------------------------------------------------------------
 
@@ -5055,24 +5017,24 @@ namespace Aimtec.SDK.Util.ThirdParty
             this.DoOffset(delta);
             //now clean up 'corners' ...
             var clpr = new Clipper();
-            clpr.AddPaths(this.m_destPolys, PolyType.ptSubject, true);
+            clpr.AddPaths(this.mDestPolys, PolyType.PtSubject, true);
             if (delta > 0)
             {
-                clpr.Execute(ClipType.ctUnion, solution, PolyFillType.pftPositive, PolyFillType.pftPositive);
+                clpr.Execute(ClipType.CtUnion, solution, PolyFillType.PftPositive, PolyFillType.PftPositive);
             }
             else
             {
-                var r = ClipperBase.GetBounds(this.m_destPolys);
+                var r = ClipperBase.GetBounds(this.mDestPolys);
                 var outer = new Path(4);
 
-                outer.Add(new IntPoint(r.left - 10, r.bottom + 10));
-                outer.Add(new IntPoint(r.right + 10, r.bottom + 10));
-                outer.Add(new IntPoint(r.right + 10, r.top - 10));
-                outer.Add(new IntPoint(r.left - 10, r.top - 10));
+                outer.Add(new IntPoint(r.Left - 10, r.Bottom + 10));
+                outer.Add(new IntPoint(r.Right + 10, r.Bottom + 10));
+                outer.Add(new IntPoint(r.Right + 10, r.Top - 10));
+                outer.Add(new IntPoint(r.Left - 10, r.Top - 10));
 
-                clpr.AddPath(outer, PolyType.ptSubject, true);
+                clpr.AddPath(outer, PolyType.PtSubject, true);
                 clpr.ReverseSolution = true;
-                clpr.Execute(ClipType.ctUnion, solution, PolyFillType.pftNegative, PolyFillType.pftNegative);
+                clpr.Execute(ClipType.CtUnion, solution, PolyFillType.PftNegative, PolyFillType.PftNegative);
                 if (solution.Count > 0)
                     solution.RemoveAt(0);
             }
@@ -5087,31 +5049,31 @@ namespace Aimtec.SDK.Util.ThirdParty
 
             //now clean up 'corners' ...
             var clpr = new Clipper();
-            clpr.AddPaths(this.m_destPolys, PolyType.ptSubject, true);
+            clpr.AddPaths(this.mDestPolys, PolyType.PtSubject, true);
             if (delta > 0)
             {
-                clpr.Execute(ClipType.ctUnion, solution, PolyFillType.pftPositive, PolyFillType.pftPositive);
+                clpr.Execute(ClipType.CtUnion, solution, PolyFillType.PftPositive, PolyFillType.PftPositive);
             }
             else
             {
-                var r = ClipperBase.GetBounds(this.m_destPolys);
+                var r = ClipperBase.GetBounds(this.mDestPolys);
                 var outer = new Path(4);
 
-                outer.Add(new IntPoint(r.left - 10, r.bottom + 10));
-                outer.Add(new IntPoint(r.right + 10, r.bottom + 10));
-                outer.Add(new IntPoint(r.right + 10, r.top - 10));
-                outer.Add(new IntPoint(r.left - 10, r.top - 10));
+                outer.Add(new IntPoint(r.Left - 10, r.Bottom + 10));
+                outer.Add(new IntPoint(r.Right + 10, r.Bottom + 10));
+                outer.Add(new IntPoint(r.Right + 10, r.Top - 10));
+                outer.Add(new IntPoint(r.Left - 10, r.Top - 10));
 
-                clpr.AddPath(outer, PolyType.ptSubject, true);
+                clpr.AddPath(outer, PolyType.PtSubject, true);
                 clpr.ReverseSolution = true;
-                clpr.Execute(ClipType.ctUnion, solution, PolyFillType.pftNegative, PolyFillType.pftNegative);
+                clpr.Execute(ClipType.CtUnion, solution, PolyFillType.PftNegative, PolyFillType.PftNegative);
                 //remove the outer PolyNode rectangle ...
                 if (solution.ChildCount == 1 && solution.Childs[0].ChildCount > 0)
                 {
                     var outerNode = solution.Childs[0];
                     solution.Childs.Capacity = outerNode.ChildCount;
                     solution.Childs[0] = outerNode.Childs[0];
-                    solution.Childs[0].m_Parent = solution;
+                    solution.Childs[0].MParent = solution;
                     for (var i = 1; i < outerNode.ChildCount; i++)
                         solution.AddChild(outerNode.Childs[i]);
                 }
@@ -5149,36 +5111,36 @@ namespace Aimtec.SDK.Util.ThirdParty
 
         internal void DoMiter(int j, int k, double r)
         {
-            var q = this.m_delta / r;
-            this.m_destPoly.Add(
+            var q = this.mDelta / r;
+            this.mDestPoly.Add(
                 new IntPoint(
-                    Round(this.m_srcPoly[j].X + (this.m_normals[k].X + this.m_normals[j].X) * q),
-                    Round(this.m_srcPoly[j].Y + (this.m_normals[k].Y + this.m_normals[j].Y) * q)));
+                    Round(this.mSrcPoly[j].X + (this.mNormals[k].X + this.mNormals[j].X) * q),
+                    Round(this.mSrcPoly[j].Y + (this.mNormals[k].Y + this.mNormals[j].Y) * q)));
         }
         //------------------------------------------------------------------------------
 
         internal void DoRound(int j, int k)
         {
             var a = Math.Atan2(
-                this.m_sinA,
-                this.m_normals[k].X * this.m_normals[j].X + this.m_normals[k].Y * this.m_normals[j].Y);
-            var steps = Math.Max((int) Round(this.m_StepsPerRad * Math.Abs(a)), 1);
+                this.mSinA,
+                this.mNormals[k].X * this.mNormals[j].X + this.mNormals[k].Y * this.mNormals[j].Y);
+            var steps = Math.Max((int) Round(this.mStepsPerRad * Math.Abs(a)), 1);
 
-            double X = this.m_normals[k].X, Y = this.m_normals[k].Y, X2;
+            double x = this.mNormals[k].X, y = this.mNormals[k].Y, x2;
             for (var i = 0; i < steps; ++i)
             {
-                this.m_destPoly.Add(
+                this.mDestPoly.Add(
                     new IntPoint(
-                        Round(this.m_srcPoly[j].X + X * this.m_delta),
-                        Round(this.m_srcPoly[j].Y + Y * this.m_delta)));
-                X2 = X;
-                X = X * this.m_cos - this.m_sin * Y;
-                Y = X2 * this.m_sin + Y * this.m_cos;
+                        Round(this.mSrcPoly[j].X + x * this.mDelta),
+                        Round(this.mSrcPoly[j].Y + y * this.mDelta)));
+                x2 = x;
+                x = x * this.mCos - this.mSin * y;
+                y = x2 * this.mSin + y * this.mCos;
             }
-            this.m_destPoly.Add(
+            this.mDestPoly.Add(
                 new IntPoint(
-                    Round(this.m_srcPoly[j].X + this.m_normals[j].X * this.m_delta),
-                    Round(this.m_srcPoly[j].Y + this.m_normals[j].Y * this.m_delta)));
+                    Round(this.mSrcPoly[j].X + this.mNormals[j].X * this.mDelta),
+                    Round(this.mSrcPoly[j].Y + this.mNormals[j].Y * this.mDelta)));
         }
         //------------------------------------------------------------------------------
 
@@ -5186,168 +5148,168 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             var dx = Math.Tan(
                 Math.Atan2(
-                    this.m_sinA,
-                    this.m_normals[k].X * this.m_normals[j].X + this.m_normals[k].Y * this.m_normals[j].Y) / 4);
-            this.m_destPoly.Add(
+                    this.mSinA,
+                    this.mNormals[k].X * this.mNormals[j].X + this.mNormals[k].Y * this.mNormals[j].Y) / 4);
+            this.mDestPoly.Add(
                 new IntPoint(
-                    Round(this.m_srcPoly[j].X + this.m_delta * (this.m_normals[k].X - this.m_normals[k].Y * dx)),
-                    Round(this.m_srcPoly[j].Y + this.m_delta * (this.m_normals[k].Y + this.m_normals[k].X * dx))));
-            this.m_destPoly.Add(
+                    Round(this.mSrcPoly[j].X + this.mDelta * (this.mNormals[k].X - this.mNormals[k].Y * dx)),
+                    Round(this.mSrcPoly[j].Y + this.mDelta * (this.mNormals[k].Y + this.mNormals[k].X * dx))));
+            this.mDestPoly.Add(
                 new IntPoint(
-                    Round(this.m_srcPoly[j].X + this.m_delta * (this.m_normals[j].X + this.m_normals[j].Y * dx)),
-                    Round(this.m_srcPoly[j].Y + this.m_delta * (this.m_normals[j].Y - this.m_normals[j].X * dx))));
+                    Round(this.mSrcPoly[j].X + this.mDelta * (this.mNormals[j].X + this.mNormals[j].Y * dx)),
+                    Round(this.mSrcPoly[j].Y + this.mDelta * (this.mNormals[j].Y - this.mNormals[j].X * dx))));
         }
         //------------------------------------------------------------------------------
 
         private void DoOffset(double delta)
         {
-            this.m_destPolys = new Paths();
-            this.m_delta = delta;
+            this.mDestPolys = new Paths();
+            this.mDelta = delta;
 
             //if Zero offset, just copy any CLOSED polygons to m_p and return ...
-            if (ClipperBase.near_zero(delta))
+            if (ClipperBase.NearZero(delta))
             {
-                this.m_destPolys.Capacity = this.m_polyNodes.ChildCount;
-                for (var i = 0; i < this.m_polyNodes.ChildCount; i++)
+                this.mDestPolys.Capacity = this.mPolyNodes.ChildCount;
+                for (var i = 0; i < this.mPolyNodes.ChildCount; i++)
                 {
-                    var node = this.m_polyNodes.Childs[i];
-                    if (node.m_endtype == EndType.etClosedPolygon)
-                        this.m_destPolys.Add(node.m_polygon);
+                    var node = this.mPolyNodes.Childs[i];
+                    if (node.MEndtype == EndType.EtClosedPolygon)
+                        this.mDestPolys.Add(node.MPolygon);
                 }
                 return;
             }
 
             //see offset_triginometry3.svg in the documentation folder ...
             if (this.MiterLimit > 2)
-                this.m_miterLim = 2 / (this.MiterLimit * this.MiterLimit);
+                this.mMiterLim = 2 / (this.MiterLimit * this.MiterLimit);
             else
-                this.m_miterLim = 0.5;
+                this.mMiterLim = 0.5;
 
             double y;
             if (this.ArcTolerance <= 0.0)
-                y = def_arc_tolerance;
-            else if (this.ArcTolerance > Math.Abs(delta) * def_arc_tolerance)
-                y = Math.Abs(delta) * def_arc_tolerance;
+                y = DefArcTolerance;
+            else if (this.ArcTolerance > Math.Abs(delta) * DefArcTolerance)
+                y = Math.Abs(delta) * DefArcTolerance;
             else
                 y = this.ArcTolerance;
             //see offset_triginometry2.svg in the documentation folder ...
             var steps = Math.PI / Math.Acos(1 - y / Math.Abs(delta));
-            this.m_sin = Math.Sin(two_pi / steps);
-            this.m_cos = Math.Cos(two_pi / steps);
-            this.m_StepsPerRad = steps / two_pi;
+            this.mSin = Math.Sin(TwoPi / steps);
+            this.mCos = Math.Cos(TwoPi / steps);
+            this.mStepsPerRad = steps / TwoPi;
             if (delta < 0.0)
-                this.m_sin = -this.m_sin;
+                this.mSin = -this.mSin;
 
-            this.m_destPolys.Capacity = this.m_polyNodes.ChildCount * 2;
-            for (var i = 0; i < this.m_polyNodes.ChildCount; i++)
+            this.mDestPolys.Capacity = this.mPolyNodes.ChildCount * 2;
+            for (var i = 0; i < this.mPolyNodes.ChildCount; i++)
             {
-                var node = this.m_polyNodes.Childs[i];
-                this.m_srcPoly = node.m_polygon;
+                var node = this.mPolyNodes.Childs[i];
+                this.mSrcPoly = node.MPolygon;
 
-                var len = this.m_srcPoly.Count;
+                var len = this.mSrcPoly.Count;
 
-                if (len == 0 || delta <= 0 && (len < 3 || node.m_endtype != EndType.etClosedPolygon))
+                if (len == 0 || delta <= 0 && (len < 3 || node.MEndtype != EndType.EtClosedPolygon))
                     continue;
 
-                this.m_destPoly = new Path();
+                this.mDestPoly = new Path();
 
                 if (len == 1)
                 {
-                    if (node.m_jointype == JoinType.jtRound)
+                    if (node.MJointype == JoinType.JtRound)
                     {
-                        double X = 1.0, Y = 0.0;
+                        double x = 1.0, Y = 0.0;
                         for (var j = 1; j <= steps; j++)
                         {
-                            this.m_destPoly.Add(
+                            this.mDestPoly.Add(
                                 new IntPoint(
-                                    Round(this.m_srcPoly[0].X + X * delta),
-                                    Round(this.m_srcPoly[0].Y + Y * delta)));
-                            var X2 = X;
-                            X = X * this.m_cos - this.m_sin * Y;
-                            Y = X2 * this.m_sin + Y * this.m_cos;
+                                    Round(this.mSrcPoly[0].X + x * delta),
+                                    Round(this.mSrcPoly[0].Y + Y * delta)));
+                            var x2 = x;
+                            x = x * this.mCos - this.mSin * Y;
+                            Y = x2 * this.mSin + Y * this.mCos;
                         }
                     }
                     else
                     {
-                        double X = -1.0, Y = -1.0;
+                        double x = -1.0, Y = -1.0;
                         for (var j = 0; j < 4; ++j)
                         {
-                            this.m_destPoly.Add(
+                            this.mDestPoly.Add(
                                 new IntPoint(
-                                    Round(this.m_srcPoly[0].X + X * delta),
-                                    Round(this.m_srcPoly[0].Y + Y * delta)));
-                            if (X < 0)
-                                X = 1;
+                                    Round(this.mSrcPoly[0].X + x * delta),
+                                    Round(this.mSrcPoly[0].Y + Y * delta)));
+                            if (x < 0)
+                                x = 1;
                             else if (Y < 0)
                                 Y = 1;
                             else
-                                X = -1;
+                                x = -1;
                         }
                     }
-                    this.m_destPolys.Add(this.m_destPoly);
+                    this.mDestPolys.Add(this.mDestPoly);
                     continue;
                 }
 
                 //build m_normals ...
-                this.m_normals.Clear();
-                this.m_normals.Capacity = len;
+                this.mNormals.Clear();
+                this.mNormals.Capacity = len;
                 for (var j = 0; j < len - 1; j++)
-                    this.m_normals.Add(GetUnitNormal(this.m_srcPoly[j], this.m_srcPoly[j + 1]));
-                if (node.m_endtype == EndType.etClosedLine || node.m_endtype == EndType.etClosedPolygon)
-                    this.m_normals.Add(GetUnitNormal(this.m_srcPoly[len - 1], this.m_srcPoly[0]));
+                    this.mNormals.Add(GetUnitNormal(this.mSrcPoly[j], this.mSrcPoly[j + 1]));
+                if (node.MEndtype == EndType.EtClosedLine || node.MEndtype == EndType.EtClosedPolygon)
+                    this.mNormals.Add(GetUnitNormal(this.mSrcPoly[len - 1], this.mSrcPoly[0]));
                 else
-                    this.m_normals.Add(new DoublePoint(this.m_normals[len - 2]));
+                    this.mNormals.Add(new DoublePoint(this.mNormals[len - 2]));
 
-                if (node.m_endtype == EndType.etClosedPolygon)
+                if (node.MEndtype == EndType.EtClosedPolygon)
                 {
                     var k = len - 1;
                     for (var j = 0; j < len; j++)
-                        this.OffsetPoint(j, ref k, node.m_jointype);
-                    this.m_destPolys.Add(this.m_destPoly);
+                        this.OffsetPoint(j, ref k, node.MJointype);
+                    this.mDestPolys.Add(this.mDestPoly);
                 }
-                else if (node.m_endtype == EndType.etClosedLine)
+                else if (node.MEndtype == EndType.EtClosedLine)
                 {
                     var k = len - 1;
                     for (var j = 0; j < len; j++)
-                        this.OffsetPoint(j, ref k, node.m_jointype);
-                    this.m_destPolys.Add(this.m_destPoly);
-                    this.m_destPoly = new Path();
+                        this.OffsetPoint(j, ref k, node.MJointype);
+                    this.mDestPolys.Add(this.mDestPoly);
+                    this.mDestPoly = new Path();
                     //re-build m_normals ...
-                    var n = this.m_normals[len - 1];
+                    var n = this.mNormals[len - 1];
                     for (var j = len - 1; j > 0; j--)
-                        this.m_normals[j] = new DoublePoint(-this.m_normals[j - 1].X, -this.m_normals[j - 1].Y);
-                    this.m_normals[0] = new DoublePoint(-n.X, -n.Y);
+                        this.mNormals[j] = new DoublePoint(-this.mNormals[j - 1].X, -this.mNormals[j - 1].Y);
+                    this.mNormals[0] = new DoublePoint(-n.X, -n.Y);
                     k = 0;
                     for (var j = len - 1; j >= 0; j--)
-                        this.OffsetPoint(j, ref k, node.m_jointype);
-                    this.m_destPolys.Add(this.m_destPoly);
+                        this.OffsetPoint(j, ref k, node.MJointype);
+                    this.mDestPolys.Add(this.mDestPoly);
                 }
                 else
                 {
                     var k = 0;
                     for (var j = 1; j < len - 1; ++j)
-                        this.OffsetPoint(j, ref k, node.m_jointype);
+                        this.OffsetPoint(j, ref k, node.MJointype);
 
                     IntPoint pt1;
-                    if (node.m_endtype == EndType.etOpenButt)
+                    if (node.MEndtype == EndType.EtOpenButt)
                     {
                         var j = len - 1;
                         pt1 = new IntPoint(
-                            (cInt) Round(this.m_srcPoly[j].X + this.m_normals[j].X * delta),
-                            (cInt) Round(this.m_srcPoly[j].Y + this.m_normals[j].Y * delta));
-                        this.m_destPoly.Add(pt1);
+                            Round(this.mSrcPoly[j].X + this.mNormals[j].X * delta),
+                            Round(this.mSrcPoly[j].Y + this.mNormals[j].Y * delta));
+                        this.mDestPoly.Add(pt1);
                         pt1 = new IntPoint(
-                            (cInt) Round(this.m_srcPoly[j].X - this.m_normals[j].X * delta),
-                            (cInt) Round(this.m_srcPoly[j].Y - this.m_normals[j].Y * delta));
-                        this.m_destPoly.Add(pt1);
+                            Round(this.mSrcPoly[j].X - this.mNormals[j].X * delta),
+                            Round(this.mSrcPoly[j].Y - this.mNormals[j].Y * delta));
+                        this.mDestPoly.Add(pt1);
                     }
                     else
                     {
                         var j = len - 1;
                         k = len - 2;
-                        this.m_sinA = 0;
-                        this.m_normals[j] = new DoublePoint(-this.m_normals[j].X, -this.m_normals[j].Y);
-                        if (node.m_endtype == EndType.etOpenSquare)
+                        this.mSinA = 0;
+                        this.mNormals[j] = new DoublePoint(-this.mNormals[j].X, -this.mNormals[j].Y);
+                        if (node.MEndtype == EndType.EtOpenSquare)
                             this.DoSquare(j, k);
                         else
                             this.DoRound(j, k);
@@ -5355,35 +5317,35 @@ namespace Aimtec.SDK.Util.ThirdParty
 
                     //re-build m_normals ...
                     for (var j = len - 1; j > 0; j--)
-                        this.m_normals[j] = new DoublePoint(-this.m_normals[j - 1].X, -this.m_normals[j - 1].Y);
+                        this.mNormals[j] = new DoublePoint(-this.mNormals[j - 1].X, -this.mNormals[j - 1].Y);
 
-                    this.m_normals[0] = new DoublePoint(-this.m_normals[1].X, -this.m_normals[1].Y);
+                    this.mNormals[0] = new DoublePoint(-this.mNormals[1].X, -this.mNormals[1].Y);
 
                     k = len - 1;
                     for (var j = k - 1; j > 0; --j)
-                        this.OffsetPoint(j, ref k, node.m_jointype);
+                        this.OffsetPoint(j, ref k, node.MJointype);
 
-                    if (node.m_endtype == EndType.etOpenButt)
+                    if (node.MEndtype == EndType.EtOpenButt)
                     {
                         pt1 = new IntPoint(
-                            (cInt) Round(this.m_srcPoly[0].X - this.m_normals[0].X * delta),
-                            (cInt) Round(this.m_srcPoly[0].Y - this.m_normals[0].Y * delta));
-                        this.m_destPoly.Add(pt1);
+                            Round(this.mSrcPoly[0].X - this.mNormals[0].X * delta),
+                            Round(this.mSrcPoly[0].Y - this.mNormals[0].Y * delta));
+                        this.mDestPoly.Add(pt1);
                         pt1 = new IntPoint(
-                            (cInt) Round(this.m_srcPoly[0].X + this.m_normals[0].X * delta),
-                            (cInt) Round(this.m_srcPoly[0].Y + this.m_normals[0].Y * delta));
-                        this.m_destPoly.Add(pt1);
+                            Round(this.mSrcPoly[0].X + this.mNormals[0].X * delta),
+                            Round(this.mSrcPoly[0].Y + this.mNormals[0].Y * delta));
+                        this.mDestPoly.Add(pt1);
                     }
                     else
                     {
                         k = 1;
-                        this.m_sinA = 0;
-                        if (node.m_endtype == EndType.etOpenSquare)
+                        this.mSinA = 0;
+                        if (node.MEndtype == EndType.EtOpenSquare)
                             this.DoSquare(0, 1);
                         else
                             this.DoRound(0, 1);
                     }
-                    this.m_destPolys.Add(this.m_destPoly);
+                    this.mDestPolys.Add(this.mDestPoly);
                 }
             }
         }
@@ -5393,23 +5355,23 @@ namespace Aimtec.SDK.Util.ThirdParty
         {
             //fixup orientations of all closed paths if the orientation of the
             //closed path with the lowermost vertex is wrong ...
-            if (this.m_lowest.X >= 0 && !Clipper.Orientation(this.m_polyNodes.Childs[(int) this.m_lowest.X].m_polygon))
+            if (this.mLowest.X >= 0 && !Clipper.Orientation(this.mPolyNodes.Childs[(int) this.mLowest.X].MPolygon))
             {
-                for (var i = 0; i < this.m_polyNodes.ChildCount; i++)
+                for (var i = 0; i < this.mPolyNodes.ChildCount; i++)
                 {
-                    var node = this.m_polyNodes.Childs[i];
-                    if (node.m_endtype == EndType.etClosedPolygon || node.m_endtype == EndType.etClosedLine
-                        && Clipper.Orientation(node.m_polygon))
-                        node.m_polygon.Reverse();
+                    var node = this.mPolyNodes.Childs[i];
+                    if (node.MEndtype == EndType.EtClosedPolygon || node.MEndtype == EndType.EtClosedLine
+                        && Clipper.Orientation(node.MPolygon))
+                        node.MPolygon.Reverse();
                 }
             }
             else
             {
-                for (var i = 0; i < this.m_polyNodes.ChildCount; i++)
+                for (var i = 0; i < this.mPolyNodes.ChildCount; i++)
                 {
-                    var node = this.m_polyNodes.Childs[i];
-                    if (node.m_endtype == EndType.etClosedLine && !Clipper.Orientation(node.m_polygon))
-                        node.m_polygon.Reverse();
+                    var node = this.mPolyNodes.Childs[i];
+                    if (node.MEndtype == EndType.EtClosedLine && !Clipper.Orientation(node.MPolygon))
+                        node.MPolygon.Reverse();
                 }
             }
         }
@@ -5418,56 +5380,56 @@ namespace Aimtec.SDK.Util.ThirdParty
         void OffsetPoint(int j, ref int k, JoinType jointype)
         {
             //cross product ...
-            this.m_sinA = this.m_normals[k].X * this.m_normals[j].Y - this.m_normals[j].X * this.m_normals[k].Y;
+            this.mSinA = this.mNormals[k].X * this.mNormals[j].Y - this.mNormals[j].X * this.mNormals[k].Y;
 
-            if (Math.Abs(this.m_sinA * this.m_delta) < 1.0)
+            if (Math.Abs(this.mSinA * this.mDelta) < 1.0)
             {
                 //dot product ...
-                var cosA = this.m_normals[k].X * this.m_normals[j].X + this.m_normals[j].Y * this.m_normals[k].Y;
+                var cosA = this.mNormals[k].X * this.mNormals[j].X + this.mNormals[j].Y * this.mNormals[k].Y;
                 if (cosA > 0) // angle ==> 0 degrees
                 {
-                    this.m_destPoly.Add(
+                    this.mDestPoly.Add(
                         new IntPoint(
-                            Round(this.m_srcPoly[j].X + this.m_normals[k].X * this.m_delta),
-                            Round(this.m_srcPoly[j].Y + this.m_normals[k].Y * this.m_delta)));
+                            Round(this.mSrcPoly[j].X + this.mNormals[k].X * this.mDelta),
+                            Round(this.mSrcPoly[j].Y + this.mNormals[k].Y * this.mDelta)));
                     return;
                 }
                 //else angle ==> 180 degrees   
             }
-            else if (this.m_sinA > 1.0)
-                this.m_sinA = 1.0;
-            else if (this.m_sinA < -1.0)
-                this.m_sinA = -1.0;
+            else if (this.mSinA > 1.0)
+                this.mSinA = 1.0;
+            else if (this.mSinA < -1.0)
+                this.mSinA = -1.0;
 
-            if (this.m_sinA * this.m_delta < 0)
+            if (this.mSinA * this.mDelta < 0)
             {
-                this.m_destPoly.Add(
+                this.mDestPoly.Add(
                     new IntPoint(
-                        Round(this.m_srcPoly[j].X + this.m_normals[k].X * this.m_delta),
-                        Round(this.m_srcPoly[j].Y + this.m_normals[k].Y * this.m_delta)));
-                this.m_destPoly.Add(this.m_srcPoly[j]);
-                this.m_destPoly.Add(
+                        Round(this.mSrcPoly[j].X + this.mNormals[k].X * this.mDelta),
+                        Round(this.mSrcPoly[j].Y + this.mNormals[k].Y * this.mDelta)));
+                this.mDestPoly.Add(this.mSrcPoly[j]);
+                this.mDestPoly.Add(
                     new IntPoint(
-                        Round(this.m_srcPoly[j].X + this.m_normals[j].X * this.m_delta),
-                        Round(this.m_srcPoly[j].Y + this.m_normals[j].Y * this.m_delta)));
+                        Round(this.mSrcPoly[j].X + this.mNormals[j].X * this.mDelta),
+                        Round(this.mSrcPoly[j].Y + this.mNormals[j].Y * this.mDelta)));
             }
             else
                 switch (jointype)
                 {
-                    case JoinType.jtMiter:
+                    case JoinType.JtMiter:
                     {
-                        var r = 1 + (this.m_normals[j].X * this.m_normals[k].X
-                            + this.m_normals[j].Y * this.m_normals[k].Y);
-                        if (r >= this.m_miterLim)
+                        var r = 1 + (this.mNormals[j].X * this.mNormals[k].X
+                            + this.mNormals[j].Y * this.mNormals[k].Y);
+                        if (r >= this.mMiterLim)
                             this.DoMiter(j, k, r);
                         else
                             this.DoSquare(j, k);
                         break;
                     }
-                    case JoinType.jtSquare:
+                    case JoinType.JtSquare:
                         this.DoSquare(j, k);
                         break;
-                    case JoinType.jtRound:
+                    case JoinType.JtRound:
                         this.DoRound(j, k);
                         break;
                 }

@@ -4,10 +4,10 @@
 
 namespace Aimtec.SDK.Damage
 {
-    using Aimtec.SDK.Extensions;
-    
     using System.Collections.Generic;
     using System.Linq;
+
+    using Aimtec.SDK.Extensions;
 
     internal class DamageReductions
     {

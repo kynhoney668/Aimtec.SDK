@@ -76,7 +76,7 @@
             var rightBox = pos + new Vector2(width - this.IndicatorWidth - this.LineWidth, 0);
             var rect1 = new Rectangle((int) leftBox.X, (int) leftBox.Y, this.IndicatorWidth, this.MenuHeight);
             var rect2 = new Rectangle((int) rightBox.X, (int) rightBox.Y, this.IndicatorWidth, this.MenuHeight);
-            return new Rectangle[] { rect1, rect2 };
+            return new[] { rect1, rect2 };
         }
 
         public override Rectangle[] GetMenuSliderBoolControlBounds(Vector2 pos, int width)
@@ -98,7 +98,7 @@
                 width - this.IndicatorWidth,
                 this.MenuHeight);
 
-            return new Rectangle[] { sliderBounds, boolBounds };
+            return new[] { sliderBounds, boolBounds };
         }
 
         public override Rectangle GetMenuSliderControlBounds(Vector2 pos, int width)

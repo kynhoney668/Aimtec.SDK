@@ -1,6 +1,5 @@
 namespace Aimtec.SDK.Util.Cache
 {
-    using Aimtec.SDK.Events;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -30,7 +29,7 @@ namespace Aimtec.SDK.Util.Cache
         /// <summary>
         ///     The heroes
         /// </summary>
-        private static HashSet<Obj_AI_Hero> HeroesI;
+        private static HashSet<Obj_AI_Hero> heroesI;
 
         /// <summary>
         ///     The ally minions
@@ -84,9 +83,9 @@ namespace Aimtec.SDK.Util.Cache
             allyMinions = CreateHashSet(minionsI.Where(x => x.IsAlly));
             enemyMinionsI = CreateHashSet(minionsI.Where(x => x.IsEnemy));
 
-            HeroesI = CreateHashSet(ObjectManager.Get<Obj_AI_Hero>());
-            allyHeroes = CreateHashSet(HeroesI.Where(x => x.IsAlly));
-            enemyHeroes = CreateHashSet(HeroesI.Where(x => x.IsEnemy));
+            heroesI = CreateHashSet(ObjectManager.Get<Obj_AI_Hero>());
+            allyHeroes = CreateHashSet(heroesI.Where(x => x.IsAlly));
+            enemyHeroes = CreateHashSet(heroesI.Where(x => x.IsEnemy));
 
             player = ObjectManager.GetLocalPlayer();
         }
@@ -135,7 +134,7 @@ namespace Aimtec.SDK.Util.Cache
         ///     Gets the heroes.
         /// </summary>
         /// <value>The heroes.</value>
-        public static IEnumerable<Obj_AI_Hero> Heroes => HeroesI;
+        public static IEnumerable<Obj_AI_Hero> Heroes => heroesI;
 
         /// <summary>
         ///     Gets the minions.

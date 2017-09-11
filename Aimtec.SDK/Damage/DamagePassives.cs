@@ -4,13 +4,12 @@
 
 namespace Aimtec.SDK.Damage
 {
-    using Aimtec.SDK.Extensions;
-
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
     using Aimtec.SDK.Damage.JSON;
+    using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Util.Cache;
 
     internal class DamagePassives

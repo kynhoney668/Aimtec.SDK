@@ -1,13 +1,11 @@
-﻿using Aimtec.SDK.Damage;
-using Aimtec.SDK.Extensions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Aimtec.SDK.Prediction.Health
+﻿namespace Aimtec.SDK.Prediction.Health
 {
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Aimtec.SDK.Damage;
+    using Aimtec.SDK.Extensions;
+
     public class TurretAttackManager
     {
         public static Dictionary<int, TurretData> Turrets = new Dictionary<int, TurretData>();
@@ -40,9 +38,9 @@ namespace Aimtec.SDK.Prediction.Health
         }
 
 
-        public static TurretData GetTurretData(int netID)
+        public static TurretData GetTurretData(int netId)
         {
-            Turrets.TryGetValue(netID, out TurretData td);
+            Turrets.TryGetValue(netId, out TurretData td);
             return td;
         }
 
@@ -108,14 +106,8 @@ namespace Aimtec.SDK.Prediction.Health
 
         public static TurretData GetNearestTurretData(Obj_AI_Base unit, TurretTeam team)
         {
-            var t = TurretsList.Where(x => (team == TurretTeam.Ally ? x.Turret.IsValid && x.Turret.Team == unit.Team : x.Turret.Team != unit.Team)).MinBy(x => x.Turret.Distance(unit));
-
-            if (t != null)
-            {
-                return t;
-            }
-
-            return null;
+            var t = TurretsList.Where(x => team == TurretTeam.Ally ? x.Turret.IsValid && x.Turret.Team == unit.Team : x.Turret.Team != unit.Team).MinBy(x => x.Turret.Distance(unit));
+            return t;
         }
 
         public static bool UnderTurret(Obj_AI_Base unit, Obj_AI_Base turret)
@@ -128,7 +120,6 @@ namespace Aimtec.SDK.Prediction.Health
             var totalDamage = 0;
 
             var t = GetNearestTurretData(unit, TurretTeam.Enemy);
-
             if (t != null && UnderTurret(unit, t.Turret))
             {
                 foreach (var attack in t.Attacks)
@@ -138,7 +129,7 @@ namespace Aimtec.SDK.Prediction.Health
                         continue;
                     }
 
-                    if (attack.PredictedMissileETA < time)
+                    if (attack.PredictedMissileEta < time)
                     {
                         var damage = t.Turret.GetAutoAttackDamage(unit);
                         totalDamage += totalDamage;
@@ -156,7 +147,6 @@ namespace Aimtec.SDK.Prediction.Health
                 turret.OnUpdate();
             }
         }
-
 
         private static void Obj_AI_Base_OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
@@ -252,12 +242,12 @@ namespace Aimtec.SDK.Prediction.Health
                     StartTime = Game.TickCount,
                     Sender = sender,
                     Target = target,
-                    AttackStatus = TurretAttack.AttackState.Casted,
+                    AttackStatus = TurretAttack.AttackState.Casted
                 };
 
                 this.LastAttack = tAttack;
 
-                Attacks.Add(tAttack);
+                this.Attacks.Add(tAttack);
             }
 
             //Turret Attack Created
@@ -287,11 +277,11 @@ namespace Aimtec.SDK.Prediction.Health
 
             public void OnUpdate()
             {
-                foreach (var item in Attacks.ToList())
+                foreach (var item in this.Attacks.ToList())
                 {
                     if (Game.TickCount - item.StartTime > 3000)
                     {
-                        Attacks.Remove(item);
+                        this.Attacks.Remove(item);
                     }
                 }
             }
@@ -301,44 +291,37 @@ namespace Aimtec.SDK.Prediction.Health
                 public int MissileCreationTime { get; set; }
                 public MissileClient Missile { get; set; }
 
-
                 public int StartTime { get; set; }
                 public Obj_AI_Turret Sender { get; set; }
                 public Obj_AI_Base Target { get; set; }
-                public float DistanceWOBR => (int)(Target.Distance(Sender) - Sender.BoundingRadius - Target.BoundingRadius);
+                public float DistanceWobr => (int)(this.Target.Distance(this.Sender) - this.Sender.BoundingRadius - this.Target.BoundingRadius);
 
-                public int PredictedLandTime
-                {
-                    get { return this.StartTime + (int)(Sender.AttackCastDelay * 1000) + (int)(DistanceWOBR / Sender.BasicAttack.MissileSpeed) * 1000 - Game.Ping / 2; }
-                }
+                public int PredictedLandTime => this.StartTime + (int)(this.Sender.AttackCastDelay * 1000) + (int)(this.DistanceWobr / this.Sender.BasicAttack.MissileSpeed) * 1000 - Game.Ping / 2;
 
-                public int PredictedETA
-                {
-                    get { return PredictedLandTime - Game.TickCount; }
-                }
+                public int PredictedEta => this.PredictedLandTime - Game.TickCount;
 
-                public int PredictedMissileETA
+                public int PredictedMissileEta
                 {
                     get
                     {
                         if (this.Missile != null && this.Missile.IsValid)
                         {
-                            var position = Missile.ServerPosition;
-                            var distance = Missile.Distance(Target);
+                            var position = this.Missile.ServerPosition;
+                            var distance = this.Missile.Distance(this.Target);
 
-                            var travelTime = (distance / this.Sender.BasicAttack.MissileSpeed) * 1000 - Game.Ping / 2;
+                            var travelTime = distance / this.Sender.BasicAttack.MissileSpeed * 1000 - Game.Ping / 2f;
 
                             return (int)travelTime;
                         }
 
-                        return this.PredictedETA;
+                        return this.PredictedEta;
                     }
                 }
 
                 public AttackState AttackStatus { get; set; }
 
                 //Attack is destroyed
-                public bool Inactive { get; set; } = false;
+                public bool Inactive { get; set; }
 
                 public int RealEndTime { get; set; }
 

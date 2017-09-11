@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Aimtec.SDK.Util
+﻿namespace Aimtec.SDK.Util
 {
+    using System.Drawing;
+
     public class MiscUtils
     {
         /// <summary>

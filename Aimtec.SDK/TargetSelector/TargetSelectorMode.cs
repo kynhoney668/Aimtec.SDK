@@ -40,6 +40,6 @@
         /// <summary>
         ///     Gets the target with the least health.
         /// </summary>
-        MostPriority = 7,
+        MostPriority = 7
     }
 }

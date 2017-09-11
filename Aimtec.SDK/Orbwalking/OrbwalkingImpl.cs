@@ -6,6 +6,7 @@ namespace Aimtec.SDK.Orbwalking
     using System.Linq;
 
     using Aimtec.SDK.Damage;
+    using Aimtec.SDK.Events;
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
@@ -13,7 +14,6 @@ namespace Aimtec.SDK.Orbwalking
     using Aimtec.SDK.Prediction.Health;
     using Aimtec.SDK.TargetSelector;
     using Aimtec.SDK.Util;
-    using Aimtec.SDK.Events;
 
     internal class OrbwalkingImpl : AOrbwalker
     {
@@ -85,7 +85,7 @@ namespace Aimtec.SDK.Orbwalking
         /// <summary>
         ///     Special auto attack names that do not trigger OnProcessAutoAttack
         /// </summary>
-        private string[] SpecialAttacks =
+        private readonly string[] specialAttacks =
         {
             "caitlynheadshotmissile",
             "goldcardpreattack",
@@ -159,9 +159,10 @@ namespace Aimtec.SDK.Orbwalking
                 return true;
             }
 
-            if (!Player.ChampionName.Equals("Kalista") && !Player.ChampionName.Equals("Twitch"))
+            if (!Player.ChampionName.Equals("Kalista") &&
+                !Player.ChampionName.Equals("Twitch"))
             {
-                if (Player.BuffManager.HasBuffOfType(BuffType.Blind))
+                if (Player.HasBuffOfType(BuffType.Blind))
                 {
                     return false;
                 }
@@ -170,6 +171,35 @@ namespace Aimtec.SDK.Orbwalking
             return true;
         }
 
+        public bool JaxECheck()
+        {
+            if (!this.Config["Attacking"]["NoCounterStrikeAA"].Enabled)
+            {
+                return true;
+            }
+
+            var target = Orbwalker.Implementation.GetOrbwalkingTarget();
+            if (target == null)
+            {
+                return true;
+            }
+
+            var heroTarget = target as Obj_AI_Hero;
+            if (heroTarget == null)
+            {
+                return true;
+            }
+
+            if (heroTarget.ChampionName.Equals("Jax"))
+            {
+                if (heroTarget.HasBuff("JaxCounterStrike"))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
 
         public bool IsValidAttackableObject(AttackableUnit unit)
         {
@@ -251,7 +281,7 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
-            if (!this.BlindCheck())
+            if (!this.BlindCheck() || !this.JaxECheck())
             {
                 return false;
             }
@@ -375,9 +405,11 @@ namespace Aimtec.SDK.Orbwalking
                 this.ForcedTarget = null;
             }
 
+#pragma warning disable 1587
             /// <summary>
             ///     Execute the specific logic for this mode if any
             /// </summary>
+#pragma warning restore 1587
             mode.Execute();
 
             if (!mode.BaseOrbwalkingEnabled)
@@ -454,6 +486,7 @@ namespace Aimtec.SDK.Orbwalking
             return result;
         }
 
+        /*
         float DamageDealtInTime(Obj_AI_Base sender, Obj_AI_Base minion, int time)
         {
             var autos = this.NumberOfAutoAttacksInTime(sender, minion, time);
@@ -461,24 +494,22 @@ namespace Aimtec.SDK.Orbwalking
 
             return (float)(autos * dmg);
         }
+        */
 
-        AttackableUnit GetHeroTarget()
+        private static AttackableUnit GetHeroTarget()
         {
             return TargetSelector.Implementation.GetTarget(0, true);
         }
 
-        AttackableUnit GetLaneClearTarget()
+        private AttackableUnit GetLaneClearTarget()
         {
-
             if (UnderTurretMode())
             {
                 //Temporarily...
                 return this.GetLastHitTarget();
             }
 
-
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => this.IsValidAttackableObject(x));
-
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(this.IsValidAttackableObject);
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
             IEnumerable<Obj_AI_Base> minions = attackableUnits
@@ -514,7 +545,7 @@ namespace Aimtec.SDK.Orbwalking
                     var predHealth = this.GetPredictedHealth(b);
 
                     //taking damage
-                    if (this.LastTarget.Health - predHealth == 0)
+                    if (Math.Abs(this.LastTarget.Health - predHealth) < 0)
                     {
                         return this.LastTarget;
                     }
@@ -543,7 +574,7 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             //Heros
-            var hero = this.GetHeroTarget();
+            var hero = GetHeroTarget();
             if (hero != null)
             {
                 return hero;
@@ -565,13 +596,14 @@ namespace Aimtec.SDK.Orbwalking
 
         public AttackableUnit GetUnderTurret()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => this.IsValidAttackableObject(x));
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(this.IsValidAttackableObject);
 
             var nearestTurret = TurretAttackManager.GetNearestTurretData(Player, TurretAttackManager.TurretTeam.Ally);
 
             if (nearestTurret != null)
             {
-                var underTurret = attackable.Where(x => x.ServerPosition.Distance(nearestTurret.Turret.ServerPosition) < 900 && x.IsValidAutoRange());
+                var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
+                var underTurret = attackableUnits.Where(x => x.ServerPosition.Distance(nearestTurret.Turret.ServerPosition) < 900 && x.IsValidAutoRange());
 
                 if (underTurret.Any())
                 {
@@ -590,27 +622,27 @@ namespace Aimtec.SDK.Orbwalking
                                 var eta = arrival - Game.TickCount;
                                 var tDmg = tData.Turret.GetAutoAttackDamage(tTarget);
 
-                                var tWillKill = tDmg > tTarget.Health;
-                                var numTurretAutosToKill = Math.Ceiling(tTarget.Health / tDmg);
+                                //var tWillKill = tDmg > tTarget.Health;
+                                var numTurretAutosToKill = (int)Math.Ceiling(tTarget.Health / tDmg);
                                 var turretDistance = tData.Turret.Distance(tTarget) - Player.BoundingRadius - tTarget.BoundingRadius;
                                 var tCastDelay = tData.Turret.AttackCastDelay * 1000;
-                                var tTravTime = (turretDistance / tData.Turret.BasicAttack.MissileSpeed) * 1000;
-                                int tTotalTime = (int)(tCastDelay + tTravTime + Game.Ping / 2);
+                                var tTravTime = turretDistance / tData.Turret.BasicAttack.MissileSpeed * 1000;
+                                var tTotalTime = tCastDelay + tTravTime + Game.Ping / 2f;
 
                                 //myattack related
                                 var castDelay = Player.AttackCastDelay * 1000;
-                                var minDelay = castDelay;
+                                //var minDelay = castDelay;
                                 var dist = Player.Distance(tTarget) - Player.BoundingRadius - tTarget.BoundingRadius;
-                                var travTime = (dist / Player.BasicAttack.MissileSpeed) * 1000;
-                                int totalTime = (int)(castDelay + travTime + Game.Ping / 2);
+                                var travTime = dist / Player.BasicAttack.MissileSpeed * 1000;
+                                var totalTime = (int)(castDelay + travTime + Game.Ping / 2f);
 
                                 //minion hpred
                                 var tMinionDmgPredHealth = HealthPrediction.Implementation.GetPrediction(tTarget, totalTime);
 
                                 //myattack
-                                var extraBuffer = 50;
+                                const int ExtraBuffer = 50;
                                 //if total time > turret attack arrival time by buffer (can be early/late)
-                                var canReachSooner = totalTime - eta > extraBuffer;
+                                var canReachSooner = totalTime - eta > ExtraBuffer;
 
                                 var myAutoDmg = Player.GetAutoAttackDamage(tTarget);
 
@@ -621,9 +653,9 @@ namespace Aimtec.SDK.Orbwalking
                                 }
 
                                 var remHealth = tMinionDmgPredHealth - tDmg;
-                                var tNextAttackReachTime = tData.LastFireTime + tData.Turret.AttackDelay * 1000 + tCastDelay - Game.Ping / 2;
-                                var myAttackReachTime = Game.TickCount + totalTime;
-                                var iReachSooner = myAttackReachTime - tNextAttackReachTime > 50;
+                                //var tNextAttackReachTime = tData.LastFireTime + tData.Turret.AttackDelay * 1000 + tCastDelay - Game.Ping / 2f;
+                                //var myAttackReachTime = Game.TickCount + totalTime;
+                                //var iReachSooner = myAttackReachTime - tNextAttackReachTime > 50;
 
                                 //Minion wont die
                                 if (remHealth > 0)
@@ -638,11 +670,10 @@ namespace Aimtec.SDK.Orbwalking
                                         return null;
                                     }
 
-                                    for (int i = 1; i <= numTurretAutosToKill; i++)
+                                    for (var i = 1; i <= numTurretAutosToKill; i++)
                                     {
                                         var dmg = i * tDmg;
                                         var health = tTarget.Health - dmg;
-
                                         if (health > 0 && health < myAutoDmg)
                                         {
                                             break;
@@ -658,7 +689,7 @@ namespace Aimtec.SDK.Orbwalking
                                 //Turret will kill min and nothing i can do about it
                                 else
                                 {
-                                    foreach (var min in attackable)
+                                    foreach (var min in attackableUnits)
                                     {
                                         if (min.NetworkId == tTarget.NetworkId)
                                         {
@@ -666,7 +697,6 @@ namespace Aimtec.SDK.Orbwalking
                                         }
 
                                         var minBase = min as Obj_AI_Base;
-
                                         if (minBase == null)
                                         {
                                             continue;
@@ -675,13 +705,12 @@ namespace Aimtec.SDK.Orbwalking
                                         //myattack related
                                         var castDelay1 = Player.AttackCastDelay * 1000;
                                         var dist1 = Player.Distance(min) - Player.BoundingRadius - min.BoundingRadius;
-                                        var travTime1 = (dist1 / Player.BasicAttack.MissileSpeed) * 1000;
-                                        int totalTime1 = (int)(castDelay1 + travTime1 + Game.Ping / 2);
+                                        var travTime1 = dist1 / Player.BasicAttack.MissileSpeed * 1000;
+                                        var totalTime1 = (int)(castDelay1 + travTime1 + Game.Ping / 2f);
+
                                         var dmg1 = Player.GetAutoAttackDamage(minBase);
-
-                                        var pred = HealthPrediction.Implementation.GetPrediction(minBase, totalTime1);
-
-                                        if (dmg1 > pred)
+                                        var pred1 = HealthPrediction.Implementation.GetPrediction(minBase, totalTime1);
+                                        if (dmg1 > pred1)
                                         {
                                             return min;
                                         }
@@ -726,7 +755,7 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (attackable == null)
             {
-                attackable = ObjectManager.Get<AttackableUnit>().Where(x => this.IsValidAttackableObject(x));
+                attackable = ObjectManager.Get<AttackableUnit>().Where(this.IsValidAttackableObject);
             }
 
             var availableMinionTargets = attackable
@@ -742,7 +771,7 @@ namespace Aimtec.SDK.Orbwalking
         //In mixed mode we prioritize killable units, then structures, then heros. If none are found, then we don't attack anything.
         AttackableUnit GetMixedModeTarget()
         {
-            var attackable = ObjectManager.Get<AttackableUnit>().Where(x => this.IsValidAttackableObject(x));
+            var attackable = ObjectManager.Get<AttackableUnit>().Where(this.IsValidAttackableObject);
 
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
 
@@ -762,7 +791,7 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             //Heros
-            var hero = this.GetHeroTarget();
+            var hero = GetHeroTarget();
             if (hero != null)
             {
                 return hero;
@@ -812,13 +841,14 @@ namespace Aimtec.SDK.Orbwalking
             {
                 new Menu("Advanced", "Advanced")
                 {
-                    new MenuSlider("AttackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true),
+                    new MenuSlider("AttackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true)
                 },
 
                 new Menu("Attacking", "Attacking") {
 
                     new MenuSlider("ExtraWindup", "Additional Windup", Game.Ping / 2 + 10, 0, 200, true),
                     new MenuBool("NoBlindAA", "No AA when Blind", true, true),
+                    new MenuBool("NoCounterStrikeAA", "No AA against E'ing Jax", true, true)
                 },
 
                 new Menu("Farming", "Farming")
@@ -831,28 +861,28 @@ namespace Aimtec.SDK.Orbwalking
 
                 new Menu("Misc", "Misc")
                 {
-                    new MenuSlider("HoldPositionRadius", "Hold Radius", 50, 0, 400, true),
+                    new MenuSlider("HoldPositionRadius", "Hold Radius", 50, 0, 400, true)
                 },
 
                 new Menu("Drawings", "Drawings")
                 {
-                    new MenuBool("DrawAttackRange", "Draw Attack Range", true),
-                    new MenuBool("DrawHoldRadius", "Draw Hold Radius", true),
-                    new MenuBool("DrawKillableMinion", "Indicate Killable", true),
-                },
+                    new MenuBool("DrawAttackRange", "Draw Attack Range"),
+                    new MenuBool("DrawHoldRadius", "Draw Hold Radius"),
+                    new MenuBool("DrawKillableMinion", "Indicate Killable")
+                }
             };
 
-            this.AddMode(this.Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, this.GetHeroTarget, null));
+            this.AddMode(this.Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, GetHeroTarget, null));
             this.AddMode(this.LaneClear = new OrbwalkerMode("Laneclear", GlobalKeys.WaveClearKey, this.GetLaneClearTarget, null));
             this.AddMode(this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
             this.AddMode(this.Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, this.GetMixedModeTarget, null));
 
-            GPCheck();
+            this.GpCheck();
 
-            GameEvents.GameStart += GameEvents_GameStart;
+            GameEvents.GameStart += this.GameEventsGameStart;
         }
 
-        private void GPCheck()
+        private void GpCheck()
         {
             var gp = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(x => x.ChampionName.ToLower().Equals("gangplank"));
             if (gp != null)
@@ -861,13 +891,13 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-        private void GameEvents_GameStart()
+        private void GameEventsGameStart()
         {
-            this.GPCheck();
+            this.GpCheck();
         }
 
-
-        int NumberOfAutoAttacksInTime(Obj_AI_Base sender, AttackableUnit minion, int time)
+        /*
+        private int NumberOfAutoAttacksInTime(Obj_AI_Base sender, AttackableUnit minion, int time)
         {
             var basetimePerAuto = this.TimeForAutoToReachTarget(minion);
 
@@ -892,6 +922,7 @@ namespace Aimtec.SDK.Orbwalking
 
             return numberOfAutos;
         }
+        */
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
@@ -899,7 +930,7 @@ namespace Aimtec.SDK.Orbwalking
             {
                 var name = e.SpellData.Name.ToLower();
 
-                if (this.SpecialAttacks.Contains(name))
+                if (this.specialAttacks.Contains(name))
                 {
                     this.ObjAiHeroOnProcessAutoAttack(sender, e);
                 }
@@ -927,7 +958,7 @@ namespace Aimtec.SDK.Orbwalking
             {
                 foreach (var m in ObjectManager.Get<Obj_AI_Minion>().Where(x => x.IsValidTarget(Player.AttackRange * 2) && x.Health <= Player.GetAutoAttackDamage(x)))
                 {
-                    Render.Circle(m.Position, 50, 30, System.Drawing.Color.LimeGreen);
+                    Render.Circle(m.Position, 50, 30, Color.LimeGreen);
                 }
             }
         }
@@ -955,12 +986,12 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
-        int TimeForAutoToReachTarget(AttackableUnit minion, bool applyDelay = false)
+        private int TimeForAutoToReachTarget(AttackableUnit minion, bool applyDelay = false)
         {
             var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
             var ms = Player.IsMelee ? int.MaxValue : Player.BasicAttack.MissileSpeed;
-            var attackTravelTime = (dist / ms) * 1000f;
-            var totalTime = (int)(this.AnimationTime + attackTravelTime + Game.Ping / 2 - 100);
+            var attackTravelTime = dist / ms * 1000f;
+            var totalTime = (int)(this.AnimationTime + attackTravelTime + Game.Ping / 2f - 100);
             return totalTime + (applyDelay ? this.FarmDelay : 0);
         }
 

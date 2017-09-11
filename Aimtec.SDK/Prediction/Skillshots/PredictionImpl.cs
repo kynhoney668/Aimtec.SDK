@@ -152,8 +152,8 @@
             var position = PositionAfter(unit, 1, unit.MoveSpeed - 100);
             var prediction = position + speed * (input.Delay / 1000);
 
-            return new PredictionOutput()
-            {
+            return new PredictionOutput
+                       {
                 UnitPosition = new Vector3(position.X, position.Y, unit.ServerPosition.Z),
                 CastPosition = new Vector3(prediction.X, prediction.Y, unit.ServerPosition.Z),
                 HitChance = HitChance.High
@@ -230,7 +230,7 @@
         {
             speed = Math.Abs(speed) < float.Epsilon ? input.Unit.MoveSpeed : speed;
 
-            if (path.Count <= 1 || (input.Unit.SpellBook.IsAutoAttacking && !input.Unit.IsDashing()))
+            if (path.Count <= 1 || input.Unit.SpellBook.IsAutoAttacking && !input.Unit.IsDashing())
             {
                 return new PredictionOutput
                 {

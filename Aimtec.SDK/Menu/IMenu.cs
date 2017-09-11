@@ -1,7 +1,5 @@
 ﻿namespace Aimtec.SDK.Menu
 {
-    using System.Collections.Generic;
-
     /// <summary>
     ///     Interface IMenu
     /// </summary>

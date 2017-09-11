@@ -17,7 +17,7 @@
     {
         #region Fields
 
-        private readonly string[] HighPriority =
+        private readonly string[] highPriority =
         {
             "Akali",
             "Diana",
@@ -40,7 +40,7 @@
             "Zilean"
         };
 
-        private readonly string[] LowPriority =
+        private readonly string[] lowPriority =
         {
             "Alistar",
             "Amumu",
@@ -82,7 +82,7 @@
             "Zyra"
         };
 
-        private readonly string[] MaxPriority =
+        private readonly string[] maxPriority =
         {
             "Ahri",
             "Anivia",
@@ -131,7 +131,7 @@
             "Soraka"
         };
 
-        private readonly string[] MediumPriority =
+        private readonly string[] mediumPriority =
         {
             "Aatrox",
             "Darius",
@@ -161,7 +161,7 @@
             "RekSai"
         };
 
-        private List<Weight> Weights = new List<Weight>();
+        public readonly List<Weight> Weights = new List<Weight>();
 
         private bool FocusSelected => this.Config["Misc"]["FocusSelected"].Enabled;
 
@@ -191,7 +191,7 @@
 
             LowPriority = 2,
 
-            MinPriority = 1,
+            MinPriority = 1
         }
 
         public enum WeightEffect
@@ -268,22 +268,22 @@
         {
             var name = hero.ChampionName;
 
-            if (this.MaxPriority.Contains(name))
+            if (this.maxPriority.Contains(name))
             {
                 return TargetPriority.MaxPriority;
             }
 
-            if (this.HighPriority.Contains(name))
+            if (this.highPriority.Contains(name))
             {
                 return TargetPriority.HighPriority;
             }
 
-            if (this.MediumPriority.Contains(name))
+            if (this.mediumPriority.Contains(name))
             {
                 return TargetPriority.MediumPriority;
             }
 
-            if (this.LowPriority.Contains(name))
+            if (this.lowPriority.Contains(name))
             {
                 return TargetPriority.LowPriority;
             }
@@ -293,7 +293,7 @@
 
         public List<Obj_AI_Hero> GetOrderedTargets(float range, bool autoattack = false)
         {
-            List<Obj_AI_Hero> orderedTargets = new List<Obj_AI_Hero>();
+            List<Obj_AI_Hero> orderedTargets;
 
             if (this.Config["UseWeights"].Enabled)
             {
@@ -309,7 +309,7 @@
 
             if (this.FocusSelected)
             {
-                var selected = GetSelectedTarget(range, autoattack);
+                var selected = this.GetSelectedTarget(range, autoattack);
 
                 if (selected != null)
                 {
@@ -397,7 +397,7 @@
         {
             if (this.FocusSelected)
             {
-                var selected = GetSelectedTarget(range, autoattack);
+                var selected = this.GetSelectedTarget(range, autoattack);
 
                 if (selected != null)
                 {
@@ -582,25 +582,24 @@
         private Dictionary<Obj_AI_Hero, float> GetTargetsAndWeights(float range, bool autoattack = false)
         {
             var enemies = this.GetValidTargets(range, autoattack);
-
             var enabledWeights = this.Weights.Where(x => x.MenuItem.Enabled);
+            var cumulativeResults = new Dictionary<Obj_AI_Hero, float>();
 
-            var CumulativeResults = new Dictionary<Obj_AI_Hero, float>();
-
-            foreach (var hero in enemies)
+            var objAiHeroes = enemies as Obj_AI_Hero[] ?? enemies.ToArray();
+            foreach (var hero in objAiHeroes)
             {
-                CumulativeResults[hero] = 0;
+                cumulativeResults[hero] = 0;
             }
 
             foreach (var weight in enabledWeights)
             {
-                weight.ComputeWeight(enemies, ref CumulativeResults);
+                weight.ComputeWeight(objAiHeroes, ref cumulativeResults);
             }
 
-            return CumulativeResults;
+            return cumulativeResults;
         }
 
-        private IOrderedEnumerable<KeyValuePair<Obj_AI_Hero, float>> GetTargetsAndWeightsOrdered(
+        private IEnumerable<KeyValuePair<Obj_AI_Hero, float>> GetTargetsAndWeightsOrdered(
             float range,
             bool autoattack)
         {
@@ -608,7 +607,7 @@
 
             if (this.FocusSelected)
             {
-                var selected = GetSelectedTarget(range, autoattack);
+                var selected = this.GetSelectedTarget(range, autoattack);
 
                 if (selected != null)
                 {
@@ -624,11 +623,11 @@
         {
             var indicateSelected = this.Config["Drawings"]["IndicateSelected"].Enabled;
             var showOrder = this.Config["Drawings"]["ShowOrder"].Enabled;
-            var ShowOrderAuto = this.Config["Drawings"]["ShowOrderAuto"].Enabled;
+            var showOrderAuto = this.Config["Drawings"]["ShowOrderAuto"].Enabled;
 
             if (indicateSelected)
             {
-                var selected = GetSelectedTarget();
+                var selected = this.GetSelectedTarget();
 
                 if (selected != null)
                 {
@@ -640,9 +639,9 @@
             {
                 if (this.Config["UseWeights"].Enabled)
                 {
-                    var ordered = this.GetTargetsAndWeightsOrdered(50000, ShowOrderAuto).ToList();
+                    var ordered = this.GetTargetsAndWeightsOrdered(50000, showOrderAuto).ToList();
                     var basepos = new Vector2(Render.Width / 2f, 0.10f * Render.Height);
-                    for (var i = 0; i < ordered.Count(); i++)
+                    for (var i = 0; i < ordered.Count; i++)
                     {
                         var targ = ordered[i];
                         var target = targ.Key;
@@ -658,9 +657,9 @@
 
                 else
                 {
-                    var ordered = this.GetOrderedTargetsByMode(50000, ShowOrderAuto).ToList();
+                    var ordered = this.GetOrderedTargetsByMode(50000, showOrderAuto).ToList();
                     var basepos = new Vector2(Render.Width / 2f, 0.10f * Render.Height);
-                    for (var i = 0; i < ordered.Count(); i++)
+                    for (var i = 0; i < ordered.Count; i++)
                     {
                         var target = ordered[i];
                         if (target != null)
@@ -694,7 +693,7 @@
 
                 this.Name = name;
 
-                this.MenuItem = new MenuSliderBool(name, displayName, enabled, defaultWeight, 0, 100);
+                this.MenuItem = new MenuSliderBool(name, displayName, enabled, defaultWeight);
 
                 this.WeightDefinition = definition;
 
@@ -731,16 +730,15 @@
                 IEnumerable<Obj_AI_Hero> heroes,
                 ref Dictionary<Obj_AI_Hero, float> weightedTotals)
             {
-                var TargetResults = new Dictionary<Obj_AI_Hero, float>();
+                var targetResults = new Dictionary<Obj_AI_Hero, float>();
 
                 foreach (var hero in heroes)
                 {
-                    TargetResults[hero] = this.WeightDefinition(hero);
+                    targetResults[hero] = this.WeightDefinition(hero);
                 }
 
-                var sumValues = TargetResults.Values.Sum();
-
-                foreach (var item in TargetResults)
+                var sumValues = (int)targetResults.Values.Sum();
+                foreach (var item in targetResults)
                 {
                     if (sumValues == 0)
                     {

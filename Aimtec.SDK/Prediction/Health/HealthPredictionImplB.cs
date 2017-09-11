@@ -1,17 +1,18 @@
-﻿using Aimtec.SDK.Damage;
-using Aimtec.SDK.Extensions;
-using Aimtec.SDK.Menu.Components;
-using Aimtec.SDK.Menu.Config;
-using Aimtec.SDK.Util;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-
-namespace Aimtec.SDK.Prediction.Health
+﻿namespace Aimtec.SDK.Prediction.Health
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Aimtec.SDK.Damage;
+    using Aimtec.SDK.Extensions;
+    using Aimtec.SDK.Menu;
+    using Aimtec.SDK.Menu.Components;
+    using Aimtec.SDK.Menu.Config;
+
     class HealthPredictionImplB : IHealthPrediction
     {
-        internal Menu.Menu Config { get; set; }
+        internal Menu Config { get; set; }
 
         public HealthPredictionImplB()
         {
@@ -23,11 +24,11 @@ namespace Aimtec.SDK.Prediction.Health
             SpellBook.OnStopCast += this.SpellBook_OnStopCast;
 
 
-            this.Config = new Menu.Menu("HealthPred", "HealthPrediction")
+            this.Config = new Menu("HealthPred", "HealthPrediction")
             {
                 new MenuSeperator("Seperator", "Delays are 0 by default"),
                 new MenuSlider("ExtraDelayRanged", "Extra Ranged Delay", 0, 0, 150).SetToolTip("Delay for processing minion ranged attacks"),
-                new MenuSlider("ExtraDelayMelee", "Extra Melee Attacks Delay", 0, 0, 150).SetToolTip("Delay for processing minion melee attacks"),
+                new MenuSlider("ExtraDelayMelee", "Extra Melee Attacks Delay", 0, 0, 150).SetToolTip("Delay for processing minion melee attacks")
             };
 
             AimtecMenu.Instance.Add(this.Config);
@@ -106,12 +107,12 @@ namespace Aimtec.SDK.Prediction.Health
 
                 foreach (var k in attacks)
                 {
-                    if (k.AttackStatus == AutoAttack.AttackState.Completed || k.ETA < - 200 || !k.Target.IsValid || k.Target.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > 3000)
+                    if (k.AttackStatus == AutoAttack.AttackState.Completed || k.Eta < - 200 || !k.Target.IsValid || k.Target.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > 3000)
                     {
                         continue;
                     }
 
-                    if (k.ETA < time)
+                    if (k.Eta < time)
                     {
                         predictedDamage += (float)k.Damage;
                     }
@@ -135,7 +136,7 @@ namespace Aimtec.SDK.Prediction.Health
 
                 foreach (var k in attacks)
                 {
-                    if (k.TNetworkId != target.NetworkId || Game.TickCount - k.DetectTime > rTime)
+                    if (k.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > rTime)
                     {
                         continue;
                     }
@@ -301,7 +302,7 @@ namespace Aimtec.SDK.Prediction.Health
                 this.Sender = sender;
                 this.Target = target;
                 this.SNetworkId = sender.NetworkId;
-                this.TNetworkId = target.NetworkId;
+                this.NetworkId = target.NetworkId;
 
                 this.Damage = sender.GetAutoAttackDamage(target);
 
@@ -315,7 +316,7 @@ namespace Aimtec.SDK.Prediction.Health
             public double Damage { get; set; }
 
             public int SNetworkId { get; set; }
-            public int TNetworkId { get; set; }
+            public int NetworkId { get; set; }
 
             public Obj_AI_Base Sender { get; set; }
             public Obj_AI_Base Target { get; set; }
@@ -330,7 +331,7 @@ namespace Aimtec.SDK.Prediction.Health
 
             public abstract int EstArrivalTime { get; }
 
-            public abstract int ETA { get; }
+            public abstract int Eta { get; }
 
             public int ExtraDelay { get; set; }
 
@@ -368,11 +369,11 @@ namespace Aimtec.SDK.Prediction.Health
 
             public MissileClient Missile { get; set; }
 
-            public override bool Active => this.ETA > 0;
+            public override bool Active => this.Eta > 0;
 
-            public override int ETA => (int) this.RegularETA;
+            public override int Eta => (int) this.RegularEta;
 
-            public int TravelTime => (int) (((StartPosition.Distance(Target.ServerPosition)) / this.Sender.BasicAttack.MissileSpeed) * 1000);
+            public int TravelTime => (int) (this.StartPosition.Distance(this.Target.ServerPosition) / this.Sender.BasicAttack.MissileSpeed * 1000);
 
             public int TotalTimeToReach => this.AnimationDelay + this.TravelTime + this.ExtraDelay;
 
@@ -380,7 +381,7 @@ namespace Aimtec.SDK.Prediction.Health
 
             public int ElapsedTime => Game.TickCount - this.DetectTime;
 
-            public float RegularETA => this.EstArrivalTime - Game.TickCount;
+            public float RegularEta => this.EstArrivalTime - Game.TickCount;
 
             public int MissileCreationTime { get; set; }
 
@@ -410,11 +411,11 @@ namespace Aimtec.SDK.Prediction.Health
                 this.ExtraDelay = extraDelay + 60;
             }
 
-            public override bool Active => this.ETA > 0;
+            public override bool Active => this.Eta > 0;
 
-            public override int EstArrivalTime => this.DetectTime + (int)(Sender.AttackCastDelay * 1000);
+            public override int EstArrivalTime => this.DetectTime + (int)(this.Sender.AttackCastDelay * 1000);
 
-            public override int ETA => Math.Max(0, EstArrivalTime - Game.TickCount) + ExtraDelay;
+            public override int Eta => Math.Max(0, this.EstArrivalTime - Game.TickCount) + this.ExtraDelay;
         }
 
 
@@ -454,9 +455,9 @@ namespace Aimtec.SDK.Prediction.Health
                 OutBoundAttacks[k].Remove(attack);
             }
 
-            public static List<AutoAttack> GetOutBoundAttacks(int unitID)
+            public static List<AutoAttack> GetOutBoundAttacks(int unitId)
             {
-                OutBoundAttacks.TryGetValue(unitID, out List <AutoAttack> attacks);
+                OutBoundAttacks.TryGetValue(unitId, out List <AutoAttack> attacks);
                 return attacks;
             }
         }

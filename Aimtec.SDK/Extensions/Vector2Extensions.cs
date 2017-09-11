@@ -449,7 +449,7 @@ namespace Aimtec.SDK.Extensions
             float d = eP1X - sP1X, e = eP1Y - sP1Y;
             float dist = (float) Math.Sqrt(d * d + e * e), t1 = float.NaN;
             float s = Math.Abs(dist) > float.Epsilon ? v1 * d / dist : 0,
-                  k = (Math.Abs(dist) > float.Epsilon) ? v1 * e / dist : 0f;
+                  k = Math.Abs(dist) > float.Epsilon ? v1 * e / dist : 0f;
 
             float r = sP2X - sP1X, j = sP2Y - sP1Y;
             var c = r * r + j * j;
@@ -473,12 +473,12 @@ namespace Aimtec.SDK.Extensions
                     {
                         if (Math.Abs(b) < float.Epsilon)
                         {
-                            t1 = (Math.Abs(c) < float.Epsilon) ? 0f : float.NaN;
+                            t1 = Math.Abs(c) < float.Epsilon ? 0f : float.NaN;
                         }
                         else
                         {
                             var t = -c / (2 * b);
-                            t1 = (v2 * t >= 0f) ? t : float.NaN;
+                            t1 = v2 * t >= 0f ? t : float.NaN;
                         }
                     }
                     else
@@ -489,7 +489,7 @@ namespace Aimtec.SDK.Extensions
                         {
                             return new Tuple<float, Vector2>(
                                 t1,
-                                (!float.IsNaN(t1)) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : new Vector2());
+                                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : new Vector2());
                         }
 
                         var nom = (float) Math.Sqrt(sqr);
@@ -498,13 +498,13 @@ namespace Aimtec.SDK.Extensions
                         t1 = v2 * t >= 0f ? t : float.NaN;
                         t = (nom - b) / a;
 
-                        var t2 = (v2 * t >= 0f) ? t : float.NaN;
+                        var t2 = v2 * t >= 0f ? t : float.NaN;
 
                         if (float.IsNaN(t2) || float.IsNaN(t1))
                         {
                             return new Tuple<float, Vector2>(
                                 t1,
-                                (!float.IsNaN(t1)) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : new Vector2());
+                                !float.IsNaN(t1) ? new Vector2(sP1X + s * t1, sP1Y + k * t1) : new Vector2());
                         }
 
                         if (t1 >= delay && t2 >= delay)
