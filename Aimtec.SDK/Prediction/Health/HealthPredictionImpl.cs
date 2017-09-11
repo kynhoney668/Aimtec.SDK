@@ -6,7 +6,7 @@
 
     using Aimtec.SDK.Extensions;
 
-    class HealthPredictionImpl : IHealthPrediction
+    internal class HealthPredictionImpl : IHealthPrediction
     {
         #region Constructors and Destructors
 
@@ -147,11 +147,11 @@
 
         #endregion
 
-        class Attack
+        private class Attack
         {
             #region Public Properties
 
-            public bool Active { get; set; } = true;
+            public bool Active { get; } = true;
 
             public float MissileSpeed { get; set; }
 

@@ -3,7 +3,6 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    using Aimtec.SDK.Damage;
     using Aimtec.SDK.Extensions;
 
     public class TurretAttackManager
@@ -36,7 +35,6 @@
             GameObject.OnDestroy += GameObject_OnDestroy;
             Game.OnUpdate += Game_OnUpdate;
         }
-
 
         public static TurretData GetTurretData(int netId)
         {
@@ -90,13 +88,11 @@
             }
         }
         */
-        
 
         public static AttackableUnit GetKillableTarget()
         {
             return null;
         }
-
 
         public enum TurretTeam
         {
@@ -131,7 +127,7 @@
 
                     if (attack.PredictedMissileEta < time)
                     {
-                        var damage = t.Turret.GetAutoAttackDamage(unit);
+                        //var damage = t.Turret.GetAutoAttackDamage(unit);
                         totalDamage += totalDamage;
                     }
                 }
@@ -156,7 +152,6 @@
             }
 
             var bTarget = e.Target as Obj_AI_Base;
-
             if (bTarget == null)
             {
                 return;
@@ -177,20 +172,16 @@
             }
 
             var attack = sender as MissileClient;
-
             if (attack == null)
             {
                 return;
             }
 
-
             if (attack.SpellCaster is Obj_AI_Turret tSender)
             {
                 Turrets[tSender.NetworkId].OnMissileCreated(attack);
             }
-
         }
-
 
         private static void GameObject_OnDestroy(GameObject sender)
         {
@@ -200,12 +191,10 @@
             }
 
             var attack = sender as MissileClient;
-
             if (attack == null)
             {
                 return;
             }
-
 
             if (attack.SpellCaster is Obj_AI_Turret tSender)
             {
@@ -266,7 +255,6 @@
             public void OnMissileDestroyed(MissileClient mc)
             {
                 var attack = this.Attacks.Find(x => x.Missile != null && x.Missile.NetworkId == mc.NetworkId && x.AttackStatus == TurretAttack.AttackState.CreatedMissile);
-
                 if (attack != null)
                 {
                     attack.Inactive = true;
@@ -306,7 +294,7 @@
                     {
                         if (this.Missile != null && this.Missile.IsValid)
                         {
-                            var position = this.Missile.ServerPosition;
+                            //var position = this.Missile.ServerPosition;
                             var distance = this.Missile.Distance(this.Target);
 
                             var travelTime = distance / this.Sender.BasicAttack.MissileSpeed * 1000 - Game.Ping / 2f;

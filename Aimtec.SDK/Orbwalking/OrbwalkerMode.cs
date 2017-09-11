@@ -67,12 +67,7 @@
             TargetDelegate targetDelegate,
             OrbwalkModeDelegate orbwalkBehaviour)
         {
-            if (name == null)
-            {
-                throw new Exception("There was an error creating the Orbwalker Mode");
-            }
-
-            this.Name = name;
+            this.Name = name ?? throw new Exception("There was an error creating the Orbwalker Mode");
             this.ModeBehaviour = orbwalkBehaviour;
             this.GetTargetImplementation = targetDelegate;
             this.MenuItem = new MenuKeyBind(name, name, key, KeybindType.Press);
@@ -115,10 +110,7 @@
 
                 return this.attackEnabled;
             }
-            set
-            {
-                this.attackEnabled = value;
-            }
+            set => this.attackEnabled = value;
         }
 
         /// <summary>
@@ -144,10 +136,7 @@
                 }
                 return this.moveEnabled;
             }
-            set
-            {
-                this.moveEnabled = value;
-            }
+            set => this.moveEnabled = value;
         }
 
         /// <summary>

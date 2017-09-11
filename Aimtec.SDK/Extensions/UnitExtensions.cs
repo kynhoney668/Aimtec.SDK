@@ -186,7 +186,7 @@ namespace Aimtec.SDK.Extensions
         /// <param name="buffname">The buffname.</param>
         public static int GetRealBuffCount(this Obj_AI_Base from, string buffname)
         {
-            var getBuffCount = from.BuffManager.GetBuffCount(buffname, true);
+            var getBuffCount = from.GetBuffCount(buffname);
             switch (getBuffCount)
             {
                 case -1:

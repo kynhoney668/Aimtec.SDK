@@ -9,16 +9,17 @@
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Config;
+    using Aimtec.SDK.Orbwalking;
 
-    class HealthPredictionImplB : IHealthPrediction
+    internal class HealthPredictionImplB : IHealthPrediction
     {
         internal Menu Config { get; set; }
 
         public HealthPredictionImplB()
         {
-            Obj_AI_Base.OnProcessAutoAttack += this.Obj_AI_Base_OnProcessAutoAttack;
-            GameObject.OnCreate += this.GameObject_OnCreate;
-            GameObject.OnDestroy += this.GameObject_OnDestroy;
+            Obj_AI_Base.OnProcessAutoAttack += Obj_AI_Base_OnProcessAutoAttack;
+            GameObject.OnCreate += GameObject_OnCreate;
+            GameObject.OnDestroy += GameObject_OnDestroy;
             Game.OnUpdate += this.Game_OnUpdate;
             Obj_AI_Base.OnPerformCast += this.Obj_AI_Base_OnPerformCast;
             SpellBook.OnStopCast += this.SpellBook_OnStopCast;
@@ -74,13 +75,11 @@
             }
         }
 
-
         private void Obj_AI_Base_OnPerformCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
             if (sender != null && sender.IsValid && sender.IsMelee)
             {
                 var ob = Attacks.GetOutBoundAttacks(sender.NetworkId);
-
                 if (ob != null)
                 {
                     var attacks = ob.Where(x => x.AttackStatus != AutoAttack.AttackState.Completed);
@@ -96,18 +95,26 @@
             }
         }
 
+        /// <summary>
+        ///     Returns if the name is an auto attack
+        /// </summary>
+        /// <param name="name">Name of spell</param>
+        /// <returns>The <see cref="bool" /></returns>
+        public static bool IsAutoAttack(string name)
+        {
+            name = name.ToLower();
+            return name.Contains("attack") && !AOrbwalker.NoAttacks.Contains(name) || AOrbwalker.SpecialAttacks.Contains(name);
+        }
 
         public float GetPrediction(Obj_AI_Base target, int time)
         {
             float predictedDamage = 0;
-
             foreach (var m in Attacks.OutBoundAttacks)
             {
                 var attacks = m.Value;
-
                 foreach (var k in attacks)
                 {
-                    if (k.AttackStatus == AutoAttack.AttackState.Completed || k.Eta < - 200 || !k.Target.IsValid || k.Target.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > 3000)
+                    if (k.AttackStatus == AutoAttack.AttackState.Completed || !k.IsValid() || k.Eta < -200 || !k.Target.IsValid || k.Target.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > 3000)
                     {
                         continue;
                     }
@@ -120,20 +127,17 @@
             }
 
             var health = target.Health - predictedDamage;
-
             return health;
         }
 
         public float GetLaneClearHealthPrediction(Obj_AI_Base target, int time)
         {
             float predictedDamage = 0;
-
             var rTime = time;
 
             foreach (var m in Attacks.OutBoundAttacks)
             {
                 var attacks = m.Value;
-
                 foreach (var k in attacks)
                 {
                     if (k.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > rTime)
@@ -176,7 +180,7 @@
             this.LastCleanUp = Game.TickCount;
         }
 
-        private void Obj_AI_Base_OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
+        private static void Obj_AI_Base_OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
             //Ignore auto attacks happening too far away
             if (sender == null || !sender.IsValidTarget(4000, true) || sender is Obj_AI_Hero)
@@ -191,7 +195,7 @@
                 return;
             }
 
-            AutoAttack attack = null;
+            AutoAttack attack;
 
             if (sender.IsMelee)
             {
@@ -206,7 +210,7 @@
             Attacks.AddAttack(attack);
         }
 
-        private void GameObject_OnCreate(GameObject gsender)
+        private static void GameObject_OnCreate(GameObject gsender)
         {
             if (gsender == null || !gsender.IsValid)
             {
@@ -214,16 +218,13 @@
             }
 
             var mc = gsender as MissileClient;
-
             if (mc == null || !mc.IsValid || mc.Target == null || !mc.Target.IsValid)
             {
                 return;
             }
 
             var sender = mc.SpellCaster;
-
             var target = mc.Target as Obj_AI_Minion;
-
             if (sender == null || !sender.IsValid || sender.IsMelee || sender is Obj_AI_Hero)
             {
                 return;
@@ -235,27 +236,23 @@
             }
 
             //Ignore the missile if it is not an auto attack...
-            if (!mc.SpellData.Name.ToLower().Contains("attack"))
+            if (!IsAutoAttack(mc.Name))
             {
                 return;
             }
 
             var attacks = Attacks.GetOutBoundAttacks(mc.SpellCaster.NetworkId);
-
-            if (attacks != null)
+            var attack = attacks?.MaxBy(x => x.DetectTime);
+            if (attack != null)
             {
-                var attack = attacks.MaxBy(x => x.DetectTime);
-                if (attack != null)
+                if (attack is RangedAttack rangedAttack)
                 {
-                    if (attack is RangedAttack rangedAttack)
-                    {
-                        rangedAttack.MissileCreated(mc);
-                    }
+                    rangedAttack.MissileCreated(mc);
                 }
             }
         }
 
-        private void GameObject_OnDestroy(GameObject sender)
+        private static void GameObject_OnDestroy(GameObject sender)
         {
             if (sender == null || !sender.IsValid)
             {
@@ -263,14 +260,12 @@
             }
 
             var mc = sender as MissileClient;
-
             if (mc == null || mc.SpellCaster == null || mc.SpellCaster.IsMelee || mc.SpellCaster is Obj_AI_Hero)
             {
                 return;
             }
 
             var target = mc.Target as Obj_AI_Base;
-
             if (target == null)
             {
                 return;
@@ -278,24 +273,21 @@
 
             var attacks = Attacks.GetOutBoundAttacks(mc.SpellCaster.NetworkId);
 
-            if (attacks != null)
+            //Might be destroying too eearly, attack may not land when missile destroyed
+            //add the missile to the attack object
+            var attack = attacks?.Where(x => x.Target.NetworkId == mc.Target.NetworkId && x.AttackStatus != AutoAttack.AttackState.Completed).MinBy(x => x.DetectTime);
+            if (attack != null)
             {
-                //Might be destroying too eearly, attack may not land when missile destroyed
-                //add the missile to the attack object
-                var attack = attacks.Where(x => x.Target.NetworkId == mc.Target.NetworkId && x.AttackStatus != AutoAttack.AttackState.Completed).MinBy(x => x.DetectTime);
-                if (attack != null)
+                if (attack is RangedAttack rangedAttack)
                 {
-                    if (attack is RangedAttack rangedAttack)
-                    {
-                        rangedAttack.MissileDestroyed();
-                    }
+                    rangedAttack.MissileDestroyed();
                 }
             }
         }
 
         public abstract class AutoAttack
         {
-            public AutoAttack(Obj_AI_Base sender, Obj_AI_Base target)
+            protected AutoAttack(Obj_AI_Base sender, Obj_AI_Base target)
             {
                 this.AttackStatus = AttackState.Detected;
                 this.DetectTime = Game.TickCount - Game.Ping / 2;
@@ -308,7 +300,7 @@
 
                 this.StartPosition = sender.ServerPosition;
 
-                this.AnimationDelay = (int) (sender.AttackCastDelay * 1000);
+                this.AnimationDelay = (int)(sender.AttackCastDelay * 1000);
             }
 
             public bool CanRemoveAttack => Game.TickCount - this.DetectTime > 5000;
@@ -371,11 +363,19 @@
 
             public override bool Active => this.Eta > 0;
 
-            public override int Eta => (int) this.RegularEta;
+            public override int Eta => (int)this.RegularEta;
 
-            public int TravelTime => (int) (this.StartPosition.Distance(this.Target.ServerPosition) / this.Sender.BasicAttack.MissileSpeed * 1000);
+            public int TravelTime()
+            {
+                if (this.Target.IsValid)
+                {
+                    return (int)(this.StartPosition.Distance(this.Target.ServerPosition) / this.Sender.BasicAttack.MissileSpeed * 1000);
+                }
 
-            public int TotalTimeToReach => this.AnimationDelay + this.TravelTime + this.ExtraDelay;
+                return 0;
+            }
+
+            public int TotalTimeToReach => this.AnimationDelay + this.TravelTime() + this.ExtraDelay;
 
             public override int EstArrivalTime => this.DetectTime + this.TotalTimeToReach;
 
@@ -418,20 +418,18 @@
             public override int Eta => Math.Max(0, this.EstArrivalTime - Game.TickCount) + this.ExtraDelay;
         }
 
-
-        class Attacks
+        private class Attacks
         {
-            public static Dictionary<int, List<AutoAttack>> OutBoundAttacks { get; set; } = new Dictionary<int, List<AutoAttack>>();
+            public static Dictionary<int, List<AutoAttack>> OutBoundAttacks { get; } = new Dictionary<int, List<AutoAttack>>();
 
             public static void AddAttack(AutoAttack attack)
             {
                 AddOutBoundAttack(attack);
             }
 
-            public static void AddOutBoundAttack(AutoAttack attack)
+            private static void AddOutBoundAttack(AutoAttack attack)
             {
                 var k = attack.Sender.NetworkId;
-
                 if (!OutBoundAttacks.ContainsKey(k))
                 {
                     OutBoundAttacks[k] = new List<AutoAttack>();
@@ -447,7 +445,6 @@
 
                 OutBoundAttacks[k].Add(attack);
             }
-
 
             public static void RemoveOutBoundAttack(AutoAttack attack)
             {
