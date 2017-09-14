@@ -91,7 +91,18 @@ namespace Aimtec.SDK.Orbwalking
             "goldcardpreattack",
             "redcardpreattack",
             "bluecardpreattack",
-            "viktorqbuff"
+            "viktorqbuff",
+            "quinnwenhanced",
+            "renektonexecute",
+            "renektonsuperexecute",
+            "trundleq",
+            "xenzhaothrust",
+            "xenzhaothrust2",
+            "xenzhaothrust3",
+            "frostarrow",
+            "garenslash2",
+            "kennenmegaproc",
+            "masteryidoublestrike"
         };
 
         /// <summary>
@@ -218,11 +229,20 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
+            var mBase = unit as Obj_AI_Base;
+
+            if (mBase == null || !mBase.IsFloatingHealthBarActive) 
+            {
+                return false;
+            }
+
             var minion = unit as Obj_AI_Minion;
+
             if (minion == null)
             {
                 return false;
             }
+
 
             var name = minion.UnitSkinName.ToLower();
             if (!this.Config["Farming"]["AttackPlants"].Enabled && name.Contains("sru_plant_"))
