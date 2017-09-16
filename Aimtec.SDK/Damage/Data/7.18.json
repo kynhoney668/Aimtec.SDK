@@ -10007,13 +10007,21 @@
 				"SpellData": {
 					"SpellEffectType": "Single",
 					"DamageType": "Magical",
-					"Damages": [70, 90, 110, 130, 150],
-					"BonusDamages": [{
-						"DamageType": "Magical",
-						"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
-						"ScalingTarget": "Source",
-						"ScalingType": "AbilityPoints"
-					}]
+					"Damages": [60, 70, 80, 90, 100],
+					"BonusDamages": [
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
+							"ScalingTarget": "Source",
+							"ScalingType": "AbilityPoints"
+						},
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [0.2, 0.2, 0.2, 0.2, 0.2],
+							"ScalingTarget": "Source",
+							"ScalingType": "BonusAttackPoints"
+						}
+					]
 				}
 			},
 			{
@@ -10021,7 +10029,7 @@
 				"SpellData": {
 					"SpellEffectType": "None",
 					"DamageType": "Magical",
-					"Damages": [17.5, 22.5, 27.5, 32.5, 37.5],
+					"Damages": [15, 17.5, 20, 22.5, 25],
 					"ScalingBuff": "YasuoDashScalar",
 					"ScalingBuffTarget": "Source"
 				}
