@@ -6,7 +6,6 @@ namespace Aimtec.SDK.Orbwalking
     using System.Linq;
 
     using Aimtec.SDK.Damage;
-    using Aimtec.SDK.Events;
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
@@ -119,7 +118,7 @@ namespace Aimtec.SDK.Orbwalking
         /// <summary>
         ///     Champions whos attack is not wasted on invulnerable targets or when blinded
         /// </summary>
-        private string[] NoWasteAttackChamps = { "Kalista", "Twitch" };
+        private readonly string[] noWasteAttackChamps = { "Kalista", "Twitch" };
 
         private Obj_AI_Hero GangPlank { get; set; }
         private Obj_AI_Hero Jax { get; set; }
@@ -175,7 +174,7 @@ namespace Aimtec.SDK.Orbwalking
                 return true;
             }
 
-            if (!this.NoWasteAttackChamps.Contains(Player.ChampionName))
+            if (!this.noWasteAttackChamps.Contains(Player.ChampionName))
             {
                 if (Player.HasBuffOfType(BuffType.Blind))
                 {
@@ -491,13 +490,12 @@ namespace Aimtec.SDK.Orbwalking
         private AttackableUnit GetHeroTarget()
         {
             var targets = TargetSelector.Implementation.GetOrderedTargets(0, true);
-
-            var noWaste = this.NoWasteAttackChamps.Contains(Player.ChampionName);
-
             foreach (var target in targets)
             {
                 //Ignore Jax when using counter strike
-                if (this.Jax != null && this.Config["Attacking"]["NoCounterStrikeAA"].Enabled && target.NetworkId == this.Jax.NetworkId)
+                if (this.Jax != null &&
+                    target.NetworkId == this.Jax.NetworkId &&
+                    this.Config["Attacking"]["NoCounterStrikeAA"].Enabled)
                 {
                     if (target.HasBuff("JaxCounterStrike"))
                     {
@@ -506,12 +504,6 @@ namespace Aimtec.SDK.Orbwalking
                 }
 
                 return target;
-            }
-
-            //if attack is not wasted, then use it for stacking or aoe.
-            if (noWaste)
-            {
-                return targets.FirstOrDefault();
             }
 
             return null;
@@ -527,13 +519,10 @@ namespace Aimtec.SDK.Orbwalking
 
             var attackable = ObjectManager.Get<AttackableUnit>().Where(this.IsValidAttackableObject);
             var attackableUnits = attackable as AttackableUnit[] ?? attackable.ToArray();
-
-            IEnumerable<Obj_AI_Base> minions = attackableUnits
-                .Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>().OrderByDescending(x => x.MaxHealth);
+            IEnumerable<Obj_AI_Base> minions = attackableUnits.Where(x => x is Obj_AI_Base).Cast<Obj_AI_Base>().OrderByDescending(x => x.MaxHealth);
 
             //Killable
             AttackableUnit killableMinion = minions.FirstOrDefault(x => this.CanKillMinion(x));
-
             if (killableMinion != null)
             {
 
@@ -541,7 +530,6 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             var waitableMinion = minions.Any(this.ShouldWaitMinion);
-
             if (waitableMinion)
             {
                 Player.IssueOrder(OrderType.MoveTo, Game.CursorPos);
@@ -549,7 +537,6 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             var structure = GetStructureTarget(attackableUnits);
-
             if (structure != null)
             {
                 return structure;
@@ -807,7 +794,7 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             //Heros
-            var hero = GetHeroTarget();
+            var hero = this.GetHeroTarget();
             if (hero != null)
             {
                 return hero;
@@ -888,7 +875,7 @@ namespace Aimtec.SDK.Orbwalking
                 }
             };
 
-            this.AddMode(this.Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, GetHeroTarget, null));
+            this.AddMode(this.Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, this.GetHeroTarget, null));
             this.AddMode(this.LaneClear = new OrbwalkerMode("Laneclear", GlobalKeys.WaveClearKey, this.GetLaneClearTarget, null));
             this.AddMode(this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
             this.AddMode(this.Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, this.GetMixedModeTarget, null));
