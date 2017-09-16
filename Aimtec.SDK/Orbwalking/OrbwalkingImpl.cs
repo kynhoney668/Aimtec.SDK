@@ -14,6 +14,7 @@ namespace Aimtec.SDK.Orbwalking
     using Aimtec.SDK.Prediction.Health;
     using Aimtec.SDK.TargetSelector;
     using Aimtec.SDK.Util;
+    using Aimtec.SDK.Util.Cache;
 
     internal class OrbwalkingImpl : AOrbwalker
     {
@@ -115,7 +116,13 @@ namespace Aimtec.SDK.Orbwalking
         //Members
         private float ServerAttackDetectionTick { get; set; }
 
+        /// <summary>
+        ///     Champions whos attack is not wasted on invulnerable targets or when blinded
+        /// </summary>
+        private string[] NoWasteAttackChamps = { "Kalista", "Twitch" };
+
         private Obj_AI_Hero GangPlank { get; set; }
+        private Obj_AI_Hero Jax { get; set; }
 
         #endregion
 
@@ -168,40 +175,9 @@ namespace Aimtec.SDK.Orbwalking
                 return true;
             }
 
-            if (!Player.ChampionName.Equals("Kalista") &&
-                !Player.ChampionName.Equals("Twitch"))
+            if (!this.NoWasteAttackChamps.Contains(Player.ChampionName))
             {
                 if (Player.HasBuffOfType(BuffType.Blind))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
-        public bool JaxECheck()
-        {
-            if (!this.Config["Attacking"]["NoCounterStrikeAA"].Enabled)
-            {
-                return true;
-            }
-
-            var target = Orbwalker.Implementation.GetOrbwalkingTarget();
-            if (target == null)
-            {
-                return true;
-            }
-
-            var heroTarget = target as Obj_AI_Hero;
-            if (heroTarget == null)
-            {
-                return true;
-            }
-
-            if (heroTarget.ChampionName.Equals("Jax"))
-            {
-                if (heroTarget.HasBuff("JaxCounterStrike"))
                 {
                     return false;
                 }
@@ -297,7 +273,7 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
-            if (!this.BlindCheck() || !this.JaxECheck())
+            if (!this.BlindCheck())
             {
                 return false;
             }
@@ -512,9 +488,33 @@ namespace Aimtec.SDK.Orbwalking
         }
         */
 
-        private static AttackableUnit GetHeroTarget()
+        private AttackableUnit GetHeroTarget()
         {
-            return TargetSelector.Implementation.GetTarget(0, true);
+            var targets = TargetSelector.Implementation.GetOrderedTargets(0, true);
+
+            var noWaste = this.NoWasteAttackChamps.Contains(Player.ChampionName);
+
+            foreach (var target in targets)
+            {
+                //Ignore Jax when using counter strike
+                if (this.Jax != null && this.Config["Attacking"]["NoCounterStrikeAA"].Enabled && target.NetworkId == this.Jax.NetworkId)
+                {
+                    if (target.HasBuff("JaxCounterStrike"))
+                    {
+                        continue;
+                    }
+                }
+
+                return target;
+            }
+
+            //if attack is not wasted, then use it for stacking or aoe.
+            if (noWaste)
+            {
+                return targets.FirstOrDefault();
+            }
+
+            return null;
         }
 
         private AttackableUnit GetLaneClearTarget()
@@ -536,6 +536,7 @@ namespace Aimtec.SDK.Orbwalking
 
             if (killableMinion != null)
             {
+
                 return killableMinion;
             }
 
@@ -543,7 +544,7 @@ namespace Aimtec.SDK.Orbwalking
 
             if (waitableMinion)
             {
-                Player.IssueOrder(OrderType.Stop, Player.Position);
+                Player.IssueOrder(OrderType.MoveTo, Game.CursorPos);
                 return null;
             }
 
@@ -553,7 +554,7 @@ namespace Aimtec.SDK.Orbwalking
             {
                 return structure;
             }
-
+            
             if (this.LastTarget != null && this.LastTarget.IsValidAutoRange())
             {
                 if (this.LastTarget is Obj_AI_Base b)
@@ -567,8 +568,7 @@ namespace Aimtec.SDK.Orbwalking
                     }
                 }
             }
-
-
+            
             foreach (var minion in minions)
             {
                 var predHealth = this.GetPredictedHealth(minion);
@@ -590,7 +590,7 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             //Heros
-            var hero = GetHeroTarget();
+            var hero = this.GetHeroTarget();
             if (hero != null)
             {
                 return hero;
@@ -893,23 +893,24 @@ namespace Aimtec.SDK.Orbwalking
             this.AddMode(this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
             this.AddMode(this.Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, this.GetMixedModeTarget, null));
 
-            this.GpCheck();
-
-            GameEvents.GameStart += this.GameEventsGameStart;
+            this.CheckSpecialHeros();
         }
 
-        private void GpCheck()
+        private void CheckSpecialHeros()
         {
-            var gp = ObjectManager.Get<Obj_AI_Hero>().FirstOrDefault(x => x.ChampionName.ToLower().Equals("gangplank"));
-            if (gp != null)
+            foreach (var hero in GameObjects.Heroes)
             {
-                this.GangPlank = gp;
-            }
-        }
+                var name = hero.ChampionName.ToLower();
+                if (name == "gangplank")
+                {
+                    this.GangPlank = hero;
+                }
 
-        private void GameEventsGameStart()
-        {
-            this.GpCheck();
+                else if (name == "jax")
+                {
+                    this.Jax = hero;
+                }
+            }
         }
 
         /*

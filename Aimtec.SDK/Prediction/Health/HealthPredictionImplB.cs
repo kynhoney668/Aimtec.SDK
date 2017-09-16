@@ -195,6 +195,7 @@
                 return;
             }
 
+
             AutoAttack attack;
 
             if (sender.IsMelee)
@@ -236,7 +237,7 @@
             }
 
             //Ignore the missile if it is not an auto attack...
-            if (!IsAutoAttack(mc.Name))
+            if (!IsAutoAttack(mc.SpellData.Name))
             {
                 return;
             }
