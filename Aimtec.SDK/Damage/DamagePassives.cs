@@ -824,7 +824,8 @@ namespace Aimtec.SDK.Damage
                                  DamageType = DamagePassive.PassiveDamageType.FlatMagical,
                                  PassiveDamage = (source, target) =>
                                      {
-                                         if (source.HasBuff("kogmawbioarcanebarrage"))
+                                         if (!target.IsBuilding() &&
+                                             source.HasBuff("kogmawbioarcanebarrage"))
                                          {
                                              return source.GetSpellDamage(target, SpellSlot.W);
                                          }
