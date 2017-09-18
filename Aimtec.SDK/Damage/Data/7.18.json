@@ -3617,13 +3617,35 @@
 			{
 				"Stage": "Default",
 				"SpellData": {
-					"SpellEffectType": "Single",
+					"SpellEffectType": "AoE",
 					"DamageType": "Physical",
 					"Damages": [25.0, 35.0, 45.0],
 					"BonusDamages": [
 						{
 							"DamageType": "Physical",
 							"DamagePercentages": [0.15, 0.15, 0.15],
+							"ScalingTarget": "Source",
+							"ScalingType": "BonusAttackPoints"
+						},
+						{
+							"DamageType": "Physical",
+							"DamagePercentages": [0.25, 0.3, 0.35],
+							"ScalingTarget": "Target",
+							"ScalingType": "MissingHealth"
+						}
+					]
+				}
+			},
+			{
+				"Stage": "Empowered",
+				"SpellData": {
+					"SpellEffectType": "AoE",
+					"DamageType": "Physical",
+					"Damages": [250.0, 350.0, 450.0],
+					"BonusDamages": [
+						{
+							"DamageType": "Physical",
+							"DamagePercentages": [1.5, 1.5, 1.5],
 							"ScalingTarget": "Source",
 							"ScalingType": "BonusAttackPoints"
 						},

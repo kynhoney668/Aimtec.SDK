@@ -148,7 +148,6 @@ namespace Aimtec.SDK.Orbwalking
         public override bool Attack(AttackableUnit target)
         {
             var preAttackargs = this.FirePreAttack(target);
-
             if (!preAttackargs.Cancel)
             {
                 var targetToAttack = preAttackargs.Target;
@@ -205,7 +204,6 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             var mBase = unit as Obj_AI_Base;
-
             if (mBase == null || !mBase.IsFloatingHealthBarActive) 
             {
                 return false;
@@ -370,7 +368,6 @@ namespace Aimtec.SDK.Orbwalking
         public override bool Move(Vector3 movePosition)
         {
             var preMoveArgs = this.FirePreMove(movePosition);
-
             if (!preMoveArgs.Cancel)
             {
                 if (Player.IssueOrder(OrderType.MoveTo, preMoveArgs.MovePosition))
@@ -888,14 +885,15 @@ namespace Aimtec.SDK.Orbwalking
             foreach (var hero in GameObjects.Heroes)
             {
                 var name = hero.ChampionName.ToLower();
-                if (name == "gangplank")
+                switch (name)
                 {
-                    this.GangPlank = hero;
-                }
+                    case "gangplank":
+                        this.GangPlank = hero;
+                        break;
 
-                else if (name == "jax")
-                {
-                    this.Jax = hero;
+                    case "jax":
+                        this.Jax = hero;
+                        break;
                 }
             }
         }
@@ -933,7 +931,6 @@ namespace Aimtec.SDK.Orbwalking
             if (sender.IsMe)
             {
                 var name = e.SpellData.Name.ToLower();
-
                 if (this.specialAttacks.Contains(name))
                 {
                     this.ObjAiHeroOnProcessAutoAttack(sender, e);
