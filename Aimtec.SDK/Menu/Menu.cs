@@ -416,8 +416,6 @@
                 }
             }
 
-            Console.WriteLine("HEIGHT MAX " + maxHeight);
-
             if (maxHeight > MenuManager.MaxHeightItem)
             {
                 MenuManager.MaxHeightItem = maxHeight;
