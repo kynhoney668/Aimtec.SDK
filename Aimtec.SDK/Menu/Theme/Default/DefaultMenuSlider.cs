@@ -29,6 +29,7 @@
         public void Render(Vector2 pos)
         {
             var width = this.Component.Parent.Width;
+            var height = MenuManager.MaxHeightItem + this.Theme.BonusMenuHeight;
 
             var beforeSliderWidth = (float) (this.Component.Value - this.Component.MinValue)
                 / (this.Component.MaxValue - this.Component.MinValue) * (width - this.Theme.LineWidth * 2);
@@ -41,26 +42,20 @@
 
             this.Theme.DrawMenuItemBox(position, width);
 
-            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, this.Theme.MenuHeight / 2f);
+            var displayNamePosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
 
             // Draw light bar before the slider line
             Aimtec.Render.Rectangle(
                 position,
                 beforeSliderWidth,
-                this.Theme.MenuHeight * 0.95f,
+                height * 0.95f,
                 Color.FromArgb(14, 59, 73));
-
-            Aimtec.Render.Text(
-                displayNamePosition,
-                Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
-                RenderTextFlags.VerticalCenter);
 
             var bfSlider = position + new Vector2(beforeSliderWidth, 0);
 
             Aimtec.Render.Line(
                 bfSlider,
-                bfSlider + new Vector2(0, this.Theme.MenuHeight),
+                bfSlider + new Vector2(0, height),
                 this.Theme.LineWidth,
                 false,
                 Color.FromArgb(82, 83, 57));
@@ -70,17 +65,17 @@
             Aimtec.Render.Rectangle(
                 afSlider,
                 afterSliderWidth - this.Theme.LineWidth,
-                this.Theme.MenuHeight * 0.95f,
+                height * 0.95f,
                 Color.FromArgb(16, 26, 29));
 
             // draw text
-            Aimtec.Render.Text(
-                pos + this.Theme.LineWidth + new Vector2(
-                    width - this.Theme.TextSpacing,
-                    this.Theme.MenuHeight / 2f),
-                Color.FromArgb(207, 195, 149),
-                this.Component.Value.ToString(),
-                RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight);
+            Aimtec.Render.Text(this.Component.Value.ToString(),
+                new Aimtec.Rectangle((int)pos.X + this.Theme.LineWidth, (int)pos.Y + this.Theme.LineWidth, (int)(pos.X + width - this.Theme.TextSpacing), (int)(pos.Y + height)),
+                RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight, this.Theme.TextColor);
+
+            Aimtec.Render.Text(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
+                displayNamePosition,
+                RenderTextFlags.VerticalCenter, this.Theme.TextColor);
         }
 
         #endregion

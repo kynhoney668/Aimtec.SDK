@@ -30,17 +30,23 @@
         {
             var width = this.Component.Parent.Width;
 
+            var height = MenuManager.MaxHeightItem + this.Theme.BonusMenuHeight;
+
             this.Theme.DrawMenuItemBorder(pos, width);
 
             var position = pos + this.Theme.LineWidth;
 
             this.Theme.DrawMenuItemBoxFull(position, width);
 
-            Aimtec.Render.Text(
-                position + new Vector2(width / 2f, this.Theme.MenuHeight / 2f),
-                Color.FromArgb(207, 195, 149),
-                this.Component.Value,
-                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+            var center = RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalCenter | RenderTextFlags.NoClip
+                         | RenderTextFlags.SingleLine;
+
+            var textPosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
+
+            Aimtec.Render.Text(this.Component.Value,
+                textPosition,
+                center, this.Theme.TextColor);
+
         }
 
         #endregion

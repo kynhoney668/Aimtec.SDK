@@ -16,6 +16,8 @@
 
         private bool visible;
 
+        internal static int MaxHeightItem = 0;
+
         #endregion
 
         #region Constructors and Destructors
@@ -112,7 +114,7 @@
 
                     this.Children.Add(menu.RootMenuKey, menu);
 
-                    this.UpdateWidth();
+                    this.UpdateDimensions();
                 }
             }
 
@@ -130,7 +132,7 @@
 
         internal override Rectangle GetBounds(Vector2 pos)
         {
-            return new Rectangle((int)pos.X, (int)pos.Y, this.Width, this.Theme.MenuHeight * this.Menus.Count);
+            return new Rectangle((int)pos.X, (int)pos.Y, this.Width, this.Theme.BonusMenuHeight * this.Menus.Count);
         }
 
         internal override void Render(Vector2 pos)
@@ -142,7 +144,7 @@
 
             for (var i = 0; i < this.Menus.Count; i++)
             {
-                var position = this.Position + new Vector2(0, i * this.Theme.MenuHeight);
+                var position = this.Position + new Vector2(0, i * (MaxHeightItem + this.Theme.BonusMenuHeight));
                 this.Menus[i].Position = position;
                 this.Menus[i].Render(this.Menus[i].Position);
             }
@@ -184,11 +186,26 @@
             }
         }
 
-        internal override void UpdateWidth()
+        internal override void UpdateDimensions()
         {
-            var maxWidth = this.Children.Values.Max(x => MiscUtils.MeasureTextWidth(x.DisplayName));
-            this.Width = (int) (maxWidth + Instance.Theme.BaseMenuWidth);
+            foreach (var child in this.Children.Values)
+            {
+                var dim = MiscUtils.MeasureTextWidth(child.DisplayName);
+                var width = dim[0] + Instance.Theme.BaseMenuWidth;
+                var height = dim[1];
+
+                if (width > this.Width)
+                {
+                    this.Width = width;
+                }
+
+                if (height > MaxHeightItem)
+                {
+                    MaxHeightItem = height;
+                }
+            }
         }
+
 
         #endregion
     }

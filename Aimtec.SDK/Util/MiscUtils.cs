@@ -1,6 +1,9 @@
 ﻿namespace Aimtec.SDK.Util
 {
+    using System;
     using System.Drawing;
+
+    using Rectangle = Aimtec.Rectangle;
 
     public class MiscUtils
     {
@@ -12,19 +15,18 @@
         /// <summary>
         ///     Calculates the width of the text (not 100% accurate)
         /// </summary>
-        public static float MeasureTextWidth(string text)
+        public static int[] MeasureTextWidth(string text)
         {
-            float textWidth = 0;
+            var textRect = Aimtec.Render.MeasureText(
+                text,
+                new Rectangle(0, 0, 0, 0),
+              RenderTextFlags.None);
 
-            using (var bmp = new Bitmap(1, 1))
-            {
-                using (var g = Graphics.FromImage(bmp))
-                {
-                    textWidth = g.MeasureString(text, LeagueFont).Width;
-                }
-            }
+            var width = (textRect.Right - textRect.Left);
 
-            return textWidth;
+            var height = (textRect.Bottom - textRect.Top) + 10;
+
+            return new int[] { width, height };
         }
     }
 }

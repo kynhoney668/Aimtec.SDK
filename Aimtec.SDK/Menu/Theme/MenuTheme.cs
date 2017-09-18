@@ -11,9 +11,9 @@
     {
         #region Constructors and Destructors
 
-        public MenuTheme()
+        protected MenuTheme()
         {
-            this.BaseMenuWidth = this.IndicatorWidth + this.LineWidth + this.TextSpacing;
+            this.BaseMenuWidth = this.IndicatorWidth + this.LineWidth + this.TextSpacing * 2;
         }
 
         #endregion
@@ -38,7 +38,7 @@
         ///     Gets the height of the menu.
         /// </summary>
         /// <value>The height of the menu.</value>
-        public virtual int MenuHeight { get; } = 32;
+        public virtual int BonusMenuHeight { get; } = 6;
 
         public virtual Color TextColor { get; set; } = Color.FromArgb(207, 195, 149);
 

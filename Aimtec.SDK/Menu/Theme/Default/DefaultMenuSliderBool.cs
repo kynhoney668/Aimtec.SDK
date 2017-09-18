@@ -1,8 +1,11 @@
 ﻿namespace Aimtec.SDK.Menu.Theme.Default
 {
+    using System;
     using System.Drawing;
 
     using Aimtec.SDK.Menu.Components;
+
+    using Rectangle = Aimtec.Rectangle;
 
     internal class DefaultMenuSliderBool : IRenderManager<MenuSliderBool, DefaultMenuTheme>
     {
@@ -30,6 +33,8 @@
         {
             var width = this.Component.Parent.Width;
 
+            var height = MenuManager.MaxHeightItem + this.Theme.BonusMenuHeight;
+
             var beforeSliderWidth = (float) (this.Component.Value - this.Component.MinValue)
                 / (this.Component.MaxValue - this.Component.MinValue)
                 * (width - this.Theme.IndicatorWidth - this.Theme.LineWidth * 2);
@@ -42,26 +47,20 @@
 
             this.Theme.DrawMenuItemBox(position, width);
 
-            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, this.Theme.MenuHeight / 2);
+            var displayNamePosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
 
             // Draw light bar before the slider line
             Aimtec.Render.Rectangle(
                 position,
                 beforeSliderWidth,
-                this.Theme.MenuHeight * 0.95f,
+                height * 0.95f,
                 Color.FromArgb(14, 59, 73));
-
-            Aimtec.Render.Text(
-                displayNamePosition,
-                Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
-                RenderTextFlags.VerticalCenter);
 
             var beforeSliderPos = position + new Vector2(beforeSliderWidth, 0);
 
             Aimtec.Render.Line(
                 beforeSliderPos,
-                beforeSliderPos + new Vector2(0, this.Theme.MenuHeight),
+                beforeSliderPos + new Vector2(0, height),
                 this.Theme.LineWidth,
                 false,
                 Color.FromArgb(82, 83, 57));
@@ -71,24 +70,16 @@
             Aimtec.Render.Rectangle(
                 afterSliderPos,
                 afterSliderWidth - this.Theme.LineWidth * 2,
-                this.Theme.MenuHeight * 0.95f,
+                height * 0.95f,
                 Color.FromArgb(16, 26, 29));
 
-            // draw text
-            Aimtec.Render.Text(
-                pos + this.Theme.LineWidth + new Vector2(
-                    width - this.Theme.IndicatorWidth - this.Theme.TextSpacing,
-                    this.Theme.MenuHeight / 2),
-                Color.FromArgb(207, 195, 149),
-                this.Component.Value.ToString(),
-                RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
 
             // Render indicator box outline
             Aimtec.Render.Line(
                 pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth,
                 pos.Y,
                 pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth,
-                pos.Y + this.Theme.MenuHeight,
+                pos.Y + height,
                 Color.FromArgb(82, 83, 57));
 
             // Draw indicator box
@@ -99,16 +90,22 @@
             Aimtec.Render.Rectangle(
                 indBoxPosition,
                 this.Theme.IndicatorWidth,
-                this.Theme.MenuHeight - this.Theme.LineWidth,
+                height - this.Theme.LineWidth,
                 boolColor);
 
-            var centerArrowBox = indBoxPosition + new Vector2(this.Theme.IndicatorWidth / 2, this.Theme.MenuHeight / 2);
+            Aimtec.Render.Text(this.Component.Value.ToString(),
+                new Rectangle((int)(pos.X), (int)pos.Y + this.Theme.LineWidth, (int)(pos.X + width - this.Theme.TextSpacing - this.Theme.IndicatorWidth), (int)(pos.Y + height)),
+                RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight, this.Theme.TextColor);
 
-            Aimtec.Render.Text(
+            var centerArrowBox = new Aimtec.Rectangle((int)indBoxPosition.X, (int)indBoxPosition.Y, (int) (indBoxPosition.X + this.Theme.IndicatorWidth), (int)(indBoxPosition.Y + height));
+
+            Aimtec.Render.Text(this.Component.Enabled ? "ON" : "OFF",
                 centerArrowBox,
-                Color.AliceBlue,
-                this.Component.Enabled ? "ON" : "OFF",
-                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter, Color.White);
+
+            Aimtec.Render.Text(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
+                displayNamePosition,
+                RenderTextFlags.VerticalCenter, this.Theme.TextColor);
         }
 
         #endregion

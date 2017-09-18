@@ -7,7 +7,7 @@
     public class DefaultMenuTheme : MenuTheme
     {
         #region Public Methods and Operators
-
+        
         public static void DrawRectangleOutline(
             float x,
             float y,
@@ -67,15 +67,15 @@
         public override Rectangle GetMenuBoolControlBounds(Vector2 pos, int width)
         {
             var newPos = pos + new Vector2(width - this.IndicatorWidth - this.LineWidth, 0);
-            return new Rectangle((int) newPos.X, (int) newPos.Y, this.IndicatorWidth, this.MenuHeight);
+            return new Rectangle((int) newPos.X, (int) newPos.Y, this.IndicatorWidth, MenuManager.MaxHeightItem + this.BonusMenuHeight);
         }
 
         public override Rectangle[] GetMenuListControlBounds(Vector2 pos, int width)
         {
             var leftBox = pos + new Vector2(width - this.IndicatorWidth * 2.1f - this.LineWidth, 0);
             var rightBox = pos + new Vector2(width - this.IndicatorWidth - this.LineWidth, 0);
-            var rect1 = new Rectangle((int) leftBox.X, (int) leftBox.Y, this.IndicatorWidth, this.MenuHeight);
-            var rect2 = new Rectangle((int) rightBox.X, (int) rightBox.Y, this.IndicatorWidth, this.MenuHeight);
+            var rect1 = new Rectangle((int) leftBox.X, (int) leftBox.Y, this.IndicatorWidth, MenuManager.MaxHeightItem + this.BonusMenuHeight);
+            var rect2 = new Rectangle((int) rightBox.X, (int) rightBox.Y, this.IndicatorWidth, MenuManager.MaxHeightItem + this.BonusMenuHeight);
             return new[] { rect1, rect2 };
         }
 
@@ -89,14 +89,14 @@
                 (int) boolPosition.X,
                 (int) boolPosition.Y,
                 this.IndicatorWidth,
-                this.MenuHeight);
+                MenuManager.MaxHeightItem + this.BonusMenuHeight);
             ;
 
             var sliderBounds = new Rectangle(
                 (int) sliderPosition.X,
                 (int) sliderPosition.Y,
                 width - this.IndicatorWidth,
-                this.MenuHeight);
+                MenuManager.MaxHeightItem + this.BonusMenuHeight);
 
             return new[] { sliderBounds, boolBounds };
         }
@@ -104,7 +104,7 @@
         public override Rectangle GetMenuSliderControlBounds(Vector2 pos, int width)
         {
             var sliderPosition = pos;
-            var sliderBounds = new Rectangle((int) sliderPosition.X, (int) sliderPosition.Y, width, this.MenuHeight);
+            var sliderBounds = new Rectangle((int) sliderPosition.X, (int) sliderPosition.Y, width, MenuManager.MaxHeightItem + this.BonusMenuHeight);
             return sliderBounds;
         }
 
@@ -114,7 +114,7 @@
 
         internal void DrawMenuItemBorder(Vector2 pos, int width)
         {
-            DrawRectangleOutline(pos.X, pos.Y, width, this.MenuHeight, this.LineWidth, this.LineColor);
+            DrawRectangleOutline(pos.X, pos.Y, width, MenuManager.MaxHeightItem + this.BonusMenuHeight, this.LineWidth, this.LineColor);
         }
 
         internal void DrawMenuItemBox(Vector2 position, int boxWidth)
@@ -122,7 +122,7 @@
             Render.Rectangle(
                 position,
                 boxWidth - this.IndicatorWidth - this.LineWidth,
-                this.MenuHeight - this.LineWidth,
+                (MenuManager.MaxHeightItem + this.BonusMenuHeight) - this.LineWidth,
                 this.MenuBoxBackgroundColor);
         }
 
@@ -131,7 +131,7 @@
             Render.Rectangle(
                 position,
                 boxWidth - this.LineWidth,
-                this.MenuHeight - this.LineWidth,
+                (MenuManager.MaxHeightItem + this.BonusMenuHeight) - this.LineWidth,
                 this.MenuBoxBackgroundColor);
         }
 

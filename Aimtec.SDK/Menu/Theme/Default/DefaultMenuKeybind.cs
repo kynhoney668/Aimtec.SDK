@@ -4,6 +4,8 @@
 
     using Aimtec.SDK.Menu.Components;
 
+    using Rectangle = Aimtec.Rectangle;
+
     internal class DefaultMenuKeyBind : IRenderManager<MenuKeyBind, DefaultMenuTheme>
     {
         #region Constructors and Destructors
@@ -29,6 +31,7 @@
         public void Render(Vector2 pos)
         {
             var width = this.Component.Parent.Width;
+            var height = MenuManager.MaxHeightItem + this.Theme.BonusMenuHeight;
 
             this.Theme.DrawMenuItemBorder(pos, width);
 
@@ -36,20 +39,20 @@
 
             this.Theme.DrawMenuItemBox(position, width);
 
-            var displayNamePosition = position + new Vector2(this.Theme.TextSpacing, this.Theme.MenuHeight / 2);
+            var leftVCenter = RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalLeft | RenderTextFlags.NoClip;
 
-            Aimtec.Render.Text(
+            var displayNamePosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
+
+            Aimtec.Render.Text(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
                 displayNamePosition,
-                Color.FromArgb(207, 195, 149),
-                this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
-                RenderTextFlags.VerticalCenter);
+                leftVCenter, this.Theme.TextColor);
 
             // Render indicator box outline
             Aimtec.Render.Line(
                 pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth,
                 pos.Y,
                 pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth,
-                pos.Y + this.Theme.MenuHeight,
+                pos.Y + height,
                 Color.FromArgb(82, 83, 57));
 
             // Draw indicator box
@@ -60,21 +63,14 @@
             Aimtec.Render.Rectangle(
                 indBoxPosition,
                 this.Theme.IndicatorWidth,
-                this.Theme.MenuHeight - this.Theme.LineWidth,
+                height - this.Theme.LineWidth,
                 boolColor);
 
-            var centerArrowBox = indBoxPosition + new Vector2(this.Theme.IndicatorWidth / 2, this.Theme.MenuHeight / 2);
+            var centerArrowBox = new Aimtec.Rectangle((int)indBoxPosition.X, (int)indBoxPosition.Y, (int)(indBoxPosition.X + this.Theme.IndicatorWidth), (int)(indBoxPosition.Y + height));
 
-            Aimtec.Render.Text(
-                centerArrowBox,
-                Color.AliceBlue,
-                this.Component.Value ? "ON" : "OFF",
-                RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter);
+            Aimtec.Render.Text(this.Component.Value ? "ON" : "OFF", centerArrowBox, RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter | RenderTextFlags.NoClip | RenderTextFlags.SingleLine, Color.White);
 
             //Draw Key indicator
-            var keyIndicatorPos = pos + new Vector2(
-                width - this.Theme.IndicatorWidth - this.Theme.LineWidth - this.Theme.TextSpacing,
-                this.Theme.MenuHeight / 2);
 
             var text = this.Component.KeyIsBeingSet
                 ? "PRESS KEY"
@@ -82,11 +78,8 @@
                     ? "None"
                     : $"[{this.Component.Key}]";
 
-            Aimtec.Render.Text(
-                keyIndicatorPos,
-                Color.FromArgb(207, 195, 149),
-                text,
-                RenderTextFlags.HorizontalRight | RenderTextFlags.VerticalCenter);
+            Aimtec.Render.Text(text, new Aimtec.Rectangle((int)pos.X, (int)pos.Y, (int)(pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth - this.Theme.TextSpacing), (int)(pos.Y + height)), RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight | RenderTextFlags.NoClip | RenderTextFlags.SingleLine, this.Theme.TextColor);
+
         }
 
         #endregion

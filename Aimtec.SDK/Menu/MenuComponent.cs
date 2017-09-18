@@ -244,7 +244,7 @@
         /// <returns>System.Drawing.Rectangle.</returns>
         internal virtual Rectangle GetBounds(Vector2 pos)
         {
-            return new Rectangle((int)pos.X, (int)pos.Y, this.Parent.Width, MenuManager.Instance.Theme.MenuHeight);
+            return new Rectangle((int)pos.X, (int)pos.Y, this.Parent.Width, MenuManager.MaxHeightItem + MenuManager.Instance.Theme.BonusMenuHeight);
         }
 
         /// <summary>
@@ -286,13 +286,14 @@
         private void RenderToolTip()
         {
             var text = $"[i] {this.ToolTip}";
-            var width = Math.Max(this.Parent.Width, (int)MiscUtils.MeasureTextWidth(text));
+            var dim = MiscUtils.MeasureTextWidth(text);
+            var width = Math.Max(this.Parent.Width, dim[0] + MenuManager.Instance.Theme.TextSpacing + 15);
 
             DefaultMenuTheme.DrawRectangleOutline(
                 this.Position.X,
                 this.Position.Y,
                 width,
-                MenuManager.Instance.Theme.MenuHeight,
+                MenuManager.MaxHeightItem + MenuManager.Instance.Theme.BonusMenuHeight,
                 MenuManager.Instance.Theme.LineWidth,
                 MenuManager.Instance.Theme.LineColor);
 
@@ -301,17 +302,12 @@
             Aimtec.Render.Rectangle(
                 position,
                 width - MenuManager.Instance.Theme.LineWidth,
-                MenuManager.Instance.Theme.MenuHeight - MenuManager.Instance.Theme.LineWidth,
+                MenuManager.MaxHeightItem + MenuManager.Instance.Theme.BonusMenuHeight - MenuManager.Instance.Theme.LineWidth,
                 MenuManager.Instance.Theme.MenuBoxBackgroundColor);
 
-            var centerPoint = this.Position + new Vector2(
-                width - MenuManager.Instance.Theme.LineWidth * 2 / 2,
-                MenuManager.Instance.Theme.MenuHeight - MenuManager.Instance.Theme.LineWidth * 2 / 2);
+            var textPosition = new Aimtec.Rectangle((int)position.X, (int)position.Y, (int)(position.X + width - (MenuManager.Instance.Theme.LineWidth)), (int)(position.Y + MenuManager.MaxHeightItem + MenuManager.Instance.Theme.BonusMenuHeight));
 
-            var textPosition = position + new Vector2(
-                MenuManager.Instance.Theme.TextSpacing,
-                MenuManager.Instance.Theme.MenuHeight / 2);
-            Aimtec.Render.Text(textPosition, Color.LightBlue, text, RenderTextFlags.VerticalCenter);
+            Aimtec.Render.Text(text, textPosition, RenderTextFlags.VerticalCenter | RenderTextFlags.NoClip | RenderTextFlags.Center, Color.LightBlue);
         }
 
         /// <summary>

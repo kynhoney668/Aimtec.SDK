@@ -8,6 +8,7 @@
     using System.Reflection;
     using System.Runtime.InteropServices;
 
+    using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Theme;
     using Aimtec.SDK.Util;
@@ -175,7 +176,8 @@
                     menuComponent.LoadValue();
                 }
 
-                this.UpdateWidth();
+                this.UpdateDimensions();
+                
             }
 
             return this;
@@ -231,7 +233,7 @@
             for (var i = 0; i < this.Children.Values.Count; i++)
             {
                 var child = this.Children.Values.ToList()[i];
-                child.Position = position + new Vector2(this.Parent.Width, i * MenuManager.Instance.Theme.MenuHeight);
+                child.Position = position + new Vector2(this.Parent.Width, i * (MenuManager.MaxHeightItem + MenuManager.Instance.Theme.BonusMenuHeight));
                 child.Render(child.Position);
             }
         }
@@ -344,54 +346,81 @@
             }
         }
 
-        internal virtual void UpdateWidth()
+        internal virtual void UpdateDimensions()
         {
             var children = this.Children.Values;
 
             var maxWidth = 0;
+            var maxHeight = 0;
 
             foreach (var child in children)
             {
-                var width = 0;
+                int width = 0;
+                int height = 0;
 
                 if (child is MenuList)
                 {
                     var mList = child as MenuList;
-                    var longestItem = mList.Items.OrderByDescending(x => x.Length).FirstOrDefault();
+                    var longestItem = mList.Items.MaxBy(x => x.Length);
                     if (longestItem != null)
                     {
-                        width = (int)MiscUtils.MeasureTextWidth(mList.DisplayName + longestItem)
-                            + MenuManager.Instance.Theme.IndicatorWidth + 15;
+                        var dim = MiscUtils.MeasureTextWidth(mList.DisplayName + longestItem);
+                        width = dim[0]
+                            + MenuManager.Instance.Theme.IndicatorWidth * 2 + 15;
+
+                        height = dim[1];
+
                     }
                 }
 
                 else if (child is MenuKeyBind)
                 {
                     var kb = child as MenuKeyBind;
-                    width = (int) MiscUtils.MeasureTextWidth(kb.DisplayName + "PRESS KEY");
+                    var dim = MiscUtils.MeasureTextWidth(kb.DisplayName + "PRESS KEY");
+                    width = dim[0];
+                    height = dim[1];
+
                 }
 
                 else if (child is MenuSlider)
                 {
                     var slider = child as MenuSlider;
-                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue);
+                    var dim = MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue);
+                    width = dim[0];
+                    height = dim[1];
                 }
 
                 else if (child is MenuSliderBool)
                 {
                     var slider = child as MenuSliderBool;
-                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue);
+                    var dim = MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue);
+                    width = dim[0] + MenuManager.Instance.Theme.IndicatorWidth;
+                    height = dim[1];
                 }
 
                 else
                 {
-                    width = (int)MiscUtils.MeasureTextWidth(child.DisplayName);
+                    var dim = MiscUtils.MeasureTextWidth(child.DisplayName);
+                    width = dim[0];
+                    height = dim[1];
                 }
 
                 if (width > maxWidth)
                 {
                     maxWidth = width;
                 }
+
+                if (height > maxHeight)
+                {
+                    maxHeight = height;
+                }
+            }
+
+            Console.WriteLine("HEIGHT MAX " + maxHeight);
+
+            if (maxHeight > MenuManager.MaxHeightItem)
+            {
+                MenuManager.MaxHeightItem = maxHeight;
             }
 
             this.Width = maxWidth + MenuManager.Instance.Theme.BaseMenuWidth;
