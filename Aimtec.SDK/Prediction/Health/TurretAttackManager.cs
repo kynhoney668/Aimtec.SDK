@@ -22,7 +22,7 @@
             Game.OnStart += Start;
         }
 
-        static void Start()
+        private static void Start()
         {
             //Generate turret data for each turret in game
             foreach (var turret in ObjectManager.Get<Obj_AI_Turret>())
@@ -144,24 +144,26 @@
             }
         }
 
-        private static void Obj_AI_Base_OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
+        private static void Obj_AI_Base_OnProcessAutoAttack(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs args)
         {
-            if (sender == null || e.Target == null)
+            if (sender == null || args.Target == null)
             {
                 return;
             }
 
-            var bTarget = e.Target as Obj_AI_Base;
+            var bTarget = args.Target as Obj_AI_Base;
             if (bTarget == null)
             {
                 return;
             }
 
-
-            if (sender is Obj_AI_Turret tSender)
+            var tSender = sender as Obj_AI_Turret;
+            if (tSender == null)
             {
-                Turrets[tSender.NetworkId].OnAttack(tSender, bTarget, e);
+                return;
             }
+
+            Turrets[tSender.NetworkId]?.OnAttack(tSender, bTarget, args);
         }
 
         private static void GameObject_OnCreate(GameObject sender)
@@ -177,10 +179,13 @@
                 return;
             }
 
-            if (attack.SpellCaster is Obj_AI_Turret tSender)
+            var tSender = attack.SpellCaster as Obj_AI_Turret;
+            if (tSender == null)
             {
-                Turrets[tSender.NetworkId].OnMissileCreated(attack);
+                return;
             }
+
+            Turrets[tSender.NetworkId]?.OnMissileCreated(attack);
         }
 
         private static void GameObject_OnDestroy(GameObject sender)
@@ -196,10 +201,13 @@
                 return;
             }
 
-            if (attack.SpellCaster is Obj_AI_Turret tSender)
+            var tSender = attack.SpellCaster as Obj_AI_Turret;
+            if (tSender == null)
             {
-                Turrets[tSender.NetworkId].OnMissileDestroyed(attack);
+                return;
             }
+
+            Turrets[tSender.NetworkId]?.OnMissileDestroyed(attack);
         }
 
         public class TurretData

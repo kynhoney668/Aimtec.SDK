@@ -632,7 +632,7 @@
                         var target = targ.Key;
                         if (target != null)
                         {
-                            Render.Text(basepos + new Vector2(0, i * 15), Color.Red, target.ChampionName + " " + targ.Value);
+                            Render.Text(target.ChampionName + " " + targ.Value, basepos + new Vector2(0, i * 15), RenderTextFlags.None, Color.Red);
                         }
                     }
                 }
@@ -645,7 +645,7 @@
                         var target = ordered[i];
                         if (target != null)
                         {
-                            Render.Text(basepos + new Vector2(0, i * 15), Color.Red, target.ChampionName);
+                            Render.Text(target.ChampionName, basepos + new Vector2(0, i * 15), RenderTextFlags.None, Color.Red);
                         }
                     }
                 }
