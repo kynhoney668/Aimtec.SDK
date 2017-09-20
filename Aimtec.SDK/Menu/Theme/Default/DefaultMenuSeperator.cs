@@ -41,7 +41,7 @@
             var center = RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalCenter | RenderTextFlags.NoClip
                          | RenderTextFlags.SingleLine;
 
-            var textPosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
+            var textPosition = new Aimtec.Rectangle((int)position.X, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
 
             Aimtec.Render.Text(this.Component.Value,
                 textPosition,

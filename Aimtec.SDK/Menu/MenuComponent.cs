@@ -286,7 +286,7 @@
         private void RenderToolTip()
         {
             var text = $"[i] {this.ToolTip}";
-            var dim = MiscUtils.MeasureTextWidth(text);
+            var dim = MiscUtils.MeasureText(text);
             var width = Math.Max(this.Parent.Width, dim[0] + MenuManager.Instance.Theme.TextSpacing + 15);
 
             DefaultMenuTheme.DrawRectangleOutline(

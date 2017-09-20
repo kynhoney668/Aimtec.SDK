@@ -364,7 +364,7 @@
                     var longestItem = mList.Items.MaxBy(x => x.Length);
                     if (longestItem != null)
                     {
-                        var dim = MiscUtils.MeasureTextWidth(mList.DisplayName + longestItem);
+                        var dim = MiscUtils.MeasureText(mList.DisplayName + longestItem);
                         width = dim[0]
                             + MenuManager.Instance.Theme.IndicatorWidth * 2 + 15;
 
@@ -376,7 +376,7 @@
                 else if (child is MenuKeyBind)
                 {
                     var kb = child as MenuKeyBind;
-                    var dim = MiscUtils.MeasureTextWidth(kb.DisplayName + "PRESS KEY");
+                    var dim = MiscUtils.MeasureText(kb.DisplayName + "PRESS KEY");
                     width = dim[0];
                     height = dim[1];
 
@@ -385,7 +385,7 @@
                 else if (child is MenuSlider)
                 {
                     var slider = child as MenuSlider;
-                    var dim = MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue);
+                    var dim = MiscUtils.MeasureText(child.DisplayName + slider.MaxValue);
                     width = dim[0];
                     height = dim[1];
                 }
@@ -393,14 +393,14 @@
                 else if (child is MenuSliderBool)
                 {
                     var slider = child as MenuSliderBool;
-                    var dim = MiscUtils.MeasureTextWidth(child.DisplayName + slider.MaxValue);
+                    var dim = MiscUtils.MeasureText(child.DisplayName + slider.MaxValue);
                     width = dim[0] + MenuManager.Instance.Theme.IndicatorWidth;
                     height = dim[1];
                 }
 
                 else
                 {
-                    var dim = MiscUtils.MeasureTextWidth(child.DisplayName);
+                    var dim = MiscUtils.MeasureText(child.DisplayName);
                     width = dim[0];
                     height = dim[1];
                 }

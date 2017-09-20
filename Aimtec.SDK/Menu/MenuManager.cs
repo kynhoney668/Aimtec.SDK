@@ -190,7 +190,7 @@
         {
             foreach (var child in this.Children.Values)
             {
-                var dim = MiscUtils.MeasureTextWidth(child.DisplayName);
+                var dim = MiscUtils.MeasureText(child.DisplayName);
                 var width = dim[0] + Instance.Theme.BaseMenuWidth;
                 var height = dim[1];
 
