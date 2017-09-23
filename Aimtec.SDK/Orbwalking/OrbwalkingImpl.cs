@@ -475,12 +475,9 @@ namespace Aimtec.SDK.Orbwalking
                 //Ignore Jax when using counter strike
                 if (this.Jax != null &&
                     target.NetworkId == this.Jax.NetworkId &&
-                    this.Config["Attacking"]["NoCounterStrikeAA"].Enabled)
+                    target.HasBuff("JaxCounterStrike"))
                 {
-                    if (target.HasBuff("JaxCounterStrike"))
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 return target;
@@ -829,8 +826,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 new Menu("Attacking", "Attacking") {
 
-                    new MenuSlider("ExtraWindup", "Additional Windup", Game.Ping / 2 + 10, 0, 200, true),
-                    new MenuBool("NoCounterStrikeAA", "No AA against E'ing Jax", true, true)
+                    new MenuSlider("ExtraWindup", "Additional Windup", Game.Ping / 2 + 10, 0, 200, true)
                 },
 
                 new Menu("Farming", "Farming")
