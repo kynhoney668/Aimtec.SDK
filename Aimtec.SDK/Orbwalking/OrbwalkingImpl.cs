@@ -442,19 +442,13 @@ namespace Aimtec.SDK.Orbwalking
             var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
 
             var pred = this.GetPredictedHealth(minion, rtime);
-
-            //The minions health will already be 0 by the time our auto attack reaches it, so no point attacking it...
             if (pred <= 0)
             {
                 this.FireNonKillableMinion(minion);
                 return false;
             }
 
-            var dmg = Player.GetAutoAttackDamage(minion);
-
-            var result = dmg - pred >= 0;
-
-            return result;
+            return pred <= Player.GetAutoAttackDamage(minion);
         }
 
         /*

@@ -395,19 +395,13 @@ namespace Aimtec.SDK.Extensions
             bool allyIsValidTarget = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            if (target == null || !target.IsValid || target.IsDead || target.IsInvulnerable || !target.IsVisible
-                || !target.IsTargetable)
+            if (!target.IsValidTarget(float.MaxValue, allyIsValidTarget))
             {
                 return false;
             }
 
-            if (!allyIsValidTarget && target.Team == Player.Team)
-            {
-                return false;
-            }
-
-            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition)
-                < Player.GetFullAttackRange(target);
+            var checkFrom = checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition;
+            return target.Distance(checkFrom) <= Player.GetFullAttackRange(target);
         }
 
         /// <summary>
@@ -428,8 +422,12 @@ namespace Aimtec.SDK.Extensions
             bool includeBoundingRadius = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            if (target == null || !target.IsValid || target.IsDead || target.IsInvulnerable || !target.IsVisible
-                || !target.IsTargetable)
+            if (target == null ||
+                !target.IsValid ||
+                target.IsDead ||
+                target.IsInvulnerable ||
+                !target.IsVisible ||
+                !target.IsTargetable)
             {
                 return false;
             }
@@ -439,8 +437,10 @@ namespace Aimtec.SDK.Extensions
                 return false;
             }
 
-            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition) < range
-                + (includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0);
+            var checkFrom = checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition;
+            var includeRadius = includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0;
+
+            return target.Distance(checkFrom) <= range + includeRadius;
         }
 
         /// <summary>
