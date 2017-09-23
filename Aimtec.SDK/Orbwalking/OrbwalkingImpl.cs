@@ -824,9 +824,9 @@ namespace Aimtec.SDK.Orbwalking
                     new MenuSlider("AttackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true)
                 },
 
-                new Menu("Attacking", "Attacking") {
-
-                    new MenuSlider("ExtraWindup", "Additional Windup", Game.Ping / 2 + 10, 0, 200, true)
+                new Menu("Attacking", "Attacking")
+                {
+                    new MenuSlider("ExtraWindup", "Additional Windup", Game.Ping / 2, 0, 200, true)
                 },
 
                 new Menu("Farming", "Farming")
@@ -855,10 +855,10 @@ namespace Aimtec.SDK.Orbwalking
             this.AddMode(this.LastHit = new OrbwalkerMode("Lasthit", GlobalKeys.LastHitKey, this.GetLastHitTarget, null));
             this.AddMode(this.Mixed = new OrbwalkerMode("Mixed", GlobalKeys.MixedKey, this.GetMixedModeTarget, null));
 
-            this.CheckSpecialHeros();
+            this.CheckSpecialHeroes();
         }
 
-        private void CheckSpecialHeros()
+        private void CheckSpecialHeroes()
         {
             foreach (var hero in GameObjects.Heroes)
             {
@@ -968,9 +968,10 @@ namespace Aimtec.SDK.Orbwalking
         private int TimeForAutoToReachTarget(AttackableUnit minion, bool applyDelay = false)
         {
             var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
-            var ms = Player.IsMelee ? int.MaxValue : Player.BasicAttack.MissileSpeed;
+            var ms = Player.IsMelee ? int.MaxValue : (int)Player.BasicAttack.MissileSpeed;
             var attackTravelTime = dist / ms * 1000f;
-            var totalTime = (int)(this.AnimationTime + attackTravelTime + Game.Ping / 2f - 100);
+            var totalTime = (int)(this.AnimationTime + attackTravelTime + Game.Ping / 2f);
+
             return totalTime + (applyDelay ? this.FarmDelay : 0);
         }
 
