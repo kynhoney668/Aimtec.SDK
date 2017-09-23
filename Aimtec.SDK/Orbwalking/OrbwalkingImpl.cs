@@ -166,24 +166,6 @@ namespace Aimtec.SDK.Orbwalking
             return false;
         }
 
-        public bool BlindCheck()
-        {
-            if (!this.Config["Attacking"]["NoBlindAA"].Enabled)
-            {
-                return true;
-            }
-
-            if (!this.noWasteAttackChamps.Contains(Player.ChampionName))
-            {
-                if (Player.HasBuffOfType(BuffType.Blind))
-                {
-                    return false;
-                }
-            }
-
-            return true;
-        }
-
         public bool IsValidAttackableObject(AttackableUnit unit)
         {
             //Valid check
@@ -270,7 +252,8 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
-            if (!this.BlindCheck())
+            if (Player.HasBuffOfType(BuffType.Blind) &&
+                !this.noWasteAttackChamps.Contains(Player.ChampionName))
             {
                 return false;
             }
@@ -847,7 +830,6 @@ namespace Aimtec.SDK.Orbwalking
                 new Menu("Attacking", "Attacking") {
 
                     new MenuSlider("ExtraWindup", "Additional Windup", Game.Ping / 2 + 10, 0, 200, true),
-                    new MenuBool("NoBlindAA", "No AA when Blind", true, true),
                     new MenuBool("NoCounterStrikeAA", "No AA against E'ing Jax", true, true)
                 },
 
