@@ -165,6 +165,10 @@
 
         private bool FocusSelected => this.Config["Misc"]["FocusSelected"].Enabled;
 
+        private bool AssasinMode => this.Config["Misc"]["AssasinMode"].Enabled;
+
+        private bool Magnet => this.Config["Misc"]["Magnet"].Enabled;
+
         #endregion
 
         #region Constructors and Destructors
@@ -225,29 +229,7 @@
 
         public Obj_AI_Hero GetSelectedTarget()
         {
-            return this.GetSelectedTarget(20000, false);
-        }
-
-        public Obj_AI_Hero GetSelectedTarget(float range, bool autoattack)
-        {
-            var force = this.Config["Misc"]["ForceSelected"].Enabled;
-
-            if (this.SelectedTarget.IsValidTarget())
-            {
-                if (force)
-                {
-                    return this.SelectedTarget;
-                }
-
-                var distance = this.SelectedTarget.Distance(Player);
-                var inRange = autoattack ? distance < Player.GetFullAttackRange(this.SelectedTarget) : distance < range;
-                if (inRange)
-                {
-                    return this.SelectedTarget;
-                }
-            }
-
-            return null;
+            return this.SelectedTarget;
         }
 
         public void AddWeight(Weight weight)
@@ -305,14 +287,34 @@
 
             if (this.FocusSelected)
             {
-                var selected = this.GetSelectedTarget(range, autoattack);
+                var selected = this.GetSelectedTarget();
+
                 if (selected != null)
                 {
-                    var containsSelected = orderedTargets.Any(x => x.NetworkId == selected.NetworkId);
-                    if (containsSelected)
+                    var distance = Player.Distance(selected);
+                    var inRange = autoattack ? distance < Player.GetFullAttackRange(this.SelectedTarget) : distance < range;
+
+                    if (this.AssasinMode)
                     {
-                        orderedTargets.RemoveAll(x => x.NetworkId == selected.NetworkId);
-                        orderedTargets.Insert(0, selected);
+                        if (inRange || this.Magnet)
+                        {
+                            return new List<Obj_AI_Hero>
+                                       { selected }; // Return only the selected target if we assasin mode
+                        }
+
+                        return new List<Obj_AI_Hero>() { }; // Return nothing if the target is out of range and magnet not enabled
+                    }
+
+                    // Non Assasination Mode logic
+                    else if (inRange || this.Magnet) 
+                    {
+                        var containsSelected = orderedTargets.Any(x => x.NetworkId == selected.NetworkId); // if selected target is in target list
+                        if (containsSelected)
+                        {
+                            // Put selected target at beginning of list even if there weight is lower
+                            orderedTargets.RemoveAll(x => x.NetworkId == selected.NetworkId);
+                            orderedTargets.Insert(0, selected); 
+                        }
                     }
                 }
             }
@@ -376,9 +378,21 @@
             return returnValue;
         }
 
+        private bool IsWhiteListed(Obj_AI_Hero hero)
+        {
+            var sbool = this.Config["TargetsMenu"]["target" + hero.ChampionName];
+            if (sbool != null)
+            {
+                return sbool.Enabled;
+            }
+
+            return true;
+        }
+
+
         public TargetPriority GetPriority(Obj_AI_Hero hero)
         {
-            var slider = this.Config["TargetsMenu"]["priority" + hero.ChampionName];
+            var slider = this.Config["TargetsMenu"]["target" + hero.ChampionName];
             if (slider != null)
             {
                 return (TargetPriority)slider.Value;
@@ -389,16 +403,8 @@
 
         public Obj_AI_Hero GetTarget(float range, bool autoattack = false)
         {
-            if (this.FocusSelected)
-            {
-                var selected = this.GetSelectedTarget(range, autoattack);
-                if (selected != null)
-                {
-                    return selected;
-                }
-            }
-
             var target = this.GetOrderedTargets(range, autoattack).FirstOrDefault();
+
             if (target != null)
             {
                 return target;
@@ -409,7 +415,7 @@
 
         public IEnumerable<Obj_AI_Hero> GetValidTargets(float range, bool autoattack)
         {
-            var enemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => autoattack ? x.IsValidAutoRange() : x.IsValidTarget(range));
+            var enemies = ObjectManager.Get<Obj_AI_Hero>().Where(x => this.IsWhiteListed(x) && autoattack ? x.IsValidAutoRange() : x.IsValidTarget(range));
             return enemies;
         }
 
@@ -429,7 +435,7 @@
             var targetsMenu = new Menu("TargetsMenu", "Targets");
             foreach (var enemy in ObjectManager.Get<Obj_AI_Hero>().Where(x => x.IsEnemy))
             {
-                targetsMenu.Add(new MenuSlider("priority" + enemy.ChampionName, enemy.ChampionName, (int)this.GetDefaultPriority(enemy), 1, 5));
+                targetsMenu.Add(new MenuSliderBool("target" + enemy.ChampionName, enemy.ChampionName, true, (int)this.GetDefaultPriority(enemy), 1, 5));
             }
             this.Config.Add(targetsMenu);
 
@@ -444,7 +450,8 @@
             var miscMenu = new Menu("Misc", "Misc")
             {
                 new MenuBool("FocusSelected", "Focus Selected Target"),
-                new MenuBool("ForceSelected", "Force Selected (Assasin)", false).SetToolTip("Only Attack Selected Target")
+                new MenuBool("AssasinMode", "Assasin Mode", false).SetToolTip("Only Attack Selected Target"),
+                new MenuBool("Magnet", "Magnet", false).SetToolTip("Force walk towards selected target if not in range")
             };
 
             this.Config.Add(miscMenu);
@@ -585,6 +592,7 @@
             return cumulativeResults;
         }
 
+        // Only used for drawing target list
         private IEnumerable<KeyValuePair<Obj_AI_Hero, float>> GetTargetsAndWeightsOrdered(
             float range,
             bool autoattack)
@@ -593,7 +601,7 @@
 
             if (this.FocusSelected)
             {
-                var selected = this.GetSelectedTarget(range, autoattack);
+                var selected = this.GetSelectedTarget();
 
                 if (selected != null)
                 {
