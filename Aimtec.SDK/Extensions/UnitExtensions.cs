@@ -395,13 +395,12 @@ namespace Aimtec.SDK.Extensions
             bool allyIsValidTarget = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            if (!target.IsValidTarget(float.MaxValue, allyIsValidTarget))
+            if (!target.IsValidTarget(allyIsValidTarget: allyIsValidTarget))
             {
                 return false;
             }
 
-            var checkFrom = checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition;
-            return target.Distance(checkFrom) <= Player.GetFullAttackRange(target);
+            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition) < Player.GetFullAttackRange(target);
         }
 
         /// <summary>
@@ -432,10 +431,7 @@ namespace Aimtec.SDK.Extensions
                 return false;
             }
 
-            var checkFrom = checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition;
-            var includeRadius = includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0;
-
-            return target.Distance(checkFrom) <= range + includeRadius;
+            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition) < range + (includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0);
         }
 
         /// <summary>
