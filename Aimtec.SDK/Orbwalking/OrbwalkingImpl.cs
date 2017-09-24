@@ -958,12 +958,44 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
+        private static float GetBasicAttackMissileSpeed(Obj_AI_Hero hero)
+        {
+            if (hero.IsMelee)
+            {
+                return float.MaxValue;
+            }
+
+            switch (hero.ChampionName)
+            {
+                case "Azir":
+                case "Velkoz":
+                case "Thresh":
+                case "Rakan":
+                    return float.MaxValue;
+
+                case "Kayle":
+                    if (hero.HasBuff("JudicatorRighteousFury"))
+                    {
+                        return float.MaxValue;
+                    }
+                    break;
+
+                case "Viktor":
+                    if (hero.HasBuff("ViktorPowerTransferReturn"))
+                    {
+                        return float.MaxValue;
+                    }
+                    break;
+            }
+
+            return hero.BasicAttack.MissileSpeed;
+        }
+
         // ReSharper disable once SuggestBaseTypeForParameter
         private int TimeForAutoToReachTarget(AttackableUnit minion, bool applyDelay = false)
         {
             var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
-            var ms = Player.IsMelee ? int.MaxValue : (int)Player.BasicAttack.MissileSpeed;
-            var attackTravelTime = dist / ms * 1000f;
+            var attackTravelTime = dist / (int)GetBasicAttackMissileSpeed(ObjectManager.GetLocalPlayer()) * 1000f;
             var totalTime = (int)(this.AnimationTime + attackTravelTime + Game.Ping / 2f);
 
             return totalTime + (applyDelay ? this.FarmDelay : 0);
