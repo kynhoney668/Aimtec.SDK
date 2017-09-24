@@ -442,19 +442,13 @@ namespace Aimtec.SDK.Orbwalking
             var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
 
             var pred = this.GetPredictedHealth(minion, rtime);
-
-            //The minions health will already be 0 by the time our auto attack reaches it, so no point attacking it...
             if (pred <= 0)
             {
                 this.FireNonKillableMinion(minion);
                 return false;
             }
 
-            var dmg = Player.GetAutoAttackDamage(minion);
-
-            var result = dmg - pred >= 0;
-
-            return result;
+            return pred <= Player.GetAutoAttackDamage(minion);
         }
 
         /*
@@ -964,12 +958,44 @@ namespace Aimtec.SDK.Orbwalking
             }
         }
 
+        private static float GetBasicAttackMissileSpeed(Obj_AI_Hero hero)
+        {
+            if (hero.IsMelee)
+            {
+                return float.MaxValue;
+            }
+
+            switch (hero.ChampionName)
+            {
+                case "Azir":
+                case "Velkoz":
+                case "Thresh":
+                case "Rakan":
+                    return float.MaxValue;
+
+                case "Kayle":
+                    if (hero.HasBuff("JudicatorRighteousFury"))
+                    {
+                        return float.MaxValue;
+                    }
+                    break;
+
+                case "Viktor":
+                    if (hero.HasBuff("ViktorPowerTransferReturn"))
+                    {
+                        return float.MaxValue;
+                    }
+                    break;
+            }
+
+            return hero.BasicAttack.MissileSpeed;
+        }
+
         // ReSharper disable once SuggestBaseTypeForParameter
         private int TimeForAutoToReachTarget(AttackableUnit minion, bool applyDelay = false)
         {
             var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
-            var ms = Player.IsMelee ? int.MaxValue : (int)Player.BasicAttack.MissileSpeed;
-            var attackTravelTime = dist / ms * 1000f;
+            var attackTravelTime = dist / (int)GetBasicAttackMissileSpeed(ObjectManager.GetLocalPlayer()) * 1000f;
             var totalTime = (int)(this.AnimationTime + attackTravelTime + Game.Ping / 2f);
 
             return totalTime + (applyDelay ? this.FarmDelay : 0);
