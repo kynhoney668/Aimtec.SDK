@@ -2,11 +2,20 @@
 {
     public class Prediction : ISkillshotPrediction
     {
+        #region Constructors and Destructors
+
+        private Prediction()
+        {
+            this.ResetImplementation();
+        }
+
+        #endregion
+
         #region Public Properties
 
         public static Prediction Instance { get; } = new Prediction();
 
-        public ISkillshotPrediction Implementation { get; set; } = new PredictionImpl();
+        public ISkillshotPrediction Implementation { get; set; }
 
         #endregion
 

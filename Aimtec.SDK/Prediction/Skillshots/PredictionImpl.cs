@@ -8,6 +8,7 @@
     using Aimtec.SDK.Extensions;
     using Aimtec.SDK.Prediction.Collision;
     using Aimtec.SDK.Prediction.Skillshots.AoE;
+    using Aimtec.SDK.Util;
 
     internal class PredictionImpl : ISkillshotPrediction
     {
@@ -153,7 +154,7 @@
             var prediction = position + speed * (input.Delay / 1000);
 
             return new PredictionOutput
-                       {
+            {
                 UnitPosition = new Vector3(position.X, position.Y, unit.ServerPosition.Z),
                 CastPosition = new Vector3(prediction.X, prediction.Y, unit.ServerPosition.Z),
                 HitChance = HitChance.High
@@ -230,7 +231,7 @@
         {
             speed = Math.Abs(speed) < float.Epsilon ? input.Unit.MoveSpeed : speed;
 
-            if (path.Count <= 1 || input.Unit.SpellBook.IsAutoAttacking && !input.Unit.IsDashing())
+            if (path.Count <= 1)
             {
                 return new PredictionOutput
                 {
@@ -259,15 +260,15 @@
                         var direction = (b - a).Normalized();
 
                         var cp = a + direction * tDistance;
-                        var p = a + direction * (i == path.Count - 2
+                        var p = a + direction * ((i == path.Count - 2)
                             ? Math.Min(tDistance + input.RealRadius, d)
-                            : tDistance + input.RealRadius);
+                            : (tDistance + input.RealRadius));
 
                         return new PredictionOutput
                         {
                             Input = input,
-                            CastPosition = (Vector3) cp,
-                            UnitPosition = (Vector3) p,
+                            CastPosition = cp.To3D(),
+                            UnitPosition = p.To3D(),
                             HitChance = PathTracker.GetCurrentPath(input.Unit).Time < 0.1d
                                 ? HitChance.VeryHigh
                                 : HitChance.High
@@ -277,7 +278,6 @@
                     tDistance -= d;
                 }
             }
-
             if (pLength >= input.Delay * speed - input.RealRadius
                 && Math.Abs(input.Speed - float.MaxValue) > float.Epsilon)
             {
@@ -299,15 +299,9 @@
                     var tB = a.Distance(b) / speed;
                     var direction = (b - a).Normalized();
                     a = a - speed * tT * direction;
-                    var sol = Vector2Extensions.VectorMovementCollision(
-                        a,
-                        b,
-                        speed,
-                        (Vector2) input.From,
-                        input.Speed,
-                        tT);
-                    var t = sol.Item1;
-                    var pos = sol.Item2;
+                    var sol = Geometry.VectorMovementCollision(a, b, speed, input.From.To2D(), input.Speed, tT);
+                    var t = sol.Time;
+                    var pos = sol.Position;
 
                     if (!pos.IsZero && t >= tT && t <= tT + tB)
                     {
@@ -321,14 +315,13 @@
                         return new PredictionOutput
                         {
                             Input = input,
-                            CastPosition = (Vector3) pos,
-                            UnitPosition = (Vector3) p,
-                            HitChance = PathTracker.GetCurrentPath(input.Unit).Time < 0.1d
+                            CastPosition = pos.To3D(),
+                            UnitPosition = p.To3D(),
+                            HitChance = PathTracker.GetCurrentPath(input.Unit).Time < 0.1
                                 ? HitChance.VeryHigh
                                 : HitChance.High
                         };
                     }
-
                     tT += tB;
                 }
             }
@@ -338,8 +331,8 @@
             return new PredictionOutput
             {
                 Input = input,
-                CastPosition = (Vector3) position,
-                UnitPosition = (Vector3) position,
+                CastPosition = position.To3D(),
+                UnitPosition = position.To3D(),
                 HitChance = HitChance.Medium
             };
         }

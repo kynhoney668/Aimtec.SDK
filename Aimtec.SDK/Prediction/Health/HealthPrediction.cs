@@ -1,18 +1,9 @@
 ﻿namespace Aimtec.SDK.Prediction.Health
 {
-    /// <summary>
-    ///     Class HealthPrediction.
-    /// </summary>
-    /// <seealso cref="Aimtec.SDK.Prediction.Health.IHealthPrediction" />
+    /// <inheritdoc />
     public class HealthPrediction : IHealthPrediction
     {
         #region Public Properties
-
-        /// <summary>
-        ///     Gets or sets the implementation.
-        /// </summary>
-        /// <value>The implementation.</value>
-        public static IHealthPrediction Implementation { get; set; } = new HealthPredictionImplB();
 
         /// <summary>
         ///     Gets the instance.
@@ -20,30 +11,26 @@
         /// <value>The instance.</value>
         public static HealthPrediction Instance { get; } = new HealthPrediction();
 
+        /// <summary>
+        ///     Gets or sets the implementation.
+        /// </summary>
+        /// <value>The implementation.</value>
+        public IHealthPrediction Implementation { get; set; } = new HealthPredictionImplB();
+
         #endregion
 
         #region Public Methods and Operators
 
-        /// <summary>
-        ///     Gets the predicted health of the target in the amount of time given.
-        /// </summary>
-        /// <param name="target">The target.</param>
-        /// <param name="time">The time.</param>
-        /// <returns>System.Single.</returns>
-        public float GetPrediction(Obj_AI_Base target, int time)
-        {
-            return Implementation.GetPrediction(target, time);
-        }
-
-        /// <summary>
-        ///     Gets the predicted health of the target for laneclear.
-        /// </summary>
-        /// <param name="target">The target.</param>
-        /// <param name="time">The time.</param>
-        /// <returns>System.Single.</returns>
+        /// <inheritdoc />
         public float GetLaneClearHealthPrediction(Obj_AI_Base target, int time)
         {
-            return Implementation.GetPrediction(target, time);
+            return this.Implementation.GetPrediction(target, time);
+        }
+
+        /// <inheritdoc />
+        public float GetPrediction(Obj_AI_Base target, int time)
+        {
+            return this.Implementation.GetPrediction(target, time);
         }
 
         #endregion

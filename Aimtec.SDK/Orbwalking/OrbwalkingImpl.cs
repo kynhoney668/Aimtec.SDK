@@ -617,7 +617,7 @@ namespace Aimtec.SDK.Orbwalking
                                 var totalTime = (int)(castDelay + travTime + Game.Ping / 2f);
 
                                 //minion hpred
-                                var tMinionDmgPredHealth = HealthPrediction.Implementation.GetPrediction(tTarget, totalTime);
+                                var tMinionDmgPredHealth = HealthPrediction.Instance.GetPrediction(tTarget, totalTime);
 
                                 //myattack
                                 const int ExtraBuffer = 50;
@@ -689,7 +689,7 @@ namespace Aimtec.SDK.Orbwalking
                                         var totalTime1 = (int)(castDelay1 + travTime1 + Game.Ping / 2f);
 
                                         var dmg1 = Player.GetAutoAttackDamage(minBase);
-                                        var pred1 = HealthPrediction.Implementation.GetPrediction(minBase, totalTime1);
+                                        var pred1 = HealthPrediction.Instance.GetPrediction(minBase, totalTime1);
                                         if (dmg1 > pred1)
                                         {
                                             return min;
@@ -783,7 +783,7 @@ namespace Aimtec.SDK.Orbwalking
         private int GetPredictedHealth(Obj_AI_Base minion, int time = 0)
         {
             var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
-            return (int)Math.Ceiling(HealthPrediction.Implementation.GetPrediction(minion, rtime));
+            return (int)Math.Ceiling(HealthPrediction.Instance.GetPrediction(minion, rtime));
         }
 
         //Gets a structure target based on the following order (Nexus, Turret, Inihibitor)
@@ -945,7 +945,7 @@ namespace Aimtec.SDK.Orbwalking
         private bool ShouldWaitMinion(Obj_AI_Base minion)
         {
             var time = this.TimeForAutoToReachTarget(minion) + (int)Player.AttackDelay * 1000 + 100;
-            var pred = HealthPrediction.Implementation.GetLaneClearHealthPrediction(minion, (int)(time * 2f));
+            var pred = HealthPrediction.Instance.GetLaneClearHealthPrediction(minion, (int)(time * 2f));
             var dmg = Player.GetAutoAttackDamage(minion);
 
             if (pred < dmg)
