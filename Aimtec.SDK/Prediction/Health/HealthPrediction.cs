@@ -24,7 +24,7 @@
         /// <inheritdoc />
         public float GetLaneClearHealthPrediction(Obj_AI_Base target, int time)
         {
-            return this.Implementation.GetPrediction(target, time);
+            return this.Implementation.GetLaneClearHealthPrediction(target, time);
         }
 
         /// <inheritdoc />
