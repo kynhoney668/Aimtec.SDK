@@ -57,7 +57,6 @@
     <Compile Include="Damage\DamageItem.cs" />
     <Compile Include="Damage\DamagePassives.cs" />
     <Compile Include="Damage\DamageReduction.cs" />
-    <Compile Include="Damage\MasteryId.cs" />
     <Compile Include="Events\Dash.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Orbwalking\AOrbwalker.cs" />
@@ -146,7 +145,6 @@
     <Compile Include="Util\WindowsMessages.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Damage\Data\7.17.json" />
     <EmbeddedResource Include="Damage\Data\7.18.json" />
     <None Include="packages.config" />
   </ItemGroup>

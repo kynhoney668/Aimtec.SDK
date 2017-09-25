@@ -122,12 +122,14 @@ namespace Aimtec.SDK.Damage
                     dmgReduce *= 0.9;
                 }
 
+                /*
                 if (hero != null &&
                     hero.IsUsingMastery(hero.GetFerocityPage(MasteryId.Ferocity.FreshBlood)) &&
                     !hero.HasBuff("Mastery6121"))
                 {
                     dmgPhysical += 10 + hero.Level;
                 }
+                */
 
                 switch (targetHero.ChampionName)
                 {
@@ -300,11 +302,13 @@ namespace Aimtec.SDK.Damage
                     dmgPassive += itemDamage.PhysicalDamage + itemDamage.MagicalDamage;
                 }
 
+                /*
                 var sorcery = source.GetFerocityPage(MasteryId.Ferocity.Sorcery);
                 if (sorcery != null && source.IsUsingMastery(sorcery))
                 {
                     totalDamage *= 1 + new[] { 0.4, 0.8, 1.2, 1.6, 2 }[sorcery.Points - 1] / 100;
                 }
+                */
 
                 if (spellData.IsModifiedDamage)
 				{
@@ -460,6 +464,7 @@ namespace Aimtec.SDK.Damage
         {
             var amount = 0d;
 
+            /*
             var targetHero = target as Obj_AI_Hero;
             if (targetHero != null)
             {
@@ -485,6 +490,7 @@ namespace Aimtec.SDK.Damage
                     }
                 }
             }
+            */
 
             return amount;
         }
@@ -540,6 +546,7 @@ namespace Aimtec.SDK.Damage
 
             if (hero != null)
             {
+                /*
                 var doubleEdgedSword = hero.GetFerocityPage(MasteryId.Ferocity.DoubleEdgedSword);
                 if (doubleEdgedSword != null &&
                     hero.IsUsingMastery(doubleEdgedSword))
@@ -554,6 +561,7 @@ namespace Aimtec.SDK.Damage
                 {
                     amount *= target.Health * 3 / 100;
                 }
+                */
 
                 if (minionTarget != null)
                 {
@@ -593,6 +601,7 @@ namespace Aimtec.SDK.Damage
 
                 if (targetHero != null)
                 {
+                    /*
                     var battleTrance = hero.GetFerocityPage(MasteryId.Ferocity.BattleTrance);
                     if (battleTrance != null &&
                         hero.IsUsingMastery(battleTrance))
@@ -634,6 +643,7 @@ namespace Aimtec.SDK.Damage
                     {
                         amount *= 1 + 1.5 / 100;
                     }
+                    */
 
                     if (hero.MaxHealth < targetHero.MaxHealth && damageType == DamageType.Physical)
                     {
