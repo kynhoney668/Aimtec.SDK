@@ -1087,6 +1087,46 @@ namespace Aimtec.SDK.Damage
 
             Passives.Add(new DamagePassive
                              {
+                                 Name = "TwistedFate",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("cardmasterstackparticle"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.E);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "TwistedFate",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (source.HasBuff("bluecardpreattack"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W);
+                                         }
+
+                                         if (source.HasBuff("redcardpreattack"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W, DamageStage.SecondForm);
+                                         }
+
+                                         if (source.HasBuff("goldcardpreattack"))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W, DamageStage.ThirdForm);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
                                  Name = "Vayne",
                                  DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
                                  PassiveDamage = (source, target) =>
