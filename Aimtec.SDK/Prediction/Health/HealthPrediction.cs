@@ -27,13 +27,13 @@
         /// <inheritdoc />
         public float GetLaneClearHealthPrediction(Obj_AI_Base target, int time)
         {
-            return Instance.GetLaneClearHealthPrediction(target, time);
+            return Implementation.GetLaneClearHealthPrediction(target, time);
         }
 
         /// <inheritdoc />
         public float GetPrediction(Obj_AI_Base target, int time)
         {
-            return Instance.GetPrediction(target, time);
+            return Implementation.GetPrediction(target, time);
         }
 
         #endregion
