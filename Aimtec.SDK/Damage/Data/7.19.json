@@ -648,13 +648,31 @@
 			{
 				"Stage": "Default",
 				"SpellData": {
-					"SpellEffectType": "AoE",
+					"SpellEffectType": "None",
 					"DamageType": "Magical",
-					"Damages": [65.0, 85.0, 105.0, 125.0, 145.0],
+					"Damages": [70.0, 100.0, 130.0, 160.0, 190.0],
 					"BonusDamages": [
 						{
 							"DamageType": "Magical",
-							"DamagePercentages": [0.5, 0.5, 0.5, 0.5, 0.5],
+							"DamagePercentages": [0.3, 0.3, 0.3, 0.3, 0.3],
+							"ScalingTarget": "Source",
+							"ScalingType": "AbilityPoints"
+						}
+					]
+				}
+			}
+		],
+		"W": [
+			{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "None",
+					"DamageType": "Magical",
+					"DamagesPerLvl": [60.0, 62.0, 64.0, 66.0, 68.0, 75, 80, 85, 95, 105, 115, 125, 135, 145, 155, 165, 175, 185],
+					"BonusDamages": [
+						{
+							"DamageType": "Magical",
+							"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
 							"ScalingTarget": "Source",
 							"ScalingType": "AbilityPoints"
 						}
@@ -666,13 +684,13 @@
 			{
 				"Stage": "Default",
 				"SpellData": {
-					"SpellEffectType": "Single",
+					"SpellEffectType": "None",
 					"DamageType": "Magical",
 					"Damages": [60.0, 90.0, 120.0, 150.0, 180.0],
 					"BonusDamages": [
 						{
 							"DamageType": "Magical",
-							"DamagePercentages": [0.4, 0.4, 0.4, 0.4, 0.4],
+							"DamagePercentages": [0.7, 0.7, 0.7, 0.7, 0.7],
 							"ScalingTarget": "Source",
 							"ScalingType": "AbilityPoints"
 						}
@@ -920,13 +938,13 @@
 			{
 				"Stage": "Default",
 				"SpellData": {
-					"SpellEffectType": "Attack",
+					"SpellEffectType": "AoE",
 					"DamageType": "Physical",
-					"Damages": [15, 35, 55, 75, 95],
+					"Damages": [30.0, 70.0, 110.0, 150.0, 190.0],
 					"BonusDamages": [
 						{
 							"DamageType": "Physical",
-							"DamagePercentages": [0.65, 0.7, 0.75, 0.8, 0.85],
+							"DamagePercentages": [1.3, 1.4, 1.5, 1.6, 1.7],
 							"ScalingTarget": "Source",
 							"ScalingType": "AttackPoints"
 						}
@@ -936,13 +954,13 @@
 			{
 				"Stage": "SecondForm",
 				"SpellData": {
-					"SpellEffectType": "Attack",
+					"SpellEffectType": "AoE",
 					"DamageType": "Physical",
-					"Damages": [30.0, 70.0, 110.0, 150.0, 190.0],
+					"Damages": [20.1, 46.9, 73.7, 100.5, 127.3],
 					"BonusDamages": [
 						{
 							"DamageType": "Physical",
-							"DamagePercentages": [1.3, 1.4, 1.5, 1.6, 1.7],
+							"DamagePercentages": [0.871, 0.938, 1.005, 1.072, 1.139],
 							"ScalingTarget": "Source",
 							"ScalingType": "AttackPoints"
 						}
@@ -956,13 +974,13 @@
 				"SpellData": {
 					"SpellEffectType": "Attack",
 					"DamageType": "Physical",
-					"Damages": [10.0, 55.0, 100.0, 145.0, 190.0],
+					"Damages": [40.0, 90.0, 140.0, 190.0, 240.0],
 					"BonusDamages": [
 						{
 							"DamageType": "Physical",
-							"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
+							"DamagePercentages": [0.4, 0.55, 0.7, 0.85, 1.0],
 							"ScalingTarget": "Source",
-							"ScalingType": "AttackPoints"
+							"ScalingType": "BonusAttackPoints"
 						}
 					]
 				}
@@ -8962,7 +8980,7 @@
 		"W": [{
 				"Stage": "Default",
 				"SpellData": {
-					"SpellEffectType": "None",
+					"SpellEffectType": "Single",
 					"IsApplyOnHit": true,
 					"DamageType": "Magical",
 					"Damages": [40.0, 60.0, 80.0, 100.0, 120.0],
@@ -9004,7 +9022,7 @@
 			{
 				"Stage": "ThirdForm",
 				"SpellData": {
-					"SpellEffectType": "None",
+					"SpellEffectType": "Single",
 					"IsApplyOnHit": true,
 					"DamageType": "Magical",
 					"Damages": [15.0, 22.5, 30.0, 37.5, 45.0],
@@ -9235,7 +9253,7 @@
 				"DamageType": "Physical",
 				"BonusDamages": [{
 					"DamageType": "Physical",
-					"DamagePercentages": [0.3, 0.35, 0.4, 0.45, 0.5],
+					"DamagePercentages": [0.5, 0.55, 0.6, 0.65, 0.7],
 					"ScalingTarget": "Source",
 					"ScalingType": "AttackPoints"
 				}]
@@ -9248,7 +9266,8 @@
 				"DamageType": "True",
 				"BonusDamages": [{
 					"DamageType": "True",
-					"DamagePercentages": [0.06, 0.075, 0.09, 0.105, 0.12],
+					"DamagePercentages": [0.04, 0.06, 0.08, 0.10, 0.12],
+					"MinDamage": [50, 65, 80, 95, 110],
 					"ScalingTarget": "Target",
 					"ScalingType": "MaxHealth"
 				}]
@@ -9918,35 +9937,51 @@
 				"SpellEffectType": "None",
 				"IsApplyOnHit": true,
 				"DamageType": "Physical",
-				"Damages": [15.0, 30.0, 45.0, 60.0, 75.0],
+				"Damages": [15.0, 20.0, 25.0, 30.0, 35.0],
 				"BonusDamages": [{
 					"DamageType": "Physical",
-					"DamagePercentages": [0.2, 0.2, 0.2, 0.2, 0.2],
+					"DamagePercentages": [0.4, 0.4, 0.4, 0.4, 0.4],
 					"ScalingTarget": "Source",
-					"ScalingType": "AttackPoints"
+					"ScalingType": "BonusAttackPoints"
 				}]
 			}
 		}],
-		"W": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "None",
-				"IsApplyOnHit": true,
-				"DamageType": "Physical",
-				"BonusDamages": [{
+		"W": [
+			{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "None",
 					"DamageType": "Physical",
-					"DamagePercentages": [1.25, 1.375, 1.5, 1.625, 1.75],
-					"ScalingTarget": "Source",
-					"ScalingType": "AttackPoints"
-				}]
+					"Damages": [30.0, 40.0, 50.0, 60.0, 70.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.3, 0.3, 0.3, 0.3, 0.3],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "SecondForm",
+				"SpellData": {
+					"SpellEffectType": "None",
+					"DamageType": "Physical",
+					"Damages": [30.0, 65.0, 100.0, 135.0, 170.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.85, 0.85, 0.85, 0.85, 0.85],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					}]
+				}
 			}
-		}],
+		],
 		"E": [{
 			"Stage": "Default",
 			"SpellData": {
 				"SpellEffectType": "Single",
 				"DamageType": "Magical",
-				"Damages": [70.0, 110.0, 150.0, 190.0, 230.0],
+				"Damages": [50.0, 75.0, 100.0, 125.0, 150.0],
 				"BonusDamages": [{
 					"DamageType": "Magical",
 					"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
