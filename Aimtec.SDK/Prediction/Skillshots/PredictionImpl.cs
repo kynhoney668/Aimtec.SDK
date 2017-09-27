@@ -100,19 +100,19 @@
                     result.HitChance = HitChance.Medium;
                 }
 
-                if (input.RangeCheckFrom.DistanceSqr(result.UnitPosition) > Math.Pow(
+                if (input.RangeCheckFrom.Distance(result.UnitPosition) > Math.Pow(
                     input.Range + (input.Type == SkillshotType.Circle ? input.RealRadius : 0),
                     2))
                 {
                     result.HitChance = HitChance.OutOfRange;
                 }
 
-                if (input.RangeCheckFrom.DistanceSqr(result.CastPosition) > Math.Pow(input.Range, 2))
+                if (input.RangeCheckFrom.Distance(result.CastPosition) > Math.Pow(input.Range, 2))
                 {
                     if (result.HitChance != HitChance.OutOfRange)
                     {
                         result.CastPosition = input.RangeCheckFrom + input.Range
-                            * (result.UnitPosition - input.RangeCheckFrom).Normalized().FixHeight();
+                            * (result.UnitPosition - input.RangeCheckFrom).To2D().Normalized().To3D();
                     }
                     else
                     {
@@ -343,7 +343,6 @@
 
             if (input.Unit.DistanceSqr(input.From) < 200 * 200)
             {
-                // input.Delay /= 2;
                 speed /= 1.5f;
             }
 
