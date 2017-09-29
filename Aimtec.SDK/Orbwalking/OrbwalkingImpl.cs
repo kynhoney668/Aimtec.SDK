@@ -372,7 +372,7 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             if (this.ForcedTarget != null &&
-                !this.ForcedTarget.IsValidTarget())
+                !this.ForcedTarget.IsValidAutoRange())
             {
                 this.ForcedTarget = null;
             }
