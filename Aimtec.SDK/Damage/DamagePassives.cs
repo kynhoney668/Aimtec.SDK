@@ -923,7 +923,6 @@ namespace Aimtec.SDK.Damage
                                          if (passiveObject != null)
                                          {
                                              var passiveUnit = ObjectManager.Get<AttackableUnit>()
-                                                 .Where(m => m.IsValidTarget())
                                                  .MinBy(o => o.Distance(passiveObject));
 
                                              if (passiveUnit != null &&
