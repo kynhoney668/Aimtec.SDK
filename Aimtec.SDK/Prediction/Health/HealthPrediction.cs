@@ -1,4 +1,5 @@
-﻿namespace Aimtec.SDK.Prediction.Health
+﻿#pragma warning disable 618
+namespace Aimtec.SDK.Prediction.Health
 {
     using System;
 

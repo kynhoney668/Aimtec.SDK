@@ -364,7 +364,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("dariusnoxiantacticsonh"))
                                          {
-                                             return source.GetSpellDamage(target, SpellSlot.W) * source.TotalAttackDamage;
+                                             return source.GetSpellDamage(target, SpellSlot.W);
                                          }
 
                                          return 1;
@@ -657,7 +657,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("jaycehypercharge"))
                                          {
-                                             return new[] { 0.7, 0.78, 0.86, 0.94, 1.02, 1.1 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] * source.TotalAttackDamage;
+                                             return new[] { 0.7, 0.78, 0.86, 0.94, 1.02, 1.1 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1];
                                          }
 
                                          return 1;

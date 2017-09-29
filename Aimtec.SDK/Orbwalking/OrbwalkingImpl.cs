@@ -151,7 +151,8 @@ namespace Aimtec.SDK.Orbwalking
             if (!preAttackargs.Cancel)
             {
                 var targetToAttack = preAttackargs.Target;
-                if (this.ForcedTarget != null)
+                if (this.ForcedTarget != null &&
+                    this.ForcedTarget.IsValidAutoRange())
                 {
                     targetToAttack = this.ForcedTarget;
                 }
@@ -369,7 +370,7 @@ namespace Aimtec.SDK.Orbwalking
             {
                 return;
             }
-            
+
             if (this.ForcedTarget != null &&
                 !this.ForcedTarget.IsValidTarget())
             {
@@ -391,7 +392,8 @@ namespace Aimtec.SDK.Orbwalking
             if (this.CanAttack(mode))
             {
                 var target = this.LastTarget = this.FindTarget(mode);
-                if (target != null)
+                if (target != null &&
+                    target.IsValidAutoRange())
                 {
                     this.Attack(target);
                 }
