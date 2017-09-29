@@ -371,7 +371,7 @@
                     break;
 
                 case TargetSelectorMode.MostPriority:
-                    returnValue = validTargets.OrderBy(this.GetPriority);
+                    returnValue = validTargets.OrderByDescending(this.GetPriority);
                     break;
             }
 
