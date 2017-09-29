@@ -364,7 +364,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("dariusnoxiantacticsonh"))
                                          {
-                                             return source.GetSpellDamage(target, SpellSlot.W);
+                                             return 1.4;
                                          }
 
                                          return 1;

@@ -392,8 +392,7 @@ namespace Aimtec.SDK.Orbwalking
             if (this.CanAttack(mode))
             {
                 var target = this.LastTarget = this.FindTarget(mode);
-                if (target != null &&
-                    target.IsValidAutoRange())
+                if (target != null)
                 {
                     this.Attack(target);
                 }
