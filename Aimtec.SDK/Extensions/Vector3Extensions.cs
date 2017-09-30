@@ -1,5 +1,6 @@
 ﻿namespace Aimtec.SDK.Extensions
 {
+    using System;
     using System.Linq;
 
     using Aimtec.SDK.Util.Cache;
@@ -101,6 +102,36 @@
         public static Vector3 Normalized(this Vector3 v)
         {
             return Vector3.Normalize(v);
+        }
+
+        /// <summary>
+        ///     Returns the Perpendicular Vector3 to the Extended Vector3.
+        /// </summary>
+        /// <param name="vector3">Extended SharpDX Vector3</param>
+        /// <param name="offset">Axis Offset (0 = X, 1 = Y)</param>
+        /// <returns>Perpendicular Vector3</returns>
+        public static Vector3 Perpendicular(this Vector3 vector3, int offset = 0)
+        {
+            return offset == 0
+                       ? new Vector3(-vector3.Z, vector3.X, vector3.Y)
+                       : new Vector3(vector3.Z, -vector3.X, vector3.Y);
+        }
+
+        /// <summary>
+        ///     Rotates the Vector3 to a set angle.
+        /// </summary>
+        /// <param name="vector3">Extended SharpDX Vector2</param>
+        /// <param name="angle">Angle (in radians)</param>
+        /// <returns>Rotated Vector3</returns>
+        public static Vector3 Rotated(this Vector3 vector3, float angle)
+        {
+            var cos = Math.Cos(angle);
+            var sin = Math.Sin(angle);
+
+            return new Vector3(
+                (float)(vector3.X * cos - vector3.Z * sin),
+                (float)(vector3.Z * cos + vector3.X * sin),
+                vector3.Y);
         }
 
         public static bool PointUnderAllyTurret(this Vector3 point)

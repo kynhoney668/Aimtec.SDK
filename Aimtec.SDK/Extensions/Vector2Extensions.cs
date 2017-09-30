@@ -298,17 +298,6 @@ namespace Aimtec.SDK.Extensions
             return vector2;
         }
 
-        /// <summary>
-        ///     Creates a new vector perpendicular to <paramref name="vector2" /> and shifted by the specified offset.
-        /// </summary>
-        /// <param name="vector2">The vector2.</param>
-        /// <param name="offset">The offset.</param>
-        /// <returns>Vector2.</returns>
-        public static Vector2 Perpendicular(this Vector2 vector2, int offset = 0)
-        {
-            return offset == 0 ? new Vector2(-vector2.Y, vector2.X) : new Vector2(vector2.Y, -vector2.X);
-        }
-
         public static bool PointUnderAllyTurret(this Vector2 point)
         {
             var allyTurrets = ObjectManager
@@ -403,6 +392,19 @@ namespace Aimtec.SDK.Extensions
             var isOnSegment = Math.Abs(rS - rL) < float.Epsilon;
             var pointSegment = isOnSegment ? pointLine : new Vector2(ax + rS * (bx - ax), ay + rS * (by - ay));
             return new ProjectionInfo(isOnSegment, pointSegment, pointLine);
+        }
+
+        /// <summary>
+        ///     Creates a new vector perpendicular to <paramref name="vector2" /> and shifted by the specified offset.
+        /// </summary>
+        /// <param name="vector2">The vector2.</param>
+        /// <param name="offset">The offset.</param>
+        /// <returns>Vector2.</returns>
+        public static Vector2 Perpendicular(this Vector2 vector2, int offset = 0)
+        {
+            return offset == 0
+                       ? new Vector2(-vector2.Y, vector2.X)
+                       : new Vector2(vector2.Y, -vector2.X);
         }
 
         /// <summary>
