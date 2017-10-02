@@ -130,8 +130,8 @@
 
             return new Vector3(
                 (float)(vector3.X * cos - vector3.Z * sin),
-                (float)(vector3.Z * cos + vector3.X * sin),
-                vector3.Y);
+                vector3.Y,
+                (float)(vector3.Z * cos + vector3.X * sin));
         }
 
         public static bool PointUnderAllyTurret(this Vector3 point)
@@ -154,7 +154,7 @@
 
         public static Vector2 To2D(this Vector3 v)
         {
-            return (Vector2) v;
+            return (Vector2)v;
         }
 
         /// <summary>

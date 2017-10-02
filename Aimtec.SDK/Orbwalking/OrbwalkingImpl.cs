@@ -441,7 +441,6 @@ namespace Aimtec.SDK.Orbwalking
         private bool CanKillMinion(Obj_AI_Base minion, int time = 0)
         {
             var rtime = time == 0 ? this.TimeForAutoToReachTarget(minion) : time;
-
             var pred = this.GetPredictedHealth(minion, rtime);
             if (pred <= 0)
             {
@@ -497,7 +496,6 @@ namespace Aimtec.SDK.Orbwalking
             AttackableUnit killableMinion = minions.FirstOrDefault(x => this.CanKillMinion(x));
             if (killableMinion != null)
             {
-
                 return killableMinion;
             }
 
@@ -514,7 +512,8 @@ namespace Aimtec.SDK.Orbwalking
                 return structure;
             }
             
-            if (this.LastTarget != null && this.LastTarget.IsValidAutoRange())
+            if (this.LastTarget != null &&
+                this.LastTarget.IsValidAutoRange())
             {
                 if (this.LastTarget is Obj_AI_Base b)
                 {
@@ -542,7 +541,6 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             var first = minions.MaxBy(x => x.Health);
-
             if (first != null)
             {
                 return first;
@@ -738,7 +736,8 @@ namespace Aimtec.SDK.Orbwalking
 
             var bestMinionTarget = availableMinionTargets
                 .OrderByDescending(x => x.MaxHealth)
-                .ThenBy(x => x.Health).FirstOrDefault();
+                .ThenBy(x => x.Health)
+                .FirstOrDefault();
 
             return bestMinionTarget;
         }
@@ -941,9 +940,7 @@ namespace Aimtec.SDK.Orbwalking
         {
             var time = this.TimeForAutoToReachTarget(minion) + (int)Player.AttackDelay * 1000 + 100;
             var pred = HealthPrediction.Instance.GetLaneClearHealthPrediction(minion, (int)(time * 2f));
-            var dmg = Player.GetAutoAttackDamage(minion);
-
-            if (pred < dmg)
+            if (pred < Player.GetAutoAttackDamage(minion))
             {
                 return true;
             }
@@ -995,7 +992,7 @@ namespace Aimtec.SDK.Orbwalking
         // ReSharper disable once SuggestBaseTypeForParameter
         private int TimeForAutoToReachTarget(AttackableUnit minion, bool applyDelay = false)
         {
-            var dist = Player.Distance(minion) - Player.BoundingRadius - minion.BoundingRadius;
+            var dist = Player.Distance(minion) - Player.BoundingRadius;
             var attackTravelTime = dist / (int)GetBasicAttackMissileSpeed(ObjectManager.GetLocalPlayer()) * 1000f;
             var totalTime = (int)(this.AnimationTime + attackTravelTime + Game.Ping / 2f);
 
