@@ -301,7 +301,7 @@
             {
                 var selected = this.GetSelectedTarget();
 
-                if (selected != null)
+                if (selected.IsValidTarget())
                 {
                     var distance = Player.Distance(selected);
                     var inRange = autoattack ? distance < Player.GetFullAttackRange(selected) : distance < range;
@@ -797,7 +797,7 @@
 
             internal void OnRender()
             {
-                if (this.SelectedTarget == null || this.TargetLockState == LockState.None)
+                if (!this.SelectedTarget.IsValidTarget() || this.TargetLockState == LockState.None)
                 {
                     return;
                 }
