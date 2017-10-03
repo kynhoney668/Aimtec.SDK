@@ -17,6 +17,9 @@
     {
         #region Fields
 
+        private TargetLockingManager TargetLockManager { get; set; }
+
+        #region Hero Priorities
         private readonly string[] highPriority =
         {
             "Akali",
@@ -161,13 +164,9 @@
             "RekSai"
         };
 
+        #endregion
+
         public readonly List<Weight> Weights = new List<Weight>();
-
-        private bool FocusSelected => this.Config["Misc"]["FocusSelected"].Enabled;
-
-        private bool AssasinMode => this.Config["Misc"]["AssasinMode"].Enabled;
-
-        private bool Magnet => this.Config["Misc"]["Magnet"].Enabled;
 
         #endregion
 
@@ -175,10 +174,11 @@
 
         public TargetSelectorImpl()
         {
+            this.Config = new Menu("Aimtec.TS", "Target Selector");
+            this.TargetLockManager = new TargetLockingManager(this);
             this.CreateMenu();
             this.CreateWeights();
             Render.OnRender += this.RenderManagerOnOnRender;
-            Game.OnWndProc += this.GameOnOnWndProc;
         }
 
         #endregion
@@ -213,8 +213,6 @@
 
         public TargetSelectorMode Mode => (TargetSelectorMode)this.Config["TsMode"].As<MenuList>().Value;
 
-        public Obj_AI_Hero SelectedTarget { get; set; }
-
         #endregion
 
         #region Properties
@@ -229,7 +227,7 @@
 
         public Obj_AI_Hero GetSelectedTarget()
         {
-            return this.SelectedTarget;
+            return this.TargetLockManager.SelectedTarget;
         }
 
         public void AddWeight(Weight weight)
@@ -241,7 +239,7 @@
         public void Dispose()
         {
             Render.OnRender -= this.RenderManagerOnOnRender;
-            Game.OnWndProc -= this.GameOnOnWndProc;
+            this.TargetLockManager.Dispose();
         }
 
         public TargetPriority GetDefaultPriority(Obj_AI_Hero hero)
@@ -271,6 +269,18 @@
             return TargetPriority.MinPriority;
         }
 
+        public void MoveToFront(Obj_AI_Hero target, ref List<Obj_AI_Hero> targets)
+        {
+            var containsSelected = targets.Any(x => x.NetworkId == target.NetworkId); // if selected target is in target list
+            if (containsSelected)
+            {
+                targets.RemoveAll(x => x.NetworkId == target.NetworkId);
+            }
+
+            // Put selected target at beginning of list even if there weight is lower
+            targets.Insert(0, target);
+        }
+
         public List<Obj_AI_Hero> GetOrderedTargets(float range, bool autoattack = false)
         {
             List<Obj_AI_Hero> orderedTargets;
@@ -285,36 +295,35 @@
                 orderedTargets = this.GetOrderedTargetsByMode(range, autoattack).ToList();
             }
 
-            if (this.FocusSelected)
+            var lockState = this.TargetLockManager.TargetLockState;
+
+            if (lockState.HasFlag(TargetLockingManager.LockState.Prioritize))
             {
                 var selected = this.GetSelectedTarget();
 
                 if (selected != null)
                 {
                     var distance = Player.Distance(selected);
-                    var inRange = autoattack ? distance < Player.GetFullAttackRange(this.SelectedTarget) : distance < range;
+                    var inRange = autoattack ? distance < Player.GetFullAttackRange(selected) : distance < range;
 
-                    if (this.AssasinMode)
+                    if (lockState == TargetLockingManager.LockState.Prioritize)
                     {
-                        if (inRange || this.Magnet)
+                        if (inRange)
+                        {
+                            this.MoveToFront(selected, ref orderedTargets);
+                            return orderedTargets;
+                        }
+                    }
+
+                    else if (lockState.HasFlag(TargetLockingManager.LockState.OnlyAttackTarget))
+                    {
+                        if (inRange || lockState.HasFlag(TargetLockingManager.LockState.Magnetize))
                         {
                             return new List<Obj_AI_Hero>
                                        { selected }; // Return only the selected target if we assasin mode
                         }
 
-                        return new List<Obj_AI_Hero>() { }; // Return nothing if the target is out of range and magnet not enabled
-                    }
-
-                    // Non Assasination Mode logic
-                    else if (inRange || this.Magnet) 
-                    {
-                        var containsSelected = orderedTargets.Any(x => x.NetworkId == selected.NetworkId); // if selected target is in target list
-                        if (containsSelected)
-                        {
-                            // Put selected target at beginning of list even if there weight is lower
-                            orderedTargets.RemoveAll(x => x.NetworkId == selected.NetworkId);
-                            orderedTargets.Insert(0, selected); 
-                        }
+                        return new List<Obj_AI_Hero>() { }; // Return nothing if the target is out of range
                     }
                 }
             }
@@ -427,8 +436,6 @@
         {
             Logger.Info("Constructing Menu for default Target Selector");
 
-            this.Config = new Menu("Aimtec.TS", "Target Selector");
-
             var weights = new Menu("WeightsMenu", "Weights");
             this.Config.Add(weights);
 
@@ -442,19 +449,12 @@
             var drawings = new Menu("Drawings", "Drawings")
             {
                 new MenuBool("IndicateSelected", "Indicate Selected Target"),
+                new MenuBool("ShowLineToSelected", "Show Line to Selected"),
                 new MenuBool("ShowOrder", "Show Target Order"),
                 new MenuBool("ShowOrderAuto", "Auto range only")
             };
+
             this.Config.Add(drawings);
-
-            var miscMenu = new Menu("Misc", "Misc")
-            {
-                new MenuBool("FocusSelected", "Focus Selected Target"),
-                new MenuBool("AssasinMode", "Assasin Mode", false).SetToolTip("Only Attack Selected Target"),
-                new MenuBool("Magnet", "Magnet", false).SetToolTip("Force walk towards selected target if not in range")
-            };
-
-            this.Config.Add(miscMenu);
 
             this.Config.Add(new MenuBool("UseWeights", "Use Weights"));
             this.Config.Add(new MenuList("TsMode", "Mode", Enum.GetNames(typeof(TargetSelectorMode)), 0));
@@ -544,33 +544,6 @@
                     WeightEffect.LowerIsBetter));
         }
 
-        private void GameOnOnWndProc(WndProcEventArgs args)
-        {
-            if (!this.FocusSelected)
-            {
-                return;
-            }
-
-            var message = args.Message;
-            if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
-            {
-                var clickPosition = Game.CursorPos;
-
-                var targets = ObjectManager
-                    .Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(5000)).OrderBy(x => x.Distance(clickPosition));
-
-                var closestHero = targets.FirstOrDefault(x => x.IsHero);
-
-                if (closestHero != null && Game.CursorPos.Distance(closestHero.Position) <= 300)
-                {
-                    this.SelectedTarget = closestHero;
-                }
-                else
-                {
-                    this.SelectedTarget = null;
-                }
-            }
-        }
 
         private Dictionary<Obj_AI_Hero, float> GetTargetsAndWeights(float range, bool autoattack = false)
         {
@@ -599,7 +572,7 @@
         {
             var results = this.GetTargetsAndWeights(range, autoattack).ToList();
 
-            if (this.FocusSelected)
+            if (this.TargetLockManager.FocusSelected)
             {
                 var selected = this.GetSelectedTarget();
 
@@ -615,18 +588,8 @@
 
         private void RenderManagerOnOnRender()
         {
-            var indicateSelected = this.Config["Drawings"]["IndicateSelected"].Enabled;
             var showOrder = this.Config["Drawings"]["ShowOrder"].Enabled;
             var showOrderAuto = this.Config["Drawings"]["ShowOrderAuto"].Enabled;
-
-            if (indicateSelected)
-            {
-                var selected = this.GetSelectedTarget();
-                if (selected != null)
-                {
-                    Render.Circle(selected.Position, selected.BoundingRadius * 2, 30, Color.Red);
-                }
-            }
 
             if (showOrder)
             {
@@ -658,6 +621,8 @@
                     }
                 }
             }
+
+            this.TargetLockManager.OnRender();
         }
 
         #endregion
@@ -748,6 +713,162 @@
             }
 
             #endregion
+        }
+
+        class TargetLockingManager
+        {
+            internal bool FocusSelected => this.Config["FocusSelected"].Enabled;
+
+            public LockState TargetLockState { get; set; } = LockState.None;
+
+            public Obj_AI_Hero SelectedTarget { get; set; }
+
+            public Menu Config { get; set; }
+
+            public TargetSelectorImpl TSInstance { get; set; }
+
+            public TargetLockingManager(TargetSelectorImpl ins)
+            {
+                this.TSInstance = ins;
+
+                this.Config = new Menu("TargetLocking", "Target Locking")
+                                  {
+                                      new MenuSeperator("info1", "Click Target To Focus"),
+                                      new MenuSeperator("info2", "1st Click = Priority Target"),
+                                      new MenuSeperator("info3", "2nd Click = Only Attack Target"),
+                                      new MenuSeperator("info4", "3rd Click = Magnet To Target"),
+                                      new MenuBool("FocusSelected", "Focus Selected Target"),
+                                  };
+
+                this.TSInstance.Config.Add(this.Config);
+
+                Game.OnWndProc += this.Game_OnWndProc;
+            }
+
+            private void Game_OnWndProc(WndProcEventArgs e)
+            {
+                if (!this.FocusSelected)
+                {
+                    return;
+                }
+
+                var message = e.Message;
+
+                if (message == (ulong)WindowsMessages.WM_LBUTTONDOWN)
+                {
+                    var clickPosition = Game.CursorPos;
+
+                    var targets = ObjectManager
+                        .Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(5000)).OrderBy(x => x.Distance(clickPosition));
+
+                    var closestHero = targets.FirstOrDefault(x => x.IsHero);
+
+                    if (closestHero != null && Game.CursorPos.Distance(closestHero.Position) <= 300)
+                    {
+                        if (this.SelectedTarget == null || this.SelectedTarget.NetworkId != closestHero.NetworkId)
+                        {
+                            this.SelectedTarget = closestHero;
+                            this.TargetLockState = LockState.None;
+                        }
+
+                        if (this.TargetLockState == LockState.None)
+                        {
+                            this.TargetLockState = LockState.Prioritize;
+                        }
+
+                        else if (this.TargetLockState == LockState.Prioritize)
+                        {
+                            this.TargetLockState = LockState.Prioritize | LockState.OnlyAttackTarget;
+                        }
+
+                        else
+                        {
+                            this.TargetLockState = LockState.Prioritize | LockState.OnlyAttackTarget | LockState.Magnetize;
+                        }
+                    }
+
+                    else
+                    {
+                        this.SelectedTarget = null;
+                        this.TargetLockState = LockState.None;
+                    }
+                }
+            }
+
+            internal void OnRender()
+            {
+                if (this.SelectedTarget == null || this.TargetLockState == LockState.None)
+                {
+                    return;
+                }
+
+                var indicateSelected = this.TSInstance.Config["Drawings"]["IndicateSelected"].Enabled;
+                var showLine = this.TSInstance.Config["Drawings"]["ShowLineToSelected"].Enabled;
+                if (indicateSelected)
+                {
+                    Color color = Color.White;
+                    string text = "";
+
+                    if (this.TargetLockState.HasFlag(LockState.Prioritize))
+                    {
+                        color = Color.YellowGreen;
+                        Render.Circle(this.SelectedTarget.Position, 150, 100, Color.YellowGreen);
+                        var position = this.SelectedTarget.Position + new Vector3(135, 0, 135);
+                        if (Render.WorldToScreen(position, out Vector2 screenposition))
+                        {
+                            text = "Priority Target";
+                        }
+                    }
+
+                    if (this.TargetLockState.HasFlag(LockState.OnlyAttackTarget))
+                    {
+                        text = "Only Attack Target";
+                        color = Color.Orange;
+                        Render.Circle(this.SelectedTarget.Position, 100, 100, color);
+                    }
+
+                    if (this.TargetLockState.HasFlag(LockState.Magnetize))
+                    {
+                        text = "Magnet Target";
+                        color = Color.Red;
+                        ;
+                        Render.Circle(this.SelectedTarget.Position, 150, 5, color);
+                    }
+
+                    if (showLine)
+                    {
+                        var distance = Player.Position.Distance(this.SelectedTarget.Position);
+                        var midDistance = distance / 2;
+                        var midp = Player.Position.Extend(this.SelectedTarget.Position, midDistance);
+
+                        if (Render.WorldToScreen(Player.Position, out Vector2 pscreenposition) && Render.WorldToScreen(
+                                this.SelectedTarget.Position,
+                                out Vector2 tscreenposition))
+                        {
+                            Render.Line(pscreenposition, tscreenposition, 5, true, color);
+                        }
+
+                        if (Render.WorldToScreen(midp, out Vector2 mscreenposition))
+                        {
+                            Render.Text(text, mscreenposition, RenderTextFlags.Center, color);
+                        }
+                    }
+                }
+            }
+
+            [Flags]
+            public enum LockState
+            {
+                None = 0,
+                Prioritize = 1, //Focus this target if in range
+                OnlyAttackTarget = 2, //Only attack this target
+                Magnetize = 4  // Force this target no matter what (Assasin/Outofrange)
+            }
+
+            internal void Dispose()
+            {
+                Game.OnWndProc -= this.Game_OnWndProc;
+            }
         }
     }
 }
