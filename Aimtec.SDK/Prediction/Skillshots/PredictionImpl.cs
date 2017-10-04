@@ -381,13 +381,19 @@
 
         internal static double UnitIsImmobileUntil(Obj_AI_Base unit)
         {
-            var result = unit.Buffs.Where(
-                buff => buff.IsActive && Game.ClockTime <= buff.EndTime
-                    && (buff.Type == BuffType.Charm || buff.Type == BuffType.Knockup
-                        || buff.Type == BuffType.Stun || buff.Type == BuffType.Suppression
-                        || buff.Type == BuffType.Snare)).Aggregate(
-                0d,
-                (current, buff) => Math.Max(current, buff.EndTime));
+            var immobileBuffsArray = new[]
+            {
+                BuffType.Charm,
+                BuffType.Knockup,
+                BuffType.Stun,
+                BuffType.Suppression,
+                BuffType.Snare
+            };
+            var result = unit.ValidActiveBuffs()
+                .Where(buff =>
+                    Game.ClockTime <= buff.EndTime &&
+                    immobileBuffsArray.Contains(buff.Type))
+                .Aggregate(0d, (current, buff) => Math.Max(current, buff.EndTime));
             return result - Game.ClockTime;
         }
 
