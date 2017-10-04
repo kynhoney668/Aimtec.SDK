@@ -67,12 +67,13 @@ namespace Aimtec.SDK.Damage
                                    Type = DamageReduction.ReductionDamageType.Percent,
                                    ReductionDamage = (source, attacker) =>
                                        {
-										   if (ObjectManager.Get<GameObject>().Any(p => p.IsAlly && p.Name == "Garen_Base_W_Shoulder_L.troy"))
-                                           {
+                                            var objects = ObjectManager.Get<GameObject>().Where(o => o.IsValid && o.Name == "Garen_Base_W_Shoulder_L.troy");
+                                            if (objects.Any(o => ObjectManager.Get<Obj_AI_Hero>().Where(t => t.Team == o.Team).MinBy(t => t.Distance(o)) == source))
+                                            {
                                                 return 60;
-                                           }
+                                            }
 
-                                           return 30;
+                                            return 30;
                                        }
                                });
 

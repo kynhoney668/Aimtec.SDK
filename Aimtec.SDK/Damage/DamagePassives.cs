@@ -481,17 +481,14 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (target.HasBuff("FizzW"))
                                          {
-                                             if (ObjectManager.Get<GameObject>().Any(o =>
-                                                    o.IsValid &&
-                                                    o.Distance(target) <= 50 &&
-                                                    o.Name == "Fizz_Base_W_DmgMarker_champion.troy"))
+                                             var normalObjects = ObjectManager.Get<GameObject>().Where(o => o.IsValid && o.Name == "Fizz_Base_W_DmgMarker_champion.troy");
+                                             if (normalObjects.Any(o => ObjectManager.Get<Obj_AI_Hero>().Where(t => t.Team != o.Team).MinBy(t => t.Distance(o)) == target))
                                              {
-                                                 return source.GetSpellDamage(target, SpellSlot.W);
+                                                return source.GetSpellDamage(target, SpellSlot.W);
                                              }
-                                             if (ObjectManager.Get<GameObject>().Any(o =>
-                                                    o.IsValid &&
-                                                    o.Distance(target) <= 50 &&
-                                                    o.Name == "Fizz_Base_W_DmgMarkerMaintain.troy"))
+
+                                             var empoweredObjects = ObjectManager.Get<GameObject>().Where(o => o.IsValid && o.Name == "Fizz_Base_W_DmgMarkerMaintain.troy");
+                                             if (empoweredObjects.Any(o => ObjectManager.Get<Obj_AI_Hero>().Where(t => t.Team != o.Team).MinBy(t => t.Distance(o)) == target))
                                              {
                                                  return source.GetSpellDamage(target, SpellSlot.W, DamageStage.Empowered);
                                              }
@@ -806,10 +803,8 @@ namespace Aimtec.SDK.Damage
                                  DamageType = DamagePassive.PassiveDamageType.FlatPhysical,
                                  PassiveDamage = (source, target) =>
                                      {
-                                         if (ObjectManager.Get<GameObject>().Any(o =>
-                                                o.IsValid &&
-                                                o.Distance(target) <= 50 &&
-                                                o.Name == "Kled_Base_W_4th_ready.troy"))
+                                         var objects = ObjectManager.Get<GameObject>().Where(o => o.IsValid && o.Name == "Kled_Base_W_4th_ready.troy");
+                                         if (objects.Any(o => ObjectManager.Get<Obj_AI_Hero>().Where(t => t.Team == o.Team).MinBy(t => t.Distance(o)) == source))
                                          {
                                              return source.GetSpellDamage(target, SpellSlot.W);
                                          }
@@ -922,9 +917,7 @@ namespace Aimtec.SDK.Damage
                                              .FirstOrDefault(o => o.IsValid && o.Name == "MissFortune_Base_P_Mark.troy");
                                          if (passiveObject != null)
                                          {
-                                             var passiveUnit = ObjectManager.Get<AttackableUnit>()
-                                                 .MinBy(o => o.Distance(passiveObject));
-
+                                             var passiveUnit = ObjectManager.Get<AttackableUnit>().MinBy(o => o.Distance(passiveObject));
                                              if (passiveUnit != null &&
                                                  target != passiveUnit)
                                              {
