@@ -114,7 +114,7 @@ namespace Aimtec.SDK.Orbwalking
             "xenzhaothrust2",
             "xenzhaothrust3",
             "frostarrow",
-            "garenslash2",
+            "garenqattack",
             "kennenmegaproc",
             "masteryidoublestrike"
         };
