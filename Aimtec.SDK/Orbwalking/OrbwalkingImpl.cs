@@ -116,7 +116,8 @@ namespace Aimtec.SDK.Orbwalking
             "frostarrow",
             "garenqattack",
             "kennenmegaproc",
-            "masteryidoublestrike"
+            "masteryidoublestrike",
+            "mordekaiserqattack"
         };
 
         /// <summary>
@@ -921,7 +922,7 @@ namespace Aimtec.SDK.Orbwalking
             if (sender.IsMe)
             {
                 var name = e.SpellData.Name.ToLower();
-                if (this.specialAttacks.Contains(name))
+                if (this.specialAttacks.Any(x => name.StartsWith(x)))
                 {
                     this.ObjAiHeroOnProcessAutoAttack(sender, e);
                 }
