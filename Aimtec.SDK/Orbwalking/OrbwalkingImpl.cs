@@ -40,10 +40,26 @@ namespace Aimtec.SDK.Orbwalking
         public float AnimationTime => Player.AttackCastDelay * 1000;
 
         public float AttackCoolDownTime
-           =>
-               (Player.ChampionName.Equals("Graves")
-                    ? 1.07402968406677f * Player.AttackDelay - 0.716238141059875f
-                    : Player.AttackDelay) * 1000 - this.AttackDelayReduction;
+        {
+            get
+            {
+                var champion = Player.ChampionName;
+
+                var attackDelay = Player.AttackDelay * 1000;
+
+                if (champion.Equals("Graves"))
+                {
+                    attackDelay = (1.07402968406677f * Player.AttackDelay - 0.716238141059875f) * 1000;
+                }
+
+                if (champion.Equals("Kalista") && !this.Config["Misc"]["KalistaFly"].Enabled)
+                {
+                    return attackDelay;
+                }
+
+                return attackDelay - this.AttackDelayReduction;
+            }
+        }
 
         public override bool IsWindingUp
         {
@@ -64,8 +80,6 @@ namespace Aimtec.SDK.Orbwalking
             >= this.AttackCoolDownTime;
 
         private bool Attached { get; set; }
-
-
 
         private int AttackDelayReduction => this.Config["Advanced"]["AttackDelayReduction"].Value;
 
@@ -271,7 +285,10 @@ namespace Aimtec.SDK.Orbwalking
 
             if (this.NoCancelChamps.Contains(Player.ChampionName))
             {
-                return true;
+                if (Player.ChampionName.Equals("Kalista") && this.Config["Misc"]["KalistaFly"].Enabled)
+                {
+                    return true;
+                }
             }
 
             if (this.IsWindingUp)
@@ -428,6 +445,7 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (sender.IsMe)
             {
+                Console.WriteLine(args.SpellData.Name);
                 if (args.Target is AttackableUnit targ)
                 {
                     this.ServerAttackDetectionTick = Game.TickCount - Game.Ping / 2;
@@ -833,14 +851,15 @@ namespace Aimtec.SDK.Orbwalking
 
                 new Menu("Misc", "Misc")
                 {
-                    new MenuSlider("HoldPositionRadius", "Hold Radius", 50, 0, 400, true)
+                    new MenuSlider("HoldPositionRadius", "Hold Radius", 50, 0, 400, true),
+                    new MenuBool("KalistaFly", "Kalista Fly", true, true), 
                 },
 
                 new Menu("Drawings", "Drawings")
                 {
-                    new MenuBool("DrawAttackRange", "Draw Attack Range"),
-                    new MenuBool("DrawHoldRadius", "Draw Hold Radius"),
-                    new MenuBool("DrawKillableMinion", "Indicate Killable")
+                    new MenuBool("DrawAttackRange", "Draw Attack Range", true),
+                    new MenuBool("DrawHoldRadius", "Draw Hold Radius", true),
+                    new MenuBool("DrawKillableMinion", "Indicate Killable", true)
                 }
             };
 

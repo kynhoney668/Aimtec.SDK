@@ -85,6 +85,7 @@
         /// <summary>
         ///     Gets whether this keybind is currently listening for key presses
         /// </summary>
+        [JsonProperty(Order = 4)]
         internal bool Inactive { get; set; }
 
         /// <summary>
@@ -188,6 +189,7 @@
 
                 if (sValue?.InternalName != null)
                 {
+                    this.Inactive = sValue.Inactive;
                     this.Value = sValue.Value;
                     this.Key = sValue.Key;
                 }
@@ -201,6 +203,7 @@
             {
                 this.Inactive = true;
                 this.Value = false;
+                this.Key = KeyCode.None;
                 return;
             }
 
@@ -212,6 +215,8 @@
                 Key = this.Key,
                 KeybindType = this.KeybindType
             };
+
+            this.Inactive = false; 
 
             this.Key = key;
 

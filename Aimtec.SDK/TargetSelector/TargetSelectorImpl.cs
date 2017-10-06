@@ -740,9 +740,23 @@
                                       new MenuBool("FocusSelected", "Focus Selected Target"),
                                   };
 
+                var resetKey = new MenuKeyBind("resetkey", "Reset Target", KeyCode.None, KeybindType.Press).SetToolTip("Resets the selected target upon releasing key");
+
+                resetKey.OnValueChanged += this.ResetKey_OnValueChanged;
+
+                this.Config.Add(resetKey);
+
                 this.TSInstance.Config.Add(this.Config);
 
                 Game.OnWndProc += this.Game_OnWndProc;
+            }
+
+            private void ResetKey_OnValueChanged(MenuComponent sender, ValueChangedArgs args)
+            {
+                if (!args.GetNewValue<MenuKeyBind>().Enabled)
+                {
+                    this.SelectedTarget = null;
+                }
             }
 
             private void Game_OnWndProc(WndProcEventArgs e)
