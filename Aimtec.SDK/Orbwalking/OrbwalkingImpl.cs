@@ -49,7 +49,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 if (champion.Equals("Graves"))
                 {
-                    attackDelay = (1.07402968406677f * Player.AttackDelay - 0.716238141059875f) * 1000;
+                    attackDelay = (1.0740296828f * Player.AttackDelay - 0.7162381256175f) * 1000;
                 }
 
                 if (champion.Equals("Kalista") && !this.Config["Misc"]["KalistaFly"].Enabled)
