@@ -445,7 +445,6 @@ namespace Aimtec.SDK.Orbwalking
         {
             if (sender.IsMe)
             {
-                Console.WriteLine(args.SpellData.Name);
                 if (args.Target is AttackableUnit targ)
                 {
                     this.ServerAttackDetectionTick = Game.TickCount - Game.Ping / 2;
