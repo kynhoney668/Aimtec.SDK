@@ -6238,18 +6238,10 @@
 			{
 				"Stage": "Default",
 				"SpellData": {
-					"SpellEffectType": "None",
+					"SpellEffectType": "Attack",
 					"IsApplyOnHit": true,
 					"DamageType": "Physical",
-					"Damages": [30.0, 50.0, 70.0, 90.0, 110.0],
-					"BonusDamages": [
-						{
-							"DamageType": "Physical",
-							"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
-							"ScalingTarget": "Source",
-							"ScalingType": "AttackPoints"
-						}
-					]
+					"Damages": [30.0, 50.0, 70.0, 90.0, 110.0]
 				}
 			},
 			{

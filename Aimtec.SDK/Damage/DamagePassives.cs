@@ -955,7 +955,9 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("NasusQ"))
                                          {
-                                             return source.GetSpellDamage(target, SpellSlot.Q) + source.GetRealBuffCount("nasusqstacks");
+                                             return
+                                                source.GetSpellDamage(target, SpellSlot.Q) +
+                                                source.GetSpellDamage(target, SpellSlot.Q, DamageStage.Buff);
                                          }
 
                                          return 0;
