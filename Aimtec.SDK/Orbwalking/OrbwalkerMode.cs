@@ -2,6 +2,7 @@
 {
     using System;
 
+    using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
     using Aimtec.SDK.Menu.Config;
     using Aimtec.SDK.Util;
@@ -28,9 +29,11 @@
         /// </summary>
         public AOrbwalker ParentInstance;
 
-        private bool attackEnabled;
+        internal Menu ModeMenu { get; set; }
 
-        private bool moveEnabled;
+        private bool attackEnabled = true;
+
+        private bool moveEnabled = true;
 
         #endregion
 
@@ -56,6 +59,12 @@
             this.MenuItem = key.KeyBindItem;
             key.Activate();
             this.UsingGlobalKey = true;
+
+            this.ModeMenu = new Menu($"orbmode.{name}", name)
+                                {
+                                    new MenuBool($"orbmode.{name}.move", "Movement"),
+                                    new MenuBool($"orbmode.{name}.attack", "Attacking")
+                                };
         }
 
         /// <summary>
@@ -103,9 +112,9 @@
         {
             get
             {
-                if (this.ParentInstance != null && this.ParentInstance.AttackingEnabled)
+                if (!this.ModeMenu[$"orbmode.{this.Name}.attack"].Enabled)
                 {
-                    return true;
+                    return false;
                 }
 
                 return this.attackEnabled;
@@ -130,10 +139,11 @@
         {
             get
             {
-                if (this.ParentInstance != null && this.ParentInstance.MovingEnabled)
+                if (!this.ModeMenu[$"orbmode.{this.Name}.move"].Enabled)
                 {
-                    return true;
+                    return false;
                 }
+
                 return this.moveEnabled;
             }
             set => this.moveEnabled = value;

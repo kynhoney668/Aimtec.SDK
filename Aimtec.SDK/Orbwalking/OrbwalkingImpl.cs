@@ -87,8 +87,6 @@ namespace Aimtec.SDK.Orbwalking
 
         private int HoldPositionRadius => this.Config["Misc"]["HoldPositionRadius"].Value;
 
-        private int FarmDelay => this.Config["Farming"]["FarmDelay"].Value;
-
         private bool DrawAttackRange => this.Config["Drawings"]["DrawAttackRange"].Enabled;
 
         private bool DrawHoldPosition => this.Config["Drawings"]["DrawHoldRadius"].Enabled;
@@ -829,39 +827,40 @@ namespace Aimtec.SDK.Orbwalking
 
         private void Initialize()
         {
-            this.Config = new Menu("Orbwalker", "Orbwalker")
-            {
-                new Menu("Advanced", "Advanced")
-                {
-                    new MenuSlider("AttackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true)
-                },
+            var advanced = new Menu("Advanced", "Advanced")
+                               {
+                                   new MenuSlider("AttackDelayReduction", "Attack Delay Reduction", 90, 0, 180, true)
+                               };
 
-                new Menu("Attacking", "Attacking")
-                {
-                    new MenuSlider("ExtraWindup", "Additional Windup", Game.Ping / 2, 0, 200, true)
-                },
+            var attacking = new Menu("Attacking", "Attacking")
+                                { new MenuSlider("ExtraWindup", "Additional Windup", Game.Ping / 2, 0, 200, true) };
 
-                new Menu("Farming", "Farming")
-                {
-                    new MenuSlider("FarmDelay", "Farm Delay", 0, 0, 120, true).SetToolTip("Additional Delay for auto attack when farming"),
-                    new MenuBool("AttackPlants", "Attack Plants", false, true),
-                    new MenuBool("AttackWards", "Attack Wards", true, true),
-                    new MenuBool("AttackBarrels", "Attack Barrels", true, true)
-                },
+            var farming = new Menu("Farming", "Farming")
+                              {
+                                  new MenuBool("AttackPlants", "Attack Plants", false, true),
+                                  new MenuBool("AttackWards", "Attack Wards", true, true),
+                                  new MenuBool("AttackBarrels", "Attack Barrels", true, true)
+                              };
 
-                new Menu("Misc", "Misc")
-                {
-                    new MenuSlider("HoldPositionRadius", "Hold Radius", 50, 0, 400, true),
-                    new MenuBool("KalistaFly", "Kalista Fly", true, true), 
-                },
+            var misc = new Menu("Misc", "Misc")
+                           {
+                               new MenuSlider("HoldPositionRadius", "Hold Radius", 50, 0, 400, true),
+                               new MenuBool("KalistaFly", "Kalista Fly", true, true),
+                           };
 
-                new Menu("Drawings", "Drawings")
-                {
-                    new MenuBool("DrawAttackRange", "Draw Attack Range", true),
-                    new MenuBool("DrawHoldRadius", "Draw Hold Radius", true),
-                    new MenuBool("DrawKillableMinion", "Indicate Killable", true)
-                }
-            };
+            var drawings = new Menu("Drawings", "Drawings")
+                               {
+                                   new MenuBool("DrawAttackRange", "Draw Attack Range"),
+                                   new MenuBool("DrawHoldRadius", "Draw Hold Radius"),
+                                   new MenuBool("DrawKillableMinion", "Indicate Killable")
+                               };
+
+            this.Config.Add(advanced);
+            this.Config.Add(attacking);
+            this.Config.Add(farming);
+            this.Config.Add(misc);
+            this.Config.Add(drawings);
+
 
             this.AddMode(this.Combo = new OrbwalkerMode("Combo", GlobalKeys.ComboKey, this.GetHeroTarget, null));
             this.AddMode(this.LaneClear = new OrbwalkerMode("Laneclear", GlobalKeys.WaveClearKey, this.GetLaneClearTarget, null));
@@ -1009,13 +1008,12 @@ namespace Aimtec.SDK.Orbwalking
         }
 
         // ReSharper disable once SuggestBaseTypeForParameter
-        private int TimeForAutoToReachTarget(AttackableUnit minion, bool applyDelay = false)
+        private int TimeForAutoToReachTarget(AttackableUnit minion)
         {
-            var dist = Player.Distance(minion) - Player.BoundingRadius;
+            var dist = Player.ServerPosition.Distance(minion.ServerPosition);
             var attackTravelTime = dist / (int)GetBasicAttackMissileSpeed(ObjectManager.GetLocalPlayer()) * 1000f;
             var totalTime = (int)(this.AnimationTime + attackTravelTime + Game.Ping / 2f);
-
-            return totalTime + (applyDelay ? this.FarmDelay : 0);
+            return totalTime;
         }
 
         #endregion

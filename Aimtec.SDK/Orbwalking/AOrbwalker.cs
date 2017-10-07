@@ -15,6 +15,15 @@
     /// </summary>
     public abstract class AOrbwalker : IOrbwalker
     {
+        public Menu ModeMenu { get; set; }
+
+        public AOrbwalker()
+        {
+            this.Config = new Menu("Orbwalker", "Orbwalker");
+            this.ModeMenu = new Menu("Modes", "Modes");
+            this.Config.Add(this.ModeMenu);
+        }
+
         #region Fields
 
         /// <summary>
@@ -28,102 +37,102 @@
         protected Menu Config;
 
         private string[] attackResets =
-        {
-            "dariusnoxiantacticsonh",
-            "fiorae",
-            "garenq",
-            "gravesmove",
-            "hecarimrapidslash",
-            "jaxempowertwo",
-            "jaycehypercharge",
-            "leonashieldofdaybreak",
-            "luciane",
-            "monkeykingdoubleattack",
-            "mordekaisermaceofspades",
-            "nasusq",
-            "nautiluspiercinggaze",
-            "netherblade",
-            "gangplankqwrapper",
-            "powerfist",
-            "renektonpreexecute",
-            "rengarq",
-            "shyvanadoubleattack",
-            "sivirw",
-            "takedown",
-            "talonnoxiandiplomacy",
-            "trundletrollsmash",
-            "vaynetumble",
-            "vie",
-            "volibearq",
-            "xenzhaocombotarget",
-            "yorickspectral",
-            "reksaiq",
-            "itemtitanichydracleave",
-            "masochism",
-            "illaoiw",
-            "elisespiderw",
-            "fiorae",
-            "meditate",
-            "sejuaninorthernwinds",
-            "asheq",
-            "camilleq",
-            "camilleq2",
-            "vorpalspikes"
-        };
+            {
+                "dariusnoxiantacticsonh",
+                "fiorae",
+                "garenq",
+                "gravesmove",
+                "hecarimrapidslash",
+                "jaxempowertwo",
+                "jaycehypercharge",
+                "leonashieldofdaybreak",
+                "luciane",
+                "monkeykingdoubleattack",
+                "mordekaisermaceofspades",
+                "nasusq",
+                "nautiluspiercinggaze",
+                "netherblade",
+                "gangplankqwrapper",
+                "powerfist",
+                "renektonpreexecute",
+                "rengarq",
+                "shyvanadoubleattack",
+                "sivirw",
+                "takedown",
+                "talonnoxiandiplomacy",
+                "trundletrollsmash",
+                "vaynetumble",
+                "vie",
+                "volibearq",
+                "xenzhaocombotarget",
+                "yorickspectral",
+                "reksaiq",
+                "itemtitanichydracleave",
+                "masochism",
+                "illaoiw",
+                "elisespiderw",
+                "fiorae",
+                "meditate",
+                "sejuaninorthernwinds",
+                "asheq",
+                "camilleq",
+                "camilleq2",
+                "vorpalspikes"
+            };
 
         /// <summary>
         ///     Spells that are attacks even if they don't have the "attack" word in their name.
         /// </summary>
         public static string[] SpecialAttacks =
-        {
-            "caitlynheadshotmissile",
-            "kennenmegaproc",
-            "masteryidoublestrike",
-            "quinnwenhanced",
-            "renektonexecute",
-            "renektonsuperexecute",
-            "trundleq",
-            "viktorqbuff",
-            "xenzhaothrust",
-            "xenzhaothrust2",
-            "xenzhaothrust3"
-        };
+            {
+                "caitlynheadshotmissile",
+                "kennenmegaproc",
+                "masteryidoublestrike",
+                "quinnwenhanced",
+                "renektonexecute",
+                "renektonsuperexecute",
+                "trundleq",
+                "viktorqbuff",
+                "xenzhaothrust",
+                "xenzhaothrust2",
+                "xenzhaothrust3"
+            };
 
         /// <summary>
         ///     Spells that are not attacks even if they have the "attack" word in their name.
         /// </summary>
         public static string[] NoAttacks =
-        {
-            "asheqattacknoonhit",
-            "volleyattackwithsound",
-            "volleyattack",
-            "annietibbersbasicattack",
-            "annietibbersbasicattack2",
-            "azirsoldierbasicattack",
-            "azirsundiscbasicattack",
-            "elisespiderlingbasicattack",
-            "gravesbasicattackspread",
-            "gravesautoattackrecoil",
-            "heimertyellowbasicattack",
-            "heimertyellowbasicattack2",
-            "heimertbluebasicattack",
-            "jarvanivcataclysmattack",
-            "kindredwolfbasicattack",
-            "malzaharvoidlingbasicattack",
-            "malzaharvoidlingbasicattack2",
-            "malzaharvoidlingbasicattack3",
-            "shyvanadoubleattack",
-            "shyvanadoubleattackdragon",
-            "sivirwattackbounce",
-            "monkeykingdoubleattack",
-            "yorickspectralghoulbasicattack",
-            "yorickdecayedghoulbasicattack",
-            "yorickravenousghoulbasicattack",
-            "zyragraspingplantattack",
-            "zyragraspingplantattack2",
-            "zyragraspingplantattackfire",
-            "zyragraspingplantattack2fire"
-        };
+            {
+                "asheqattacknoonhit",
+                "volleyattackwithsound",
+                "volleyattack",
+                "annietibbersbasicattack",
+                "annietibbersbasicattack2",
+                "azirsoldierbasicattack",
+                "azirsundiscbasicattack",
+                "elisespiderlingbasicattack",
+                "gravesbasicattackspread",
+                "gravesautoattackrecoil",
+                "heimertyellowbasicattack",
+                "heimertyellowbasicattack2",
+                "heimertbluebasicattack",
+                "jarvanivcataclysmattack",
+                "kindredwolfbasicattack",
+                "malzaharvoidlingbasicattack",
+                "malzaharvoidlingbasicattack2",
+                "malzaharvoidlingbasicattack3",
+                "shyvanadoubleattack",
+                "shyvanadoubleattackdragon",
+                "sivirwattackbounce",
+                "monkeykingdoubleattack",
+                "yorickspectralghoulbasicattack",
+                "yorickdecayedghoulbasicattack",
+                "yorickravenousghoulbasicattack",
+                "zyragraspingplantattack",
+                "zyragraspingplantattack2",
+                "zyragraspingplantattackfire",
+                "zyragraspingplantattack2fire"
+            };
 
         #endregion
 
@@ -268,6 +277,8 @@
             {
                 this.Config.Add(mode.MenuItem);
             }
+
+            this.ModeMenu.Add(mode.ModeMenu);
         }
 
         /// <inheritdoc cref="IOrbwalker" />
