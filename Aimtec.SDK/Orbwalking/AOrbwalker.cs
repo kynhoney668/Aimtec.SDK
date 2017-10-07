@@ -42,7 +42,6 @@
                 "fiorae",
                 "garenq",
                 "gravesmove",
-                "hecarimrapidslash",
                 "jaxempowertwo",
                 "jaycehypercharge",
                 "leonashieldofdaybreak",
