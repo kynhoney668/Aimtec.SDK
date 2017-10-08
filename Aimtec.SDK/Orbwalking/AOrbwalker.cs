@@ -73,7 +73,6 @@
                 "fiorae",
                 "meditate",
                 "sejuaninorthernwinds",
-                "asheq",
                 "camilleq",
                 "camilleq2",
                 "vorpalspikes"
