@@ -279,7 +279,7 @@
             }
 
             // Pass message to children
-            foreach (var child in this.Children.Values)
+            foreach (var child in this.Children.Values.ToArray())
             {
                 child.BaseWndProc(message, wparam, lparam);
             }
