@@ -80,6 +80,13 @@
             this.ModeBehaviour = orbwalkBehaviour;
             this.GetTargetImplementation = targetDelegate;
             this.MenuItem = new MenuKeyBind(name, name, key, KeybindType.Press);
+
+
+            this.ModeMenu = new Menu($"orbmode.{name}", name)
+                                {
+                                    new MenuBool($"orbmode.{name}.move", "Movement"),
+                                    new MenuBool($"orbmode.{name}.attack", "Attacking")
+                                };
         }
 
         #endregion
