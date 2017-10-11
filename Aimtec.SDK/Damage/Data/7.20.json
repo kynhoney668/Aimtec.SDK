@@ -2715,7 +2715,7 @@
 					"BonusDamages": [
 						{
 							"DamageType": "Physical",
-							"DamagePercentages": [0.8, 0.8, 0.8, 0.8, 0.8],
+							"DamagePercentages": [1.0, 1.0, 1.0, 1.0, 1.0],
 							"ScalingTarget": "Source",
 							"ScalingType": "BonusAttackPoints"
 						}
@@ -6800,10 +6800,10 @@
 					"BonusDamages": [
 						{
 							"DamageType": "Magical",
-							"DamagePercentages": [0.15, 0.175, 0.20, 0.225, 0.25],
+							"DamagePercentages": [0.12, 0.14, 0.16, 0.18, 0.20],
 							"MinDamage": [80, 130, 180, 230, 280],
 							"ScalingTarget": "Target",
-							"ScalingType": "CurrentHealth"
+							"ScalingType": "MaxHealth"
 						}
 					]
 				}
