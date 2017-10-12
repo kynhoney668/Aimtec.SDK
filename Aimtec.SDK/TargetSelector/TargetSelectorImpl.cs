@@ -845,7 +845,6 @@
                     {
                         text = "Magnet Target";
                         color = Color.Red;
-                        ;
                         Render.Circle(this.SelectedTarget.Position, 150, 5, color);
                     }
 
