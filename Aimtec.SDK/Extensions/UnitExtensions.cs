@@ -438,10 +438,11 @@ namespace Aimtec.SDK.Extensions
         ///     Returns true if this unit is able to be targetted by spells 
         /// </summary>
         /// <param name="unit">The unit.</param>
+        /// <param name="allyIsValidTarget">Returns if the unit is a valid spell target</param>
         /// <param name="range">The range.</param>
-        public static bool IsValidSpellTarget(this AttackableUnit unit, float range = float.MaxValue)
+        public static bool IsValidSpellTarget(this AttackableUnit unit, bool allyIsValidTarget = false, float range = float.MaxValue)
         {
-            if (!unit.IsValidTarget(range))
+            if (!unit.IsValidTarget(range, allyIsValidTarget))
             {
                 return false;
             }
