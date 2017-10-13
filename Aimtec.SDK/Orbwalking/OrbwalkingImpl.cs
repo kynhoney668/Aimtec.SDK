@@ -466,7 +466,7 @@ namespace Aimtec.SDK.Orbwalking
                 return false;
             }
 
-            return pred <= Player.GetAutoAttackDamage(minion);
+            return pred <= this.GetRealAutoAttackDamage(minion);
         }
 
         /*
@@ -635,7 +635,7 @@ namespace Aimtec.SDK.Orbwalking
                                 //if total time > turret attack arrival time by buffer (can be early/late)
                                 var canReachSooner = totalTime - eta > ExtraBuffer;
 
-                                var myAutoDmg = Player.GetAutoAttackDamage(tTarget);
+                                var myAutoDmg = this.GetRealAutoAttackDamage(tTarget);
 
                                 //if my attk reach sooner than turret & my auto can kill it
                                 if (canReachSooner && myAutoDmg >= tMinionDmgPredHealth)
@@ -699,7 +699,7 @@ namespace Aimtec.SDK.Orbwalking
                                         var travTime1 = dist1 / Player.BasicAttack.MissileSpeed * 1000;
                                         var totalTime1 = (int)(castDelay1 + travTime1 + Game.Ping / 2f);
 
-                                        var dmg1 = Player.GetAutoAttackDamage(minBase);
+                                        var dmg1 = this.GetRealAutoAttackDamage(minBase);
                                         var pred1 = HealthPrediction.Instance.GetPrediction(minBase, totalTime1);
                                         if (dmg1 > pred1)
                                         {
@@ -719,7 +719,7 @@ namespace Aimtec.SDK.Orbwalking
                                     var dist1 = Player.Distance(target) - Player.BoundingRadius - target.BoundingRadius;
                                     var travTime1 = (dist1 / Player.BasicAttack.MissileSpeed) * 1000;
                                     int totalTime1 = (int)(castDelay1 + travTime1 + Game.Ping / 2);
-                                    var dmg1 = Player.GetAutoAttackDamage(target);
+                                    var dmg1 = this.GetRealAutoAttackDamage(target);
                                     var pred = HealthPrediction.Instance.GetPrediction(target, totalTime1);
 
                                     if (pred <= dmg1)
@@ -949,18 +949,29 @@ namespace Aimtec.SDK.Orbwalking
 
             if (this.DrawKillable)
             {
-                foreach (var m in ObjectManager.Get<Obj_AI_Minion>().Where(x => x.IsValidTarget(Player.AttackRange * 2) && x.Health <= Player.GetAutoAttackDamage(x)))
+                foreach (var m in ObjectManager.Get<Obj_AI_Minion>().Where(x => this.IsValidAttackableObject(x) && x.Health <= this.GetRealAutoAttackDamage(x)))
                 {
                     Render.Circle(m.Position, 50, 30, Color.LimeGreen);
                 }
             }
         }
 
+
+        private double GetRealAutoAttackDamage(Obj_AI_Base minion)
+        {
+            if (minion.IsWard())
+            {
+                return 1;
+            }
+
+            return Player.GetAutoAttackDamage(minion);
+        }
+
         private bool ShouldWaitMinion(Obj_AI_Base minion)
         {
             var time = this.TimeForAutoToReachTarget(minion) + (int)Player.AttackDelay * 1000 + 100;
             var pred = HealthPrediction.Instance.GetLaneClearHealthPrediction(minion, (int)(time * 2f));
-            if (pred < Player.GetAutoAttackDamage(minion))
+            if (pred < this.GetRealAutoAttackDamage(minion))
             {
                 return true;
             }

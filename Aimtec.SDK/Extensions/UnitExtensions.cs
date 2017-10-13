@@ -383,6 +383,21 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
+        ///     Determines if unit is a ward
+        /// </summary>
+        public static bool IsWard(this Obj_AI_Base minion)
+        {
+            var name = minion.UnitSkinName.ToLower();
+
+            if (name.Contains("ward") || name.Contains("trinket") || name.Contains("jammerdevice"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         ///     Determines whether the target is a valid target in the auto attack range from the specified check range from
         ///     vector.
         /// </summary>
