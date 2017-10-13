@@ -194,16 +194,18 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             //J4 flag
-            if (unit.Name.Contains("Beacon"))
+            if (unit.Name.Contains("Beacon") || unit.Name.Contains("ZyraSeed"))
             {
                 return false;
             }
 
             var mBase = unit as Obj_AI_Base;
-            if (mBase == null || !mBase.IsFloatingHealthBarActive) 
+
+            if (mBase == null || !mBase.IsFloatingHealthBarActive)
             {
                 return false;
             }
+        
 
             var minion = unit as Obj_AI_Minion;
 

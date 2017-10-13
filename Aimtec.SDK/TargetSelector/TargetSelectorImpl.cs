@@ -317,7 +317,7 @@
 
                     else if (lockState.HasFlag(TargetLockingManager.LockState.OnlyAttackTarget))
                     {
-                        if (inRange || lockState.HasFlag(TargetLockingManager.LockState.Magnetize))
+                        if (inRange || Player.IsMelee && lockState.HasFlag(TargetLockingManager.LockState.Magnetize))
                         {
                             return new List<Obj_AI_Hero>
                                        { selected }; // Return only the selected target if we assasin mode
@@ -736,7 +736,7 @@
                                       new MenuSeperator("info1", "Click Target To Focus"),
                                       new MenuSeperator("info2", "1st Click = Priority Target"),
                                       new MenuSeperator("info3", "2nd Click = Only Attack Target"),
-                                      new MenuSeperator("info4", "3rd Click = Magnet To Target"),
+                                      new MenuSeperator("info4", "3rd Click = Magnet To Target (Melee Only)"),
                                       new MenuBool("FocusSelected", "Focus Selected Target"),
                                   };
 
@@ -795,7 +795,7 @@
                             this.TargetLockState = LockState.Prioritize | LockState.OnlyAttackTarget;
                         }
 
-                        else
+                        else if (Player.IsMelee)
                         {
                             this.TargetLockState = LockState.Prioritize | LockState.OnlyAttackTarget | LockState.Magnetize;
                         }
@@ -841,7 +841,7 @@
                         Render.Circle(this.SelectedTarget.Position, 100, 100, color);
                     }
 
-                    if (this.TargetLockState.HasFlag(LockState.Magnetize))
+                    if (Player.IsMelee && this.TargetLockState.HasFlag(LockState.Magnetize))
                     {
                         text = "Magnet Target";
                         color = Color.Red;
