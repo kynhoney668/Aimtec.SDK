@@ -421,7 +421,7 @@ namespace Aimtec.SDK.Extensions
             bool includeBoundingRadius = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            if (target == null || !target.IsValid || target.IsDead || target.IsInvulnerable || !target.IsVisible || !target.IsTargetable)
+            if (target == null || !target.IsValid || target.IsDead || !target.IsVisible || !target.IsTargetable)
             {
                 return false;
             }
