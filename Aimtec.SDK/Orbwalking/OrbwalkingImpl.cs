@@ -117,7 +117,8 @@ namespace Aimtec.SDK.Orbwalking
             "masteryidoublestrike",
             "mordekaiserqattack",
             "reksaiq",
-            "warwickq"
+            "warwickq",
+            "vaynecondemnmissile"
         };
 
         /// <summary>
