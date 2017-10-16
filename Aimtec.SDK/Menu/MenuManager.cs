@@ -10,7 +10,7 @@
     using Aimtec.SDK.Menu.Theme.Default;
     using Aimtec.SDK.Util;
 
-    internal class MenuManager : Menu
+    public class MenuManager : Menu
     {
         #region Fields
 
@@ -124,6 +124,15 @@
         public new Menu Attach()
         {
             throw new NotImplementedException();
+        }
+        
+        public static Menu GetMenu(string assemblyname, string internalName)
+        {
+            var menu = Instance.Children.Values.ToArray().FirstOrDefault(x =>
+                x.IsMenu && x.AssemblyConfigDirectoryName.Contains(assemblyname) && x.InternalName == internalName);
+
+            var ms = menu as Menu;
+            return ms;
         }
 
         #endregion

@@ -39,7 +39,6 @@
         private string[] attackResets =
             {
                 "dariusnoxiantacticsonh",
-                "fiorae",
                 "garenq",
                 "gravesmove",
                 "jaxempowertwo",

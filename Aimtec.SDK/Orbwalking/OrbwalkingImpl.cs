@@ -115,7 +115,10 @@ namespace Aimtec.SDK.Orbwalking
             "garenqattack",
             "kennenmegaproc",
             "masteryidoublestrike",
-            "mordekaiserqattack"
+            "mordekaiserqattack",
+            "reksaiq",
+            "warwickq",
+            "vaynecondemnmissile"
         };
 
         /// <summary>
@@ -194,7 +197,7 @@ namespace Aimtec.SDK.Orbwalking
             }
 
             //J4 flag
-            if (unit.Name.Contains("Beacon") || unit.Name.Contains("ZyraSeed"))
+            if (unit.Name.Contains("Beacon"))
             {
                 return false;
             }
@@ -216,6 +219,12 @@ namespace Aimtec.SDK.Orbwalking
 
 
             var name = minion.UnitSkinName.ToLower();
+            
+            if (name.Contains("zyraseed")) 
+            {
+                return false;
+            }
+            
             if (!this.Config["Farming"]["AttackPlants"].Enabled && name.Contains("sru_plant_"))
             {
                 return false;
@@ -225,7 +234,7 @@ namespace Aimtec.SDK.Orbwalking
             {
                 return false;
             }
-
+            
             if (this.GangPlank != null)
             {
                 if (name.Contains("gangplankbarrel"))
