@@ -162,6 +162,11 @@
             {
                 return;
             }
+            
+            if (!Turrets.ContainsKey(tSender.NetworkId))
+            {
+                return;
+            }
 
             Turrets[tSender.NetworkId]?.OnAttack(tSender, bTarget, args);
         }
@@ -184,6 +189,11 @@
             {
                 return;
             }
+            
+            if (!Turrets.ContainsKey(tSender.NetworkId))
+            {
+                return;
+            }
 
             Turrets[tSender.NetworkId]?.OnMissileCreated(attack);
         }
@@ -203,6 +213,11 @@
 
             var tSender = attack.SpellCaster as Obj_AI_Turret;
             if (tSender == null)
+            {
+                return;
+            }
+            
+            if (!Turrets.ContainsKey(tSender.NetworkId))
             {
                 return;
             }
