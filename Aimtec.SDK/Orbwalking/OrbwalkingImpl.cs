@@ -990,7 +990,7 @@ namespace Aimtec.SDK.Orbwalking
 
         private void SpellBook_OnStopCast(Obj_AI_Base sender, SpellBookStopCastEventArgs e)
         {
-            if (sender.IsMe && (e.DestroyMissile || e.ForceStop || e.StopAnimation))
+            if (sender.IsMe && (e.DestroyMissile || e.ForceStop)) // || e.StopAnimation
             {
                 this.ResetAutoAttackTimer();
             }
