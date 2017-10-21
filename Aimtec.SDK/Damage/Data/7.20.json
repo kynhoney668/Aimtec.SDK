@@ -1,4 +1,4 @@
-﻿{
+{
 	"Aatrox": {
 		"Q": [
 			{
@@ -9259,20 +9259,41 @@
 		}]
 	},
 	"Varus": {
-		"Q": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "AoE",
-				"DamageType": "Physical",
-				"Damages": [3.3, 15.6, 27.8, 40.0, 52.2],
-				"BonusDamages": [{
+		"Q": [
+			{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "AoE",
 					"DamageType": "Physical",
-					"DamagePercentages": [0.33, 0.33, 0.33, 0.33, 0.33],
-					"ScalingTarget": "Source",
-					"ScalingType": "AttackPoints"
-				}]
+					"Damages": [3.3, 15.6, 27.8, 40.0, 52.2],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.33, 0.33, 0.33, 0.33, 0.33],
+						"ScalingTarget": "Source",
+						"ScalingType": "AttackPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "Buff",
+				"SpellData": {
+					"SpellEffectType": "None",
+					"DamageType": "Magical",
+					"ScalingBuff": "VarusWDebuff",
+					"ScalingBuffTarget": "Target",
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"MaxDamageOnMonster": [360, 360, 360, 360, 360],
+						"DamagePercentages": [0.02, 0.0275, 0.035, 0.0425, 0.05],
+						"ScalePer100Ap": 0.02,
+						"ScalingTarget": "Target",
+						"ScalingType": "MaxHealth",
+						"ScalingBuff": "VarusWDebuff",
+						"ScalingBuffTarget": "Target"
+					}]
+				}
 			}
-		}],
+		],
 		"W": [{
 				"Stage": "Default",
 				"SpellData": {
@@ -9287,51 +9308,78 @@
 						"ScalingType": "AbilityPoints"
 					}]
 				}
+			}
+		],
+		"E": [
+			{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "AoE",
+					"DamageType": "Physical",
+					"Damages": [65.0, 100.0, 135.0, 170.0, 205.0],
+					"BonusDamages": [{
+						"DamageType": "Physical",
+						"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
+						"ScalingTarget": "Source",
+						"ScalingType": "BonusAttackPoints"
+					}]
+				}
 			},
 			{
-				"Stage": "Detonation",
+				"Stage": "Buff",
 				"SpellData": {
 					"SpellEffectType": "None",
 					"DamageType": "Magical",
-					"Damages": [10.0, 14.0, 18.0, 22.0, 26.0],
+					"ScalingBuff": "VarusWDebuff",
+					"ScalingBuffTarget": "Target",
 					"BonusDamages": [{
 						"DamageType": "Magical",
+						"MaxDamageOnMonster": [360, 360, 360, 360, 360],
 						"DamagePercentages": [0.02, 0.0275, 0.035, 0.0425, 0.05],
 						"ScalePer100Ap": 0.02,
 						"ScalingTarget": "Target",
-						"ScalingType": "MaxHealth"
+						"ScalingType": "MaxHealth",
+						"ScalingBuff": "VarusWDebuff",
+						"ScalingBuffTarget": "Target"
 					}]
 				}
 			}
 		],
-		"E": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "AoE",
-				"DamageType": "Physical",
-				"Damages": [65.0, 100.0, 135.0, 170.0, 205.0],
-				"BonusDamages": [{
-					"DamageType": "Physical",
-					"DamagePercentages": [0.6, 0.6, 0.6, 0.6, 0.6],
-					"ScalingTarget": "Source",
-					"ScalingType": "BonusAttackPoints"
-				}]
-			}
-		}],
-		"R": [{
-			"Stage": "Default",
-			"SpellData": {
-				"SpellEffectType": "AoE",
-				"DamageType": "Magical",
-				"Damages": [100.0, 175.0, 250.0],
-				"BonusDamages": [{
+		"R": [
+			{
+				"Stage": "Default",
+				"SpellData": {
+					"SpellEffectType": "AoE",
 					"DamageType": "Magical",
-					"DamagePercentages": [1.0, 1.0, 1.0],
-					"ScalingTarget": "Source",
-					"ScalingType": "AbilityPoints"
-				}]
+					"Damages": [100.0, 175.0, 250.0],
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"DamagePercentages": [1.0, 1.0, 1.0],
+						"ScalingTarget": "Source",
+						"ScalingType": "AbilityPoints"
+					}]
+				}
+			},
+			{
+				"Stage": "Buff",
+				"SpellData": {
+					"SpellEffectType": "None",
+					"DamageType": "Magical",
+					"ScalingBuff": "VarusWDebuff",
+					"ScalingBuffTarget": "Target",
+					"BonusDamages": [{
+						"DamageType": "Magical",
+						"MaxDamageOnMonster": [360, 360, 360, 360, 360],
+						"DamagePercentages": [0.02, 0.0275, 0.035, 0.0425, 0.05],
+						"ScalePer100Ap": 0.02,
+						"ScalingTarget": "Target",
+						"ScalingType": "MaxHealth",
+						"ScalingBuff": "VarusWDebuff",
+						"ScalingBuffTarget": "Target"
+					}]
+				}
 			}
-		}]
+		]
 	},
 	"Vayne": {
 		"Q": [{
