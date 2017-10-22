@@ -1,4 +1,4 @@
-﻿
+
 // ReSharper disable ConvertToLambdaExpression
 // ReSharper disable LoopCanBeConvertedToQuery
 
@@ -1113,6 +1113,21 @@ namespace Aimtec.SDK.Damage
                                          if (source.HasBuff("goldcardpreattack"))
                                          {
                                              return source.GetSpellDamage(target, SpellSlot.W, DamageStage.ThirdForm);
+                                         }
+
+                                         return 0;
+                                     }
+                             });
+
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Varus",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (!source.SpellBook.GetSpell(SpellSlot.W).State.HasFlag(SpellState.NotLearned))
+                                         {
+                                             return source.GetSpellDamage(target, SpellSlot.W);
                                          }
 
                                          return 0;
