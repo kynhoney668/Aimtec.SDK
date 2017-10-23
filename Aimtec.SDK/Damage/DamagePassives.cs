@@ -707,7 +707,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("JinxQ"))
                                          {
-                                             return 1.1 * source.TotalAttackDamage;
+                                             return source.GetSpellDamage(target, SpellSlot.Q);
                                          }
 
                                          return 0;
