@@ -353,7 +353,7 @@
 
             public override bool HasReached()
             {
-                if (this.AttackStatus == AttackState.Completed || this.ETA < -100)
+                if (this.AttackStatus == AttackState.Completed || !this.IsValid() || this.ETA < -100)
                 {
                     return true;
                 }
