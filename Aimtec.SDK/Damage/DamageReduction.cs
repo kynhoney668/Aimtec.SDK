@@ -1,4 +1,4 @@
-﻿
+
 // ReSharper disable ConvertToLambdaExpression
 // ReSharper disable LoopCanBeConvertedToQuery
 
@@ -54,10 +54,22 @@ namespace Aimtec.SDK.Damage
             Reductions.Add(new DamageReduction
             {
                                    BuffName = "GalioW",
+                                   DamageType = DamageType.Magical,
                                    Type = DamageReduction.ReductionDamageType.Percent,
                                    ReductionDamage = (source, attacker) =>
                                        {
-                                           return new[] { 20, 25, 30, 35, 40 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] + 8 * (source.BonusSpellBlock / 100);
+                                           return new[] { 20, 25, 30, 35, 40 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] + 8 * (source.BonusSpellBlock / 100) + 5 * (source.TotalAbilityDamage / 100);
+                                       }
+                               });
+
+            Reductions.Add(new DamageReduction
+                               {
+                                   BuffName = "GalioW",
+                                   DamageType = DamageType.Physical,
+                                   Type = DamageReduction.ReductionDamageType.Percent,
+                                   ReductionDamage = (source, attacker) =>
+                                       {
+                                           return (new[] { 20, 25, 30, 35, 40 }[source.SpellBook.GetSpell(SpellSlot.W).Level - 1] + 8 * (source.BonusSpellBlock / 100) + 5 * (source.TotalAbilityDamage / 100)) / 2;
                                        }
                                });
 
