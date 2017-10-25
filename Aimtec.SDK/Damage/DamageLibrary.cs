@@ -101,6 +101,9 @@ namespace Aimtec.SDK.Damage
                 case DamageScalingType.MaxMana:
                     origin = sourceScale.MaxMana;
                     break;
+                case DamageScalingType.BonusMana: // TODO: Implement sourceScale.BaseMana, since Total-Base = Bonus
+                    origin = sourceScale.MaxMana;
+                    break;
                 case DamageScalingType.BonusCriticalDamage:
                     origin = sourceScale.HasItem(ItemId.InfinityEdge) ? 50 : 0; // TODO: Implement sourceScale.BonusCritDamage or sourceScale.CritDamageMod
                     break;
@@ -171,7 +174,7 @@ namespace Aimtec.SDK.Damage
             try
             {
                 // TODO: make this load dynamically based on current running game version.
-                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.20.json"))
+                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.21.json"))
                 {
                     if (stream == null)
                     {
