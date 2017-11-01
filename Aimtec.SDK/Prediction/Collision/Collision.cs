@@ -83,7 +83,7 @@
                     continue;
                 }
 
-                if (Game.TickCount - WallCastedT > 4000)
+                if (Environment.TickCount - WallCastedT > 4000)
                 {
                     continue;
                 }
@@ -115,7 +115,7 @@
                     continue;
                 }
 
-                var t = Game.TickCount
+                var t = Environment.TickCount
                     + (wallStart.Intersection(wallEnd, (Vector2) position, (Vector2) input.From).Point
                                 .Distance(input.From) / input.Speed + input.Delay) * 1000;
 
@@ -142,7 +142,7 @@
                 return;
             }
 
-            WallCastedT = Game.TickCount;
+            WallCastedT = Environment.TickCount;
             YasuoWallPosition = (Vector2) sender.ServerPosition;
         }
 

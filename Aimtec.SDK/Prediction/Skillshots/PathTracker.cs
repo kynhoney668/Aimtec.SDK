@@ -98,7 +98,7 @@
                 StoredPaths.Add(sender.NetworkId, new List<StoredPath>());
             }
 
-            var newPath = new StoredPath { Tick = Game.TickCount, Path = args.Path.Select(x => (Vector2) x).ToList() };
+            var newPath = new StoredPath { Tick = Environment.TickCount, Path = args.Path.Select(x => (Vector2) x).ToList() };
             StoredPaths[sender.NetworkId].Add(newPath);
 
             if (StoredPaths[sender.NetworkId].Count > 50)

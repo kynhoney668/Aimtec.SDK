@@ -66,7 +66,7 @@ namespace Aimtec.SDK.Orbwalking
             get
             {
                 var detectionTime = Math.Max(this.ServerAttackDetectionTick, this.LastAttackCommandSentTime);
-                return Game.TickCount + Game.Ping / 2 - detectionTime <= this.WindUpTime;
+                return Environment.TickCount + Game.Ping / 2 - detectionTime <= this.WindUpTime;
             }
         }
 
@@ -76,7 +76,7 @@ namespace Aimtec.SDK.Orbwalking
 
         #region Properties
 
-        protected bool AttackReady => Game.TickCount + Game.Ping / 2 - this.ServerAttackDetectionTick
+        protected bool AttackReady => Environment.TickCount + Game.Ping / 2 - this.ServerAttackDetectionTick
             >= this.AttackCoolDownTime;
 
         private bool Attached { get; set; }
@@ -175,7 +175,7 @@ namespace Aimtec.SDK.Orbwalking
 
                 if (Player.IssueOrder(OrderType.AttackUnit, targetToAttack))
                 {
-                    this.LastAttackCommandSentTime = Game.TickCount;
+                    this.LastAttackCommandSentTime = Environment.TickCount;
                     return true;
                 }
             }
@@ -457,7 +457,7 @@ namespace Aimtec.SDK.Orbwalking
             {
                 if (args.Target is AttackableUnit targ)
                 {
-                    this.ServerAttackDetectionTick = Game.TickCount - Game.Ping / 2;
+                    this.ServerAttackDetectionTick = Environment.TickCount - Game.Ping / 2;
                     this.LastTarget = targ;
                     this.ForcedTarget = null;
                     DelayAction.Queue((int)this.WindUpTime, () => this.FirePostAttack(targ));
@@ -619,7 +619,7 @@ namespace Aimtec.SDK.Orbwalking
                             {
                                 //turret related
                                 var arrival = attack.PredictedLandTime;
-                                var eta = arrival - Game.TickCount;
+                                var eta = arrival - Environment.TickCount;
                                 var tDmg = tData.Turret.GetAutoAttackDamage(tTarget);
 
                                 //var tWillKill = tDmg > tTarget.Health;
@@ -654,7 +654,7 @@ namespace Aimtec.SDK.Orbwalking
 
                                 var remHealth = tMinionDmgPredHealth - tDmg;
                                 //var tNextAttackReachTime = tData.LastFireTime + tData.Turret.AttackDelay * 1000 + tCastDelay - Game.Ping / 2f;
-                                //var myAttackReachTime = Game.TickCount + totalTime;
+                                //var myAttackReachTime = Environment.TickCount + totalTime;
                                 //var iReachSooner = myAttackReachTime - tNextAttackReachTime > 50;
 
                                 //Minion wont die

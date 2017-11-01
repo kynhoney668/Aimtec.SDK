@@ -1,5 +1,6 @@
 namespace Aimtec.SDK.Prediction.Skillshots
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -33,7 +34,7 @@ namespace Aimtec.SDK.Prediction.Skillshots
         /// <summary>
         ///     Gets the current tick of the path.
         /// </summary>
-        public double Time => (Game.TickCount - this.Tick) / 1000d;
+        public double Time => (Environment.TickCount - this.Tick) / 1000d;
 
         /// <summary>
         ///     Gets the number of waypoints within the path.

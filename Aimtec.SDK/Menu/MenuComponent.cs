@@ -257,7 +257,7 @@
                 var x = lparam & 0xffff;
                 var y = lparam >> 16;
 
-                MenuManager.LastMouseMoveTime = Game.TickCount;
+                MenuManager.LastMouseMoveTime = Environment.TickCount;
                 MenuManager.LastMousePosition = new Point(x, y);
             }
 
@@ -320,7 +320,7 @@
             {
                 if (!string.IsNullOrEmpty(this.ToolTip))
                 {
-                    if (Game.TickCount - MenuManager.LastMouseMoveTime > 500)
+                    if (Environment.TickCount - MenuManager.LastMouseMoveTime > 500)
                     {
                         if (this.GetBounds(this.Position).Contains(MenuManager.LastMousePosition))
                         {

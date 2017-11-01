@@ -1,5 +1,6 @@
 ﻿namespace Aimtec.SDK.Util
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -61,7 +62,7 @@
             }
 
             data.Name = e.SpellData.Name;
-            data.Time = Game.TickCount - Game.Ping / 2;
+            data.Time = Environment.TickCount - Game.Ping / 2;
 
             UnitLastCastedSpell[sender.NetworkId] = data;
         }
