@@ -40,26 +40,17 @@ namespace Aimtec.SDK.Extensions
         }
 
         /// <summary>
-        ///     Get the angles between the two points.
+        ///     Gets the angle between 2 vectors
         /// </summary>
-        /// <param name="self">The self.</param>
-        /// <param name="v1">The v1.</param>
-        /// <returns>System.Single.</returns>
-        public static float AngleBetween(this Vector2 self, Vector2 v1)
+        /// <returns>Returns the the angle in degrees between vector1 and vector2</returns>
+        /// <param name="v1"> The first vector </param>
+        /// <param name="v2"> The second vector </param>
+        public static float AngleBetween(this Vector2 v1, Vector2 v2)
         {
-            var theta = self.Polar() - v1.Polar();
+            double sin = v1.X * v2.Y - v2.X * v1.Y;
+            double cos = v1.X * v2.X + v1.Y * v2.Y;
 
-            if (theta < 0)
-            {
-                theta = theta + 360;
-            }
-
-            if (theta > 180)
-            {
-                theta = 360 - theta;
-            }
-
-            return theta;
+            return (float) (Math.Atan2(sin, cos) * (180 / Math.PI));
         }
 
         /// <summary>

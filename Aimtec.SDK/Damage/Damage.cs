@@ -412,6 +412,10 @@ namespace Aimtec.SDK.Damage
             double armorPenetrationPercent = source.PercentArmorPenetration;
             double bonusArmorPenetrationMod = source.PercentBonusArmorPenetration;
             var armorPenetrationFlat = source.PhysicalLethality * (0.6 + 0.4 * source.Level / 18);
+            if (double.IsNaN(armorPenetrationFlat))
+            {
+                armorPenetrationFlat = 0;
+            }
 
             switch (source.Type)
             {
