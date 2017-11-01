@@ -121,6 +121,8 @@
                 }
             }
 
+            result.CastPosition = result.CastPosition.IsZero ? input.Unit.ServerPosition : result.CastPosition.FixHeight();
+
             if (!checkCollision || !input.Collision)
             {
                 return result;
@@ -135,6 +137,8 @@
 
             return result;
         }
+
+
 
         #endregion
 
@@ -198,7 +202,10 @@
                 }
             }
 
-            result.CastPosition = (Vector3) dashData.Path.Last();
+            var cp = (Vector3) dashData.Path.Last();
+
+            result.CastPosition = cp.IsZero ? input.Unit.ServerPosition :cp.FixHeight();
+
             result.UnitPosition = result.CastPosition;
 
             return result;

@@ -47,7 +47,7 @@
         /// </summary>
         public Vector3 CastPosition
         {
-            get => this.castPosition.IsZero ? this.Input.Unit.ServerPosition : this.castPosition.FixHeight();
+            get => this.castPosition;
             set => this.castPosition = value;
         }
 
