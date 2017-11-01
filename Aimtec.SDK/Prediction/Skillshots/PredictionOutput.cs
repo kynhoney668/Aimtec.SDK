@@ -45,9 +45,9 @@
         /// <summary>
         ///     Gets or sets the position where the skill-shot should be casted to increase the accuracy.
         /// </summary>
-        public Vector3 CastPosition
+        public virtual Vector3 CastPosition
         {
-            get => this.castPosition;
+            get => this.castPosition.IsZero ? this.Input.Unit.ServerPosition : this.castPosition.FixHeight();
             set => this.castPosition = value;
         }
 
@@ -64,7 +64,7 @@
         /// <summary>
         ///     Gets or sets where the unit is going to be when the skill-shot reaches his position.
         /// </summary>
-        public Vector3 UnitPosition
+        public virtual Vector3 UnitPosition
         {
             get => this.unitPosition.IsZero ? this.Input.Unit.ServerPosition : this.unitPosition.FixHeight();
             set => this.unitPosition = value;
@@ -77,7 +77,7 @@
         /// <summary>
         ///     Gets or sets the input.
         /// </summary>
-        internal PredictionInput Input { get; set; }
+        public PredictionInput Input { get; set; }
 
         #endregion
     }

@@ -1,5 +1,6 @@
 ﻿namespace Aimtec.SDK.Prediction.Skillshots
 {
+
     public class Prediction : ISkillshotPrediction
     {
         #region Constructors and Destructors
@@ -23,12 +24,16 @@
 
         public PredictionOutput GetPrediction(PredictionInput input)
         {
-            return this.Implementation.GetPrediction(input);
+            var output = this.Implementation.GetPrediction(input);
+            output.Input = input;
+            return output;
         }
 
         public PredictionOutput GetPrediction(PredictionInput input, bool ft, bool collision)
         {
-            return this.Implementation.GetPrediction(input, ft, collision);
+            var output = this.Implementation.GetPrediction(input, ft, collision);
+            output.Input = input;
+            return output;
         }
 
         public void ResetImplementation()
