@@ -73,6 +73,7 @@
     <Compile Include="Prediction\Skillshots\PathTracker.cs" />
     <Compile Include="Prediction\Skillshots\Prediction.cs" />
     <Compile Include="Prediction\Skillshots\PredictionImpl.cs" />
+    <Compile Include="Prediction\Skillshots\PredictionImplB.cs" />
     <Compile Include="Prediction\Skillshots\PredictionInput.cs" />
     <Compile Include="Prediction\Skillshots\PredictionOutput.cs" />
     <Compile Include="Prediction\Skillshots\SkillshotType.cs" />

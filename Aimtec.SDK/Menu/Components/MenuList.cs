@@ -47,6 +47,8 @@
 
         #endregion
 
+        private string[] _items;
+
         #region Public Properties
 
         /// <summary>
@@ -54,7 +56,29 @@
         /// </summary>
         /// <value>The items.</value>
         [JsonProperty(Order = 4)]
-        public string[] Items { get; set; }
+        public string[] Items
+        {
+            get => _items;
+            set
+            {
+                int oldlength = 0;
+
+                if (this._items != null)
+                {
+                    oldlength = this._items.Length;
+                }
+
+                this._items = value;
+
+                if (oldlength != this._items.Length)
+                {
+                    if (this.SelectedIndexSaved <= this._items.Length - 1 && this.Value == 0)
+                    {
+                        this.Value = this.SelectedIndexSaved;
+                    }
+                }
+            }
+        }
 
         /// <summary>
         ///     Gets the selected item.
@@ -74,6 +98,8 @@
         #region Properties
 
         internal override string Serialized => JsonConvert.SerializeObject(this, Formatting.Indented);
+
+        internal int SelectedIndexSaved { get; set; } = 0;
 
         #endregion
 
@@ -147,6 +173,13 @@
 
                 if (sValue?.InternalName != null)
                 {
+                    if (sValue.Value > this.Items.Length - 1)
+                    {
+                        this.SelectedIndexSaved = sValue.Value;
+                        this.Value = 0;
+                        return;
+                    }
+
                     this.Value = sValue.Value;
                 }
             }
