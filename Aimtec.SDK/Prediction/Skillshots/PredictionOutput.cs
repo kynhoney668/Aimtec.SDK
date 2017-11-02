@@ -15,12 +15,12 @@
         /// <summary>
         ///     Cast Predicted Position data in a 3D-Space given value.
         /// </summary>
-        private Vector3 castPosition;
+        protected Vector3 castPosition;
 
         /// <summary>
         ///     Unit Predicted Position data ina a 3D-Space given value.
         /// </summary>
-        private Vector3 unitPosition;
+        protected Vector3 unitPosition;
 
         #endregion
 
