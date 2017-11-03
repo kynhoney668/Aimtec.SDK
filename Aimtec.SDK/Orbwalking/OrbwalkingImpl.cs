@@ -76,7 +76,7 @@ namespace Aimtec.SDK.Orbwalking
 
         #region Properties
 
-        protected bool AttackReady => Environment.TickCount + Game.Ping / 2 - this.ServerAttackDetectionTick
+        protected bool AttackReady => Game.TickCount + Game.Ping / 2 - this.ServerAttackDetectionTick
                                       >= this.AttackCoolDownTime;
 
         private bool Attached { get; set; }
