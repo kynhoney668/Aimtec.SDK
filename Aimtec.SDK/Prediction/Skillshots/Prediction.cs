@@ -92,6 +92,7 @@
         {
             string[] updatedPredList = this.Implementations.Keys.ToArray();
             this.PredictionMenuItem.Items = updatedPredList;
+            this.Implementation = this.Implementations[this.PredictionMenuItem.SelectedItem];
         }
     }
 }
