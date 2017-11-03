@@ -133,13 +133,13 @@
                         continue;
                     }
 
-                    if (k.Target.NetworkId != target.NetworkId || Environment.TickCount - k.DetectTime > 3000)
+                    if (k.Target.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > 3000)
                     {
                         continue;
                     }
 
-                    var mlt = Environment.TickCount + time;
-                    var alt = Environment.TickCount + k.ETA;
+                    var mlt = Game.TickCount + time;
+                    var alt = Game.TickCount + k.ETA;
 
                     if (mlt - alt > 100 + this.Config["ExtraDelay"].Value)
                     {
@@ -162,7 +162,7 @@
                 var attacks = m.Value;
                 foreach (var k in attacks)
                 {
-                    if (k.NetworkId != target.NetworkId || Environment.TickCount - k.DetectTime > rTime)
+                    if (k.NetworkId != target.NetworkId || Game.TickCount - k.DetectTime > rTime)
                     {
                         continue;
                     }
@@ -180,7 +180,7 @@
         private void Game_OnUpdate()
         {
             //Limit the clean up to every 2 seconds
-            if (Environment.TickCount - this.LastCleanUp <= 1000)
+            if (Game.TickCount - this.LastCleanUp <= 1000)
             {
                 return;
             }
@@ -199,7 +199,7 @@
                 kvp.Value.RemoveAll(x => x.CanRemoveAttack);
             }
 
-            this.LastCleanUp = Environment.TickCount;
+            this.LastCleanUp = Game.TickCount;
         }
 
 
@@ -237,7 +237,7 @@
             protected AutoAttack(Obj_AI_Base sender, Obj_AI_Base target)
             {
                 this.AttackStatus = AttackState.Detected;
-                this.DetectTime = Environment.TickCount - Game.Ping / 2;
+                this.DetectTime = Game.TickCount - Game.Ping / 2;
                 this.Sender = sender;
                 this.Target = target;
                 this.SNetworkId = sender.NetworkId;
@@ -250,7 +250,7 @@
                 this.AnimationDelay = (int)(sender.AttackCastDelay * 1000);
             }
 
-            public bool CanRemoveAttack => Environment.TickCount - this.DetectTime > 5000;
+            public bool CanRemoveAttack => Game.TickCount - this.DetectTime > 5000;
 
             public double Damage { get; set; }
 
@@ -273,7 +273,7 @@
 
             public abstract int LandTime { get; }
 
-            public virtual int ETA => this.LandTime - Environment.TickCount;
+            public virtual int ETA => this.LandTime - Game.TickCount;
 
             public int ExtraDelay { get; set; }
 
@@ -293,7 +293,7 @@
                 return this.Sender.IsValid && this.Target.IsValid;
             }
 
-            public int ElapsedTime => Environment.TickCount - this.DetectTime;
+            public int ElapsedTime => Game.TickCount - this.DetectTime;
 
             public abstract bool HasReached();
         }
@@ -328,7 +328,7 @@
             {
                 get
                 {
-                    var dist = (this.Missile.SpellData.MissileSpeed / 1000) * (Environment.TickCount - this.DetectTime);
+                    var dist = (this.Missile.SpellData.MissileSpeed / 1000) * (Game.TickCount - this.DetectTime);
                     return this.StartPosition.Extend(this.Missile.EndPosition, dist);
                 }
             }
@@ -343,7 +343,7 @@
                 }
             }
 
-            public override int LandTime => Environment.TickCount + this.TimeToLand;
+            public override int LandTime => Game.TickCount + this.TimeToLand;
         }
 
         public class MeleeAttack : AutoAttack

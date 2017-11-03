@@ -62,7 +62,7 @@
             }
 
             data.Name = e.SpellData.Name;
-            data.Time = Environment.TickCount - Game.Ping / 2;
+            data.Time = Game.TickCount - Game.Ping / 2;
 
             UnitLastCastedSpell[sender.NetworkId] = data;
         }

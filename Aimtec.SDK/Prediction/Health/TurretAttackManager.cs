@@ -230,7 +230,7 @@
         {
             public Obj_AI_Turret Turret { get; set; }
 
-            public bool TurretActive => Environment.TickCount - this.LastFireTime < 2500;
+            public bool TurretActive => Game.TickCount - this.LastFireTime < 2500;
 
             public TurretAttack LastAttack { get; set; }
 
@@ -247,12 +247,12 @@
 
             public void OnAttack(Obj_AI_Turret sender, Obj_AI_Base target, Obj_AI_BaseMissileClientDataEventArgs e)
             {
-                this.LastFireTime = Environment.TickCount;
+                this.LastFireTime = Game.TickCount;
                 this.LastTarget = target;
 
                 var tAttack = new TurretAttack
                 {
-                    StartTime = Environment.TickCount,
+                    StartTime = Game.TickCount,
                     Sender = sender,
                     Target = target,
                     AttackStatus = TurretAttack.AttackState.Casted
@@ -269,7 +269,7 @@
                 var attack = this.Attacks.Where(x => x.AttackStatus == TurretAttack.AttackState.Casted).MaxBy(x => x.StartTime);
                 if (attack != null)
                 {
-                    attack.MissileCreationTime = Environment.TickCount;
+                    attack.MissileCreationTime = Game.TickCount;
                     attack.Missile = mc;
                     attack.AttackStatus = TurretAttack.AttackState.CreatedMissile;
                 }
@@ -282,7 +282,7 @@
                 if (attack != null)
                 {
                     attack.Inactive = true;
-                    attack.RealEndTime = Environment.TickCount;
+                    attack.RealEndTime = Game.TickCount;
                     attack.AttackStatus = TurretAttack.AttackState.Completed;
                 }
             }
@@ -291,7 +291,7 @@
             {
                 foreach (var item in this.Attacks.ToList())
                 {
-                    if (Environment.TickCount - item.StartTime > 3000)
+                    if (Game.TickCount - item.StartTime > 3000)
                     {
                         this.Attacks.Remove(item);
                     }
@@ -310,7 +310,7 @@
 
                 public int PredictedLandTime => this.StartTime + (int)(this.Sender.AttackCastDelay * 1000) + (int)(this.DistanceWobr / this.Sender.BasicAttack.MissileSpeed) * 1000 - Game.Ping / 2;
 
-                public int PredictedEta => this.PredictedLandTime - Environment.TickCount;
+                public int PredictedEta => this.PredictedLandTime - Game.TickCount;
 
                 public int PredictedMissileEta
                 {

@@ -95,7 +95,7 @@
                 }
 
                 var start = Math.Max(this.chargeReqSentT, this.chargedCastedT);
-                var chargePercent = (Environment.TickCount - start) / (start + this.ChargeDuration - 150 - start);
+                var chargePercent = (Game.TickCount - start) / (start + this.ChargeDuration - 150 - start);
 
                 return chargePercent * 100;
             }
@@ -139,7 +139,7 @@
         /// </summary>
         /// <value><c>true</c> if this instance is charing; otherwise, <c>false</c>.</value>
         public bool IsCharging => this.Ready && (Player.HasBuff(this.ChargedBuffName)
-            || Environment.TickCount - this.chargedCastedT < 300 + Game.Ping);
+            || Game.TickCount - this.chargedCastedT < 300 + Game.Ping);
 
         /// <summary>
         ///     Gets or sets a value indicating whether this instance is skill shot.
@@ -175,7 +175,7 @@
                 {
                     return this.ChargedMinRange + Math.Min(
                         this.ChargedMaxRange - this.ChargedMinRange,
-                        (Environment.TickCount - this.chargedCastedT) * (this.ChargedMaxRange - this.ChargedMinRange)
+                        (Game.TickCount - this.chargedCastedT) * (this.ChargedMaxRange - this.ChargedMinRange)
                         / this.ChargeDuration - 150);
                 }
 
@@ -261,7 +261,7 @@
 
             if (!this.IsSkillShot && !this.IsChargedSpell)
             {
-                this.LastCastAttemptT = Environment.TickCount;
+                this.LastCastAttemptT = Game.TickCount;
 
                 return Player.SpellBook.CastSpell(this.Slot, target);
             }
@@ -298,7 +298,7 @@
                 return false;
             }
 
-            this.LastCastAttemptT = Environment.TickCount;
+            this.LastCastAttemptT = Game.TickCount;
 
             return Player.SpellBook.CastSpell(this.Slot, prediction.CastPosition);
         }
@@ -394,7 +394,7 @@
                 return false;
             }
 
-            this.LastCastAttemptT = Environment.TickCount;
+            this.LastCastAttemptT = Game.TickCount;
 
             return Player.SpellBook.CastSpell(this.Slot, obj);
         }
@@ -478,13 +478,13 @@
             {
                 if (sender.IsMe && args.SpellData.Name == this.ChargedSpellName)
                 {
-                    this.chargedCastedT = Environment.TickCount;
+                    this.chargedCastedT = Game.TickCount;
                 }
             };
 
             SpellBook.OnUpdateChargedSpell += (sender, args) =>
             {
-                if (sender.IsMe && Environment.TickCount - this.chargeReqSentT < 3000 && args.ReleaseCast)
+                if (sender.IsMe && Game.TickCount - this.chargeReqSentT < 3000 && args.ReleaseCast)
                 {
                     //args.Process = false;
                 }
@@ -492,7 +492,7 @@
 
             SpellBook.OnCastSpell += (sender, args) =>
             {
-                if (args.Slot == this.Slot && Environment.TickCount - this.chargeReqSentT > 500 && this.IsCharging)
+                if (args.Slot == this.Slot && Game.TickCount - this.chargeReqSentT > 500 && this.IsCharging)
                 {
                     this.Cast((Vector2) args.End);
                 }
@@ -575,12 +575,12 @@
         /// </summary>
         public bool StartCharging(Vector3 position)
         {
-            if (this.IsCharging || Environment.TickCount - this.chargeReqSentT <= 400 + Game.Ping)
+            if (this.IsCharging || Game.TickCount - this.chargeReqSentT <= 400 + Game.Ping)
             {
                 return false;
             }
 
-            this.chargeReqSentT = Environment.TickCount;
+            this.chargeReqSentT = Game.TickCount;
             return Player.SpellBook.CastSpell(this.Slot, position);
         }
 

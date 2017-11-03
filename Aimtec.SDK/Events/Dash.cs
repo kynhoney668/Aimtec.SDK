@@ -76,7 +76,7 @@
                 DetectedDashes[hero.NetworkId].Path = path;
                 DetectedDashes[hero.NetworkId].Speed = args.Speed;
                 DetectedDashes[hero.NetworkId].StartPos = (Vector2) hero.ServerPosition;
-                DetectedDashes[hero.NetworkId].StartTick = Environment.TickCount - Game.Ping / 2;
+                DetectedDashes[hero.NetworkId].StartTick = Game.TickCount - Game.Ping / 2;
                 DetectedDashes[hero.NetworkId].EndPos = path.Last();
                 DetectedDashes[hero.NetworkId].EndTick = DetectedDashes[hero.NetworkId].StartTick
                     + (int) (1000

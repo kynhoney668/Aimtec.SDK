@@ -62,7 +62,7 @@
                 return;
             }
 
-            TaskQueue.Add(new Tuple<int, Action, CancellationToken>(Environment.TickCount + milliseconds, action, token));
+            TaskQueue.Add(new Tuple<int, Action, CancellationToken>(Game.TickCount + milliseconds, action, token));
             SortList();
         }
 
@@ -94,7 +94,7 @@
                     continue;
                 }
 
-                if (Environment.TickCount >= task.Item1)
+                if (Game.TickCount >= task.Item1)
                 {
                     task.Item2();
                     TaskQueue.RemoveAt(i);
