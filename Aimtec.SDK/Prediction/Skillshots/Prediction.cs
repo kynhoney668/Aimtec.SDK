@@ -28,7 +28,7 @@
             this.Implementations["Default"] = new PredictionImpl();
             this.Implementations["PredImplB"] = new PredictionImplB();
 
-            this.PredictionMenuItem = new MenuList("PredictionType", "Prediction", this.Implementations.Keys.ToArray(), 1);
+            this.PredictionMenuItem = new MenuList("PredictionType", "Prediction", this.Implementations.Keys.ToArray(), 0);
             this.PredConfig.Add(this.PredictionMenuItem);
 
             AimtecMenu.Instance.Add(this.PredConfig);
