@@ -15,13 +15,9 @@
     /// </summary>
     public abstract class AOrbwalker : IOrbwalker
     {
-        public Menu ModeMenu { get; set; }
-
         public AOrbwalker()
         {
             this.Config = new Menu("Orbwalker", "Orbwalker");
-            this.ModeMenu = new Menu("Modes", "Modes");
-            this.Config.Add(this.ModeMenu);
         }
 
         #region Fields
@@ -274,8 +270,6 @@
             {
                 this.Config.Add(mode.MenuItem);
             }
-
-            this.ModeMenu.Add(mode.ModeMenu);
         }
 
         /// <inheritdoc cref="IOrbwalker" />

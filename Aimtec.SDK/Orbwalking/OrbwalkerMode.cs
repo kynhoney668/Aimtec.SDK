@@ -29,8 +29,6 @@
         /// </summary>
         public AOrbwalker ParentInstance;
 
-        internal Menu ModeMenu { get; set; }
-
         private bool attackEnabled = true;
 
         private bool moveEnabled = true;
@@ -59,12 +57,6 @@
             this.MenuItem = key.KeyBindItem;
             key.Activate();
             this.UsingGlobalKey = true;
-
-            this.ModeMenu = new Menu($"orbmode.{name}", name)
-                                {
-                                    new MenuBool($"orbmode.{name}.move", "Movement"),
-                                    new MenuBool($"orbmode.{name}.attack", "Attacking")
-                                };
         }
 
         /// <summary>
@@ -80,13 +72,6 @@
             this.ModeBehaviour = orbwalkBehaviour;
             this.GetTargetImplementation = targetDelegate;
             this.MenuItem = new MenuKeyBind(name, name, key, KeybindType.Press);
-
-
-            this.ModeMenu = new Menu($"orbmode.{name}", name)
-                                {
-                                    new MenuBool($"orbmode.{name}.move", "Movement"),
-                                    new MenuBool($"orbmode.{name}.attack", "Attacking")
-                                };
         }
 
         #endregion
@@ -119,11 +104,6 @@
         {
             get
             {
-                if (!this.ModeMenu[$"orbmode.{this.Name}.attack"].Enabled)
-                {
-                    return false;
-                }
-
                 return this.attackEnabled;
             }
             set => this.attackEnabled = value;
@@ -146,11 +126,6 @@
         {
             get
             {
-                if (!this.ModeMenu[$"orbmode.{this.Name}.move"].Enabled)
-                {
-                    return false;
-                }
-
                 return this.moveEnabled;
             }
             set => this.moveEnabled = value;
