@@ -856,7 +856,7 @@ namespace Aimtec.SDK.Orbwalking
             var misc = new Menu("Misc", "Misc")
                            {
                                new MenuSlider("HoldPositionRadius", "Hold Radius", 50, 0, 400, true),
-                               new MenuBool("KalistaFly", "Kalista Fly", true, true),
+                               ObjectManager.GetLocalPlayer().ChampionName.Equals("Kalista") ? new MenuBool("KalistaFly", "Kalista Fly", true, true) : null
                            };
 
             var drawings = new Menu("Drawings", "Drawings")
