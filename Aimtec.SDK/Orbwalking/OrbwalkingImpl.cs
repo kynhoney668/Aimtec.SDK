@@ -478,22 +478,11 @@ namespace Aimtec.SDK.Orbwalking
             return pred <= this.GetRealAutoAttackDamage(minion);
         }
 
-        /*
-        float DamageDealtInTime(Obj_AI_Base sender, Obj_AI_Base minion, int time)
-        {
-            var autos = this.NumberOfAutoAttacksInTime(sender, minion, time);
-            var dmg = autos * sender.GetAutoAttackDamage(minion);
-
-            return (float)(autos * dmg);
-        }
-        */
-
         private AttackableUnit GetHeroTarget()
         {
             var targets = TargetSelector.Implementation.GetOrderedTargets(0, true);
             foreach (var target in targets)
             {
-                //Ignore Jax when using counter strike
                 if (this.Jax != null &&
                     target.NetworkId == this.Jax.NetworkId &&
                     target.HasBuff("JaxCounterStrike"))
@@ -653,9 +642,6 @@ namespace Aimtec.SDK.Orbwalking
                                 }
 
                                 var remHealth = tMinionDmgPredHealth - tDmg;
-                                //var tNextAttackReachTime = tData.LastFireTime + tData.Turret.AttackDelay * 1000 + tCastDelay - Game.Ping / 2f;
-                                //var myAttackReachTime = Game.TickCount + totalTime;
-                                //var iReachSooner = myAttackReachTime - tNextAttackReachTime > 50;
 
                                 //Minion wont die
                                 if (remHealth > 0)
@@ -717,27 +703,6 @@ namespace Aimtec.SDK.Orbwalking
                                     }
                                 }
                             }
-
-                            /*
-                            if (!attacks.Any())
-                            {
-                                var target = tData.LastTarget;
-                                if (tData.LastTarget != null)
-                                {
-                                    var castDelay1 = Player.AttackCastDelay * 1000;
-                                    var dist1 = Player.Distance(target) - Player.BoundingRadius - target.BoundingRadius;
-                                    var travTime1 = (dist1 / Player.BasicAttack.MissileSpeed) * 1000;
-                                    int totalTime1 = (int)(castDelay1 + travTime1 + Game.Ping / 2);
-                                    var dmg1 = this.GetRealAutoAttackDamage(target);
-                                    var pred = HealthPrediction.Instance.GetPrediction(target, totalTime1);
-
-                                    if (pred <= dmg1)
-                                    {
-                                        return target;
-                                    }
-                                }
-                            }
-                            */
                         }
                     }
                 }
@@ -898,34 +863,6 @@ namespace Aimtec.SDK.Orbwalking
                 }
             }
         }
-
-        /*
-        private int NumberOfAutoAttacksInTime(Obj_AI_Base sender, AttackableUnit minion, int time)
-        {
-            var basetimePerAuto = this.TimeForAutoToReachTarget(minion);
-
-            var numberOfAutos = 0;
-            var adjustedTime = 0;
-
-            if (basetimePerAuto > time)
-            {
-                return 0;
-            }
-
-            if (this.AttackReady)
-            {
-                numberOfAutos++;
-                adjustedTime = time - basetimePerAuto;
-            }
-
-            var fullTimePerAuto = basetimePerAuto + sender.AttackDelay * 1000;
-            var additionalAutos = (int)Math.Ceiling(adjustedTime / fullTimePerAuto);
-
-            numberOfAutos += additionalAutos;
-
-            return numberOfAutos;
-        }
-        */
 
         private void Obj_AI_Base_OnProcessSpellCast(Obj_AI_Base sender, Obj_AI_BaseMissileClientDataEventArgs e)
         {
