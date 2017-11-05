@@ -26,7 +26,7 @@
             this.PredConfig.Add(new MenuBool("displayPred", "Display Pred Type"));
 
             this.Implementations["Default"] = new PredictionImpl();
-            this.Implementations["PredImplB"] = new PredictionImplB();
+            this.Implementations["TimbelPred"] = new PredictionImplB();
 
             this.PredictionMenuItem = new MenuList("PredictionType", "Prediction", this.Implementations.Keys.ToArray(), 0);
             this.PredConfig.Add(this.PredictionMenuItem);
