@@ -436,7 +436,7 @@ namespace Aimtec.SDK.Extensions
             bool includeBoundingRadius = false,
             Vector3 checkRangeFrom = default(Vector3))
         {
-            if (target == null || !target.IsValid || target.IsDead || !target.IsVisible) // || !target.IsTargetable || target.IsInvulnerable
+            if (target == null || !target.IsValid || target.IsDead || !target.IsVisible || !target.IsTargetable) //|| target.IsInvulnerable
             {
                 return false;
             }
@@ -446,7 +446,9 @@ namespace Aimtec.SDK.Extensions
                 return false;
             }
 
-            return target.Distance(checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition) < range + (includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0);
+            var fromPoint = checkRangeFrom != Vector3.Zero ? checkRangeFrom : Player.ServerPosition;
+            var boundingRadius = includeBoundingRadius ? Player.BoundingRadius + target.BoundingRadius : 0;
+            return target.Distance(fromPoint) < range + boundingRadius;
         }
 
         /// <summary>
