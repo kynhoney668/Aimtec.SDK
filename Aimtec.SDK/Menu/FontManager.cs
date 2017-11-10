@@ -16,7 +16,7 @@
 
         static FontManager()
         {
-            switch (AimtecMenu.Instance.Value)
+            switch (AimtecMenu.Instance["CurrentFont"].Value)
             {
                 case 0:
                     CurrentFont = Arial;
