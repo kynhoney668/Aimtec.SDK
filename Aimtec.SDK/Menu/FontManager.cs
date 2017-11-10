@@ -24,6 +24,12 @@
                 case 1:
                     CurrentFont = Tahoma;
                     break;
+                case 2:
+                    CurrentFont = Calibri;
+                    break;
+                case 3:
+                    CurrentFont = SegoeUI;
+                    break;
                 default:
                     Log.Warn().Message("Unknown font menu value").Write();
                     CurrentFont = Tahoma;
@@ -40,6 +46,10 @@
         public static Font CurrentFont { get; set; }
 
         public static Font Tahoma { get; } = new Font("Tahoma", FontSize, 0);
+
+        public static Font Calibri { get; } = new Font("Calibri", 18, 0);
+
+        public static Font SegoeUI { get; } = new Font("Segoe UI", FontSize, 0);
 
         #endregion
     }
