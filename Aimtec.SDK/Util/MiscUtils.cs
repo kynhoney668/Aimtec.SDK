@@ -3,8 +3,6 @@
     using System;
     using System.Drawing;
 
-    using Aimtec.SDK.Menu;
-
     using Rectangle = Aimtec.Rectangle;
 
     public class MiscUtils

@@ -6,16 +6,12 @@
 
     public class FontManager
     {
-        #region Constants
-
-        public const int FontSize = 16;
-
-        #endregion
-
         #region Constructors and Destructors
 
         static FontManager()
         {
+            UpdateFonts(false);
+
             switch (AimtecMenu.Instance["CurrentFont"].Value)
             {
                 case 0:
@@ -35,21 +31,47 @@
                     CurrentFont = Tahoma;
                     break;
             }
+
+            FontSize = AimtecMenu.Instance["FontSize"].Value;
         }
 
         #endregion
 
         #region Public Properties
 
-        public static Font Arial { get; } = new Font("Arial", FontSize, 0);
+        public static Font Arial { get; private set; }
+
+        public static Font Calibri { get; private set; }
 
         public static Font CurrentFont { get; set; }
 
-        public static Font Tahoma { get; } = new Font("Tahoma", FontSize, 0);
+        public static int FontSize { get; internal set; }
 
-        public static Font Calibri { get; } = new Font("Calibri", 18, 0);
+        public static Font SegoeUI { get; private set; }
 
-        public static Font SegoeUI { get; } = new Font("Segoe UI", FontSize, 0);
+        public static Font Tahoma { get; private set; }
+
+        #endregion
+
+        #region Methods
+
+        internal static void UpdateFonts(bool updateCurrent = true)
+        {
+            Arial = CreateFont("Arial");
+            Tahoma = CreateFont("Tahoma");
+            Calibri = CreateFont("Calibri");
+            SegoeUI = CreateFont("Segoe UI");
+
+            if (updateCurrent)
+            {
+                CurrentFont = CreateFont(CurrentFont.Facename);
+            }
+        }
+
+        private static Font CreateFont(string name)
+        {
+            return new Font(name, FontSize, 0) { Quality = FontQuality.AntiAliased };
+        }
 
         #endregion
     }

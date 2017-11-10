@@ -12,6 +12,7 @@
             : base("Aimtec.Menu", "Aimtec", true)
         {
             this.Add(new MenuList("CurrentFont", "Menu Font", new[] { "Arial", "Tahoma", "Calibri", "Segoe UI" }, 2, true));
+            this.Add(new MenuSlider("FontSize", "Font Size", 16, 10, 20, true));
             this.Add(new MenuBool("Aimtec.Debug", "Debugging", false, true));
 
             this["CurrentFont"].OnValueChanged += (sender, args) =>
@@ -37,6 +38,12 @@
                         break;
                 }
             };
+
+            this["FontSize"].OnValueChanged += (sender, args) =>
+            {
+                FontManager.FontSize = args.GetNewValue<MenuSlider>().Value;
+                FontManager.UpdateFonts();
+            }; 
 
             Log.Info().Message("Aimtec menu created").Write();
         }
