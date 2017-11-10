@@ -47,7 +47,7 @@
 
             var displayNamePosition = new Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int) (position.X + width), (int) (position.Y + height));
 
-            FontManager.CurrentFont.Draw(this.Component.DisplayName,
+            Aimtec.Render.Text(this.Component.DisplayName,
                 displayNamePosition,
                 leftVCenter, this.Theme.TextColor);
 
@@ -75,7 +75,7 @@
                 height - this.Theme.LineWidth,
                 arrowBoxColor);
 
-            FontManager.CurrentFont.Draw(">",new Aimtec.Rectangle((int)position.X, (int)position.Y, (int) (position.X + this.Theme.IndicatorWidth), (int)(position.Y + (height - this.Theme.LineWidth))), center, this.Theme.TextColor);
+            Aimtec.Render.Text(">",new Aimtec.Rectangle((int)position.X, (int)position.Y, (int) (position.X + this.Theme.IndicatorWidth), (int)(position.Y + (height - this.Theme.LineWidth))), center, this.Theme.TextColor);
 
         }
 

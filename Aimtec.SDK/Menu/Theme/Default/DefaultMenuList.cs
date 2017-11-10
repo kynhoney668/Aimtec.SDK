@@ -66,7 +66,7 @@
 
             var displayNamePosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
 
-            FontManager.CurrentFont.Draw(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
+            Aimtec.Render.Text(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
                 displayNamePosition,
                 leftVCenter, this.Theme.TextColor);
 
@@ -112,13 +112,13 @@
 
             var rectRight = new Aimtec.Rectangle((int)rightBoxPosition.X, (int)rightBoxPosition.Y, (int)(rightBoxPosition.X + this.Theme.IndicatorWidth), (int)(rightBoxPosition.Y + height));
 
-            FontManager.CurrentFont.Draw(">",
+            Aimtec.Render.Text(">",
                 rectRight,
                 RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter, this.Theme.TextColor);
 
             var valuePosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width - this.Theme.IndicatorWidth * 2 - this.Theme.LineWidth * 2 - 15), (int)(position.Y + height));
 
-            FontManager.CurrentFont.Draw(this.Component.Items[this.Component.Value],
+            Aimtec.Render.Text(this.Component.Items[this.Component.Value],
                 valuePosition,
                 RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight, this.Theme.TextColor);
 
