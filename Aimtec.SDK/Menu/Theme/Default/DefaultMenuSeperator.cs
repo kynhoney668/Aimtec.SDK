@@ -43,7 +43,7 @@
 
             var textPosition = new Aimtec.Rectangle((int)position.X, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
 
-            Aimtec.Render.Text(this.Component.Value,
+            FontManager.CurrentFont.Draw(this.Component.Value,
                 textPosition,
                 center, this.Theme.TextColor);
 

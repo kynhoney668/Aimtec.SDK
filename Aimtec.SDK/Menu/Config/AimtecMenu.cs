@@ -11,7 +11,26 @@
         internal AimtecMenu()
             : base("Aimtec.Menu", "Aimtec", true)
         {
+            this.Add(new MenuList("CurrentFont", "Menu Font", new[] { "Arial", "Tahoma" }, 1, true));
             this.Add(new MenuBool("Aimtec.Debug", "Debugging", false, true));
+
+            this["CurrentFont"].OnValueChanged += (sender, args) =>
+            {
+                var val = args.GetNewValue<MenuList>();
+
+                switch (val.Value)
+                {
+                    case 0:
+                        FontManager.CurrentFont = FontManager.Arial;
+                        break;
+                    case 1:
+                        FontManager.CurrentFont = FontManager.Tahoma;
+                        break;
+                    default:
+                        Log.Warn().Message("Unknown font menu value").Write();
+                        break;
+                }
+            };
 
             Log.Info().Message("Aimtec menu created").Write();
         }
