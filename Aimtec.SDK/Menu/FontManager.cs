@@ -10,6 +10,8 @@
 
         static FontManager()
         {
+            FontSize = AimtecMenu.Instance["FontSize"].Value;
+
             UpdateFonts(false);
 
             switch (AimtecMenu.Instance["CurrentFont"].Value)
@@ -32,7 +34,7 @@
                     break;
             }
 
-            FontSize = AimtecMenu.Instance["FontSize"].Value;
+            
         }
 
         #endregion
