@@ -19,13 +19,13 @@
 
         #region Public Properties
 
-        public static Font Arial { get; private set; }
-
-        public static Font Calibri { get; private set; }
-
         public static Font CurrentFont { get; set; }
 
         public static int FontSize { get; internal set; }
+    
+        public static Font Arial { get; private set; }
+
+        public static Font Calibri { get; private set; }
 
         public static Font SegoeUI { get; private set; }
 
