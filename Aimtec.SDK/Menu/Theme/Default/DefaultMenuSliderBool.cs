@@ -93,17 +93,17 @@
                 height - this.Theme.LineWidth,
                 boolColor);
 
-            FontManager.CurrentFont.Draw(this.Component.Value.ToString(),
+            Aimtec.Render.Text(this.Component.Value.ToString(),
                 new Rectangle((int)(pos.X), (int)pos.Y + this.Theme.LineWidth, (int)(pos.X + width - this.Theme.TextSpacing - this.Theme.IndicatorWidth), (int)(pos.Y + height)),
                 RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight, this.Theme.TextColor);
 
             var centerArrowBox = new Aimtec.Rectangle((int)indBoxPosition.X, (int)indBoxPosition.Y, (int) (indBoxPosition.X + this.Theme.IndicatorWidth), (int)(indBoxPosition.Y + height));
 
-            FontManager.CurrentFont.Draw(this.Component.Enabled ? "ON" : "OFF",
+            Aimtec.Render.Text(this.Component.Enabled ? "ON" : "OFF",
                 centerArrowBox,
                 RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter, Color.White);
 
-            FontManager.CurrentFont.Draw(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
+            Aimtec.Render.Text(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
                 displayNamePosition,
                 RenderTextFlags.VerticalCenter, this.Theme.TextColor);
         }
