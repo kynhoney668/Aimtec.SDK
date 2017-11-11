@@ -17,26 +17,7 @@
 
             this["CurrentFont"].OnValueChanged += (sender, args) =>
             {
-                var val = args.GetNewValue<MenuList>();
-
-                switch (val.Value)
-                {
-                    case 0:
-                        FontManager.CurrentFont = FontManager.Arial;
-                        break;
-                    case 1:
-                        FontManager.CurrentFont = FontManager.Tahoma;
-                        break;
-                    case 2:
-                        FontManager.CurrentFont = FontManager.Calibri;
-                        break;
-                    case 3:
-                        FontManager.CurrentFont = FontManager.SegoeUI;
-                        break;
-                    default:
-                        Log.Warn().Message("Unknown font menu value").Write();
-                        break;
-                }
+                FontManager.CurrentFont = FontManager.GetFontById(args.GetNewValue<MenuList>().Value);
             };
 
             this["FontSize"].OnValueChanged += (sender, args) =>

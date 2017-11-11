@@ -11,30 +11,8 @@
         static FontManager()
         {
             FontSize = AimtecMenu.Instance["FontSize"].Value;
-
             UpdateFonts(false);
-
-            switch (AimtecMenu.Instance["CurrentFont"].Value)
-            {
-                case 0:
-                    CurrentFont = Arial;
-                    break;
-                case 1:
-                    CurrentFont = Tahoma;
-                    break;
-                case 2:
-                    CurrentFont = Calibri;
-                    break;
-                case 3:
-                    CurrentFont = SegoeUI;
-                    break;
-                default:
-                    Log.Warn().Message("Unknown font menu value").Write();
-                    CurrentFont = Tahoma;
-                    break;
-            }
-
-            
+            CurrentFont = GetFontById(AimtecMenu.Instance["CurrentFont"].Value);
         }
 
         #endregion
@@ -56,6 +34,24 @@
         #endregion
 
         #region Methods
+
+        internal static Font GetFontById(int id)
+        {
+            switch (id)
+            {
+                case 0:
+                    return Arial;
+                case 1:
+                    return Tahoma;
+                case 2:
+                    return Calibri;
+                case 3:
+                    return SegoeUI;
+                default:
+                    Log.Warn().Message("Unknown font menu value").Write();
+                    return Tahoma;
+            }
+        }
 
         internal static void UpdateFonts(bool updateCurrent = true)
         {
