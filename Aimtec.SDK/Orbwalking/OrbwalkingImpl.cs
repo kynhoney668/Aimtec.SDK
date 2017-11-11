@@ -827,8 +827,8 @@ namespace Aimtec.SDK.Orbwalking
             var drawings = new Menu("Drawings", "Drawings")
                                {
                                    new MenuBool("DrawAttackRange", "Draw Attack Range"),
-                                   new MenuBool("DrawHoldRadius", "Draw Hold Radius"),
-                                   new MenuBool("DrawKillableMinion", "Indicate Killable")
+                                   new MenuBool("DrawHoldRadius", "Draw Hold Radius", false),
+                                   new MenuBool("DrawKillableMinion", "Indicate Killable", false)
                                };
 
             this.Config.Add(advanced);

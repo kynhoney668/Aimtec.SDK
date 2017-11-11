@@ -579,26 +579,6 @@ namespace Aimtec.SDK.Damage
                          minionTarget.HasBuff("s5_dragonvengeance") &&
                          minionTarget.UnitSkinName.Contains("SRU_Dragon"))
                     {
-                        /* TODO: Broscience, not 100% consistent:
-                            Real Effect: "7% reduced damage for each dragon killed by your team."
-                            Code Effect: "7% reduced damage for each dragon TYPE killed by your team."
-                            Reason for inconsistence:
-                                No Hero Buffs can tell you how many dragons you've killed, nor the name, nor its quantity
-                                    (You receive a determined buff whenever you kill a different dragon and that's it,
-                                    the quantity wont change nor further buffs will be added by killing another dragon of the same type),
-
-                                No Dragon Buffs can tell you how many dragons you've killed, nor the name, nor its quantity,
-                                    (The dragon gets the "s5_dragonvengeance" buff which reduces his damage received by 7% for each
-                                    elemental dragon killed by the attacking team and that's it, the quantity wont change nor further
-                                    buffs will be added by killing another dragon of the same type)
-
-                                No Effect Names can tell you how many dragons you've killed,
-                                No Objects Names can tell you how many dragons you've killed,
-                                No existent Property can tell you how many dragons you've killed, the best I found is "NeutralMinionsKilled", which is int, not a determined List/Array,
-                                so I can't just take it and filter the dragons.
-
-                            TL:DR; There is no way of telling in-game how many dragons a determined team has killed, so, for now, this is the best possible logic for it.
-                        */
                         amount *= 1 - 7 * source.ValidActiveBuffs().Count(b => b.Name.Contains("dragonbuff") && b.Name.Contains("_manager")) / 100;
                     }
                 }
