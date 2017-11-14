@@ -1,6 +1,7 @@
 ﻿namespace Aimtec.SDK.Menu.Config
 {
     using Aimtec.SDK.Menu.Components;
+    using Aimtec.SDK.Util;
 
     using NLog.Fluent;
 
@@ -11,7 +12,10 @@
         internal AimtecMenu()
             : base("Aimtec.Menu", "Aimtec", true)
         {
-            this.Add(new MenuList("CurrentFont", "Menu Font", new[] { "Arial", "Tahoma", "Calibri", "Segoe UI" }, 2, true));
+            Hacks.Init(this);
+
+            this.Add(
+                new MenuList("CurrentFont", "Menu Font", new[] { "Arial", "Tahoma", "Calibri", "Segoe UI" }, 2, true));
             this.Add(new MenuSlider("FontSize", "Font Size", 16, 10, 20, true));
             this.Add(new MenuBool("Aimtec.Debug", "Debugging", false, true));
 
@@ -24,7 +28,7 @@
             {
                 FontManager.FontSize = args.GetNewValue<MenuSlider>().Value;
                 FontManager.UpdateFonts();
-            }; 
+            };
 
             Log.Info().Message("Aimtec menu created").Write();
         }

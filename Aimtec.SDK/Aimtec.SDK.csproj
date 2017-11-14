@@ -137,6 +137,7 @@
     <Compile Include="TargetSelector\TargetSelectorImpl.cs" />
     <Compile Include="TargetSelector\TargetSelectorMode.cs" />
     <Compile Include="Util\DelayAction.cs" />
+    <Compile Include="Util\Hacks.cs" />
     <Compile Include="Util\KeyboardEvents.cs" />
     <Compile Include="Util\Keys.cs" />
     <Compile Include="Util\Geometry.cs" />
