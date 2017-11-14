@@ -33,11 +33,11 @@
                 shared: true).SetToolTip("Re-Enables drawings.");
 
             enabler.OnValueChanged += (sender, args) =>
-            {
-                // Doesn't fire OnValueChanged
-                enableDrawing.Value = true;
-                EnableDrawing = true;
-            };
+                {
+                    // Doesn't fire OnValueChanged
+                    enableDrawing.Value = true;
+                    EnableDrawing = true;
+                };
 
             // Loads value from config
             menu.Add(enableDrawing);

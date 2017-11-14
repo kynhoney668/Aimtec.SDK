@@ -12,7 +12,7 @@
         internal AimtecMenu()
             : base("Aimtec.Menu", "Aimtec", true)
         {
-            //Hacks.Init(this);
+            Hacks.Init(this);
 
             this.Add(new MenuBool("Aimtec.Debug", "Debugging", false, true));
 
