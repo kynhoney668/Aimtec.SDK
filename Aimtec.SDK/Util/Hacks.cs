@@ -34,11 +34,6 @@
 
             enabler.OnValueChanged += (sender, args) =>
             {
-                if (!args.GetNewValue<MenuKeyBind>().Value)
-                {
-                    return;
-                }
-
                 // Doesn't fire OnValueChanged
                 enableDrawing.Value = true;
                 EnableDrawing = true;
