@@ -12,7 +12,7 @@
         internal AimtecMenu()
             : base("Aimtec.Menu", "Aimtec", true)
         {
-            Hacks.Init(this);
+            //Hacks.Init(this);
 
             this.Add(
                 new MenuList("CurrentFont", "Menu Font", new[] { "Arial", "Tahoma", "Calibri", "Segoe UI" }, 2, true));
