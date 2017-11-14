@@ -43,7 +43,7 @@
 
             var displayNamePosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
 
-            FontManager.CurrentFont.Draw(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
+            Aimtec.Render.Text(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
                 displayNamePosition,
                 leftVCenter, this.Theme.TextColor);
 
@@ -68,7 +68,7 @@
 
             var centerArrowBox = new Aimtec.Rectangle((int)indBoxPosition.X, (int)indBoxPosition.Y, (int)(indBoxPosition.X + this.Theme.IndicatorWidth), (int)(indBoxPosition.Y + height));
 
-            FontManager.CurrentFont.Draw(this.Component.Value ? "ON" : "OFF", centerArrowBox, RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter | RenderTextFlags.NoClip | RenderTextFlags.SingleLine, Color.White);
+            Aimtec.Render.Text(this.Component.Value ? "ON" : "OFF", centerArrowBox, RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter | RenderTextFlags.NoClip | RenderTextFlags.SingleLine, Color.White);
 
             //Draw Key indicator
 
@@ -78,7 +78,7 @@
                     ? "None"
                     : $"[{this.Component.Key}]";
 
-            FontManager.CurrentFont.Draw(text, new Aimtec.Rectangle((int)pos.X, (int)pos.Y, (int)(pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth - this.Theme.TextSpacing), (int)(pos.Y + height)), RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight | RenderTextFlags.NoClip | RenderTextFlags.SingleLine, this.Theme.TextColor);
+            Aimtec.Render.Text(text, new Aimtec.Rectangle((int)pos.X, (int)pos.Y, (int)(pos.X + width - this.Theme.IndicatorWidth - this.Theme.LineWidth - this.Theme.TextSpacing), (int)(pos.Y + height)), RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight | RenderTextFlags.NoClip | RenderTextFlags.SingleLine, this.Theme.TextColor);
 
         }
 

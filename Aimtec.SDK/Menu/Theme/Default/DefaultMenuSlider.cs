@@ -69,11 +69,11 @@
                 Color.FromArgb(16, 26, 29));
 
             // draw text
-            FontManager.CurrentFont.Draw(this.Component.Value.ToString(),
+            Aimtec.Render.Text(this.Component.Value.ToString(),
                 new Aimtec.Rectangle((int)pos.X + this.Theme.LineWidth, (int)pos.Y + this.Theme.LineWidth, (int)(pos.X + width - this.Theme.TextSpacing), (int)(pos.Y + height)),
                 RenderTextFlags.VerticalCenter | RenderTextFlags.HorizontalRight, this.Theme.TextColor);
 
-            FontManager.CurrentFont.Draw(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
+            Aimtec.Render.Text(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
                 displayNamePosition,
                 RenderTextFlags.VerticalCenter, this.Theme.TextColor);
         }
