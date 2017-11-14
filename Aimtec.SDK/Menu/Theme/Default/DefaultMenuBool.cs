@@ -43,7 +43,7 @@
 
             var displayNamePosition = new Aimtec.Rectangle((int)position.X + this.Theme.TextSpacing, (int)position.Y, (int)(position.X + width), (int)(position.Y + height));
 
-            Aimtec.Render.Text(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
+            FontManager.CurrentFont.Draw(this.Component.DisplayName + (!string.IsNullOrEmpty(this.Component.ToolTip) ? " [?]" : ""),
                 displayNamePosition,
                 leftVCenter, this.Theme.TextColor);
 
@@ -73,7 +73,7 @@
                 (int)indBoxPosition.Y + height);
 
 
-            Aimtec.Render.Text(this.Component.Value ? "ON" : "OFF",
+            FontManager.CurrentFont.Draw(this.Component.Value ? "ON" : "OFF",
                 centerArrowBox,
                 RenderTextFlags.HorizontalCenter | RenderTextFlags.VerticalCenter, Color.White);
         }
