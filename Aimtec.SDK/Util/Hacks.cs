@@ -1,5 +1,7 @@
 ﻿namespace Aimtec.SDK.Util
 {
+    using System;
+
     using Aimtec.SDK.Menu;
     using Aimtec.SDK.Menu.Components;
 
@@ -26,9 +28,9 @@
             enableDrawing.OnValueChanged += (sender, args) => EnableDrawing = args.GetNewValue<MenuBool>().Value;
 
             var enabler = new MenuKeyBind(
-                "ReenableDrawing",
+                "ReenableDrawings",
                 "Re-enable Drawings",
-                KeyCode.F10,
+                KeyCode.F11,
                 KeybindType.Press,
                 shared: true).SetToolTip("Re-Enables drawings.");
 
