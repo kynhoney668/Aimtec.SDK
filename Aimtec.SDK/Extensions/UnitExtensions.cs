@@ -379,7 +379,7 @@ namespace Aimtec.SDK.Extensions
         /// </returns>
         public static bool IsRecalling(this Obj_AI_Hero unit)
         {
-            return unit.HasBuff("recall");
+            return unit.HasBuff("recall") || unit.HasBuff("SuperRecall");
         }
 
         /// <summary>
