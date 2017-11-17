@@ -9267,6 +9267,19 @@
 					"ScalingType": "BonusAttackPoints"
 				}]
 			}
+		}],
+		"R": [{
+			"Stage": "Default",
+			"SpellData": {
+				"SpellEffectType": "Single",
+				"DamageType": "Physical",
+				"BonusDamages": [{
+					"DamageType": "Physical",
+					"DamagePercentages": [1.0, 1.0, 1.0],
+					"ScalingTarget": "Source",
+					"ScalingType": "AttackPoints"
+				}]
+			}
 		}]
 	},
 	"Ziggs": {
