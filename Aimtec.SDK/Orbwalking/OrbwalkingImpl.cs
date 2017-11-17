@@ -118,7 +118,8 @@ namespace Aimtec.SDK.Orbwalking
             "mordekaiserqattack",
             "reksaiq",
             "warwickq",
-            "vaynecondemnmissile"
+            "vaynecondemnmissile",
+            "masochismattack"
         };
 
         /// <summary>
