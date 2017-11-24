@@ -23,27 +23,12 @@
         {
             var menu = new Menu("Aimtec.Menu.Hacks", "Hacks");
 
-            var enableDrawing = new MenuBool("EnableDrawing", "Enable Drawing", shared: true);
+            var enableDrawing = new MenuKeyBind("EnableDrawing", "Enable Drawing", KeyCode.F11, KeybindType.Toggle, shared: true);
             enableDrawing.SetToolTip("Disables ALL drawings untill the Re-enable key is pressed.");
-            enableDrawing.OnValueChanged += (sender, args) => EnableDrawing = args.GetNewValue<MenuBool>().Value;
-
-            var enabler = new MenuKeyBind(
-                "ReenableDrawings",
-                "Re-enable Drawings",
-                KeyCode.F11,
-                KeybindType.Press,
-                shared: true).SetToolTip("Re-Enables drawings.");
-
-            enabler.OnValueChanged += (sender, args) =>
-                {
-                    // Doesn't fire OnValueChanged
-                    enableDrawing.Value = true;
-                    EnableDrawing = true;
-                };
+            enableDrawing.OnValueChanged += (sender, args) => EnableDrawing = args.GetNewValue<MenuKeyBind>().Value;
 
             // Loads value from config
             menu.Add(enableDrawing);
-            menu.Add(enabler);
 
             root.Add(menu);
 
