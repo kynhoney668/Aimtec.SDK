@@ -898,7 +898,7 @@ namespace Aimtec.SDK.Orbwalking
             {
                 foreach (var m in ObjectManager.Get<Obj_AI_Minion>().Where(x => this.IsValidAttackableObject(x) && x.Health <= this.GetRealAutoAttackDamage(x)))
                 {
-                    Render.Circle(m.Position, 50, 30, Color.LimeGreen);
+                    m.SetGlow(Color.Lime, 4);
                 }
             }
         }
