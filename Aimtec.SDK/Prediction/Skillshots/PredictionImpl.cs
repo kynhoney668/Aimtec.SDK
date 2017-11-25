@@ -54,13 +54,12 @@
             {
                 return new PredictionOutput();
             }
-
-            input.From = input.From - (input.Unit.ServerPosition - input.From).Normalized()
-                * ObjectManager.GetLocalPlayer().BoundingRadius;
-
+           
             if (ft)
             {
                 input.Delay += Game.Ping / 2000f + 0.06f;
+                input.From = input.From - (input.Unit.ServerPosition - input.From).Normalized()
+                    * ObjectManager.GetLocalPlayer().BoundingRadius;
 
                 if (input.AoE)
                 {
