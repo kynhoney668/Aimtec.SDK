@@ -168,6 +168,8 @@
 
         public readonly List<Weight> Weights = new List<Weight>();
 
+        internal Obj_AI_Hero LastGlowTarget { get; set; }
+
         #endregion
 
         #region Constructors and Destructors
@@ -450,6 +452,7 @@
             {
                 new MenuBool("IndicateSelected", "Indicate Selected Target"),
                 new MenuBool("ShowLineToSelected", "Show Line to Selected"),
+                new MenuBool("GlowSelected", "Glow Selected"),
                 new MenuBool("ShowOrder", "Show Target Order"),
                 new MenuBool("ShowOrderAuto", "Auto range only")
             };
@@ -775,12 +778,17 @@
                     var targets = ObjectManager
                         .Get<Obj_AI_Hero>().Where(x => x.IsValidTarget(5000)).OrderBy(x => x.Distance(clickPosition));
 
-                    var closestHero = targets.FirstOrDefault(x => x.IsHero);
+                    var closestHero = targets.FirstOrDefault();
 
                     if (closestHero != null && Game.CursorPos.Distance(closestHero.Position) <= 300)
                     {
                         if (this.SelectedTarget == null || this.SelectedTarget.NetworkId != closestHero.NetworkId)
                         {
+                            if (this.SelectedTarget != null)
+                            {
+                                this.SelectedTarget.RemoveGlow();
+                            }
+
                             this.SelectedTarget = closestHero;
                             this.TargetLockState = LockState.None;
                         }
@@ -803,6 +811,11 @@
 
                     else
                     {
+                        if (this.SelectedTarget != null)
+                        {
+                            this.SelectedTarget.RemoveGlow();
+                        }
+
                         this.SelectedTarget = null;
                         this.TargetLockState = LockState.None;
                     }
@@ -816,8 +829,16 @@
                     return;
                 }
 
+                if (this.TSInstance.LastGlowTarget != null && this.SelectedTarget.NetworkId != this.TSInstance.LastGlowTarget.NetworkId)
+                {
+                    this.TSInstance.LastGlowTarget.RemoveGlow();
+                }
+
                 var indicateSelected = this.TSInstance.Config["Drawings"]["IndicateSelected"].Enabled;
                 var showLine = this.TSInstance.Config["Drawings"]["ShowLineToSelected"].Enabled;
+                var doGlow = this.TSInstance.Config["Drawings"]["GlowSelected"].Enabled;
+                this.TSInstance.LastGlowTarget = this.SelectedTarget;
+
                 if (indicateSelected)
                 {
                     Color color = Color.White;
@@ -832,6 +853,9 @@
                         {
                             text = "Priority Target";
                         }
+
+                        if (doGlow)
+                            this.SelectedTarget.SetGlow(color, 3);
                     }
 
                     if (this.TargetLockState.HasFlag(LockState.OnlyAttackTarget))
@@ -839,6 +863,8 @@
                         text = "Only Attack Target";
                         color = Color.Orange;
                         Render.Circle(this.SelectedTarget.Position, 100, 100, color);
+                        if (doGlow)
+                        this.SelectedTarget.SetGlow(color, 3);
                     }
 
                     if (Player.IsMelee && this.TargetLockState.HasFlag(LockState.Magnetize))
@@ -846,6 +872,8 @@
                         text = "Magnet Target";
                         color = Color.Red;
                         Render.Circle(this.SelectedTarget.Position, 150, 5, color);
+                        if (doGlow)
+                        this.SelectedTarget.SetGlow(color, 4);
                     }
 
                     if (showLine)
