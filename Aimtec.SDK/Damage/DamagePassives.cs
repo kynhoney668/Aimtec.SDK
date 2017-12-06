@@ -231,7 +231,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.GetRealBuffCount("bardpspiritammocount") > 0)
                                          {
-                                             return 30 + 15 * (source.GetRealBuffCount("bardpdisplaychimecount") / 5) + 0.3 * source.TotalAbilityDamage;
+                                             return 40 + 15 * (source.GetRealBuffCount("bardpdisplaychimecount") / 5) + 0.3 * source.TotalAbilityDamage;
                                          }
 
                                          return 0;
@@ -506,7 +506,7 @@ namespace Aimtec.SDK.Damage
                                      {
                                          if (source.HasBuff("galiopassivebuff"))
                                          {
-                                             return 8 + 4 * source.Level + source.TotalAttackDamage + (source.TotalAbilityDamage + 0.4) + source.BonusSpellBlock * 0.4;
+                                             return (8 + 4 * source.Level) + source.TotalAttackDamage + source.TotalAbilityDamage * 0.5 + source.BonusSpellBlock * 0.4;
                                          }
 
                                          return 0;
@@ -620,7 +620,7 @@ namespace Aimtec.SDK.Damage
                                              switch (target.Type)
                                              {
                                                  case GameObjectType.obj_AI_Hero:
-                                                     return target.Health * 0.1;
+                                                     return target.Health * 0.08;
 
                                                  case GameObjectType.obj_AI_Minion:
                                                      return Math.Min(target.Health * 0.1, 400);
@@ -984,6 +984,35 @@ namespace Aimtec.SDK.Damage
                                                                               : 50);
 
                                          return baseDamage * (1 + 0.20 * source.GetRealBuffCount("orianapowerdaggerdisplay"));
+                                     }
+                             });
+                             
+            Passives.Add(new DamagePassive
+                             {
+                                 Name = "Ornn",
+                                 DamageType = DamagePassive.PassiveDamageType.FlatMagical,
+                                 PassiveDamage = (source, target) =>
+                                     {
+                                         if (target.HasBuff("ornnvulnerabledebuff"))
+                                         {
+                                             var multiplier = source.Level < 3
+                                                                  ? 7 :
+                                                                  source.Level < 6
+                                                                      ? 8 :
+                                                                      source.Level < 9
+                                                                          ? 9 :
+                                                                          source.Level < 12
+                                                                              ? 10 :
+                                                                              source.Level < 15
+                                                                                  ? 11
+                                                                                  source.Level < 18
+                                                                                      ? 12
+                                                                                      : 13;
+
+                                             return mutiplier/100 * target.MaxHealth;
+                                         }
+                                         
+                                         return 0;
                                      }
                              });
 

@@ -112,24 +112,24 @@ namespace Aimtec.SDK.Damage
 
             var dmg = origin * (percent > 0 || percent < 0
                 ? (percent > 0 ? percent : 0)
-                + (spellBonus.ScalePer100BonusAp > 0
-                    ? Math.Abs(source.FlatMagicDamageMod / 100) * spellBonus.ScalePer100BonusAp
-                    : 0)
-                + (spellBonus.ScalePer100Ap > 0
-                    ? Math.Abs(source.TotalAbilityDamage / 100) * spellBonus.ScalePer100Ap
-                    : 0)
-                + (spellBonus.ScalePer35BonusAd > 0
-                    ? Math.Abs(source.FlatPhysicalDamageMod / 35) * spellBonus.ScalePer35BonusAd
-                    : 0)
-                + (spellBonus.ScalePer100BonusAd > 0
-                    ? Math.Abs(source.FlatPhysicalDamageMod / 100) * spellBonus.ScalePer100BonusAd
-                    : 0)
-                + (spellBonus.ScalePer100Ad > 0
-                    ? Math.Abs(source.TotalAttackDamage / 100) * spellBonus.ScalePer100Ad
-                    : 0)
-                + (spellBonus.ScalePerCritPercent > 0
-                    ? Math.Abs(source.Crit * 100) * spellBonus.ScalePerCritPercent
-                    : 0)
+                    + (spellBonus.ScalePer100BonusAp > 0
+                        ? Math.Abs(source.FlatMagicDamageMod / 100) * spellBonus.ScalePer100BonusAp
+                        : 0)
+                    + (spellBonus.ScalePer100Ap > 0
+                        ? Math.Abs(source.TotalAbilityDamage / 100) * spellBonus.ScalePer100Ap
+                        : 0)
+                    + (spellBonus.ScalePer35BonusAd > 0
+                        ? Math.Abs(source.FlatPhysicalDamageMod / 35) * spellBonus.ScalePer35BonusAd
+                        : 0)
+                    + (spellBonus.ScalePer100BonusAd > 0
+                        ? Math.Abs(source.FlatPhysicalDamageMod / 100) * spellBonus.ScalePer100BonusAd
+                        : 0)
+                    + (spellBonus.ScalePer100Ad > 0
+                        ? Math.Abs(source.TotalAttackDamage / 100) * spellBonus.ScalePer100Ad
+                        : 0)
+                    + (spellBonus.ScalePerCritPercent > 0
+                        ? Math.Abs(source.Crit * 100) * spellBonus.ScalePerCritPercent
+                        : 0)
                 : 0);
 
             if (target is Obj_AI_Minion && spellBonus.BonusDamageOnMinion?.Count > 0)
@@ -174,7 +174,7 @@ namespace Aimtec.SDK.Damage
             try
             {
                 // TODO: make this load dynamically based on current running game version.
-                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.22.json"))
+                using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Aimtec.SDK.Damage.Data.7.24.json"))
                 {
                     if (stream == null)
                     {
