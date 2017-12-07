@@ -1009,7 +1009,7 @@ namespace Aimtec.SDK.Damage
                                                                                       ? 12
                                                                                       : 13;
 
-                                             return mutiplier/100 * target.MaxHealth;
+                                             return multiplier/100 * target.MaxHealth;
                                          }
                                          
                                          return 0;
