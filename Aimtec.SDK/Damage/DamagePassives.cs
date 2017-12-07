@@ -1004,7 +1004,7 @@ namespace Aimtec.SDK.Damage
                                                                           source.Level < 12
                                                                               ? 10 :
                                                                               source.Level < 15
-                                                                                  ? 11
+                                                                                  ? 11 :
                                                                                   source.Level < 18
                                                                                       ? 12
                                                                                       : 13;
